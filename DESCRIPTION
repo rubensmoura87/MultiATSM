@@ -1,0 +1,41 @@
+Package: MultiATSM
+Type: Package
+Title: Multi-Country Term Structure of Interest Rates Models
+Version: 0.1.0
+Date: 2021-09-20
+Author: Rubens Moura
+Maintainer: Rubens Moura <rubens.gtmoura@gmail.com>
+Description: Estimation of several classes of affine term structure of interest rates models with unspanned macroeconomic risk. 
+License: GPL-2 | GPL-3
+Encoding: UTF-8
+RoxygenNote: 7.1.1
+Imports:
+  readr,
+  readxl,
+  xts,
+  zoo,
+  magic,
+  Jmisc,
+  pracma,
+  powerplus,
+  wrapr,
+  Matrix,
+  sjmisc,
+  stringr,
+  neldermead,
+  tidyverse,
+  hablar,
+  functional,
+  cowplot,
+  ggplot2,
+  reshape2,
+  methods,
+  lubridate,
+Depends: 
+  R (>= 3.5.0)
+Suggests: 
+    knitr,
+    rmarkdown,
+    kableExtra,
+    bookdown
+VignetteBuilder: knitr
