@@ -14,7 +14,21 @@
 #'
 #'
 #'@importFrom pracma ceil rand strcmp num2str tril
-#'@importFrom Jmisc tic toc
+#'
+#'
+#'
+#'@examples
+#'\dontrun{
+#' # See examples in the vignette file of this package (Section 4).
+#'}
+#'
+#'@returns
+#'list containing the following elements:
+#'\itemize{
+#' \item list of model parameters for one each one the draws;
+#' \item list of numerical outputs (IRFs, GIRFs, FEVDs, GFEVDs) for each one of the draws;
+#' \item Confidence bands for the chosen level of significance.
+#' }
 
 #'@references
 #' This function is a modified and extended version of the "VARirbound" function from "A toolbox for VAR analysis"
@@ -143,7 +157,7 @@ Bootstrap <- function(ModelType, ModelParaPE, NumOutPE, mat, Economies, InputsFo
 
       ###################################### OPTIMIZATION #############################################################
       #################################################################################################################
-      tic()
+      Jmisc::tic()
       while (tt<=ndraws){
 
         ## Create the matrices for the loop
@@ -302,7 +316,7 @@ saveRDS(ModelBootstrap, paste("Bootstrap_", InputsForOutputs$'Label Outputs','.r
 
     print('-- Done!')
 
-    toc()
+    Jmisc::toc()
 
 
     ###################################### NUMERICAL OUTPUTS ########################################################

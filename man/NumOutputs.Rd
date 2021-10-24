@@ -17,6 +17,23 @@ NumOutputs(ModelType, ModelPara, InputsForOutputs, FactorLabels, Economies)
 
 \item{Economies}{a string-vector containing the names of the economies which are part of the economic system}
 }
+\value{
+List of the model numerical outputs, namely
+\enumerate{
+\item Model fit of bond yields
+\item IRFs
+\item FEVDs
+\item GIRFs
+\item GFEVDs
+}
+}
 \description{
 Construct the model numerical outputs (model fit, IRFs, GIRFs, FEVDs, and GFEVDs)
+}
+\examples{
+\dontrun{
+# See examples in the vignette file of this package (Section 4).
+}
+
+
 }

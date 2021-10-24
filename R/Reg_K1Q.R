@@ -8,10 +8,7 @@
 #'@param type     'Jordan' -> K1Q will be of the Jordan type \cr
 #                 'NULL' --> no adjustment will be made
 #'
-#'@importFrom stats lm splinefun
-#'@importFrom powerplus Matpow
 #'@importFrom pracma mldivide
-#'@importFrom Jmisc  demean
 #'
 #'@return Risk neutral feedback matrix K1Q.
 #'@examples
@@ -45,14 +42,14 @@ Reg_K1Q <- function(Y, mat, Z, dt,type){
   b <- matrix(data=NA, ncol= ncol(Y) , nrow = M )
 
   for(i in 1:ncol(Y)){
-    a <- splinefun(mat, t(Y[,i]), method="fmm")
+    a <- stats::splinefun(mat, t(Y[,i]), method="fmm")
     b[,i] <- t(a(seq(dt, M*dt, dt))) # each column contains one term structure in each point in time
   }
 
   R <- b
 
   # Step 3: regress by OLS interpolated yields onto pricing factors to obtain B: Y_t = A +B*Z_t
-  Bn <- lm( demean(t(R))~ demean(t(Z))-1)$coefficients
+  Bn <- stats::lm( Jmisc::demean(t(R))~ Jmisc::demean(t(Z))-1)$coefficients
   Bn <- t(Bn)
 
   # Step 4: set h such that b_h will be obtained without the need of extrapolation beyond the current maturity range
@@ -76,7 +73,7 @@ Reg_K1Q <- function(Y, mat, Z, dt,type){
 
   K1Qh <- mldivide(RHS,LHS)
   options(warn = -1)
-  K1Q <- Matpow(K1Qh, numer=1, denom = h)
+  K1Q <- powerplus::Matpow(K1Qh, numer=1, denom = h)
 
 
   #Step 7: Convert  K1Q into Jordan form

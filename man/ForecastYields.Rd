@@ -32,6 +32,21 @@ ForecastYields(
 
 \item{GVARinputs}{list of necessary inputs for the estimation of GVAR-based models (see "GVAR" function)}
 }
+\value{
+List containg the following elements
+\enumerate{
+\item Out-of-sample forecasts of bond yields per forecast horizon
+\item Out-of-sample forecast errors of bond yields per forecast horizon
+\item Root mean square errors per forecast horizon
+}
+}
 \description{
 Gather bond yields forecasts for all the model types
+}
+\examples{
+\dontrun{
+# See examples in the vignette file of this package (Section 4).
+}
+
+
 }

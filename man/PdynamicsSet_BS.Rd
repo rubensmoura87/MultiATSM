@@ -9,8 +9,8 @@ PdynamicsSet_BS(
   AllFactorsUnderP,
   FactorLabels,
   Economies,
-  JLLinputs,
-  GVARinputs
+  JLLinputs = NULL,
+  GVARinputs = NULL
 )
 }
 \arguments{
@@ -22,9 +22,9 @@ PdynamicsSet_BS(
 
 \item{Economies}{string-vector containing the names of the economies which are part of the economic system}
 
-\item{JLLinputs}{List containing the necessary inputs for the estimation of the JLL-based models (see "JLL" function)}
+\item{JLLinputs}{List containing the necessary inputs for the estimation of the JLL-based models (see "JLL" function). Default is set to NULL.}
 
-\item{GVARinputs}{List containing the necessary inputs for the estimation of the GVAR-based models (see "GVAR" function)}
+\item{GVARinputs}{List containing the necessary inputs for the estimation of the GVAR-based models (see "GVAR" function). Default is set to NULL.}
 }
 \description{
 Compute some key parameters from the P-dynamics (Bootstrap set)

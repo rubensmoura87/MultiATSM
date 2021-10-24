@@ -9,8 +9,21 @@
 #'@param JLLinputs list of necessary inputs for the estimation of JLL-based models (see "JLL" function)
 #'@param GVARinputs list of necessary inputs for the estimation of GVAR-based models (see "GVAR" function)
 #'
-#'@importFrom Jmisc tic toc
-#'@importFrom utils capture.output
+
+#'@examples
+#'\dontrun{
+#' # See examples in the vignette file of this package (Section 4).
+#'}
+#'
+#'
+#'@returns
+#' List containg the following elements
+#' \enumerate{
+#' \item Out-of-sample forecasts of bond yields per forecast horizon
+#' \item Out-of-sample forecast errors of bond yields per forecast horizon
+#' \item Root mean square errors per forecast horizon
+#'}
+#'
 #'@export
 
 ForecastYields <- function(ModelType, ModelPara, InputsForOutputs, FactorLabels, Economies, DataFrequency,
@@ -19,9 +32,9 @@ ForecastYields <- function(ModelType, ModelPara, InputsForOutputs, FactorLabels,
 
   WishForecast <- InputsForOutputs[[ModelType]]$Forecasting$WishForecast
 
-  if (WishForecast ==0){ show( "No bond yields forecasts were generated")
+  if (WishForecast ==0){ print( "No bond yields forecasts were generated")
     }else{
-tic()
+      Jmisc::tic()
   # If one chooseS models in which the estimation is done country-by-country
   if ( "JPS" %in% ModelType || "JPS jointP" %in% ModelType ||  "GVAR sepQ" %in% ModelType){
     ForeYie <- ForecastYieldsSepQ(ModelType, ModelPara, InputsForOutputs, FactorLabels, Economies, DataFrequency,
@@ -36,7 +49,7 @@ tic()
                                   JLLinputs, GVARinputs)
 
   }
-      toc()
+      Jmisc::toc()
       return(ForeYie)
     }
 
@@ -54,19 +67,17 @@ tic()
 #'@param JLLinputs list of necessary inputs for the estimation of JLL-based models (see "JLL" function)
 #'@param GVARinputs list of necessary inputs for the estimation of GVAR-based models (see "GVAR" function)
 #'
-#'@importFrom utils tail
-#'@importFrom powerplus Matpow
 #'
-#'@export
+
 
 ForecastYieldsSepQ <- function(ModelType, ModelPara, InputsForOutputs, FactorLabels, Economies, DataFrequency,
                                JLLinputs, GVARinputs){
 
 
 
-  show('#########################################################################################################')
-  show( paste('#################################', 'Forecasting', ModelType, '#################################' ))
-  show('#########################################################################################################')
+  print('#########################################################################################################')
+  print( paste('#################################', 'Forecasting', ModelType, '#################################' ))
+  print('#########################################################################################################')
 
   # 1) Redefine some general model outputs
   StationarityUnderQ <- InputsForOutputs$StationaryQ
@@ -183,8 +194,8 @@ ForecastYieldsSepQ <- function(ModelType, ModelPara, InputsForOutputs, FactorLab
       K1ZsumOld <- 0
 
       for (hh in 1:H){
-        K1Znew <- Matpow(K1Z, numer = hh -1 )
-        VARforecast <- (K1ZsumOld + K1Znew)%*%K0Z + Matpow(K1Z, numer = hh)%*%ZZtt
+        K1Znew <- powerplus::Matpow(K1Z, numer = hh -1 )
+        VARforecast <- (K1ZsumOld + K1Znew)%*%K0Z + powerplus::Matpow(K1Z, numer = hh)%*%ZZtt
         ForecastYields[,hh] <- A + Bfull%*%(VARforecast)
 
         K1ZsumOld <- K1ZsumOld + K1Znew
@@ -202,12 +213,12 @@ ForecastYieldsSepQ <- function(ModelType, ModelPara, InputsForOutputs, FactorLab
 
 
 
-      show(paste(ModelType, Economies[i], ": Out-of-sample forecast for information set available until", ForecastDate))
+      print(paste(ModelType, Economies[i], ": Out-of-sample forecast for information set available until", ForecastDate))
 
     }
   }
 
-  toc()
+
 
   # 5) RMSE
   RMSE <- list(RMSEsep(OutofSampleForecast))
@@ -233,17 +244,15 @@ ForecastYieldsSepQ <- function(ModelType, ModelPara, InputsForOutputs, FactorLab
 #'@param JLLinputs list of necessary inputs for the estimation of JLL-based models (see "JLL" function)
 #'@param GVARinputs list of necessary inputs for the estimation of GVAR-based models (see "GVAR" function)
 #'
-#'@importFrom utils tail
-#'@importFrom powerplus Matpow
 #'
-#'@export
+
 
 ForecastYieldsJointQ <- function(ModelType, ModelPara, InputsForOutputs, FactorLabels, Economies, DataFrequency,
                                JLLinputs, GVARinputs){
 
-  show('#########################################################################################################')
-  show( paste('#################################', 'Forecasting', ModelType, '#################################' ))
-  show('#########################################################################################################')
+  print('#########################################################################################################')
+  print( paste('#################################', 'Forecasting', ModelType, '#################################' ))
+  print('#########################################################################################################')
 
   # 1) Redefine some general model outputs
   StationarityUnderQ <- InputsForOutputs$StationaryQ
@@ -335,7 +344,7 @@ ForecastYieldsJointQ <- function(ModelType, ModelPara, InputsForOutputs, FactorL
       tol <- 1e-4
 
 
-      invisible(capture.output(FullModelParaList[[ModelType]] <- Optimization(f, tol, varargin, FactorLabels,
+      invisible(utils::capture.output(FullModelParaList[[ModelType]] <- Optimization(f, tol, varargin, FactorLabels,
                                                      Economies, ModelType, JLLinputs)$Summary))
 
 
@@ -359,8 +368,8 @@ ForecastYieldsJointQ <- function(ModelType, ModelPara, InputsForOutputs, FactorL
       K1ZsumOld <- 0
 
       for (hh in 1:H){
-        K1Znew <- Matpow(K1Z, numer = hh -1 )
-        VARforecast <- (K1ZsumOld + K1Znew)%*%K0Z + Matpow(K1Z, numer = hh)%*%ZZtt
+        K1Znew <- powerplus::Matpow(K1Z, numer = hh -1 )
+        VARforecast <- (K1ZsumOld + K1Znew)%*%K0Z + powerplus::Matpow(K1Z, numer = hh)%*%ZZtt
         ForecastYields[,hh] <- A + Bfull%*%(VARforecast)
 
         K1ZsumOld <- K1ZsumOld + K1Znew
@@ -378,12 +387,12 @@ ForecastYieldsJointQ <- function(ModelType, ModelPara, InputsForOutputs, FactorL
 
 
 
-      show(paste(ModelType, ": Out-of-sample forecast for information set available until", ForecastDate))
+      print(paste(ModelType, ": Out-of-sample forecast for information set available until", ForecastDate))
 
 
   }
 
-  toc()
+
 
   # 5) RMSE
   RMSE <- list(RMSEjoint(OutofSampleForecast))
@@ -400,7 +409,7 @@ ForecastYieldsJointQ <- function(ModelType, ModelPara, InputsForOutputs, FactorL
 #'
 #'@param ForecastOutputs  List of country-specific forecasts (see "ForecastYieldsSepQ" function)
 #'
-#'@export
+
 
 RMSEsep <- function(ForecastOutputs){
 
@@ -439,7 +448,7 @@ RMSEsep <- function(ForecastOutputs){
 #'
 #'@param ForecastOutputs  List of country-specific forecasts (see "ForecastYieldsjointQ" function)
 #'
-#'@export
+
 
 RMSEjoint <- function(ForecastOutputs){
 

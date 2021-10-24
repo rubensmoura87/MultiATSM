@@ -34,7 +34,7 @@
 #' For the model 'JLL  NoDomUnit', the name of one dominant economy must be set as "None".
 #'@references
 #' Jotiskhatira, Le and Lundblad (2015). "Why do interest rates in different currencies co-move?" (Journal of Financial Economics)
-#'@return      List of inputs
+#'@return      List of model parameters from both the orthogonalized and non-orthogonalized versions of the JLL's based models
 #
 #'@export
 
@@ -106,7 +106,7 @@ c <- list()
 
 # Equation 6
 for (i in 1:C){
-  PricingRegressEQ6[[JLLinputs$Economies[i]]] <- lm( t(FullFactorsSet[[JLLinputs$Economies[i]]]$Pricing)~ t(FullFactorsSet[[JLLinputs$Economies[i]]]$Macro) -1)
+  PricingRegressEQ6[[JLLinputs$Economies[i]]] <- stats::lm( t(FullFactorsSet[[JLLinputs$Economies[i]]]$Pricing)~ t(FullFactorsSet[[JLLinputs$Economies[i]]]$Macro) -1)
   b[[JLLinputs$Economies[i]]] <- t(PricingRegressEQ6[[JLLinputs$Economies[i]]]$coefficients)
   P_e[[JLLinputs$Economies[i]]] <- t(PricingRegressEQ6[[JLLinputs$Economies[i]]]$residuals)
 }
@@ -122,7 +122,7 @@ if (JLLinputs$DomUnit == "None"){
   c <- list()
 
   for (j in 1:(C-1)){
-    PricingRegressEQ10[[JLLinputs$Economies[-IdxDomUnit][j]]] <- lm( t(P_e[[JLLinputs$Economies[-IdxDomUnit][j]]]) ~ t(P_e[[JLLinputs$DomUnit]]) -1)
+    PricingRegressEQ10[[JLLinputs$Economies[-IdxDomUnit][j]]] <- stats::lm( t(P_e[[JLLinputs$Economies[-IdxDomUnit][j]]]) ~ t(P_e[[JLLinputs$DomUnit]]) -1)
     P_e_star[[JLLinputs$Economies[-IdxDomUnit][j]]] <- t(PricingRegressEQ10[[JLLinputs$Economies[-IdxDomUnit][j]]]$residuals)
     c[[JLLinputs$Economies[-IdxDomUnit][j]]] <- t(PricingRegressEQ10[[JLLinputs$Economies[-IdxDomUnit][j]]]$coefficients)
   }
@@ -137,7 +137,7 @@ a_DU_CS <- list() # Dominant unit country
 if (JLLinputs$DomUnit == "None"){
   # Equation 8
   for (i in 1:C){
-    MacroRegressEQ8[[JLLinputs$Economies[i]]] <- lm( t(FullFactorsSet[[JLLinputs$Economies[i]]]$Macro)~ t(MacroGlobal) -1)
+    MacroRegressEQ8[[JLLinputs$Economies[i]]] <- stats::lm( t(FullFactorsSet[[JLLinputs$Economies[i]]]$Macro)~ t(MacroGlobal) -1)
     a_W[[JLLinputs$Economies[i]]] <- t(MacroRegressEQ8[[JLLinputs$Economies[i]]]$coefficients)
     M_e[[JLLinputs$Economies[i]]] <- t(MacroRegressEQ8[[JLLinputs$Economies[i]]]$residuals)
     a_DU_CS[[JLLinputs$Economies[i]]] <- matrix(0, M, G)
@@ -147,13 +147,13 @@ if (JLLinputs$DomUnit == "None"){
   MacroRegressEQ9 <- list()
   M_e_CS <- list()
   # Equation 8
-  MacroRegressEQ8[[JLLinputs$DomUnit]] <- lm( t(FullFactorsSet[[JLLinputs$DomUnit]]$Macro)~ t(MacroGlobal) -1)
+  MacroRegressEQ8[[JLLinputs$DomUnit]] <- stats::lm( t(FullFactorsSet[[JLLinputs$DomUnit]]$Macro)~ t(MacroGlobal) -1)
   a_W[[JLLinputs$DomUnit]] <- t(MacroRegressEQ8[[JLLinputs$DomUnit]]$coefficients)
   M_e[[JLLinputs$DomUnit]] <- t(MacroRegressEQ8[[JLLinputs$DomUnit]]$residuals)
 
   # Equation 9
   for (j in 1:(C-1)){
-    MacroRegressEQ9[[JLLinputs$Economies[-IdxDomUnit][j]]] <- lm( t(FullFactorsSet[[JLLinputs$Economies[-IdxDomUnit][j]]]$Macro)~ t(MacroGlobal) + t(M_e[[JLLinputs$DomUnit]]) -1)
+    MacroRegressEQ9[[JLLinputs$Economies[-IdxDomUnit][j]]] <- stats::lm( t(FullFactorsSet[[JLLinputs$Economies[-IdxDomUnit][j]]]$Macro)~ t(MacroGlobal) + t(M_e[[JLLinputs$DomUnit]]) -1)
     a_W[[JLLinputs$Economies[-IdxDomUnit][j]]] <- t(MacroRegressEQ9[[JLLinputs$Economies[-IdxDomUnit][j]]]$coefficients)[,seqi(1,G)]
     a_DU_CS[[JLLinputs$Economies[-IdxDomUnit][j]]] <-t(MacroRegressEQ9[[JLLinputs$Economies[-IdxDomUnit][j]]]$coefficients)[,(G+1):(G+M)]
     M_e_CS[[JLLinputs$Economies[-IdxDomUnit][j]]] <- t(MacroRegressEQ9[[JLLinputs$Economies[-IdxDomUnit][j]]]$residuals)

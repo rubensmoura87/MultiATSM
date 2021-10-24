@@ -14,32 +14,34 @@
 #'@param Data         Data for computing the transition matrix. Default is set to NULL.
 #'
 #
-#'@importFrom stats cov median
 #'@return matrix or list of matrices
-
-#'@examples
-#' data("CM_Trade")
-#' t_First <- "2006"
-#' t_Last <-  "2019"
-#' Economies<- c("China", "Brazil", "Mexico", "Uruguay")
-#' type <- 'Sample Mean'
-#' Transition_Matrix(t_First, t_Last, Economies, type, DataPath = NULL, Data = TradeFlows)
-
+#'
 #'@details
 #' NOTE: if there is missing data for any country of the system for that particularly year,
 #' then the transition matrix will include only NAs.
+#'
+#'@examples
+#'data(CM_Trade)
+#'
+#' t_First <- "2006"
+#' t_Last <-  "2019"
+#' Economies <- c("China", "Brazil", "Mexico", "Uruguay")
+#' type <- "Sample Mean"
+#' Transition_Matrix(t_First, t_Last, Economies, type, DataPath = NULL, Data = TradeFlows)
+#'
+#'
 #'@export
 
 
 Transition_Matrix <- function(t_First, t_Last, Economies, type, DataPath = NULL, Data = NULL){
 
 
-  if (is_empty(Data)){
+  if (sjmisc::is_empty(Data)){
 
-  if (is_empty(DataPath)){ DataPath <- system.file("extdata", "TradeData.xlsx", package = "MultiATSM") }
+  if (sjmisc::is_empty(DataPath)){ DataPath <- system.file("extdata", "TradeData.xlsx", package = "MultiATSM") }
 
-  tab_names_Trade <- excel_sheets(DataPath)
-  list_all_Trade <- lapply(tab_names_Trade, function(x) read_excel(path = DataPath, sheet = x))
+  tab_names_Trade <- readxl::excel_sheets(DataPath)
+  list_all_Trade <- lapply(tab_names_Trade, function(x) readxl::read_excel(path = DataPath, sheet = x))
   names(list_all_Trade) <- tab_names_Trade
 
   L <- length(list_all_Trade)
@@ -56,6 +58,7 @@ Transition_Matrix <- function(t_First, t_Last, Economies, type, DataPath = NULL,
   }
 
 # a) Pre-allocation of variables
+DataAdj <- lapply(Data, function(x) as.data.frame(t(x)))
 C <- length(Economies)
 T <- ncol(Data[[1]])
 WgvarAllYears <- vector(mode='list', length = T)
@@ -68,11 +71,11 @@ Wyear <- matrix(NA, nrow = C, ncol= C)
 for(k in 1:T){
   for (h in 1:C){
     for (j in 1:C){
-      num[h,j] <- Data[[Economies[h]]][[Economies[j],k]]
-      dem[h] <- sum(num[h,])
-      Wyear[h,] <- num[h,]/dem[h]
+      num[h,j] <- DataAdj[[Economies[h]]][[Economies[j]]][k]
     }
-  }
+    dem[h] <- sum(num[h,])
+    Wyear[h,] <- num[h,]/dem[h]
+      }
   if(any(is.na(Wyear))){ # If there is missing data for any country of the system for that particularly year, then return a matrix of NAs.
     Wyear <- matrix(NA, nrow = C, ncol= C)
   }
@@ -95,7 +98,7 @@ if (type == "Sample Mean"){
   idx0 <- which(TimeLable == Y_First)
   idx1 <- which(TimeLable == Y_Last)
 
-  WgvarSubSample <- WgvarAllYears[c(idx0:idx1)]
+  WgvarSubSample <- WgvarAllYears[idx0:idx1]
   Wgvar <- apply(simplify2array(WgvarSubSample), 1:2, mean)
 
   colnames(Wgvar) <- Economies
@@ -109,7 +112,6 @@ if (type !="Sample Mean" & type !="Full Sample" ){
   rownames(Wgvar) <- Economies
 
   }
-
 
 
 return(Wgvar)

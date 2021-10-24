@@ -6,7 +6,7 @@
 #'@param FactorLabels string-list based which contains all the labels of all the variables present in the model
 #'@param Economies  string-vector containing the names of the economies which are part of the economic system
 #'
-#'@export
+
 
 NumOutputs_Bootstrap <- function(ModelType, ModelParaBoot, InputsForOutputs, FactorLabels, Economies){
 
@@ -58,7 +58,7 @@ NumOutputs_Bootstrap <- function(ModelType, ModelParaBoot, InputsForOutputs, Fac
 #'@param FactorLabels  string-list based which contains all the labels of all the variables present in the model
 #'@param Economies  string-vector containing the names of the economies which are part of the economic system
 #'
-#'@export
+
 
 
 OutputConstructionSep_BS <- function(ModelType, ModelParaBoot, InputsForOutputs, FactorLabels, Economies){
@@ -93,7 +93,7 @@ OutputConstructionSep_BS <- function(ModelType, ModelParaBoot, InputsForOutputs,
 #'@param FactorLabels  string-list based which contains all the labels of all the variables present in the model
 #'@param Economies  string-vector containing the names of the economies which are part of the economic system
 #'
-#'@export
+
 
 
 IRFsep_BS <- function(ModelType, ModelParaBoot, IRFhoriz, FactorLabels, Economies){
@@ -147,8 +147,8 @@ IRFsep_BS <- function(ModelType, ModelParaBoot, IRFhoriz, FactorLabels, Economie
         tempYields[ , , 1]  <- B %*% S
         # Shock at t=1:
         for (r in 2:IRFhoriz){
-          tempFactors[ , , r] <- Matpow(A1,numer=r-1, denom=1)%*%S # IRF (t+h) = A1^h*S
-          tempYields[ , , r]      <- B%*%Matpow(A1,numer=r-1, denom=1)%*%S
+          tempFactors[ , , r] <- powerplus::Matpow(A1,numer=r-1, denom=1)%*%S # IRF (t+h) = A1^h*S
+          tempYields[ , , r]      <- B%*%powerplus::Matpow(A1,numer=r-1, denom=1)%*%S
         }
         IRFRiskFactors <- aperm(tempFactors, c(3,1,2))
         IRFYields <- aperm(tempYields, c(3,1,2))
@@ -202,7 +202,7 @@ IRFsep_BS <- function(ModelType, ModelParaBoot, IRFhoriz, FactorLabels, Economie
 #'@param FactorLabels  string-list based which contains all the labels of all the variables present in the model
 #'@param Economies  string-vector containing the names of the economies which are part of the economic system
 #'
-#'@export
+
 
 FEVDsep_BS <- function(ModelType, ModelParaBoot, FEVDhoriz, FactorLabels, Economies){
 
@@ -350,7 +350,7 @@ FEVDsep_BS <- function(ModelType, ModelParaBoot, FEVDhoriz, FactorLabels, Econom
 #'
 #' \item Pesaran and Shin, 1998. "Generalized impulse response analysis in linear multivariate models" (Economics Letters)
 #' }
-#'@export
+
 
 
 GIRFSep_BS <- function(ModelType, ModelParaBoot, GIRFhoriz, FactorLabels, Economies){
@@ -478,7 +478,7 @@ GIRFSep_BS <- function(ModelType, ModelParaBoot, GIRFhoriz, FactorLabels, Econom
 #' \item Pesaran and Shin, 1998. "Generalized impulse response analysis in linear multivariate models" (Economics Letters)
 #' }
 
-#'@export
+
 
 
 GFEVDsep_BS <- function(ModelType, ModelParaBoot, GFEVDhoriz, FactorLabels, Economies){
@@ -651,7 +651,7 @@ GFEVDsep_BS <- function(ModelType, ModelParaBoot, GFEVDhoriz, FactorLabels, Econ
 #'@param FactorLabels  string-list based which contains all the labels of all the variables present in the model
 #'@param Economies  string-vector containing the names of the economies which are part of the economic system
 #'
-#'@export
+
 
 OutputConstructionJoint_BS <- function(ModelType, ModelParaBoot, InputsForOutputs, FactorLabels, Economies){
 
@@ -739,7 +739,7 @@ OutputConstructionJoint_BS <- function(ModelType, ModelParaBoot, InputsForOutput
 #'@param FactorLabels a string-list based which contains all the labels of all the variables present in the model
 #'@param Economies a string-vector containing the names of the economies which are part of the economic system
 #'
-#'@export
+
 
 
 IRFjoint_BS <- function(ModelType, ModelParaBoot, IRFhoriz, FactorLabels, Economies){
@@ -791,8 +791,8 @@ IRFjoint_BS <- function(ModelType, ModelParaBoot, IRFhoriz, FactorLabels, Econom
         tempYields[ , , 1]  <- B %*% S
         # Shock at t=1:
         for (r in 2:IRFhoriz){
-          tempFactors[ , , r] <- Matpow(A1,numer=r-1, denom=1)%*%S # IRF (t+h) = A1^h*S
-          tempYields[ , , r]      <- B%*%Matpow(A1,numer=r-1, denom=1)%*%S
+          tempFactors[ , , r] <- powerplus::Matpow(A1,numer=r-1, denom=1)%*%S # IRF (t+h) = A1^h*S
+          tempYields[ , , r]      <- B%*%powerplus::Matpow(A1,numer=r-1, denom=1)%*%S
         }
         IRFRiskFactors <- aperm(tempFactors, c(3,1,2))
         IRFYields <- aperm(tempYields, c(3,1,2))
@@ -851,7 +851,7 @@ IRFjoint_BS <- function(ModelType, ModelParaBoot, IRFhoriz, FactorLabels, Econom
 #'@param FactorLabels  string-list based which contains all the labels of all the variables present in the model
 #'@param Economies  string-vector containing the names of the economies which are part of the economic system
 #'
-#'@export
+
 
 FEVDjoint_BS <- function(ModelType, ModelParaBoot, FEVDhoriz, FactorLabels, Economies){
 
@@ -997,7 +997,7 @@ FEVDjoint_BS <- function(ModelType, ModelParaBoot, FEVDhoriz, FactorLabels, Econ
 #'
 #' \item Pesaran and Shin, 1998. "Generalized impulse response analysis in linear multivariate models" (Economics Letters)
 #' }
-#'@export
+
 
 
 
@@ -1128,7 +1128,7 @@ GIRFjoint_BS <- function(ModelType, ModelParaBoot, GIRFhoriz, FactorLabels, Econ
 #'
 #' \item Pesaran and Shin, 1998. "Generalized impulse response analysis in linear multivariate models" (Economics Letters)
 #' }
-#'@export
+
 
 GFEVDjoint_BS <- function(ModelType, ModelParaBoot, GFEVDhoriz, FactorLabels, Economies){
 
@@ -1300,7 +1300,7 @@ GFEVDjoint_BS <- function(ModelType, ModelParaBoot, GFEVDhoriz, FactorLabels, Ec
 #'@param FactorLabels  string-list based which contains all the labels of all the variables present in the model
 #'@param Economies  string-vector containing the names of the economies which are part of the economic system
 #'
-#'@export
+
 
 IRFjointOrthoJLL_BS <- function(ModelType, ModelParaBoot, IRFhoriz, FactorLabels, Economies){
 
@@ -1354,8 +1354,8 @@ IRFjointOrthoJLL_BS <- function(ModelType, ModelParaBoot, IRFhoriz, FactorLabels
       tempYields[ , , 1]  <- B%*%PI%*% Se
       # Shock at t=1:
       for (r in 2:IRFhoriz){
-        tempFactors[ , , r] <- Matpow(A1e,numer=r-1, denom=1)%*%Se # IRF (t+h) = A1^h*S
-        tempYields[ , , r]      <- B%*%PI%*%Matpow(A1e,numer=r-1, denom=1)%*%Se
+        tempFactors[ , , r] <- powerplus::Matpow(A1e,numer=r-1, denom=1)%*%Se # IRF (t+h) = A1^h*S
+        tempYields[ , , r]      <- B%*%PI%*%powerplus::Matpow(A1e,numer=r-1, denom=1)%*%Se
       }
       IRFRiskFactors <- aperm(tempFactors, c(3,1,2))
       IRFYields <- aperm(tempYields, c(3,1,2))
@@ -1407,7 +1407,7 @@ IRFjointOrthoJLL_BS <- function(ModelType, ModelParaBoot, IRFhoriz, FactorLabels
 #'@param FactorLabels string-list based which contains all the labels of all the variables present in the model
 #'@param Economies string-vector containing the names of the economies which are part of the economic system
 #'
-#'@export
+
 
 FEVDjointOrthogoJLL_BS <- function(ModelType, ModelParaBoot, FEVDhoriz, FactorLabels, Economies){
 
@@ -1554,7 +1554,7 @@ FEVDjointOrthogoJLL_BS <- function(ModelType, ModelParaBoot, FEVDhoriz, FactorLa
 #'
 #' \item Pesaran and Shin, 1998. "Generalized impulse response analysis in linear multivariate models" (Economics Letters)
 #' }
-#'@export
+
 
 GIRFjointOrthoJLL_BS <- function(ModelType, ModelParaBoot, GIRFhoriz, FactorLabels, Economies){
 
@@ -1681,7 +1681,7 @@ GIRFjointOrthoJLL_BS <- function(ModelType, ModelParaBoot, GIRFhoriz, FactorLabe
 #'
 #' \item Pesaran and Shin, 1998. "Generalized impulse response analysis in linear multivariate models" (Economics Letters)
 #' }
-#'@export
+
 
 GFEVDjointOrthoJLL_BS <- function(ModelType, ModelParaBoot, GFEVDhoriz, FactorLabels, Economies){
 

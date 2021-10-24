@@ -4,19 +4,20 @@
 #'@param AllFactorsUnderP   complete set of factors that may be used in the estimation of P (KxT)
 #'@param FactorLabels       string-list based which contains the labels of all the variables present in the model (see "LabFac" function)
 #'@param Economies          string-vector containing the names of the economies which are part of the economic system
-#'@param JLLinputs         List containing the necessary inputs for the estimation of the JLL-based models (see "JLL" function)
-#'@param GVARinputs        List containing the necessary inputs for the estimation of the GVAR-based models (see "GVAR" function)
+#'@param JLLinputs         List containing the necessary inputs for the estimation of the JLL-based models (see "JLL" function). Default is set to NULL.
+#'@param GVARinputs        List containing the necessary inputs for the estimation of the GVAR-based models (see "GVAR" function). Default is set to NULL.
 #'
-#'@export
+#'
 
-PdynamicsSet_BS<- function(ModelType, AllFactorsUnderP, FactorLabels, Economies, JLLinputs, GVARinputs){
+
+PdynamicsSet_BS<- function(ModelType, AllFactorsUnderP, FactorLabels, Economies, JLLinputs = NULL, GVARinputs= NULL){
 
    T <- ncol(AllFactorsUnderP)
 
   # JPS-related models
   if (ModelType == 'JPS' || ModelType == 'JPS jointP' || ModelType == 'VAR jointQ'){
     K <- nrow(AllFactorsUnderP)
-    VAR <-lm( t(AllFactorsUnderP[,2:T])~ t(AllFactorsUnderP[,1:(T-1)])) # VAR(1) under the P.
+    VAR <-stats::lm( t(AllFactorsUnderP[,2:T])~ t(AllFactorsUnderP[,1:(T-1)])) # VAR(1) under the P.
     K0Z <- t(t(VAR$coefficients[1,]))
     K1Z <- t(VAR$coefficients[2:(K+1),])
     eZ<- VAR$residuals # (T-1) x K

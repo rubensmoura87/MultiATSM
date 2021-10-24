@@ -14,9 +14,8 @@
 #'
 #'
 #'@importFrom pracma null
-#'@importFrom magic adiag
 #'
-#'@return List
+#'@return List of necessary inputs  for constructing the model's log-likelihood function
 #'@examples
 #'\dontrun{
 #' # Example 1:
@@ -166,10 +165,10 @@ if (DataFrequency == "Annually"){ dt <- 1}
         PP <- PPCS
         Y <- YCS
       }else{
-        K1XQ <- adiag(K1XQ,K1XQCS)
-        Wpca <- adiag(Wpca,WpcaCS)
-        We <- adiag(We,WeCS)
-        WpcaFull <- adiag(WpcaFull, WpcaFullCS)
+        K1XQ <- magic::adiag(K1XQ,K1XQCS)
+        Wpca <- magic::adiag(Wpca,WpcaCS)
+        We <- magic::adiag(We,WeCS)
+        WpcaFull <- magic::adiag(WpcaFull, WpcaFullCS)
         PP <- rbind(PP, PPCS)
         Y <- rbind(Y, YCS)
         }
@@ -254,7 +253,6 @@ if (DataFrequency == "Annually"){ dt <- 1}
 #'@param GVARinputs   list of necessary inputs for the estimation of GVAR-based models (see "GVAR" function)
 
 #'@importFrom pracma null
-#'@importFrom magic adiag
 #'
 #'@export
 
@@ -324,10 +322,10 @@ InputsForMLEdensity_BS <- function(ModelType, Y_artificial, Z_artificial, Factor
     }else{
       P_artificial <-rbind(P_artificial, P_CS)
       Y_artificial <- rbind(Y_artificial, Y_CS)
-      Wpca_artificial <- adiag(Wpca_artificial, Wpca_CS)
-      We_artificial <- adiag(We_artificial, We_CS)
-      WpcaFull_artificial <- adiag(WpcaFull_artificial, WpcaFull_CS)
-      K1XQ_artificial <- adiag(K1XQ_artificial, K1XQ__CS)
+      Wpca_artificial <- magic::adiag(Wpca_artificial, Wpca_CS)
+      We_artificial <- magic::adiag(We_artificial, We_CS)
+      WpcaFull_artificial <- magic::adiag(WpcaFull_artificial, WpcaFull_CS)
+      K1XQ_artificial <- magic::adiag(K1XQ_artificial, K1XQ__CS)
     }
     idxJ0<- idxJ1
     idxN0 <- idxN1

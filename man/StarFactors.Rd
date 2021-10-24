@@ -14,7 +14,7 @@ StarFactors(RiskFactors, Economies, W)
 \item{W}{GVAR transition matrix (C x C)}
 }
 \value{
-List of star factors
+List containg the star factors of each country of the economic system
 }
 \description{
 Generates the star variables necessary for the GVAR estimation

@@ -8,7 +8,7 @@
 list containing the bilateral trade flows
 }
 \usage{
-CM_Trade
+data("CM_Trade")
 }
 \description{
 Trade Flows data used in Candelon and Moura (2021)

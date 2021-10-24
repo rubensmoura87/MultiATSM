@@ -17,7 +17,7 @@ Unspanned macro risk model outputs by Bauer and Rudebusch (2017)
   }
 }
 \usage{
-BR_jps_gro_R3
+data("BR_jps_gro_R3")
 }
 \description{
 Unspanned macro risk model outputs by Bauer and Rudebusch (2017)

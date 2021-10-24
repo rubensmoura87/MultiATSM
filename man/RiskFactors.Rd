@@ -8,7 +8,7 @@
 matrix containing the  risk factors of the models
 }
 \usage{
-CM_Factors
+data("CM_Factors")
 }
 \description{
 Risk factors data used in Candelon and Moura (2021)

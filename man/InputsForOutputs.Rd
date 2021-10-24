@@ -58,6 +58,24 @@ Default is set as "0"}
  \item "t0Forecast": index of the first forecast cut-off date.
 }}
 }
+\value{
+List of necessary inputs to generate the graphs of the outputs of the desired model
+}
 \description{
 Collect the inputs that are used to construct the numerical and the graphical outputs
+}
+\examples{
+
+ModelType <- "JPS"
+Horiz <- 100
+DesiredOutputGraphs <- c("Fit", "GIRF", "GFEVD")
+OutputLabel <- "Test"
+WishStationarityQ <- 1
+WishGraphRiskFac <- 0
+WishGraphYields <- 1
+
+
+InputsList <- InputsForOutputs(ModelType, Horiz, DesiredOutputGraphs, OutputLabel,
+                              WishStationarityQ, WishGraphYields, WishGraphRiskFac)
+
 }

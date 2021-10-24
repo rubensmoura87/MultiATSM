@@ -7,6 +7,16 @@
 #'@param FactorLabels string-list based which contains the labels of all the variables present in the model
 #'@param ModelType string-vector containing the label of the model to be estimated
 #'
+#'
+#'
+#'@examples
+#'\dontrun{
+#' # See examples in the vignette file of this package (Section 4).
+#'}
+#'
+#'@returns
+#'objective function
+#'
 #'@export
 
 
@@ -27,7 +37,7 @@ if (ModelType == 'JPS' || ModelType == 'JPS jointP' || ModelType == "GVAR sepQ")
 
   i <- get("i", globalenv())
 
-  f <-Curry(MLEdensity_sepQ, r0 = NULL, MLEinputs$K0Z, MLEinputs$K1Z, se= NULL, MLEinputs$Gy.0, mat, MLEinputs$Y,
+  f <-functional::Curry(MLEdensity_sepQ, r0 = NULL, MLEinputs$K0Z, MLEinputs$K1Z, se= NULL, MLEinputs$Gy.0, mat, MLEinputs$Y,
             MLEinputs$ZZ, MLEinputs$PP, MLEinputs$Wpca, MLEinputs$We, MLEinputs$WpcaFull, dt, Economies[i], FactorLabels,
             ModelType, MLEinputs$GVARinputs)
 }
@@ -40,7 +50,7 @@ if (ModelType == 'GVAR jointQ' || ModelType == 'VAR jointQ' ||  ModelType == "JL
   if(length(Economies) == 1){stop('The chosen model type has to be estimated for multiple countries at the time.
                                 The input "Economies" should contain several members.')}
 
-    f <-Curry(MLEdensity_jointQ, r0 = NULL, MLEinputs$K0Z, MLEinputs$K1Z, se= NULL, MLEinputs$Gy.0, mat, MLEinputs$Y,
+    f <-functional::Curry(MLEdensity_jointQ, r0 = NULL, MLEinputs$K0Z, MLEinputs$K1Z, se= NULL, MLEinputs$Gy.0, mat, MLEinputs$Y,
               MLEinputs$ZZ, MLEinputs$PP, MLEinputs$Wpca, MLEinputs$We, MLEinputs$WpcaFull, dt, Economies,
               FactorLabels, ModelType, MLEinputs$GVARinputs, MLEinputs$JLLinputs)
 }
@@ -53,7 +63,7 @@ if (ModelType == "JLL original" || ModelType == "JLL NoDomUnit") {
   if(length(Economies) == 1){stop('The chosen model type has to be estimated for multiple countries at the time.
                                 The input "Economies" should contain several members.')}
 
-  f <- Curry(MLEdensity_jointQ_sepSigma, r0 = NULL, MLEinputs$SSZ, MLEinputs$K0Z, MLEinputs$K1Z, se= NULL, MLEinputs$Gy.0,
+  f <- functional::Curry(MLEdensity_jointQ_sepSigma, r0 = NULL, MLEinputs$SSZ, MLEinputs$K0Z, MLEinputs$K1Z, se= NULL, MLEinputs$Gy.0,
             mat, MLEinputs$Y, MLEinputs$ZZ, MLEinputs$PP, MLEinputs$Wpca, MLEinputs$We, MLEinputs$WpcaFull, dt,
             Economies, FactorLabels, ModelType, MLEinputs$JLLinputs)
 }
@@ -101,14 +111,14 @@ Functionf_Boot <- function(ModelType, MLEinputsBS, Economies, mat, dt, FactorLab
 # 1) If one choose models in which the estimation is done country-by-country
 if (ModelType == 'JPS' || ModelType == 'JPS jointP' || ModelType == "GVAR sepQ"){
   i <- get("i", globalenv())
-   f <-Curry(A0N_MLEdensity_WOE__sepQ_Bootstrap, r0 = NULL, K0Z, K1Z, se= NULL, Gy.0, mat, Y_artificial,
+   f <-functional::Curry(A0N_MLEdensity_WOE__sepQ_Bootstrap, r0 = NULL, K0Z, K1Z, se= NULL, Gy.0, mat, Y_artificial,
             ZZ_artificial, PP_artificial, Wpca_artificial, We_artificial, WpcaFull_artificial, dt, Economies[i],
             FactorLabels, ModelType, residBS,  MaxEigen, GVARinputs)
 }
 
   # 2) If one choose models in which the estimation is done jointly for all countries of the system
 if (ModelType == 'GVAR jointQ' || ModelType == 'VAR jointQ' ||  ModelType == "JLL jointSigma") {
-  f <-Curry(A0N_MLEdensity_WOE__jointQ_Bootstrap, r0= NULL, K0Z, K1Z, se= NULL, Gy.0,  mat, Y_artificial,
+  f <-functional::Curry(A0N_MLEdensity_WOE__jointQ_Bootstrap, r0= NULL, K0Z, K1Z, se= NULL, Gy.0,  mat, Y_artificial,
             ZZ_artificial, PP_artificial, Wpca_artificial, We_artificial, WpcaFull_artificial, dt, Economies,
             FactorLabels, ModelType, residBS, MaxEigen, GVARinputs, JLLinputs)
 }
@@ -116,7 +126,7 @@ if (ModelType == 'GVAR jointQ' || ModelType == 'VAR jointQ' ||  ModelType == "JL
 
 # 3) If one choose models in which the estimation is done jointly for all countries of the system
 if (ModelType == "JLL original" || ModelType == "JLL NoDomUnit") {
-  f <-Curry(A0N_MLEdensity_WOE__jointQ_sepSigma_Bootstrap, r0 = NULL, SSZ, K0Z, K1Z, se= NULL, Gy.0, mat,
+  f <-functional::Curry(A0N_MLEdensity_WOE__jointQ_sepSigma_Bootstrap, r0 = NULL, SSZ, K0Z, K1Z, se= NULL, Gy.0, mat,
             Y_artificial, ZZ_artificial, PP_artificial, Wpca_artificial, We_artificial, WpcaFull_artificial,
             dt, Economies, FactorLabels, ModelType, residBS, MaxEigen, GVARinputs, JLLinputs)
 }

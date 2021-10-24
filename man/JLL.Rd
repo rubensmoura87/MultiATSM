@@ -23,7 +23,7 @@ JLL(NonOrthoFactors, N, JLLinputs)
 }}
 }
 \value{
-List of inputs
+List of model parameters from both the orthogonalized and non-orthogonalized versions of the JLL's based models
 }
 \description{
 Set of inputs present at JLL's P-dynamics

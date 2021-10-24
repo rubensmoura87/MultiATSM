@@ -38,7 +38,7 @@ If the ModelType selected is "JPS", "JPS jointP", "GVAR sepQ", then only one eco
 \item{GVARinputs}{list of necessary inputs for the estimation of GVAR-based models (see "GVAR" function)}
 }
 \value{
-List
+List of necessary inputs  for constructing the model's log-likelihood function
 }
 \description{
 Generates several  inputs that are necessary to build the likelihood function

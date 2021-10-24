@@ -16,6 +16,10 @@
 #'
 #'VarLabels <- LabFac(N, DomVar, GlobalVar, Economies, ModelType)
 #'
+#'
+#'@returns
+#' List containing the country-specific risk factor labels
+#'
 #'@export
 
 LabFac <- function(N, DomVar, GlobalVar, Economies, ModelType){

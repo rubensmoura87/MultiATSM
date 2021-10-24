@@ -17,19 +17,19 @@ vignette: >
 bibliography: references.bib
 ---
 
-This document aims at providing general guidance on the use of the [MultiATSM](*LINK TO BE ASSIGNED*) package available at the [CRAN repository](https://cran.r-project.org/). 
+This document aims at providing general guidance on the use of the *MultiATSM* package available at the [CRAN repository](https://cran.r-project.org/). 
 
 ```{r}
-library('MultiATSM')
+library(MultiATSM)
 ```
 
-The [MultiATSM](*LINK TO BE ASSIGNED*) package provides several model outputs from various single and multi-country affine term structure of interest models (ATSMs). All the frameworks of this package are based on the unspanned economic risk framework from @JoslinPriebschSingleton2014 (JPS, 2014). In essence, these models assume the absence of arbitrage opportunities, consider a linear state space representations of the yield curve dynamics and offer a tractable approach to simultaneously combine the traditional yield curve factors (spanned factors) along with economic and financial variables (unspanned factors). 
+The *MultiATSM* package provides several model outputs from various single and multi-country affine term structure of interest models (ATSMs). All the frameworks of this package are based on the unspanned economic risk framework from @JoslinPriebschSingleton2014 (JPS, 2014). In essence, these models assume the absence of arbitrage opportunities, consider a linear state space representations of the yield curve dynamics and offer a tractable approach to simultaneously combine the traditional yield curve factors (spanned factors) along with economic and financial variables (unspanned factors). 
 
 Due to the peculiar features of the JPS specification, an efficient estimation of the parameters governing the risk-neutral ($Q$-measure) and the physical ($P$-measure) probability measures can be carried out rather independently. The only exception is the variance-covariance matrix (sigma) term which is a common element to both the $P$ and the $Q$ density functions.
 
-In its current version, the [MultiATSM](*LINK TO BE ASSIGNED*) package can generate the outputs of 8 different classes of ATSMs. More specifically, the [MultiATSM](*LINK TO BE ASSIGNED*) includes models in which the estimation is done on a *country-by-country* basis - as in JPS (2014)  - or *jointly* for all the countries of the economic system - as in @JotikasthiraLeLundblad2015 (JLL, 2015) and @CandelonMoura2021 (CM, 2021).  In all cases, the risk factors dynamics under the $P$-measure follows a VAR(1) model of some sort. The table below summarizes the general features of each one of the models available at this package.   
+In its current version, the *MultiATSM* package can generate the outputs of 8 different classes of ATSMs. More specifically, the *MultiATSM* includes models in which the estimation is done on a *country-by-country* basis - as in JPS (2014)  - or *jointly* for all the countries of the economic system - as in @JotikasthiraLeLundblad2015 (JLL, 2015) and @CandelonMoura2021 (CM, 2021).  In all cases, the risk factors dynamics under the $P$-measure follows a VAR(1) model of some sort. The table below summarizes the general features of each one of the models available at this package.   
 
-```{r ModFea, echo=FALSE}
+```{r ModFea, message=FALSE, echo=FALSE}
 ModelLabels <- c("JPS", "JPS jointP", "VAR jointQ", "GVAR sepQ", "GVAR jointQ", 
                  "JLL original", "JLL NoDomUnit", "JLL jointSigma")
 
@@ -67,29 +67,29 @@ colnames(Tab) <- ColNames
 
 
 # Generate the table
-options(warn = -1)
-library(kableExtra)
+options(warn=-1)
+library(magrittr)
+options(warn=0)
 
-
-kbl(Tab, align = "c", caption = "Model Features") %>%
-  kable_classic("striped", full_width = F)  %>%
-  row_spec(0, font_size = 10) %>%
-  add_header_above(c(" "=2, "Unrestricted" = 1, "Restricted" = 1, "Unrestricted" = 1, "Restricted" = 2, " " = 11)) %>%
- add_header_above(c(" "=2, "Individual" = 2, "Joint" = 3, " "=2, "Individual" = 1, "Joint" = 1, " "=2, "P only" = 1, "P and Q" = 1, " " = 3))  %>%
-  add_header_above(c( " "=2, "P-dynamics"= 5, " "=2, "Q-dynamics"= 2, " "=2, "Sigma matrix estimation" = 2, " "=2, "Dominant Country"=1), bold = T) %>%
-pack_rows("Unrestricted VAR", 1, 3 , label_row_css = "background-color: #666; color: #fff;")  %>%
-pack_rows("Restricted VAR (GVAR)", 4, 5, label_row_css = "background-color: #666; color: #fff;") %>%
-pack_rows("Restricted VAR (JLL)", 6, 8, label_row_css = "background-color: #666; color: #fff;")
+kableExtra::kbl(Tab, align = "c", caption = "Model Features") %>%
+  kableExtra::kable_classic("striped", full_width = F)  %>%
+  kableExtra::row_spec(0, font_size = 10) %>%
+  kableExtra::add_header_above(c(" "=2, "Unrestricted" = 1, "Restricted" = 1, "Unrestricted" = 1, "Restricted" = 2, " " = 11)) %>%
+ kableExtra::add_header_above(c(" "=2, "Individual" = 2, "Joint" = 3, " "=2, "Individual" = 1, "Joint" = 1, " "=2, "P only" = 1, "P and Q" = 1, " " = 3))  %>%
+  kableExtra::add_header_above(c( " "=2, "P-dynamics"= 5, " "=2, "Q-dynamics"= 2, " "=2, "Sigma matrix estimation" = 2, " "=2, "Dominant Country"=1), bold = T) %>%
+kableExtra::pack_rows("Unrestricted VAR", 1, 3 , label_row_css = "background-color: #666; color: #fff;")  %>%
+kableExtra::pack_rows("Restricted VAR (GVAR)", 4, 5, label_row_css = "background-color: #666; color: #fff;") %>%
+kableExtra::pack_rows("Restricted VAR (JLL)", 6, 8, label_row_css = "background-color: #666; color: #fff;")
 ```
 
 Some aspects of the multi-country frameworks are worth highlighting. As for the models based on the setup of JLL (2015), the version "JLL original" follows closely the seminal work of JLL (2015), i.e., it is assumed an economic cohort containing a worldwide dominant economy and a set of smaller countries, in addition to the estimation of the sigma matrix be performed exclusively under the $P$-measure. The two other alternative versions assume the absence of a dominant country ("JLL NoDomUnit") and the estimation of sigma under both the $P$ and $Q$ measures ("JLL jointSigma"), as in the standard JPS (2014) model. As for the remaining multi-country ATSMs, it is considered that the dynamics of the risk factors under the $P$-measure evolves according to a GVAR model. The version labeled "GVAR jointQ" is the one presented in CM (2021).
 
-In what follows, the focus will be devoted to describe the various pieces that are necessary to implement ATSMs. Specifically, Section \@ref(S:SectionData) describes the data-set available at this package and the set of functions that are useful to retrieve data from Excel files. Section \@ref(S:SectionInputs) exposes the necessary inputs that have to be specified by the user. In Section \@ref(S:SectionEstimation) the estimation procedure is detailed. Section \@ref(S:SectionReplication) shows how to use the [MultiATSM](*LINK TO BE ASSIGNED*) package to estimate ATSMs from scratch as well as to closely reproduce some empirical features of academic papers. To ease the exposition, throughout the next sections, the database used by CM (2021) is employed to illustrate the use of the various functions available in this package.
+In what follows, the focus will be devoted to describe the various pieces that are necessary to implement ATSMs. Specifically, Section \@ref(S:SectionData) describes the data-set available at this package and the set of functions that are useful to retrieve data from Excel files. Section \@ref(S:SectionInputs) exposes the necessary inputs that have to be specified by the user. In Section \@ref(S:SectionEstimation) the estimation procedure is detailed. Section \@ref(S:SectionReplication) shows how to use the *MultiATSM* package to estimate ATSMs from scratch as well as to closely reproduce some empirical features of academic papers. To ease the exposition, throughout the next sections, the database used by CM (2021) is employed to illustrate the use of the various functions available in this package.
 
 # Data {#S:SectionData}
  
 ## Package data-set{#S:SectionDataPackage}
-The [MultiATSM](*LINK TO BE ASSIGNED*) package contains the four data-sets used in CM (2021). The first set of data comprises several time series of zero-coupon bonds yields from four emerging markets: China, Brazil, Mexico, and Uruguay. It is worth noting that this package requires *(i)* for estimation purposes, the maturities of the bond yields to be the same for all countries (although the function *DataForEstimation* handles different maturities across countries as inputs, the outputs generated by this same function are bond yields of the same maturities for all the economies); *(ii)* bond yields to be expressed in percentage terms (and not in basis points) per annum. The [MultiATSM](*LINK TO BE ASSIGNED*) package does not support a routine to bootstrap zero-coupon yields from coupon bonds. This data manipulation procedure must be handled by the user herself, if necessary.  
+The *MultiATSM* package contains the four data-sets used in CM (2021). The first set of data comprises several time series of zero-coupon bonds yields from four emerging markets: China, Brazil, Mexico, and Uruguay. It is worth noting that this package requires *(i)* for estimation purposes, the maturities of the bond yields to be the same for all countries (although the function *DataForEstimation* handles different maturities across countries as inputs, the outputs generated by this same function are bond yields of the same maturities for all the economies); *(ii)* bond yields to be expressed in percentage terms (and not in basis points) per annum. The *MultiATSM* package does not support a routine to bootstrap zero-coupon yields from coupon bonds. This data manipulation procedure must be handled by the user herself, if necessary.  
 ```{r}
 data('CM_Yields')
 ```
@@ -206,7 +206,7 @@ One possible list of JLL inputs is as follows:
 
 
 ## Additional inputs for numerical and graphical outputs
-Once the model parameters from the ATSM have been estimated, the [MultiATSM](*LINK TO BE ASSIGNED*) package enables the numerical and graphical compilation of the following additional outputs:
+Once the model parameters from the ATSM have been estimated, the *MultiATSM* package enables the numerical and graphical compilation of the following additional outputs:
 
 - Model fit of the bond yields;
 - Impulse response functions (IRFs);
@@ -338,13 +338,13 @@ data("CM_Trade")
 t_First <- "2006"
 t_Last <-  "2019"
 Economies <- c("China", "Brazil", "Mexico", "Uruguay")
-type <- 'Sample Mean'
+type <- "Sample Mean"
 W_gvar <- Transition_Matrix(t_First, t_Last, Economies, type, DataPath = NULL, TradeFlows)
 ```
 
 Having defined the form of the transition matrix, one can complete the *GVARinputs* variable along the lines discussed in Section \@ref(S:SectionGVARJLLinputs). 
 ```{r}
-data('CM_Factors_GVAR')
+data("CM_Factors_GVAR")
 
 GVARinputs <- list()
 GVARinputs$Economies <- Economies
@@ -386,8 +386,8 @@ The estimation of ATSM involves defining the model inputs from the log-likelihoo
 For the sake of simplicity, one illustrates the construction of a log-likelihood function based on a *VAR jointQ* model. For both the JLL and GVAR-based models, one must further specify the JLLinputs or GVARinputs along the lines described in the Section \@ref(S:SectionGVARJLLinputs).
 ```{r}
 # Inputs to be specified by the user
-data('CM_Yields')
-data('CM_Factors')
+data("CM_Yields")
+data("CM_Factors")
 ModelType <- "VAR jointQ"
 Yields <- Yields
 ZZ <- RiskFactors
@@ -413,7 +413,7 @@ f <- Functionf(ATSMInputs, Economies, mat, DataFrequency, FactorLabels, ModelTyp
 JPS (2014) requires the estimation of a set of parameters containing 6 elements, namely: the risk-neutral
 long-run mean of the short rate (*r0*), the risk-neutral feedback matrix (*K1XQ*), the variance-covariance matrix (*SSZ*) from the VAR processes, the standard deviation of the errors from the portfolios of yields observed with error (*se*), in addition to the intercept (*K0Z*) and the feedback (*K1Z*) matrices of the physical dynamics. Each one of these parameters must be cast in a individual list that should contain the *(i)* the starting value of the parameter (if any); *(ii)* the variable label followed by a ':' and a type of constraint; *(iii)* a lower bound (if any), and *(iv)* an upper bound (if any). The variable labels of *r0*, *se*, *K0Z* and *K1Z* should be preceded by the symbol @ as manner to account for the fact that the solution for these parameters are known in closed-form. For the remaining ones (*K1XQ* and *SSZ*), @LeSingleton2018 provide standardized routines (already incorporated in this package) to set good initial values so that the optimization process runs fast.
 
-The type of constraint to be set for the parameters *r0*, *se*, *K0Z* and *K1Z* is typically *bounded* and are used for bounded matrices. For *K1XQ* and *SSZ*, the [MultiATSM](*LINK TO BE ASSIGNED*) package currently provides the following options:
+The type of constraint to be set for the parameters *r0*, *se*, *K0Z* and *K1Z* is typically *bounded* and are used for bounded matrices. For *K1XQ* and *SSZ*, the *MultiATSM* package currently provides the following options:
 
 - **K1XQ:** *'Jordan'* (or *Jordan MultiCountry'*) for a matrix of Jordan type for single (multi) country specifications. These labels can be extended by *'; stationary'*, if one wishes to impose the largest eigenvalue of the risk-neutral feedback matrix to be strictly smaller than 1;   
 - **SSZ:** *'psd'* for a positive semi-definite matrix; *'diag'* for a diagonal matrix; *'BlockDiag'* for a block diagonal matrix (typical from the GVAR-based models) and *'JLLstructure'* for the models containing the restrictions along the lines of JLL (2015). 
@@ -434,7 +434,7 @@ To complete the optimization setting, the user needs to specify the level of con
 
 
 # Examples of full implementation of ATSMs {#S:SectionReplication}
-This section presents some examples on how to use the [MultiATSM](*LINK TO BE ASSIGNED*) package to fully implement ATSMs. Further on, the functions of this package are used to replicate some of the results presented in the original papers of JPS (2014) and CM (2021).  
+This section presents some examples on how to use the *MultiATSM* package to fully implement ATSMs. Further on, the functions of this package are used to replicate some of the results presented in the original papers of JPS (2014) and CM (2021).  
 
 
 ## General template
@@ -559,7 +559,7 @@ for (i in 1:C){
   varargin$se <- list(NULL, VarLab[[ModelType]][["se"]], 1e-6, NULL)
   varargin$K0Z <- list(NULL, VarLab[[ModelType]][["K0Z"]], NULL, NULL)
   varargin$K1Z <- list(NULL, VarLab[[ModelType]][["K1Z"]], NULL, NULL)
-  varargin$OptRun <-  c("iter off")
+  varargin$OptRun <- c("iter off")
 
   LabelVar<- c('Value', 'Label', 'LB', 'UB') # Elements of each parameter
   for (d in 1:(length(varargin)-1)){ names(varargin[[d]]) <-  LabelVar}
@@ -590,11 +590,11 @@ Forecasts <- ForecastYields(ModelType, ModelParaList, InputsForOutputs, FactorLa
 
 ## Paper replications
 ### Joslin, Priebisch and Singleton (2014)
-To the best of my knowledge, the original data-set used in @JoslinPriebschSingleton2014 is not publicly available. Nevertheless, there exists an alternative source of data that closely matches JPS (2014) in terms of the construction method and the sample period. This database is constructed by @BauerRudebusch2017 (BR, 2017) and is available at [Bauer's website](https://www.michaeldbauer.com/publication/spanning-puzzle/). In that paper, BR (2017) investigate whether macro-finance term structure models better suit the unspanned macro risk framework by JPS (2014) or the earlier traditional spanned settings as the one by @AngPiazzesi2003JME. Accordingly, BR (2017) intend to replicate some of the empirical results reported in JPS (2014). The R-code used by BR (2017) is also available at available at [Bauer's website](*https://www.michaeldbauer.com/publication/spanning-puzzle/*).
+To the best of my knowledge, the original data-set used in @JoslinPriebschSingleton2014 is not publicly available. Nevertheless, there exists an alternative source of data that closely matches JPS (2014) in terms of the construction method and the sample period. This database is constructed by @BauerRudebusch2017 (BR, 2017) and is available at [Bauer's website](https://www.michaeldbauer.com/publication/spanning-puzzle/). In that paper, BR (2017) investigate whether macro-finance term structure models better suit the unspanned macro risk framework by JPS (2014) or the earlier traditional spanned settings as the one by @AngPiazzesi2003JME. Accordingly, BR (2017) intend to replicate some of the empirical results reported in JPS (2014). The R-code used by BR (2017) is also available at available at [Bauer's website](https://www.michaeldbauer.com/publication/spanning-puzzle/).
 
-Supported by BR (2017)'s data-set, the code below uses the [MultiATSM](*LINK TO BE ASSIGNED*) package to estimate the key model parameters from the ATSM along the lines of JPS (2014).
+Supported by BR (2017)'s data-set, the code below uses the *MultiATSM* package to estimate the key model parameters from the ATSM along the lines of JPS (2014).
 
-```{r, results="hide"}
+```{r, eval=FALSE} 
 ###############################################################################################################
 #################################### USER INPUTS ##############################################################
 ###############################################################################################################
@@ -670,11 +670,14 @@ ModelPara <- Optimization(f, tol, varargin, FactorLabels, Economies, ModelType)$
 ```
 
 
-The tables below compare the ATSM parameter estimates generated from BR (2017) and the [MultiATSM](*LINK TO BE ASSIGNED*). Overall, one can note that the differences in the estimates are economically modest.
+
+The tables below compare the ATSM parameter estimates generated from BR (2017) and the *MultiATSM*. Overall, one can note that the differences in the estimates are economically modest.
 
 
-```{r, eval=ModelPara, echo= FALSE}
+```{r, echo= FALSE}
 options(scipen = 100) # eliminate the scientific notation
+data("BR_jps_gro_R3")
+data("JPSrep")
 
 RowsQ <- c("$r0$", "$\\lambda_1$", "$\\lambda_2$", "$\\lambda_3$" )
 TableQ <- data.frame(matrix(NA, ncol = 0, nrow =length(RowsQ)))
@@ -689,13 +692,16 @@ TableQ <- round(TableQ, digits = 5)
 
 
 kableExtra::kbl(TableQ, align = "c", caption = "$Q$-dynamics parameters") %>%
-  kable_classic("striped", full_width = F)  %>%
-  row_spec(0, font_size = 14) %>%
-  footnote(general = " $\\lambda$'s are the eigenvalues from the risk-neutral feedback matrix and $r0$ is the long-run mean of the short rate under Q.")
+  kableExtra::kable_classic("striped", full_width = F)  %>%
+  kableExtra::row_spec(0, font_size = 14) %>%
+  kableExtra::footnote(general = " $\\lambda$'s are the eigenvalues from the risk-neutral feedback matrix and $r0$ is the long-run mean of the short rate under Q.")
 ```
 
 
-```{r, eval=ModelPara, echo= FALSE}
+```{r, echo= FALSE}
+data("BR_jps_gro_R3")
+data("JPSrep")
+
 RowsP <- c("PC1", "PC2", "PC3", "GRO", "INF")
 ColP <- c(" ", RowsP)
 
@@ -726,28 +732,31 @@ TableP <- rbind(TablePbr,TablePMultiATSM)
 row.names(TableP) <- c(RowsP,paste(RowsP," ",sep="")) # trick to avoid rows to have the same name
 
 kableExtra::kbl(TableP, align = "c", caption = "$P$-dynamics parameters") %>%
-  kable_classic("striped", full_width = F)  %>%
-  row_spec(0, font_size = 14) %>%
-  add_header_above(c(" "= 1, "K0Z"=1, "K1Z" = 5), bold = T) %>%
-  pack_rows("BR (2017)", 1, 5) %>%
-  pack_rows("MultiATSM", 6, 10) %>%
-  footnote(general = " $K0Z$ is the intercept and $K1Z$ is feedback matrix from the $P$-dynamics.")
+  kableExtra::kable_classic("striped", full_width = F)  %>%
+  kableExtra::row_spec(0, font_size = 14) %>%
+  kableExtra::add_header_above(c(" "= 1, "K0Z"=1, "K1Z" = 5), bold = T) %>%
+  kableExtra::pack_rows("BR (2017)", 1, 5) %>%
+  kableExtra::pack_rows("MultiATSM", 6, 10) %>%
+  kableExtra::footnote(general = " $K0Z$ is the intercept and $K1Z$ is feedback matrix from the $P$-dynamics.")
 ```
 
-```{r, eval=ModelPara, echo= FALSE}
+```{r, echo= FALSE}
+data("BR_jps_gro_R3")
+data("JPSrep")
+
 se <- data.frame(BR_jps_out$est.llk$sigma.e, ModelPara$ests$se )
 rownames(se) <- "se"
 colnames(se) <- c("MultiATSM","BR (2017)")
 se <- round(se, digits = 7)
 
 kableExtra::kbl(se, align = "c", caption ="Portfolio of yields with errors") %>%
-  kable_classic("striped", full_width = F)  %>%
-  row_spec(0, font_size = 14) %>%
-  footnote(general = " $se$ is the standard deviation of the portfolio of yields observed with errors.")
+  kableExtra::kable_classic("striped", full_width = F)  %>%
+  kableExtra::row_spec(0, font_size = 14) %>%
+  kableExtra::footnote(general = " $se$ is the standard deviation of the portfolio of yields observed with errors.")
 ```
 
 
-It is relevant to highlight that the script above makes use of the principal component weight provided by BR (2017). Such a matrix is simply a scaled-up version of the one provided by the function *pca_weights_one_country* of this package. Accordingly, despite the numerical differences on the weight matrices, both methods generate time series of spanned factors which are perfectly correlated. Another difference between the two approaches relates to the construction form of the log-likelihood function (llk): while in the BR (2017) code the llk is expressed in terms of portfolio of yields, the [MultiATSM](*LINK TO BE ASSIGNED*) package generates this same input directly as a function of observed yields (i.e. both procedures lead to equivalent llk up to the Jacobian term).
+It is relevant to highlight that the script above makes use of the principal component weight provided by BR (2017). Such a matrix is simply a scaled-up version of the one provided by the function *pca_weights_one_country* of this package. Accordingly, despite the numerical differences on the weight matrices, both methods generate time series of spanned factors which are perfectly correlated. Another difference between the two approaches relates to the construction form of the log-likelihood function (llk): while in the BR (2017) code the llk is expressed in terms of portfolio of yields, the *MultiATSM* package generates this same input directly as a function of observed yields (i.e. both procedures lead to equivalent llk up to the Jacobian term).
 
 
 

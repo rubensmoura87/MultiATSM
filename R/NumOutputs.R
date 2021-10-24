@@ -5,9 +5,28 @@
 #'@param InputsForOutputs list conataining the desired horizon of analysis for the model fit, IRFs, GIRFs, FEVDs, and GFEVDs
 #'@param FactorLabels  a string-list based which contains all the labels of all the variables present in the model
 #'@param Economies a string-vector containing the names of the economies which are part of the economic system
-
-
+#'
+#'
+#'@examples
+#'\dontrun{
+#' # See examples in the vignette file of this package (Section 4).
+#'}
+#'
+#'
+#'@returns
+#'List of the model numerical outputs, namely
+#'\enumerate{
+#'\item Model fit of bond yields
+#'\item IRFs
+#'\item FEVDs
+#'\item GIRFs
+#'\item GFEVDs
+#'}
+#'
+#'
 #'@export
+
+
 
 NumOutputs <- function(ModelType, ModelPara, InputsForOutputs, FactorLabels, Economies){
 
@@ -71,8 +90,7 @@ NumOutputs <- function(ModelType, ModelPara, InputsForOutputs, FactorLabels, Eco
 #'@param FactorLabels string-list based which contains all the labels of all the variables present in the model
 #'@param Economies string-vector containing the names of the economies which are part of the economic system
 
-#'
-#'@export
+
 
 OutputConstructionSep <- function(ModelType, ModelPara, InputsForOutputs, FactorLabels, Economies){
 
@@ -108,7 +126,7 @@ OutputConstructionSep <- function(ModelType, ModelPara, InputsForOutputs, Factor
 #'@param Economies  string-vector containing the names of the economies which are part of the economic system
 
 #'
-#'@export
+
 
 VarianceExplainedSep<-function(ModelType, ModelPara, FactorLabels, Economies){
 
@@ -126,7 +144,7 @@ VarianceExplainedSep<-function(ModelType, ModelPara, FactorLabels, Economies){
 
   for(j in idxIndividual){
     for (i in 1:C){
-      H <- eigen(cov(t(ModelPara[[ModelTypeSet[j]]][[Economies[i]]]$inputs$Y)))$values
+      H <- eigen(stats::cov(t(ModelPara[[ModelTypeSet[j]]][[Economies[i]]]$inputs$Y)))$values
       percentages_explained <- cumsum(H)/sum(H)
       Total_Var_exp_per_model[[i]] <-percentages_explained[1:N]
     }
@@ -157,7 +175,7 @@ VarianceExplainedSep<-function(ModelType, ModelPara, FactorLabels, Economies){
 #'
 #' @references
 #' See, for instance, Jotiskhatira, Le and Lundblad (2015). "Why do interest rates in different currencies co-move?" (Journal of Financial Economics)
-#'@export
+
 
 YieldsFitsep <- function(ModelType, ModelPara, FactorLabels, Economies){
 
@@ -240,7 +258,7 @@ YieldsFitsep <- function(ModelType, ModelPara, FactorLabels, Economies){
 #'
 #'@details
 #' Structural shocks are identified via Cholesky decomposition
-#'@export
+
 
 IRFsep <- function(ModelType, ModelPara, IRFhoriz, FactorLabels, Economies){
 
@@ -288,8 +306,8 @@ IRFsep <- function(ModelType, ModelPara, IRFhoriz, FactorLabels, Economies){
       tempYields[ , , 1]  <- B %*% S
       # Shock at t=1:
       for (r in 2:IRFhoriz){
-        tempFactors[ , , r] <- Matpow(A1,numer=r-1, denom=1)%*%S # IRF (t+h) = A1^h*S
-        tempYields[ , , r]      <- B%*%Matpow(A1,numer=r-1, denom=1)%*%S
+        tempFactors[ , , r] <- powerplus::Matpow(A1,numer=r-1, denom=1)%*%S # IRF (t+h) = A1^h*S
+        tempYields[ , , r]      <- B%*%powerplus::Matpow(A1,numer=r-1, denom=1)%*%S
       }
       IRFRiskFactors <- aperm(tempFactors, c(3,1,2))
       IRFYields <- aperm(tempYields, c(3,1,2))
@@ -341,7 +359,7 @@ IRFsep <- function(ModelType, ModelPara, IRFhoriz, FactorLabels, Economies){
 #'
 #'@details
 #' Structural shocks are identified via Cholesky decomposition
-#'@export
+
 
 FEVDsep <- function(ModelType, ModelPara, FEVDhoriz, FactorLabels, Economies){
 
@@ -481,7 +499,7 @@ FEVDsep <- function(ModelType, ModelPara, FEVDhoriz, FactorLabels, Economies){
 #'
 #' \item Pesaran and Shin, 1998. "Generalized impulse response analysis in linear multivariate models" (Economics Letters)
 #' }
-#'@export
+
 
 
 
@@ -602,7 +620,7 @@ GIRFSep <- function(ModelType, ModelPara, GIRFhoriz, FactorLabels, Economies){
 #'
 #' \item Pesaran and Shin, 1998. "Generalized impulse response analysis in linear multivariate models" (Economics Letters)
 #' }
-#'@export
+
 
 
 
@@ -776,7 +794,7 @@ GFEVDsep <- function(ModelType, ModelPara, GFEVDhoriz, FactorLabels, Economies){
 #'@param FactorLabels  string-list based which contains all the labels of all the variables present in the model
 #'@param Economies  string-vector containing the names of the economies which are part of the economic system
 #'
-#'@export
+
 
 OutputConstructionJoint <- function(ModelType, ModelPara, InputsForOutputs, FactorLabels,
                                     Economies){
@@ -857,7 +875,7 @@ idxWishModels <- which(ModelTypeSet == ModelType)
 #'@param FactorLabels  string-list based which contains all the labels of all the variables present in the model
 #'@param Economies  string-vector containing the names of the economies which are part of the economic system
 #'
-#'@export
+
 
 
 VarianceExplainedJoint<-function(ModelType, ModelPara, FactorLabels, Economies){
@@ -880,7 +898,7 @@ VarianceExplainedJoint<-function(ModelType, ModelPara, FactorLabels, Economies){
     idx0 <- 0
     for (i in 1:C){
       idx1 <- idx0 + J
-      H <- eigen(cov(t(ModelPara[[ModelTypeSet[j]]]$inputs$Y[(idx0+1):idx1,])))$values
+      H <- eigen(stats::cov(t(ModelPara[[ModelTypeSet[j]]]$inputs$Y[(idx0+1):idx1,])))$values
       percentages_explained <- cumsum(H)/sum(H)
       Total_Var_exp_per_country[[i]] <-percentages_explained[1:N]
       idx0 <- idx1
@@ -914,7 +932,7 @@ VarianceExplainedJoint<-function(ModelType, ModelPara, FactorLabels, Economies){
 #'
 #' @references
 #' See, for instance, Jotiskhatira, Le and Lundblad (2015). "Why do interest rates in different currencies co-move?" (Journal of Financial Economics)
-#'@export
+
 
 YieldsFitJoint <- function(ModelType, ModelPara, FactorLabels, Economies){
 
@@ -996,7 +1014,7 @@ YieldsFitJoint <- function(ModelType, ModelPara, FactorLabels, Economies){
 #'
 #'@details
 #' Structural shocks are identified via Cholesky decomposition
-#'@export
+
 #'
 #'
 IRFjoint <- function(ModelType, ModelPara, IRFhoriz, FactorLabels, Economies){
@@ -1046,8 +1064,8 @@ IRFjoint <- function(ModelType, ModelPara, IRFhoriz, FactorLabels, Economies){
     tempYields[ , , 1]  <- B %*% S
     # Shock at t=1:
     for (r in 2:IRFhoriz){
-      tempFactors[ , , r] <- Matpow(A1,numer=r-1, denom=1)%*%S # IRF (t+h) = A1^h*S
-      tempYields[ , , r]      <- B%*%Matpow(A1,numer=r-1, denom=1)%*%S
+      tempFactors[ , , r] <- powerplus::Matpow(A1,numer=r-1, denom=1)%*%S # IRF (t+h) = A1^h*S
+      tempYields[ , , r]      <- B%*%powerplus::Matpow(A1,numer=r-1, denom=1)%*%S
     }
     IRFRiskFactors <- aperm(tempFactors, c(3,1,2))
     IRFYields <- aperm(tempYields, c(3,1,2))
@@ -1098,7 +1116,7 @@ IRFjoint <- function(ModelType, ModelPara, IRFhoriz, FactorLabels, Economies){
 #'
 #'@details
 #' Structural shocks are identified via Cholesky decomposition
-#'@export
+
 
 FEVDjoint <- function(ModelType, ModelPara, FEVDhoriz, FactorLabels, Economies){
 
@@ -1238,7 +1256,7 @@ FEVDjoint <- function(ModelType, ModelPara, FEVDhoriz, FactorLabels, Economies){
 #'
 #' \item Pesaran and Shin, 1998. "Generalized impulse response analysis in linear multivariate models" (Economics Letters)
 #' }
-#'@export
+
 
 
 GIRFjoint <- function(ModelType, ModelPara, GIRFhoriz, FactorLabels, Economies){
@@ -1361,7 +1379,7 @@ GIRFjoint <- function(ModelType, ModelPara, GIRFhoriz, FactorLabels, Economies){
 #'
 #' \item Pesaran and Shin, 1998. "Generalized impulse response analysis in linear multivariate models" (Economics Letters)
 #' }
-#'@export
+
 
 GFEVDjoint <- function(ModelType, ModelPara, GFEVDhoriz, FactorLabels, Economies){
 
@@ -1528,7 +1546,7 @@ GFEVDjoint <- function(ModelType, ModelPara, GFEVDhoriz, FactorLabels, Economies
 #'
 #'@details
 #' Structural shocks are identified via Cholesky decomposition
-#'@export
+
 
 
 
@@ -1579,8 +1597,8 @@ IRFjointOrthoJLL <- function(ModelType, ModelPara, IRFhoriz, FactorLabels, Econo
     tempYields[ , , 1]  <- B%*%PI%*% Se
     # Shock at t=1:
     for (r in 2:IRFhoriz){
-      tempFactors[ , , r] <- Matpow(A1e,numer=r-1, denom=1)%*%Se # IRF (t+h) = A1^h*S
-      tempYields[ , , r]      <- B%*%PI%*%Matpow(A1e,numer=r-1, denom=1)%*%Se
+      tempFactors[ , , r] <- powerplus::Matpow(A1e,numer=r-1, denom=1)%*%Se # IRF (t+h) = A1^h*S
+      tempYields[ , , r]      <- B%*%PI%*%powerplus::Matpow(A1e,numer=r-1, denom=1)%*%Se
     }
     IRFRiskFactors <- aperm(tempFactors, c(3,1,2))
     IRFYields <- aperm(tempYields, c(3,1,2))
@@ -1628,7 +1646,7 @@ IRFjointOrthoJLL <- function(ModelType, ModelPara, IRFhoriz, FactorLabels, Econo
 #'
 #'@details
 #' Structural shocks are identified via Cholesky decomposition
-#'@export
+
 
 FEVDjointOrthogoJLL <- function(ModelType, ModelPara, FEVDhoriz, FactorLabels, Economies){
 
@@ -1766,7 +1784,7 @@ FEVDjointOrthogoJLL <- function(ModelType, ModelPara, FEVDhoriz, FactorLabels, E
 #'
 #' \item Pesaran and Shin, 1998. "Generalized impulse response analysis in linear multivariate models" (Economics Letters)
 #' }
-#'@export
+
 
 
 GIRFjointOrthoJLL <- function(ModelType, ModelPara, GIRFhoriz, FactorLabels, Economies){
@@ -1891,7 +1909,7 @@ GIRFjointOrthoJLL <- function(ModelType, ModelPara, GIRFhoriz, FactorLabels, Eco
 #'
 #' \item Pesaran and Shin, 1998. "Generalized impulse response analysis in linear multivariate models" (Economics Letters)
 #' }
-#'@export
+
 
 GFEVDjointOrthoJLL <- function(ModelType, ModelPara, GFEVDhoriz, FactorLabels, Economies){
 

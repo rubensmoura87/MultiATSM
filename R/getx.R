@@ -13,7 +13,6 @@
 #'  (Euro Area Business Cycle Network Training School - Term Structure Modelling).
 #'
 #'
-#'@export
 
 
 getx <- function(con, varargin, Economies, FactorLabels, JLLinputs = NULL){
@@ -35,7 +34,7 @@ getx <- function(con, varargin, Economies, FactorLabels, JLLinputs = NULL){
 
     if (!isempty(si)){
       namex[i] <- killa( substr(varargin[[i]]$Label, start =1, stop =si-1) ) # remove @ from variables name, if exists
-      a2t <- substr(varargin[[i]]$Label, start = si +1, stop = str_length(varargin[[i]]$Label) ) # type of the constraint of the parameter (e.g. Jordan, psd, bounded...)
+      a2t <- substr(varargin[[i]]$Label, start = si +1, stop = stringr::str_length(varargin[[i]]$Label) ) # type of the constraint of the parameter (e.g. Jordan, psd, bounded...)
       if (isempty(namex[i] )) { namex[i] <- paste('para', toString(i), sep="") }
     }else{
       namex[i] <- paste('para', toString(i), sep="")
@@ -120,7 +119,7 @@ getx <- function(con, varargin, Economies, FactorLabels, JLLinputs = NULL){
 #'  "A Small Package of Matlab Routines for the Estimation of Some Term Structure Models." \cr
 #'  (Euro Area Business Cycle Network Training School - Term Structure Modelling).
 #'  Available at: https://cepr.org/40029
-#' @export
+
 
 
 
@@ -131,7 +130,7 @@ true2aux <- function(b, ctype, lb, ub, Economies, FactorLabels, JLLinputs =NULL)
   if (contain('psd', ctype) ) {
     i <- strfind(ctype,'psd')
     i<-i[1]
-    M <-as.numeric(substr(ctype, start= i+3, stop= str_length(ctype) ) )
+    M <-as.numeric(substr(ctype, start= i+3, stop= stringr::str_length(ctype) ) )
     if (is.na(M)) { M<- 1 }
     ctype <- 'psd'
   }
@@ -139,7 +138,7 @@ true2aux <- function(b, ctype, lb, ub, Economies, FactorLabels, JLLinputs =NULL)
   if (contain('diag', ctype) ){
     i <- strfind(ctype,'diag')
     i <- i[1]
-    M <-as.numeric(substr(ctype, start= i+4, stop= str_length(ctype) ) )
+    M <-as.numeric(substr(ctype, start= i+4, stop= stringr::str_length(ctype) ) )
     if (is.na(M)) { M<-1 }
 
     ctype <- 'diag'
@@ -148,7 +147,7 @@ true2aux <- function(b, ctype, lb, ub, Economies, FactorLabels, JLLinputs =NULL)
   if (contain('BlockDiag', ctype) ){
     i <- strfind(ctype,'BlockDiag')
     i <- i[1]
-    M <-as.numeric(substr(ctype, start= i+9, stop= str_length(ctype) ) )
+    M <-as.numeric(substr(ctype, start= i+9, stop= stringr::str_length(ctype) ) )
     if (is.na(M)) { M<-1 }
 
     ctype <- 'BlockDiag'
@@ -157,7 +156,7 @@ true2aux <- function(b, ctype, lb, ub, Economies, FactorLabels, JLLinputs =NULL)
   if (contain('JLLstructure', ctype) ){
     i <- strfind(ctype,'JLLstructure')
     i <- i[1]
-    M <-as.numeric(substr(ctype, start= i+13, stop= str_length(ctype) ) )
+    M <-as.numeric(substr(ctype, start= i+13, stop= stringr::str_length(ctype) ) )
     if (is.na(M)) { M<-1 }
 
     ctype <- 'JLLstructure'
@@ -445,7 +444,6 @@ true2aux <- function(b, ctype, lb, ub, Economies, FactorLabels, JLLinputs =NULL)
 #' @param s text vector containing the feature of the variable
 #'
 #' @importFrom pracma strfind isempty
-#' @importFrom stringr str_length
 #'
 #'@references
 #' This function is a modified version of the "killa" function by Le and Singleton (2018). \cr
@@ -457,7 +455,7 @@ killa <- function(s){
   y <- s
   ai <- strfind(s, '@')
 
-  if (!isempty(ai) ){ y <- substr(s, start=ai+1, stop= str_length(s) ) }
+  if (!isempty(ai) ){ y <- substr(s, start=ai+1, stop= stringr::str_length(s) ) }
 
   return(y)
 }

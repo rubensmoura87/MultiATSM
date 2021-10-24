@@ -10,6 +10,15 @@ K1XQStationary(StationaryEigenvalues)
 \item{StationaryEigenvalues}{Binary variable: set "1" if the user whises the largest eigenvalue
 to be strictly smaller than 1. Set "0", otherwise}
 }
+\value{
+list
+}
 \description{
 Impose stationarity under the Q-measure
+}
+\examples{
+stat <- 1 # Takes values 1 and 0
+K1XQStationary(stat)
+
+
 }

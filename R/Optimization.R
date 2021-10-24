@@ -30,8 +30,13 @@
 #' @param Economies string-vector containing the names of the economies which are part of the economic system
 #' @param ModelType string-vector containing the label of the model to be estimated
 #' @param JLLinputs inputs used in the estimation of the JLL-based models; Default is set to NULL
-
-
+#'
+#'
+#'@examples
+#'\dontrun{
+#' # See examples in the vignette file of this package (Section 4).
+#'}
+#'
 #'@return
 #' (i) out: list of second output produced by f (the first output of f must be the objective value to be minimized). \cr
 #' (ii) x:  list containing parameter estimates
@@ -40,14 +45,10 @@
 #' If a variable name starts with a '@@', it means that that parameter will be analytically concentrated out in
 #' the specification of f. In this case, no starting value is needed for this particular parameter (an empty matrix
 #' can be provided as a starting value).
-
-
-
+#'
+#'
+#'
 #'@importFrom pracma fminunc
-#'@importFrom Jmisc tic toc
-#'@importFrom neldermead fminsearch
-#'@importFrom functional Curry
-#'@importFrom methods show
 #'
 #'@references
 #' This function is based on the "LS__opt" function by Le and Singleton (2018). \cr
@@ -58,11 +59,11 @@
 #'@export
 
 Optimization <- function(f, tol, varargin, FactorLabels, Economies, ModelType, JLLinputs = NULL){
-  tic()
+  Jmisc::tic()
 
-  show('#########################################################################################################')
-  show( paste('###########################', 'Optimization  (Point Estimate) -', ModelType, '#################################' ))
-  show('#########################################################################################################')
+  print('#########################################################################################################')
+  print( paste('###########################', 'Optimization  (Point Estimate) -', ModelType, '#################################' ))
+  print('#########################################################################################################')
 
 
   NP <- floor(sum(lengths(varargin))/4)
@@ -86,11 +87,11 @@ Optimization <- function(f, tol, varargin, FactorLabels, Economies, ModelType, J
                                             # not be changed by the function getx)
 
   # Value of the likelihood function:
-  FFvec <- Curry(f_with_vectorized_parameters, sizex= AuxVal$sizex , f, con = 'concentration', varargin, ModelType,
+  FFvec <- functional::Curry(f_with_vectorized_parameters, sizex= AuxVal$sizex , f, con = 'concentration', varargin, ModelType,
                  FactorLabels, Economies, JLLinputs, nargout=1)
   FF <-function(x0){ mean(FFvec(x=x0))   }
 
-  options200 <- optimset(MaxFunEvals = 200*numel(AuxVal$x0), Display = iter,
+  options200 <- neldermead::optimset(MaxFunEvals = 200*numel(AuxVal$x0), Display = iter,
                          MaxIter = 200, GradObj='off', TolFun= 10^-8, TolX= 10^-8)
 
   options1000 <- options200
@@ -116,7 +117,7 @@ Optimization <- function(f, tol, varargin, FactorLabels, Economies, ModelType, J
 
         FFtemporary <- function(xtemp,scaling_vector){  FF(x=scaling_vector*xtemp)       }
 
-        FFtemp <- Curry(FFtemporary, scaling_vector = scaling_vector)
+        FFtemp <- functional::Curry(FFtemporary, scaling_vector = scaling_vector)
 
         x1 <- fminunc(x0=AuxVal$x0/scaling_vector, FFtemp , gr = NULL, tol = options200$TolFun,
                       maxiter = options200$MaxIter , maxfeval = options200$MaxFunEvals )
@@ -137,7 +138,7 @@ Optimization <- function(f, tol, varargin, FactorLabels, Economies, ModelType, J
     }
 
     newF <- FF(x=AuxVal$x0)
-    show(newF)
+    print(newF)
     converged <-   (abs(oldF - newF)<tol) ||(count>Max_AG_Iteration && newF>Previous_Optimal_Obj)
     oldF <- newF
 
@@ -148,7 +149,7 @@ Optimization <- function(f, tol, varargin, FactorLabels, Economies, ModelType, J
   # Build the full auxiliary vector, including concentrated parameters
   ud <- update_para(AuxVal$x0, sizex= AuxVal$sizex, ii= NULL, con= 'concentration',
                     FactorLabels, Economies, JLLinputs, varargin) # update the parameter set which were NOT concentrated out after the optimization.
-  FF <- Curry(f_with_vectorized_parameters, sizex= AuxVal$sizex, f, con = 'concentration', varargin=ud,
+  FF <- functional::Curry(f_with_vectorized_parameters, sizex= AuxVal$sizex, f, con = 'concentration', varargin=ud,
               ModelType, FactorLabels, Economies, JLLinputs, nargout=2)
 
 
@@ -179,7 +180,7 @@ Optimization <- function(f, tol, varargin, FactorLabels, Economies, ModelType, J
 
   x.vec_ <- x0 # Vector of auxiliary parameters.
 
-  FF <- Curry(f_with_vectorized_parameters, sizex=sizex, f=f, con='', varargin=ud, ModelType,
+  FF <- functional::Curry(f_with_vectorized_parameters, sizex=sizex, f=f, con='', varargin=ud, ModelType,
               FactorLabels, Economies, JLLinputs, nargout=2)
   out <- FF(x=x0)$out
 
@@ -189,7 +190,7 @@ Optimization <- function(f, tol, varargin, FactorLabels, Economies, ModelType, J
   x[[1]] <- x.vec_
 
   for (i in 1:dim(sizex)[1]){
-    Fi <- Curry(update_para, sizex=sizex, ii=i , con='', FactorLabels, Economies, JLLinputs, varargin= ud)
+    Fi <- functional::Curry(update_para, sizex=sizex, ii=i , con='', FactorLabels, Economies, JLLinputs, varargin= ud)
     if (!isempty(namex[i]) ){
       x[[i+1]] <- Fi(x=x.vec_)
     }
@@ -204,7 +205,7 @@ Optimization <- function(f, tol, varargin, FactorLabels, Economies, ModelType, J
 
   names(outputs) <- c("FinalEstimates", "Summary")
 
-  toc()
+  Jmisc::toc()
   return(outputs)
 }
 
@@ -254,11 +255,7 @@ Optimization <- function(f, tol, varargin, FactorLabels, Economies, ModelType, J
 #' can be provided as a starting value
 
 
-
 #'@importFrom pracma fminunc
-#'@importFrom neldermead fminsearch
-#'@importFrom functional Curry
-#'@importFrom methods show
 #'
 #'@references
 #' This function is based on the "LS__opt" function by Le and Singleton (2018).\cr
@@ -266,7 +263,7 @@ Optimization <- function(f, tol, varargin, FactorLabels, Economies, ModelType, J
 #'  (Euro Area Business Cycle Network Training School - Term Structure Modelling).
 #'  Available at: https://cepr.org/40029
 #'
-#'@export
+
 
 
 Optimization_Boot <- function(f, tol, varargin, FactorLabels, Economies, ModelType, JLLinputs = NULL){
@@ -293,11 +290,11 @@ Optimization_Boot <- function(f, tol, varargin, FactorLabels, Economies, ModelTy
 
 
   # Value of the likelihood function:
-  FFvec <- Curry(f_with_vectorized_parameters, sizex= AuxVal$sizex , f, con = 'concentration', varargin,
+  FFvec <- functional::Curry(f_with_vectorized_parameters, sizex= AuxVal$sizex , f, con = 'concentration', varargin,
                  ModelType, FactorLabels, Economies, JLLinputs, nargout=1)
   FF <-function(x0){ mean(FFvec(x=x0))   }
 
-  options200 <- optimset(MaxFunEvals = 200*numel(AuxVal$x0), Display = iter,
+  options200 <- neldermead::optimset(MaxFunEvals = 200*numel(AuxVal$x0), Display = iter,
                          MaxIter = 1000, GradObj='off', TolFun= 10^-8, TolX= 10^-8)
 
   options1000 <- options200
@@ -323,7 +320,7 @@ Optimization_Boot <- function(f, tol, varargin, FactorLabels, Economies, ModelTy
 
         FFtemporary <- function(xtemp,scaling_vector){  FF(x=scaling_vector*xtemp)       }
 
-        FFtemp <- Curry(FFtemporary, scaling_vector = scaling_vector)
+        FFtemp <- functional::Curry(FFtemporary, scaling_vector = scaling_vector)
 
         x1 <- fminunc(x0=AuxVal$x0/scaling_vector, FFtemp , gr = NULL, tol = options200$TolFun,
                       maxiter = options200$MaxIter , maxfeval = options200$MaxFunEvals )
@@ -339,6 +336,7 @@ Optimization_Boot <- function(f, tol, varargin, FactorLabels, Economies, ModelTy
       if (FF(x=x1)<FF(x=AuxVal$x0)){ AuxVal$x0 <- x1 }
     }
     if (!contain('fminunc only', EstType)){
+
       x1<-neldermead::fminsearch(FF, AuxVal$x0, options1000)$optbase$xopt
       if (FF(x=x1)<FF(x=AuxVal$x0)){ AuxVal$x0 <- x1 }
     }
@@ -355,7 +353,7 @@ Optimization_Boot <- function(f, tol, varargin, FactorLabels, Economies, ModelTy
   # now build the full auxiliary vector, including concentrated parameters
   ud <- update_para(AuxVal$x0, sizex= AuxVal$sizex, ii= NULL, con= 'concentration',
                     FactorLabels, Economies, JLLinputs, varargin) # update the parameter set which were NOT concentrated out after the optimization.
-  FF <- Curry(f_with_vectorized_parameters, sizex= AuxVal$sizex, f, con = 'concentration', varargin=ud,
+  FF <- functional::Curry(f_with_vectorized_parameters, sizex= AuxVal$sizex, f, con = 'concentration', varargin=ud,
               ModelType, FactorLabels, Economies, JLLinputs, nargout=2)
 
 
@@ -385,7 +383,7 @@ Optimization_Boot <- function(f, tol, varargin, FactorLabels, Economies, ModelTy
 
   x.vec_ <- x0 # Vector of auxiliary parameters.
 
-  FF <- Curry(f_with_vectorized_parameters, sizex=sizex, f=f, con='', varargin=ud,
+  FF <- functional::Curry(f_with_vectorized_parameters, sizex=sizex, f=f, con='', varargin=ud,
               ModelType, FactorLabels, Economies, JLLinputs, nargout=2)
   out <- FF(x=x0)$out
 

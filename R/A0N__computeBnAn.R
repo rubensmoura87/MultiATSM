@@ -24,7 +24,7 @@
 #'
 #'  \item Dai and Singleton (2000). "Specification Analysis of Affine Term Structure Models" (The Journal of Finance)
 #'  }
-#' @export
+
 
 
 A0N__computeBnAn_sepQ <- function(mat, K1XQ, dx, r0, SSX){
@@ -96,7 +96,6 @@ A0N__computeBnAn_sepQ <- function(mat, K1XQ, dx, r0, SSX){
 #'  (Euro Area Business Cycle Network Training School - Term Structure Modelling).
 #'  Available at: https://cepr.org/40029
 
-#' @export
 
 
 
@@ -145,7 +144,7 @@ A0N__computeBnAn_jointQ <- function(mat, K1XQ, dx, r0, SSX, Economies){
       idx0 <- idx1
     }else{
       BnXCS <- BnXCS[mat+1, (idx0+1):idx1]/mat
-      BnX <- adiag(BnX,BnXCS)
+      BnX <- magic::adiag(BnX,BnXCS)
 
       AnXCS <- t(t(AnXCS[mat+1]/mat))
       AnX <- rbind(AnX,AnXCS)

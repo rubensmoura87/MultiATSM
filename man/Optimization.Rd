@@ -64,6 +64,12 @@ If a variable name starts with a '@', it means that that parameter will be analy
 the specification of f. In this case, no starting value is needed for this particular parameter (an empty matrix
 can be provided as a starting value).
 }
+\examples{
+\dontrun{
+# See examples in the vignette file of this package (Section 4).
+}
+
+}
 \references{
 This function is based on the "LS__opt" function by Le and Singleton (2018). \cr
  "A Small Package of Matlab Routines for the Estimation of Some Term Structure Models." \cr

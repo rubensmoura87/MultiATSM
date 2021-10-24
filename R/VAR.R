@@ -29,7 +29,7 @@ VAR <- function(RiskFactors, VARtype, Bcon = NULL){
 
   # Unconstrained
   if (VARtype == 'unconstrained'){
-    RegVAR <-lm( t(LHS)~ t(RHS)) # VAR(1) under the P.
+    RegVAR <-stats::lm( t(LHS)~ t(RHS)) # VAR(1) under the P.
     K0Z <- t(t(RegVAR$coefficients[1,]))
     K1Z <- t(RegVAR$coefficients[2:(K+1),])
     eZ <- RegVAR$residuals

@@ -1,7 +1,3 @@
-# This file comprises the several inverse functions used in the computation of the Gaussian likelihood
-# (see GaussianDensity function)
-
-
 ###############################################################################################################
 #' Inverts an array of matrices so that:  inva[,,i] = inv(a[,,i])
 

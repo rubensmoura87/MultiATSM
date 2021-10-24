@@ -11,7 +11,6 @@
 #'  (Euro Area Business Cycle Network Training School - Term Structure Modelling).
 #'  Available at: https://cepr.org/40029
 #'
-#' @export
 
 
 

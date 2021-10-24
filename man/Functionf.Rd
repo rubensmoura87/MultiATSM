@@ -19,6 +19,15 @@ Functionf(MLEinputs, Economies, mat, DataFrequency, FactorLabels, ModelType)
 
 \item{ModelType}{string-vector containing the label of the model to be estimated}
 }
+\value{
+objective function
+}
 \description{
 Set up the vector-valued objective function (Point estimate)
+}
+\examples{
+\dontrun{
+# See examples in the vignette file of this package (Section 4).
+}
+
 }

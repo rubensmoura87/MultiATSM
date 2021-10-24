@@ -7,7 +7,6 @@
 #'@param Economies string-vector containing the names of the economies which are part of the economic system
 #'
 
-#'@export
 
 BootstrapBoundsSet <- function(ModelType, ModelBootstrap, NumOutPE, InputsForOutputs, Economies){
 
@@ -101,9 +100,9 @@ BootstrapBoundsSet <- function(ModelType, ModelBootstrap, NumOutPE, InputsForOut
 #'@param PathsGraphs path of the folder in which the graphs will be saved
 #'
 #'
-#'@importFrom stats quantile
 
-#'@export
+
+
 
 
 IRFandGIRFbs_sepQ <- function(ModelType, ModelBootstrap, NumOutPE, InputsForOutputs, Economies, PathsGraphs){
@@ -157,9 +156,9 @@ IRFandGIRFbs_sepQ <- function(ModelType, ModelBootstrap, NumOutPE, InputsForOutp
 
             AllShocksOnePeriodFacs[,,h]  <- apply(Facs,2, sort) # Ensures that each column is in ascending order
 
-            INFfacs[thor, ,h] <- apply(AllShocksOnePeriodFacs[,,h], 2, quantile, probs = quants[1])
-            MEDfacs[thor, ,h] <- apply(AllShocksOnePeriodFacs[,,h], 2, quantile, probs = quants[2])
-            SUPfacs[thor, ,h] <- apply(AllShocksOnePeriodFacs[,,h], 2, quantile, probs = quants[3])
+            INFfacs[thor, ,h] <- apply(AllShocksOnePeriodFacs[,,h], 2, stats::quantile, probs = quants[1])
+            MEDfacs[thor, ,h] <- apply(AllShocksOnePeriodFacs[,,h], 2, stats::quantile, probs = quants[2])
+            SUPfacs[thor, ,h] <- apply(AllShocksOnePeriodFacs[,,h], 2, stats::quantile, probs = quants[3])
           }
         }
 
@@ -193,9 +192,9 @@ IRFandGIRFbs_sepQ <- function(ModelType, ModelBootstrap, NumOutPE, InputsForOutp
             }
             AllShocksOnePeriodyies[,,h]  <- apply(yies,2, sort) # Ensures that each column is in ascending order
 
-            INFyies[thor, ,h] <- apply(AllShocksOnePeriodyies[,,h], 2, quantile, probs = quants[1])
-            MEDyies[thor, ,h] <- apply(AllShocksOnePeriodyies[,,h], 2, quantile, probs = quants[2])
-            SUPyies[thor, ,h] <- apply(AllShocksOnePeriodyies[,,h], 2, quantile, probs = quants[3])
+            INFyies[thor, ,h] <- apply(AllShocksOnePeriodyies[,,h], 2, stats::quantile, probs = quants[1])
+            MEDyies[thor, ,h] <- apply(AllShocksOnePeriodyies[,,h], 2, stats::quantile, probs = quants[2])
+            SUPyies[thor, ,h] <- apply(AllShocksOnePeriodyies[,,h], 2, stats::quantile, probs = quants[3])
           }
         }
 
@@ -221,7 +220,7 @@ IRFandGIRFbs_sepQ <- function(ModelType, ModelBootstrap, NumOutPE, InputsForOutp
 
   if (any(IdxFacGraphs==1)){
 
-show('################################# Generating IRFs/GIRFs graphs (Bootstrap) #################################' )
+print('################################# Generating IRFs/GIRFs graphs (Bootstrap) #################################' )
 
     plot_list <- list()
 
@@ -253,8 +252,8 @@ show('################################# Generating IRFs/GIRFs graphs (Bootstrap)
 
               plot_list[[i]] <- p
             }
-            subplots <- plot_grid(plotlist= plot_list, ncol=3)
-            cowplot::ggsave(subplots, file=paste0(LabIRF[d],"Factors_shock_to_", nmShock[b], ".png"),
+            subplots <- cowplot::plot_grid(plotlist= plot_list, ncol=3)
+            ggplot2::ggsave(subplots, file=paste0(LabIRF[d],"Factors_shock_to_", nmShock[b], ".png"),
                             path= PathsGraphs[[ModelType]][[LabIRF[d]]][[Economies[f]]][["Factors"]])
           }
         }
@@ -300,8 +299,8 @@ show('################################# Generating IRFs/GIRFs graphs (Bootstrap)
 
               plot_list[[i]] <- p
             }
-            subplots <- plot_grid(plotlist= plot_list, ncol=3)
-            cowplot::ggsave(subplots, file=paste0(LabIRF[d],"Yields_shock_to_", nmShock[b], ".png"),
+            subplots <- cowplot::plot_grid(plotlist= plot_list, ncol=3)
+            ggplot2::ggsave(subplots, file=paste0(LabIRF[d],"Yields_shock_to_", nmShock[b], ".png"),
                             path=  PathsGraphs[[ModelType]][[LabIRF[d]]][[Economies[f]]][["Yields"]])
           }
         }
@@ -324,10 +323,6 @@ show('################################# Generating IRFs/GIRFs graphs (Bootstrap)
 #'@param PathsGraphs path of the folder in which the graphs will be saved
 #'
 #'
-#'@importFrom stats quantile
-
-#'@export
-
 
 
 FEVDandGFEVDbs_sepQ <- function(ModelType, ModelBootstrap, NumOutPE, InputsForOutputs, Economies, PathsGraphs){
@@ -383,9 +378,9 @@ FEVDandGFEVDbs_sepQ <- function(ModelType, ModelBootstrap, NumOutPE, InputsForOu
 
           AllShocksOnePeriodFacs[,,h]  <- apply(Facs,2, sort) # Ensures that each column is in ascending order
 
-          INFfacs[thor, ,h] <- apply(AllShocksOnePeriodFacs[,,h], 2, quantile, probs = quants[1])
-          MEDfacs[thor, ,h] <- apply(AllShocksOnePeriodFacs[,,h], 2, quantile, probs = quants[2])
-          SUPfacs[thor, ,h] <- apply(AllShocksOnePeriodFacs[,,h], 2, quantile, probs = quants[3])
+          INFfacs[thor, ,h] <- apply(AllShocksOnePeriodFacs[,,h], 2, stats::quantile, probs = quants[1])
+          MEDfacs[thor, ,h] <- apply(AllShocksOnePeriodFacs[,,h], 2, stats::quantile, probs = quants[2])
+          SUPfacs[thor, ,h] <- apply(AllShocksOnePeriodFacs[,,h], 2, stats::quantile, probs = quants[3])
         }
       }
 
@@ -419,9 +414,9 @@ FEVDandGFEVDbs_sepQ <- function(ModelType, ModelBootstrap, NumOutPE, InputsForOu
           }
           AllShocksOnePeriodyies[,,h]  <- apply(yies,2, sort) # Ensures that each column is in ascending order
 
-          INFyies[thor, ,h] <- apply(AllShocksOnePeriodyies[,,h], 2, quantile, probs = quants[1])
-          MEDyies[thor, ,h] <- apply(AllShocksOnePeriodyies[,,h], 2, quantile, probs = quants[2])
-          SUPyies[thor, ,h] <- apply(AllShocksOnePeriodyies[,,h], 2, quantile, probs = quants[3])
+          INFyies[thor, ,h] <- apply(AllShocksOnePeriodyies[,,h], 2, stats::quantile, probs = quants[1])
+          MEDyies[thor, ,h] <- apply(AllShocksOnePeriodyies[,,h], 2, stats::quantile, probs = quants[2])
+          SUPyies[thor, ,h] <- apply(AllShocksOnePeriodyies[,,h], 2, stats::quantile, probs = quants[3])
         }
       }
 
@@ -447,7 +442,7 @@ FEVDandGFEVDbs_sepQ <- function(ModelType, ModelBootstrap, NumOutPE, InputsForOu
 
   if (any(IdxFacGraphs==1)){
 
-    show('################################# Generating FEVDs/GFEVDs graphs (Bootstrap) #################################' )
+    print('################################# Generating FEVDs/GFEVDs graphs (Bootstrap) #################################' )
 
     plot_list <- list()
     for (f in 1:C){
@@ -478,8 +473,8 @@ FEVDandGFEVDbs_sepQ <- function(ModelType, ModelBootstrap, NumOutPE, InputsForOu
 
             plot_list[[i]] <- p
           }
-          subplots <- plot_grid(plotlist= plot_list, ncol=3)
-          cowplot::ggsave(subplots, file=paste0(LabFEVD[d],"Factors_", nmShock[b], ".png"),
+          subplots <- cowplot::plot_grid(plotlist= plot_list, ncol=3)
+          ggplot2::ggsave(subplots, file=paste0(LabFEVD[d],"Factors_", nmShock[b], ".png"),
                           path=  PathsGraphs[[ModelType]][[LabFEVD[d]]][[Economies[f]]][["Factors"]])
         }
       }
@@ -525,8 +520,8 @@ FEVDandGFEVDbs_sepQ <- function(ModelType, ModelBootstrap, NumOutPE, InputsForOu
 
             plot_list[[i]] <- p
           }
-          subplots <- plot_grid(plotlist= plot_list, ncol=3)
-          cowplot::ggsave(subplots, file=paste0(LabFEVD[d],"Yields_", nmShock[b], ".png"),
+          subplots <- cowplot::plot_grid(plotlist= plot_list, ncol=3)
+          ggplot2::ggsave(subplots, file=paste0(LabFEVD[d],"Yields_", nmShock[b], ".png"),
                           path=  PathsGraphs[[ModelType]][[LabFEVD[d]]][[Economies[f]]][["Yields"]])
         }
       }
@@ -556,9 +551,7 @@ FEVDandGFEVDbs_sepQ <- function(ModelType, ModelBootstrap, NumOutPE, InputsForOu
 #'@param PathsGraphs path of the folder in which the graphs will be saved
 #'
 #'
-#'@importFrom stats quantile
 
-#'@export
 
 
 IRFandGIRFbs_jointQ <- function(ModelType, ModelBootstrap, NumOutPE, InputsForOutputs, Economies, PathsGraphs){
@@ -621,9 +614,9 @@ IRFandGIRFbs_jointQ <- function(ModelType, ModelBootstrap, NumOutPE, InputsForOu
 
           AllShocksOnePeriodFacs[,,h]  <- apply(Facs,2, sort) # Ensures that each column is in ascending order
 
-          INFfacs[thor, ,h] <- apply(AllShocksOnePeriodFacs[,,h], 2, quantile, probs = quants[1])
-          MEDfacs[thor, ,h] <- apply(AllShocksOnePeriodFacs[,,h], 2, quantile, probs = quants[2])
-          SUPfacs[thor, ,h] <- apply(AllShocksOnePeriodFacs[,,h], 2, quantile, probs = quants[3])
+          INFfacs[thor, ,h] <- apply(AllShocksOnePeriodFacs[,,h], 2, stats::quantile, probs = quants[1])
+          MEDfacs[thor, ,h] <- apply(AllShocksOnePeriodFacs[,,h], 2, stats::quantile, probs = quants[2])
+          SUPfacs[thor, ,h] <- apply(AllShocksOnePeriodFacs[,,h], 2, stats::quantile, probs = quants[3])
         }
       }
 
@@ -665,9 +658,9 @@ IRFandGIRFbs_jointQ <- function(ModelType, ModelBootstrap, NumOutPE, InputsForOu
           }
           AllShocksOnePeriodyies[,,h]  <- apply(yies,2, sort) # Ensures that each column is in ascending order
 
-          INFyies[thor, ,h] <- apply(AllShocksOnePeriodyies[,,h], 2, quantile, probs = quants[1])
-          MEDyies[thor, ,h] <- apply(AllShocksOnePeriodyies[,,h], 2, quantile, probs = quants[2])
-          SUPyies[thor, ,h] <- apply(AllShocksOnePeriodyies[,,h], 2, quantile, probs = quants[3])
+          INFyies[thor, ,h] <- apply(AllShocksOnePeriodyies[,,h], 2, stats::quantile, probs = quants[1])
+          MEDyies[thor, ,h] <- apply(AllShocksOnePeriodyies[,,h], 2, stats::quantile, probs = quants[2])
+          SUPyies[thor, ,h] <- apply(AllShocksOnePeriodyies[,,h], 2, stats::quantile, probs = quants[3])
         }
       }
 
@@ -691,7 +684,7 @@ IRFandGIRFbs_jointQ <- function(ModelType, ModelBootstrap, NumOutPE, InputsForOu
 
   if (any(IdxFacGraphs==1)){
 
-    show('################################# Generating IRFs/GIRFs graphs (Bootstrap) #################################' )
+    print('################################# Generating IRFs/GIRFs graphs (Bootstrap) #################################' )
 
     plot_list <- list()
 
@@ -725,8 +718,8 @@ IRFandGIRFbs_jointQ <- function(ModelType, ModelBootstrap, NumOutPE, InputsForOu
 
             plot_list[[i]] <- p
           }
-          subplots <- plot_grid(plotlist= plot_list, ncol=3)
-          cowplot::ggsave(subplots, file=paste0(LabIRF[d],"Factors_shock_to_", nmShock[b], ".png"),
+          subplots <- cowplot::plot_grid(plotlist= plot_list, ncol=3)
+          ggplot2::ggsave(subplots, file=paste0(LabIRF[d],"Factors_shock_to_", nmShock[b], ".png"),
                           path= PathsGraphs[[ModelType]][[LabIRF[d]]][["Factors"]])
         }
       }
@@ -773,8 +766,8 @@ IRFandGIRFbs_jointQ <- function(ModelType, ModelBootstrap, NumOutPE, InputsForOu
 
             plot_list[[i]] <- p
           }
-          subplots <- plot_grid(plotlist= plot_list, ncol=3)
-          cowplot::ggsave(subplots, file=paste0(LabIRF[d],"Yields_shock_to_", nmShock[b], ".png"),
+          subplots <- cowplot::plot_grid(plotlist= plot_list, ncol=3)
+          ggplot2::ggsave(subplots, file=paste0(LabIRF[d],"Yields_shock_to_", nmShock[b], ".png"),
                           path= PathsGraphs[[ModelType]][[LabIRF[d]]][["Yields"]])
         }
         }
@@ -797,9 +790,6 @@ IRFandGIRFbs_jointQ <- function(ModelType, ModelBootstrap, NumOutPE, InputsForOu
 #'@param PathsGraphs path of the folder in which the graphs will be saved
 #'
 #'
-#'@importFrom stats quantile
-
-#'@export
 
 
 FEVDandGFEVDbs_jointQ <- function(ModelType, ModelBootstrap, NumOutPE, InputsForOutputs, Economies, PathsGraphs){
@@ -865,9 +855,9 @@ FEVDandGFEVDbs_jointQ <- function(ModelType, ModelBootstrap, NumOutPE, InputsFor
 
           AllShocksOnePeriodFacs[,,h]  <- apply(Facs,2, sort) # Ensures that each column is in ascending order
 
-          INFfacs[thor, ,h] <- apply(AllShocksOnePeriodFacs[,,h], 2, quantile, probs = quants[1])
-          MEDfacs[thor, ,h] <- apply(AllShocksOnePeriodFacs[,,h], 2, quantile, probs = quants[2])
-          SUPfacs[thor, ,h] <- apply(AllShocksOnePeriodFacs[,,h], 2, quantile, probs = quants[3])
+          INFfacs[thor, ,h] <- apply(AllShocksOnePeriodFacs[,,h], 2, stats::quantile, probs = quants[1])
+          MEDfacs[thor, ,h] <- apply(AllShocksOnePeriodFacs[,,h], 2, stats::quantile, probs = quants[2])
+          SUPfacs[thor, ,h] <- apply(AllShocksOnePeriodFacs[,,h], 2, stats::quantile, probs = quants[3])
         }
       }
 
@@ -907,9 +897,9 @@ FEVDandGFEVDbs_jointQ <- function(ModelType, ModelBootstrap, NumOutPE, InputsFor
           }
           AllShocksOnePeriodyies[,,h]  <- apply(yies,2, sort) # Ensures that each column is in ascending order
 
-          INFyies[thor, ,h] <- apply(AllShocksOnePeriodyies[,,h], 2, quantile, probs = quants[1])
-          MEDyies[thor, ,h] <- apply(AllShocksOnePeriodyies[,,h], 2, quantile, probs = quants[2])
-          SUPyies[thor, ,h] <- apply(AllShocksOnePeriodyies[,,h], 2, quantile, probs = quants[3])
+          INFyies[thor, ,h] <- apply(AllShocksOnePeriodyies[,,h], 2, stats::quantile, probs = quants[1])
+          MEDyies[thor, ,h] <- apply(AllShocksOnePeriodyies[,,h], 2, stats::quantile, probs = quants[2])
+          SUPyies[thor, ,h] <- apply(AllShocksOnePeriodyies[,,h], 2, stats::quantile, probs = quants[3])
         }
       }
 
@@ -932,7 +922,7 @@ FEVDandGFEVDbs_jointQ <- function(ModelType, ModelBootstrap, NumOutPE, InputsFor
 
   if (any(IdxFacGraphs==1)){
 
-    show('################################# Generating FEVDs/GFEVDs graphs (Bootstrap) #################################' )
+    print('################################# Generating FEVDs/GFEVDs graphs (Bootstrap) #################################' )
 
     plot_list <- list()
 
@@ -968,8 +958,8 @@ FEVDandGFEVDbs_jointQ <- function(ModelType, ModelBootstrap, NumOutPE, InputsFor
 
             plot_list[[i]] <- p
           }
-          subplots <- plot_grid(plotlist= plot_list, ncol=3)
-          cowplot::ggsave(subplots, file=paste0(LabFEVD[d],"Factors_", nmShock[b], ".png"),
+          subplots <- cowplot::plot_grid(plotlist= plot_list, ncol=3)
+          ggplot2::ggsave(subplots, file=paste0(LabFEVD[d],"Factors_", nmShock[b], ".png"),
                           path= PathsGraphs[[ModelType]][[LabFEVD[d]]][["Factors"]])
         }
       }
@@ -1016,8 +1006,8 @@ FEVDandGFEVDbs_jointQ <- function(ModelType, ModelBootstrap, NumOutPE, InputsFor
 
             plot_list[[i]] <- p
           }
-          subplots <- plot_grid(plotlist= plot_list, ncol=3)
-          cowplot::ggsave(subplots, file=paste0(LabFEVD[d],"Yields_", nmShock[b], ".png"),
+          subplots <- cowplot::plot_grid(plotlist= plot_list, ncol=3)
+          ggplot2::ggsave(subplots, file=paste0(LabFEVD[d],"Yields_", nmShock[b], ".png"),
                           path= PathsGraphs[[ModelType]][[LabFEVD[d]]][["Yields"]])
         }
       }
@@ -1043,9 +1033,6 @@ FEVDandGFEVDbs_jointQ <- function(ModelType, ModelBootstrap, NumOutPE, InputsFor
 #'@param PathsGraphs path of the folder in which the graphs will be saved
 #'
 #'
-#'@importFrom stats quantile
-
-#'@export
 
 
 IRFandGIRFbs_jointQ_Ortho <- function(ModelType, ModelBootstrap, NumOutPE, InputsForOutputs, Economies, PathsGraphs){
@@ -1102,9 +1089,9 @@ IRFandGIRFbs_jointQ_Ortho <- function(ModelType, ModelBootstrap, NumOutPE, Input
 
           AllShocksOnePeriodFacs[,,h]  <- apply(Facs,2, sort) # Ensures that each column is in ascending order
 
-          INFfacs[thor, ,h] <- apply(AllShocksOnePeriodFacs[,,h], 2, quantile, probs = quants[1])
-          MEDfacs[thor, ,h] <- apply(AllShocksOnePeriodFacs[,,h], 2, quantile, probs = quants[2])
-          SUPfacs[thor, ,h] <- apply(AllShocksOnePeriodFacs[,,h], 2, quantile, probs = quants[3])
+          INFfacs[thor, ,h] <- apply(AllShocksOnePeriodFacs[,,h], 2, stats::quantile, probs = quants[1])
+          MEDfacs[thor, ,h] <- apply(AllShocksOnePeriodFacs[,,h], 2, stats::quantile, probs = quants[2])
+          SUPfacs[thor, ,h] <- apply(AllShocksOnePeriodFacs[,,h], 2, stats::quantile, probs = quants[3])
         }
       }
 
@@ -1136,9 +1123,9 @@ IRFandGIRFbs_jointQ_Ortho <- function(ModelType, ModelBootstrap, NumOutPE, Input
           }
           AllShocksOnePeriodyies[,,h]  <- apply(yies,2, sort) # Ensures that each column is in ascending order
 
-          INFyies[thor, ,h] <- apply(AllShocksOnePeriodyies[,,h], 2, quantile, probs = quants[1])
-          MEDyies[thor, ,h] <- apply(AllShocksOnePeriodyies[,,h], 2, quantile, probs = quants[2])
-          SUPyies[thor, ,h] <- apply(AllShocksOnePeriodyies[,,h], 2, quantile, probs = quants[3])
+          INFyies[thor, ,h] <- apply(AllShocksOnePeriodyies[,,h], 2, stats::quantile, probs = quants[1])
+          MEDyies[thor, ,h] <- apply(AllShocksOnePeriodyies[,,h], 2, stats::quantile, probs = quants[2])
+          SUPyies[thor, ,h] <- apply(AllShocksOnePeriodyies[,,h], 2, stats::quantile, probs = quants[3])
         }
       }
 
@@ -1160,7 +1147,7 @@ IRFandGIRFbs_jointQ_Ortho <- function(ModelType, ModelBootstrap, NumOutPE, Input
 
   if (any(IdxFacGraphs==1)){
 
-    show('################################# Generating IRFs/GIRFs-Ortho graphs (Bootstrap) #################################' )
+    print('################################# Generating IRFs/GIRFs-Ortho graphs (Bootstrap) #################################' )
 
     plot_list <- list()
 
@@ -1193,8 +1180,8 @@ IRFandGIRFbs_jointQ_Ortho <- function(ModelType, ModelBootstrap, NumOutPE, Input
 
             plot_list[[i]] <- p
           }
-          subplots <- plot_grid(plotlist= plot_list, ncol=3)
-          cowplot::ggsave(subplots, file=paste0(LabIRF[d],"Factors_shock_to_", nmShock[b],"ORTHO", ".png"),
+          subplots <- cowplot::plot_grid(plotlist= plot_list, ncol=3)
+          ggplot2::ggsave(subplots, file=paste0(LabIRF[d],"Factors_shock_to_", nmShock[b],"ORTHO", ".png"),
                           path= PathsGraphs[[ModelType]][[LabIRF[d]]][["Factors Ortho"]])
         }
       }
@@ -1243,8 +1230,8 @@ IRFandGIRFbs_jointQ_Ortho <- function(ModelType, ModelBootstrap, NumOutPE, Input
 
             plot_list[[i]] <- p
           }
-          subplots <- plot_grid(plotlist= plot_list, ncol=3)
-          cowplot::ggsave(subplots, file=paste0(LabIRF[d],"Yields_shock_to_", nmShock[b], "ORTHO", ".png"),
+          subplots <- cowplot::plot_grid(plotlist= plot_list, ncol=3)
+          ggplot2::ggsave(subplots, file=paste0(LabIRF[d],"Yields_shock_to_", nmShock[b], "ORTHO", ".png"),
                           path= PathsGraphs[[ModelType]][[LabIRF[d]]][["Yields Ortho"]])
         }
       }
@@ -1269,10 +1256,6 @@ IRFandGIRFbs_jointQ_Ortho <- function(ModelType, ModelBootstrap, NumOutPE, Input
 #'@param PathsGraphs path of the folder in which the graphs will be saved
 #'
 #'
-#'@importFrom stats quantile
-
-#'@export
-
 
 
 FEVDandGFEVDbs_jointQ_Ortho <- function(ModelType, ModelBootstrap, NumOutPE, InputsForOutputs, Economies, PathsGraphs){
@@ -1328,9 +1311,9 @@ FEVDandGFEVDbs_jointQ_Ortho <- function(ModelType, ModelBootstrap, NumOutPE, Inp
 
           AllShocksOnePeriodFacs[,,h]  <- apply(Facs,2, sort) # Ensures that each column is in ascending order
 
-          INFfacs[thor, ,h] <- apply(AllShocksOnePeriodFacs[,,h], 2, quantile, probs = quants[1])
-          MEDfacs[thor, ,h] <- apply(AllShocksOnePeriodFacs[,,h], 2, quantile, probs = quants[2])
-          SUPfacs[thor, ,h] <- apply(AllShocksOnePeriodFacs[,,h], 2, quantile, probs = quants[3])
+          INFfacs[thor, ,h] <- apply(AllShocksOnePeriodFacs[,,h], 2, stats::quantile, probs = quants[1])
+          MEDfacs[thor, ,h] <- apply(AllShocksOnePeriodFacs[,,h], 2, stats::quantile, probs = quants[2])
+          SUPfacs[thor, ,h] <- apply(AllShocksOnePeriodFacs[,,h], 2, stats::quantile, probs = quants[3])
         }
       }
 
@@ -1360,9 +1343,9 @@ FEVDandGFEVDbs_jointQ_Ortho <- function(ModelType, ModelBootstrap, NumOutPE, Inp
           }
           AllShocksOnePeriodyies[,,h]  <- apply(yies,2, sort) # Ensures that each column is in ascending order
 
-          INFyies[thor, ,h] <- apply(AllShocksOnePeriodyies[,,h], 2, quantile, probs = quants[1])
-          MEDyies[thor, ,h] <- apply(AllShocksOnePeriodyies[,,h], 2, quantile, probs = quants[2])
-          SUPyies[thor, ,h] <- apply(AllShocksOnePeriodyies[,,h], 2, quantile, probs = quants[3])
+          INFyies[thor, ,h] <- apply(AllShocksOnePeriodyies[,,h], 2, stats::quantile, probs = quants[1])
+          MEDyies[thor, ,h] <- apply(AllShocksOnePeriodyies[,,h], 2, stats::quantile, probs = quants[2])
+          SUPyies[thor, ,h] <- apply(AllShocksOnePeriodyies[,,h], 2, stats::quantile, probs = quants[3])
         }
       }
 
@@ -1385,7 +1368,7 @@ FEVDandGFEVDbs_jointQ_Ortho <- function(ModelType, ModelBootstrap, NumOutPE, Inp
 
   if (any(IdxFacGraphs==1)){
 
-    show('################################# Generating FEVDs/GFEVDs-Ortho graphs (Bootstrap) #################################' )
+    print('################################# Generating FEVDs/GFEVDs-Ortho graphs (Bootstrap) #################################' )
 
     plot_list <- list()
 
@@ -1418,8 +1401,8 @@ FEVDandGFEVDbs_jointQ_Ortho <- function(ModelType, ModelBootstrap, NumOutPE, Inp
 
             plot_list[[i]] <- p
           }
-          subplots <- plot_grid(plotlist= plot_list, ncol=3)
-          cowplot::ggsave(subplots, file=paste0(LabFEVD[d],"Factors_", nmShock[b], "ORTHO", ".png"),
+          subplots <- cowplot::plot_grid(plotlist= plot_list, ncol=3)
+          ggplot2::ggsave(subplots, file=paste0(LabFEVD[d],"Factors_", nmShock[b], "ORTHO", ".png"),
                           path= PathsGraphs[[ModelType]][[LabFEVD[d]]][["Factors Ortho"]])
         }
       }
@@ -1467,8 +1450,8 @@ FEVDandGFEVDbs_jointQ_Ortho <- function(ModelType, ModelBootstrap, NumOutPE, Inp
 
             plot_list[[i]] <- p
           }
-          subplots <- plot_grid(plotlist= plot_list, ncol=3)
-          cowplot::ggsave(subplots, file=paste0(LabFEVD[d],"Yields_", nmShock[b], "ORTHO", ".png"),
+          subplots <- cowplot::plot_grid(plotlist= plot_list, ncol=3)
+          ggplot2::ggsave(subplots, file=paste0(LabFEVD[d],"Yields_", nmShock[b], "ORTHO", ".png"),
                           path= PathsGraphs[[ModelType]][[LabFEVD[d]]][["Yields Ortho"]])
         }
       }

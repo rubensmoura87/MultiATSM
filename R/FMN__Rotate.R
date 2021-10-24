@@ -6,7 +6,6 @@
 #'
 #'@return      y1 - list of outputs after the transformation, the structure parallels that of y0
 #'
-#'@importFrom magic adiag
 #'@importFrom pracma mldivide
 #'
 #'@details
@@ -26,7 +25,6 @@
 #' (Euro Area Business Cycle Network Training School - Term Structure Modelling).
 #' Available at: https://cepr.org/40029
 #'
-#' @export
 
 
 FMN__Rotate <- function(y0, U1, U0){
@@ -58,7 +56,7 @@ FMN__Rotate <- function(y0, U1, U0){
   if ("P" %in% names(y0)){
     NP <- numel(y0$P$K0) #  NP may be greater than N if there is unspanned variables
     U0 <- rbind(U0, matrix(0, nrow= NP-N, ncol=1))
-    U1 <- adiag(U1, diag(NP-N))
+    U1 <- magic::adiag(U1, diag(NP-N))
 
     p <- dim(y0$P$K1)[2]/dim(y0$P$K1)[1]
 
@@ -83,7 +81,7 @@ FMN__Rotate <- function(y0, U1, U0){
 
     NP <- numel(y0$K0)
     if (NP-N !=0){ U0 <- rbind(U0, zeros(NP-N,1))}
-    U1 <- adiag(U1, diag(NP-N))
+    U1 <- magic::adiag(U1, diag(NP-N))
 
     p <- dim(y0$K1)[2]/dim(y0$K1)[1]
 

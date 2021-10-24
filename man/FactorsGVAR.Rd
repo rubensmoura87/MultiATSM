@@ -8,7 +8,7 @@
 list containing the variables used in the GVAR models
 }
 \usage{
-CM_Factors_GVAR
+data("CM_Factors_GVAR")
 }
 \description{
 Risk factors data used in the GVAR models - Candelon and Moura (2021)

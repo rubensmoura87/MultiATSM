@@ -7,14 +7,11 @@
 #' @param Final_Date   Sample last date (yyyy-mm-dd)
 #' @param DataFrequency  character-based vector: "Daily All Days", "Daily Business Days", "Weekly", "Monthly", "Quarterly", "Annually"
 #'
-#'@importFrom lubridate hour hours
-#'
 #'
 #' @return
 #' Risk factors used in the estimation of the desired ATSM
 #'
 
-#' @export
 
 RiskFactorsPrep <- function(FactorSet, Economies, FactorLabels, Initial_Date, Final_Date, DataFrequency){
 

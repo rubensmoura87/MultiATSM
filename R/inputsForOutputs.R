@@ -26,6 +26,25 @@
 #'  \item "t0Sample": index of the first variable of the information set;
 #'  \item "t0Forecast": index of the first forecast cut-off date.
 #'}
+#'
+#'
+#'
+#'@examples
+#'
+#' ModelType <- "JPS"
+#' Horiz <- 100
+#' DesiredOutputGraphs <- c("Fit", "GIRF", "GFEVD")
+#' OutputLabel <- "Test"
+#' WishStationarityQ <- 1
+#' WishGraphRiskFac <- 0
+#' WishGraphYields <- 1
+#'
+#'
+#'InputsList <- InputsForOutputs(ModelType, Horiz, DesiredOutputGraphs, OutputLabel,
+#'                               WishStationarityQ, WishGraphYields, WishGraphRiskFac)
+#'
+#'@returns
+#' List of necessary inputs to generate the graphs of the outputs of the desired model
 #'@export
 
 

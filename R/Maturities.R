@@ -5,7 +5,6 @@
 #'@param Economies vector containing names of all the economies of the system
 #'@param UnitYields (i) "Month": if maturity of yields are expressed in months or
 #'                  (ii) "Year": if maturity of yields are expressed in years
-#'@importFrom readr parse_number
 #'
 #'@return Vector containing all observed maturities expressed in years
 #'
@@ -25,7 +24,7 @@ Maturities <- function(DataYields, Economies, UnitYields){
 
   C <- length(Economies)
   s <- rownames(DataYields)
-  AllMat <- parse_number(s)
+  AllMat <- readr::parse_number(s)
   J <- length(AllMat)/C
   mat <- AllMat[1:J]/fac
 

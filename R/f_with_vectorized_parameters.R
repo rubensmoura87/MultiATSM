@@ -19,7 +19,6 @@
 #' (Euro Area Business Cycle Network Training School - Term Structure Modelling).
 #'  Available at: https://cepr.org/40029
 #'
-#'@export
 
 
 f_with_vectorized_parameters <- function(x, sizex, f, con, varargin, ModelType, FactorLabels, Economies,
@@ -104,7 +103,7 @@ f_with_vectorized_parameters <- function(x, sizex, f, con, varargin, ModelType, 
 #' (Euro Area Business Cycle Network Training School - Term Structure Modelling).
 #' Available at: https://cepr.org/40029
 #'
-#'@export
+
 
 
 
@@ -187,7 +186,6 @@ update_para <-function(x, sizex, ii, con, FactorLabels, Economies, JLLinputs=NUL
 #' (Euro Area Business Cycle Network Training School - Term Structure Modelling).
 #' Available at: https://cepr.org/40029
 #'
-#'@export
 
 
 aux2true <-function(a, ctype, lb, ub, FactorLabels, Economies, JLLinputs= NULL,  nargout){
@@ -198,7 +196,7 @@ aux2true <-function(a, ctype, lb, ub, FactorLabels, Economies, JLLinputs= NULL, 
   if (contain('psd', ctype) ) {
     i <- strfind(ctype,'psd')
     i<-i[1]
-    M <-as.numeric(substr(ctype, start= i+3, stop= str_length(ctype) ) )
+    M <-as.numeric(substr(ctype, start= i+3, stop= stringr::str_length(ctype) ) )
     if (is.na(M)) { M<- 1 }
     ctype <- 'psd'
   }
@@ -206,7 +204,7 @@ aux2true <-function(a, ctype, lb, ub, FactorLabels, Economies, JLLinputs= NULL, 
   if (contain('diag', ctype) ) {
     i <- strfind(ctype,'diag')
     i<-i[1]
-    M <-as.numeric(substr(ctype, start= i+4, stop= str_length(ctype) ) )
+    M <-as.numeric(substr(ctype, start= i+4, stop= stringr::str_length(ctype) ) )
     if (is.na(M)) { M<- 1 }
     ctype <- 'diag'
   }
@@ -214,7 +212,7 @@ aux2true <-function(a, ctype, lb, ub, FactorLabels, Economies, JLLinputs= NULL, 
   if (contain('BlockDiag', ctype) ) {
     i <- strfind(ctype,'BlockDiag')
     i<-i[1]
-    M <-as.numeric(substr(ctype, start= i+9, stop= str_length(ctype) ) )
+    M <-as.numeric(substr(ctype, start= i+9, stop= stringr::str_length(ctype) ) )
     if (is.na(M)) { M<- 1 }
     ctype <- 'BlockDiag'
   }
@@ -222,7 +220,7 @@ aux2true <-function(a, ctype, lb, ub, FactorLabels, Economies, JLLinputs= NULL, 
   if (contain('JLLstructure', ctype) ){
     i <- strfind(ctype,'JLLstructure')
     i <- i[1]
-    M <-as.numeric(substr(ctype, start= i+13, stop= str_length(ctype) ) )
+    M <-as.numeric(substr(ctype, start= i+13, stop= stringr::str_length(ctype) ) )
     if (is.na(M)) { M<-1 }
 
     ctype <- 'JLLstructure'
@@ -338,7 +336,7 @@ aux2true <-function(a, ctype, lb, ub, FactorLabels, Economies, JLLinputs= NULL, 
       if (j==1) {
         b <- K1Q
       }else{
-        b <- adiag(b, K1Q)
+        b <- magic::adiag(b, K1Q)
       }
 
       idx0 <- idx1
@@ -409,7 +407,7 @@ if (length(d)==0 ){ btemp <- matrix(, nrow= 0, ncol= 0) } else{
 }
       if (j==1){ b <- btemp
       }else{
-        b <- adiag(b,btemp)
+        b <- magic::adiag(b,btemp)
       }
       idx0 <- idx1
 

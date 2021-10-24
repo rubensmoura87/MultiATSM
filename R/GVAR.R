@@ -19,7 +19,6 @@
 #'@param N    number of country-specific spanned factors (scalar)
 #'
 #'@importFrom pracma numel
-#'@importFrom magic adiag
 #'
 #'@return   A list containing
 #'\enumerate{
@@ -164,7 +163,7 @@ C <- length(GVARinputs$Economies) # Number of economies in the system
     et <- list()
     Sigma <- list()
     for (i in 1:C){
-      ModelEstimates[[i]] <- lm( t(LHS[[i]]) ~ t(RHS[[i]])-1) # RHS and LHS are Tx(M+N)
+      ModelEstimates[[i]] <- stats::lm( t(LHS[[i]]) ~ t(RHS[[i]])-1) # RHS and LHS are Tx(M+N)
       Coeff[[i]] <- t(ModelEstimates[[i]]$coefficients)
       et[[i]] <-t(ModelEstimates[[i]]$residual)
       Sigma[[i]] <- (et[[i]]%*%t(et[[i]]))/T
@@ -332,8 +331,8 @@ C <- length(GVARinputs$Economies) # Number of economies in the system
   Phi.w1 <- matrix(NA, nrow=G, ncol= G)
   Phi.w0 <- matrix(NA, nrow=G, ncol= 1)
   for (i in seqi(1,G)){
-    Phi.w0[i,] <- lm( LHS[,i] ~ RHS)$coefficients[1]
-    Phi.w1[i,] <- lm( LHS[,i] ~ RHS)$coefficients[2:(G+1)]
+    Phi.w0[i,] <- stats::lm( LHS[,i] ~ RHS)$coefficients[1]
+    Phi.w1[i,] <- stats::lm( LHS[,i] ~ RHS)$coefficients[2:(G+1)]
   }
 
   eta.t <- matrix(NA, nrow= G, ncol=T-1)
@@ -350,7 +349,7 @@ C <- length(GVARinputs$Economies) # Number of economies in the system
 
 
   # b) Gy.0:
-  Gy.0 <- adiag(diag(G), G0)
+  Gy.0 <- magic::adiag(diag(G), G0)
   # c) Gy.1:
   if (G != 0 ){
   D1 <- list()
@@ -378,7 +377,7 @@ C <- length(GVARinputs$Economies) # Number of economies in the system
   F1 <- solve(Gy.0)%*%Gy.1
 
   # b) Sigma_y:
-  Sigma_y <- adiag(Sigma_w, Sigma)
+  Sigma_y <- magic::adiag(Sigma_w, Sigma)
 
 
   # 5) Prepare labels of the tables

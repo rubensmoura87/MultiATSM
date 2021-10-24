@@ -8,7 +8,7 @@
 matrix containing the Yields of the models
 }
 \usage{
-CM_Yields
+data("CM_Yields")
 }
 \description{
 Yields data used in Candelon and Moura (2021)

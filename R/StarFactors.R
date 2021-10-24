@@ -5,7 +5,7 @@
 #'@param W GVAR transition matrix (C x C)
 
 #'
-#'@return List of star factors
+#'@return List containg the star factors of each country of the economic system
 #'@examples
 #'data(CM_Factors)
 

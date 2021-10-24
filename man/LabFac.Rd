@@ -17,6 +17,9 @@ LabFac(N, DomVar, GlobalVar, Economies, ModelType)
 
 \item{ModelType}{string-vector containing the label of the model to be estimated}
 }
+\value{
+List containing the country-specific risk factor labels
+}
 \description{
 Generates the labels factors
 }
@@ -28,5 +31,6 @@ Economies <- c("U.S.", "Canada", "Germany", "Japan")
 ModelType <- "JPS"
 
 VarLabels <- LabFac(N, DomVar, GlobalVar, Economies, ModelType)
+
 
 }

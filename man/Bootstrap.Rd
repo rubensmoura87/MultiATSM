@@ -41,8 +41,22 @@ Bootstrap(
 
 \item{GVARinputs}{list of necessary inputs for the estimation of GVAR-based models (see "GVAR" function)}
 }
+\value{
+list containing the following elements:
+\itemize{
+\item list of model parameters for one each one the draws;
+\item list of numerical outputs (IRFs, GIRFs, FEVDs, GFEVDs) for each one of the draws;
+\item Confidence bands for the chosen level of significance.
+}
+}
 \description{
 Generates the bootstrap-related outputs
+}
+\examples{
+\dontrun{
+# See examples in the vignette file of this package (Section 4).
+}
+
 }
 \references{
 This function is a modified and extended version of the "VARirbound" function from "A toolbox for VAR analysis"

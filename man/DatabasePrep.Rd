@@ -37,7 +37,23 @@ DatabasePrep(
 }
 \value{
 List of the risk factor set used in the estimation of the GVAR model
+
+List containing the risk factor set used in the estimation of the GVAR-based models
 }
 \description{
 Prepare the GVARFactors database
+}
+\examples{
+DomVar <- c("Eco_Act", "Inflation")
+GlobalVar <- c("GBC", "CPI_OECD")
+t0 <- "2006-09-01"
+tF <-  "2019-01-01"
+Economies <- c("China", "Brazil", "Mexico", "Uruguay", "Russia")
+N <- 3
+ModelType <- "JPS jointQ"
+FactorLabels <-  LabFac(N, DomVar, GlobalVar, Economies, ModelType)
+
+GVARFactors <- DatabasePrep(t0, tF, Economies, N, FactorLabels, ModelType)
+
+
 }

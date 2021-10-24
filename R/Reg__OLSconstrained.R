@@ -17,7 +17,7 @@
 #'  "A Small Package of Matlab Routines for the Estimation of Some Term Structure Models." \cr
 #'  (Euro Area Business Cycle Network Training School - Term Structure Modelling).
 #' Available at: https://cepr.org/40029
-#'@export
+
 
 
 Reg__OLSconstrained <-function(Y, X, Bcon, G){

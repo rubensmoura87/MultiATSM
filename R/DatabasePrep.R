@@ -14,9 +14,24 @@
 #'@return List of the risk factor set used in the estimation of the GVAR model
 #'
 #'
-#'@importFrom utils str
-#'@importFrom readxl read_excel excel_sheets
 #'@importFrom pracma isempty
+#'
+#'
+#'@examples
+#' DomVar <- c("Eco_Act", "Inflation")
+#' GlobalVar <- c("GBC", "CPI_OECD")
+#' t0 <- "2006-09-01"
+#' tF <-  "2019-01-01"
+#' Economies <- c("China", "Brazil", "Mexico", "Uruguay", "Russia")
+#' N <- 3
+#' ModelType <- "JPS jointQ"
+#' FactorLabels <-  LabFac(N, DomVar, GlobalVar, Economies, ModelType)
+#'
+#' GVARFactors <- DatabasePrep(t0, tF, Economies, N, FactorLabels, ModelType)
+#'
+#'
+#'@returns
+#' List containing the risk factor set used in the estimation of the GVAR-based models
 #'
 #'@export
 
@@ -30,12 +45,12 @@ DatabasePrep <- function(t_First, t_Last, Economies, N, FactorLabels, ModelType,
  if (length(DataPathYields) ==0 ){ DataPathYields <- system.file("extdata", "YieldsData.xlsx", package = "MultiATSM") }
 
   # 1) Retrieve Data
-  tab_names_Macro <- excel_sheets(DataPathMacro)
-  list_all_Macro <- lapply(tab_names_Macro, function(x) read_excel(path = DataPathMacro, sheet = x))
+  tab_names_Macro <- readxl::excel_sheets(DataPathMacro)
+  list_all_Macro <- lapply(tab_names_Macro, function(x) readxl::read_excel(path = DataPathMacro, sheet = x))
   names(list_all_Macro) <- tab_names_Macro
 
-  tab_names_Yields <- excel_sheets(DataPathYields)
-  list_all_Yields <- lapply(tab_names_Yields, function(x) read_excel(path = DataPathYields, sheet = x))
+  tab_names_Yields <- readxl::excel_sheets(DataPathYields)
+  list_all_Yields <- lapply(tab_names_Yields, function(x) readxl::read_excel(path = DataPathYields, sheet = x))
   names(list_all_Yields) <- tab_names_Yields
 
   t_First <- as.POSIXct(as.Date(t_First, "%Y-%m-%d"))

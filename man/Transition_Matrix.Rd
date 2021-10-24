@@ -42,10 +42,13 @@ NOTE: if there is missing data for any country of the system for that particular
 then the transition matrix will include only NAs.
 }
 \examples{
-data("CM_Trade")
+data(CM_Trade)
+
 t_First <- "2006"
 t_Last <-  "2019"
-Economies<- c("China", "Brazil", "Mexico", "Uruguay")
-type <- 'Sample Mean'
+Economies <- c("China", "Brazil", "Mexico", "Uruguay")
+type <- "Sample Mean"
 Transition_Matrix(t_First, t_Last, Economies, type, DataPath = NULL, Data = TradeFlows)
+
+
 }

@@ -21,11 +21,11 @@ pca_weights_one_country <- function(Y, Economy) {
   Y_CS <- Y[Idx,] # Country-specific yields
 
   # Store the eigenvectors of the matrix of yields
-  H <- eigen(cov(t(Y_CS)))
+  H <- eigen(stats::cov(t(Y_CS)))
   W <- t(H$vectors)
 
   J <- nrow(Y_CS) # Total number of maturities
-  M <- round(median(1:J)) # Median of the maturity range
+  M <- round(stats::median(1:J)) # Median of the maturity range
 
 
   # Adjust the weights to ease the interpretability of the spanned factors

@@ -1,41 +1,24 @@
 Package: MultiATSM
 Type: Package
-Title: Multi-Country Term Structure of Interest Rates Models
-Version: 0.1.0
-Date: 2021-09-20
+Title: Multicountry Term Structure of Interest Rates Models
+Version: 0.0.1
+Date: 2021-10-08
 Author: Rubens Moura
 Maintainer: Rubens Moura <rubens.gtmoura@gmail.com>
-Description: Estimation of several classes of affine term structure of interest rates models with unspanned macroeconomic risk. 
+Description: This Package Provides Estimation Routines for Several Classes of Affine Term Structure of Interest Rates Models. All the Models Are Based on the Unspanned Macroeconomic Risk Framework from Joslin, Priebisch, and Singleton (2014). 
 License: GPL-2 | GPL-3
 Encoding: UTF-8
 RoxygenNote: 7.1.1
 Imports:
-  readr,
-  readxl,
-  xts,
   zoo,
-  magic,
-  Jmisc,
   pracma,
-  powerplus,
   wrapr,
-  Matrix,
-  sjmisc,
-  stringr,
-  neldermead,
-  tidyverse,
   hablar,
-  functional,
-  cowplot,
-  ggplot2,
-  reshape2,
-  methods,
-  lubridate,
+  ggplot2
+Suggests: 
+ readxl, readr, magic, Jmisc, functional, cowplot, powerplus, reshape2, sjmisc, stringr, knitr, rmarkdown, bookdown, 
+ kableExtra, neldermead, magrittr
+Additional_repositories: https://rubensmoura87.github.io/drat
 Depends: 
   R (>= 3.5.0)
-Suggests: 
-    knitr,
-    rmarkdown,
-    kableExtra,
-    bookdown
 VignetteBuilder: knitr

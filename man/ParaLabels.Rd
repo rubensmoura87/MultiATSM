@@ -12,6 +12,15 @@ ParaLabels(ModelType, WishStationarityQ)
 \item{WishStationarityQ}{User must set "1" is she whises to impose the largest eigenvalue under the Q to be strictly
 smaller than 1. Otherwise set "0"}
 }
+\value{
+list containing the features of the parameters that will be used in the estimation
+}
 \description{
 Create the variable labels used in the estimation
+}
+\examples{
+ModelType <- "GVAR jointQ"
+WishStationarityQ <- 1
+ParaLabels(ModelType, WishStationarityQ)
+
 }

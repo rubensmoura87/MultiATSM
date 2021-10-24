@@ -180,7 +180,7 @@ x2bound <-function(x, lb, ub, nargout){
 #'  (Euro Area Business Cycle Network Training School - Term Structure Modelling).
 #'  Available at: https://cepr.org/40029
 #'
-#' @export
+
 
 
 sqrtm_robust <- function(m){

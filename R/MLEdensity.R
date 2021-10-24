@@ -22,7 +22,6 @@
 #'@param nargout if nargout== 1: provides only the values of the likelihood; if nargout== 2: complete ATSM outputs
 #'
 #'@importFrom pracma mldivide mrdivide
-#'@importFrom sjmisc is_empty
 #'
 #'@references
 #' This function is modified version of the "A0N_MLEdensity_WOE" function by Le and Singleton (2018).\cr
@@ -30,7 +29,7 @@
 #'  (Euro Area Business Cycle Network Training School - Term Structure Modelling).
 #'  Available at: https://cepr.org/40029
 #'
-#'@export
+
 
 
 
@@ -61,7 +60,7 @@ MLEdensity_sepQ <- function(K1XQ, r0, SSZ, K0Z, K1Z, se, Gy.0, mat, Y, Z, P, Wpc
   if (!exists("K0Z")){ K0Z <- matrix(, nrow=N, ncol=0)}
   if (!exists("K1Z")){ K1Z <- matrix(, nrow=N*N, ncol=0)}
 
-  if (is_empty(K0Z) || is_empty(K1Z) ){
+  if (sjmisc::is_empty(K0Z) || sjmisc::is_empty(K1Z) ){
     x <- rbind(t(t(as.vector(K1XQ))), t(t(as.vector(SSZ))), r0, se, K0Z, K1Z )
   } else{
     x <- rbind(t(t(as.vector(K1XQ))), t(t(as.vector(SSZ))), r0, se, t(t(as.vector(K0Z))), t(t(as.vector(K1Z))) )
@@ -93,7 +92,7 @@ MLEdensity_sepQ <- function(K1XQ, r0, SSZ, K0Z, K1Z, se, Gy.0, mat, Y, Z, P, Wpc
     betan <- t(t(betan/dt))
 
 
-    if (!exists("r0")|| is_empty(r0) ){
+    if (!exists("r0")|| sjmisc::is_empty(r0) ){
       # (i) A0 = (I - Bx(W*Bx)^(-1)*W)*Ax0;
       # (ii) A1 = (I - Bx(W*Bx)^(-1)*W)*Axr;
       # (iii) APer= We * A1
@@ -119,7 +118,7 @@ MLEdensity_sepQ <- function(K1XQ, r0, SSZ, K0Z, K1Z, se, Gy.0, mat, Y, Z, P, Wpc
     }
     eQ <- Peo[,t] - Pe[,t]
 
-    if (!exists("se")|| is_empty(se) ){
+    if (!exists("se")|| sjmisc::is_empty(se) ){
       se <- sqrt(mean(as.vector(eQ^2))) # Scalar - standard deviation of the measurament error.
     }
 
@@ -131,13 +130,13 @@ MLEdensity_sepQ <- function(K1XQ, r0, SSZ, K0Z, K1Z, se, Gy.0, mat, Y, Z, P, Wpc
       y <- GaussianDensity(eQ, se^2*diag(J-N))
 
       # time series density:
-      if ((!exists("K0Z")||is_empty(K0Z)) & (ModelType == 'JPS' || ModelType == 'JPS jointP' )){
+      if ((!exists("K0Z")||sjmisc::is_empty(K0Z)) & (ModelType == 'JPS' || ModelType == 'JPS jointP' )){
         VARpara <- VAR(Z, VARtype= "unconstrained", Bcon = NULL)
         K0Z <- VARpara$K0Z  # Column vector (Kx1)
         K1Z <-  VARpara$K1Z # matrix (KxK)
         Gy.0 <- diag(length(K0Z))
       }
-      if ( (!exists("K0Z")||is_empty(K0Z)) & (ModelType == 'GVAR sepQ') )  {
+      if ( (!exists("K0Z")||sjmisc::is_empty(K0Z)) & (ModelType == 'GVAR sepQ') )  {
        # Estimate GVAR(1)
         GVARPara <- GVAR(GVARinputs, N)
         K0Z <- GVARPara$F0 # Column vector (Kx1)
@@ -279,14 +278,13 @@ MLEdensity_sepQ <- function(K1XQ, r0, SSZ, K0Z, K1Z, se, Gy.0, mat, Y, Z, P, Wpc
 #'@param nargout if nargout== 1: provides only the values of the likelihood; if nargout== 2: complete ATSM outputs
 #'
 #'@importFrom pracma mldivide mrdivide
-#'@importFrom sjmisc is_empty
 #'
 #'@references
 #' This function is an extended version of the "A0N_MLEdensity_WOE" function by Le and Singleton (2018).\cr
 #'  "A Small Package of Matlab Routines for the Estimation of Some Term Structure Models." \cr
 #'  (Euro Area Business Cycle Network Training School - Term Structure Modelling).
 #'  Available at: https://cepr.org/40029
-#'@export
+
 
 
 
@@ -327,7 +325,7 @@ MLEdensity_jointQ <- function(K1XQ, r0, SSZ, K0Z, K1Z, se, Gy.0, mat, Y, Z, P, W
   if (!exists("K0Z")){ K0Z <- matrix(, nrow=N, ncol=0)}
   if (!exists("K1Z")){ K1Z <- matrix(, nrow=N*N, ncol=0)}
 
-  if (is_empty(K0Z) || is_empty(K1Z) ){
+  if (sjmisc::is_empty(K0Z) || sjmisc::is_empty(K1Z) ){
     x <- rbind(t(t(as.vector(K1XQ))), t(t(as.vector(SSZ))), r0, se, K0Z, K1Z )
   } else{
     x <- rbind(t(t(as.vector(K1XQ))), t(t(as.vector(SSZ))), r0, se, t(t(as.vector(K0Z))), t(t(as.vector(K1Z))) )
@@ -360,7 +358,7 @@ MLEdensity_jointQ <- function(K1XQ, r0, SSZ, K0Z, K1Z, se, Gy.0, mat, Y, Z, P, W
     betan <- t(t(betan/dt))
 
 
-    if (!exists("r0")|| is_empty(r0) ){
+    if (!exists("r0")|| sjmisc::is_empty(r0) ){
       # (i) A0 = (I - Bx(W*Bx)^(-1)*W)*Ax0;
       # (ii) A1 = (I - Bx(W*Bx)^(-1)*W)*Axr;
       # (iii) APer= We * A1
@@ -419,7 +417,7 @@ MLEdensity_jointQ <- function(K1XQ, r0, SSZ, K0Z, K1Z, se, Gy.0, mat, Y, Z, P, W
     }
     eQ <- Peo[,t] - Pe[,t]
 
-    if (!exists("se")|| is_empty(se) ){
+    if (!exists("se")|| sjmisc::is_empty(se) ){
       se<- rep(NA, times= C)
       idx0 <-0
       for (i in 1:C){
@@ -448,18 +446,18 @@ MLEdensity_jointQ <- function(K1XQ, r0, SSZ, K0Z, K1Z, se, Gy.0, mat, Y, Z, P, W
       se <- se[seq(1, CJ-CN, by=J-N)] # Recast se
 
       # time series density:
-      if ((!exists("K0Z")||is_empty(K0Z)) & (ModelType == 'VAR jointQ')){
+      if ((!exists("K0Z")|| sjmisc::is_empty(K0Z)) & (ModelType == 'VAR jointQ')){
         VARpara <- VAR(Z, VARtype= "unconstrained", Bcon = NULL)
         K0Z <- VARpara$K0Z  # Column vector (Kx1)
         K1Z <-  VARpara$K1Z # matrix (KxK)
       }
-      if ( (!exists("K0Z")||is_empty(K0Z)) & (ModelType == 'GVAR sepQ' || ModelType == 'GVAR jointQ') ){
+      if ( (!exists("K0Z")|| sjmisc::is_empty(K0Z)) & (ModelType == 'GVAR sepQ' || ModelType == 'GVAR jointQ') ){
         # Estimate GVAR(1)
           GVARPara <- GVAR(GVARinputs, N)
           K0Z <- GVARPara$F0 # Column vector (Kx1)
           K1Z <- GVARPara$F1 # matrix (KxK)
           }
-      if ((!exists("K0Z")||is_empty(K0Z)) & (ModelType == 'JLL jointSigma')){
+      if ((!exists("K0Z")|| sjmisc::is_empty(K0Z)) & (ModelType == 'JLL jointSigma')){
         K0Z <-  JLLPara$k0 # Column vector (Kx1)
         K1Z <-  JLLPara$k1 # matrix (KxK)
         }
@@ -632,14 +630,13 @@ MLEdensity_jointQ <- function(K1XQ, r0, SSZ, K0Z, K1Z, se, Gy.0, mat, Y, Z, P, W
 #'@param nargout if nargout== 1: provides only the values of the likelihood; if nargout== 2: complete ATSM outputs
 #'
 #'@importFrom pracma mldivide mrdivide
-#'@importFrom sjmisc is_empty
 #'
 #'@references
 #' This function is an extended version of the "A0N_MLEdensity_WOE" function by Le and Singleton (2018).\cr
 #'  "A Small Package of Matlab Routines for the Estimation of Some Term Structure Models." \cr
 #'  (Euro Area Business Cycle Network Training School - Term Structure Modelling).
 #'  Available at: https://cepr.org/40029
-#'@export
+
 
 
 MLEdensity_jointQ_sepSigma <- function(K1XQ, r0, SSZ, K0Z, K1Z, se, Gy.0, mat, Y, Z, P, Wpca, We, WpcaFull,
@@ -672,7 +669,7 @@ MLEdensity_jointQ_sepSigma <- function(K1XQ, r0, SSZ, K0Z, K1Z, se, Gy.0, mat, Y
   if (!exists("K1Z")){ K1Z <- matrix(, nrow=N*N, ncol=0)}
 
 
-  if (is_empty(K0Z) || is_empty(K1Z) ){
+  if (sjmisc::is_empty(K0Z) || sjmisc::is_empty(K1Z) ){
     x <- rbind(t(t(as.vector(K1XQ))), t(t(as.vector(SSZ))), r0, se, K0Z, K1Z )
   } else{
     x <- rbind(t(t(as.vector(K1XQ))), t(t(as.vector(SSZ))), r0, se, t(t(as.vector(K0Z))), t(t(as.vector(K1Z))) )
@@ -704,7 +701,7 @@ MLEdensity_jointQ_sepSigma <- function(K1XQ, r0, SSZ, K0Z, K1Z, se, Gy.0, mat, Y
     betan <- t(t(betan/dt))
 
 
-    if (!exists("r0")|| is_empty(r0) ){
+    if (!exists("r0")|| sjmisc::is_empty(r0) ){
       # (i) A0 = (I - Bx(W*Bx)^(-1)*W)*Ax0;
       # (ii) A1 = (I - Bx(W*Bx)^(-1)*W)*Axr;
       # (iii) APer= We * A1
@@ -764,7 +761,7 @@ MLEdensity_jointQ_sepSigma <- function(K1XQ, r0, SSZ, K0Z, K1Z, se, Gy.0, mat, Y
     }
     eQ <- Peo[,t] - Pe[,t]
 
-    if (!exists("se")|| is_empty(se) ){
+    if (!exists("se")|| sjmisc::is_empty(se) ){
       se<- rep(NA, times= C)
       idx0 <-0
       for (i in 1:C){
@@ -793,7 +790,7 @@ MLEdensity_jointQ_sepSigma <- function(K1XQ, r0, SSZ, K0Z, K1Z, se, Gy.0, mat, Y
       se <- se[seq(1, CJ-CN, by=J-N)] # Recast se
 
       # time series density:
-      if (!exists("K0Z")||is_empty(K0Z)){
+      if (!exists("K0Z")|| sjmisc::is_empty(K0Z)){
       JLLinputs$WishSigmas <- 1
       JLLinputs$SigmaNonOrtho <- SSZ
 
@@ -991,14 +988,13 @@ IdxSpanned <- function(G,M,N,C){
 #'
 #'
 #'@importFrom pracma mldivide mrdivide
-#'@importFrom sjmisc is_empty
 #'
 #'@references
 #' This function is modified version of the "A0N_MLEdensity_WOE" function by Le and Singleton (2018). \cr
 #'  "A Small Package of Matlab Routines for the Estimation of Some Term Structure Models." \cr
 #'  (Euro Area Business Cycle Network Training School - Term Structure Modelling).
 #'  Available at: https://cepr.org/40029
-#'@export
+
 
 
 A0N_MLEdensity_WOE__sepQ_Bootstrap <- function(K1XQ, r0, SSZ, K0Z, K1Z, se, Gy.0, mat, Y, Z, P, Wpca, We, WpcaFull,
@@ -1030,7 +1026,7 @@ A0N_MLEdensity_WOE__sepQ_Bootstrap <- function(K1XQ, r0, SSZ, K0Z, K1Z, se, Gy.0
   if (!exists("K0Z")){ K0Z <- matrix(, nrow=N, ncol=0)}
   if (!exists("K1Z")){ K1Z <- matrix(, nrow=N*N, ncol=0)}
   #############################################################################
-  if (is_empty(K0Z) || is_empty(K1Z) ){
+  if (sjmisc::is_empty(K0Z) || sjmisc::is_empty(K1Z) ){
     x <- rbind(t(t(as.vector(K1XQ))), t(t(as.vector(SSZ))), r0, se, K0Z, K1Z )
   } else{
     x <- rbind(t(t(as.vector(K1XQ))), t(t(as.vector(SSZ))), r0, se, t(t(as.vector(K0Z))), t(t(as.vector(K1Z))) )
@@ -1063,7 +1059,7 @@ A0N_MLEdensity_WOE__sepQ_Bootstrap <- function(K1XQ, r0, SSZ, K0Z, K1Z, se, Gy.0
     betan <- t(t(betan/dt))
 
 
-    if (!exists("r0")|| is_empty(r0) ){
+    if (!exists("r0")|| sjmisc::is_empty(r0) ){
       # (i) A0 = (I - Bx(W*Bx)^(-1)*W)*Ax0;
       # (ii) A1 = (I - Bx(W*Bx)^(-1)*W)*Axr;
       # (iii) APer= We * A1
@@ -1093,7 +1089,7 @@ A0N_MLEdensity_WOE__sepQ_Bootstrap <- function(K1XQ, r0, SSZ, K0Z, K1Z, se, Gy.0
     eQ <- Peo[,t] - Pe[,t]
 
 
-    if (!exists("se")|| is_empty(se) ){
+    if (!exists("se")|| sjmisc::is_empty(se) ){
       se <- sqrt(mean(as.vector(eQ^2))) # Scalar - standard deviation of the measurament error.
     }
 
@@ -1106,13 +1102,13 @@ A0N_MLEdensity_WOE__sepQ_Bootstrap <- function(K1XQ, r0, SSZ, K0Z, K1Z, se, Gy.0
       y <- GaussianDensity(eQ, se^2*diag(J-N))
 
       # time series density:
-      if ((!exists("K0Z")||is_empty(K0Z)) & (ModelType == 'JPS' || ModelType == 'JPS jointP' )){
+      if ((!exists("K0Z")|| sjmisc::is_empty(K0Z)) & (ModelType == 'JPS' || ModelType == 'JPS jointP' )){
         VARpara <- VAR(Z, VARtype= "unconstrained", Bcon = NULL)
         K0Z <- VARpara$K0Z  # Column vector (Kx1)
         K1Z <-  VARpara$K1Z # matrix (KxK)
         Gy.0 <- diag(length(K0Z))
       }
-      if ( (!exists("K0Z")||is_empty(K0Z)) || (ModelType == 'GVAR sepQ') )  {
+      if ( (!exists("K0Z")|| sjmisc::is_empty(K0Z)) || (ModelType == 'GVAR sepQ') )  {
         # Estimate GVAR(1)
         GVARPara <- GVAR(GVARinputs, N)
         K0Z <- GVARPara$F0 # Column vector (Kx1)
@@ -1225,7 +1221,6 @@ A0N_MLEdensity_WOE__sepQ_Bootstrap <- function(K1XQ, r0, SSZ, K0Z, K1Z, se, Gy.0
 #'@param nargout if nargout== 1: provides only the values of the likelihood; if nargout== 2: complete ATSM outputs
 #'
 #'@importFrom pracma mldivide mrdivide
-#'@importFrom sjmisc is_empty
 #'
 #'@references
 #' This function is modified version of the "A0N_MLEdensity_WOE" function by Le and Singleton (2018).\cr
@@ -1233,7 +1228,7 @@ A0N_MLEdensity_WOE__sepQ_Bootstrap <- function(K1XQ, r0, SSZ, K0Z, K1Z, se, Gy.0
 #'  (Euro Area Business Cycle Network Training School - Term Structure Modelling).
 #'  Available at: https://cepr.org/40029
 #'
-#'@export
+
 
 
 
@@ -1262,7 +1257,7 @@ A0N_MLEdensity_WOE__jointQ_Bootstrap <- function(K1XQ, r0, SSZ, K0Z, K1Z, se, Gy
   if (!exists("K0Z")){ K0Z <- matrix(, nrow=N, ncol=0)}
   if (!exists("K1Z")){ K1Z <- matrix(, nrow=N*N, ncol=0)}
   #############################################################################################
-  if (is_empty(K0Z) || is_empty(K1Z) ){
+  if (sjmisc::is_empty(K0Z) || sjmisc::is_empty(K1Z) ){
     x <- rbind(t(t(as.vector(K1XQ))), t(t(as.vector(SSZ))), r0, se, K0Z, K1Z )
   } else{
     x <- rbind(t(t(as.vector(K1XQ))), t(t(as.vector(SSZ))), r0, se, t(t(as.vector(K0Z))), t(t(as.vector(K1Z))) )
@@ -1294,7 +1289,7 @@ A0N_MLEdensity_WOE__jointQ_Bootstrap <- function(K1XQ, r0, SSZ, K0Z, K1Z, se, Gy
     betan <- t(t(betan/dt))
 
 
-    if (!exists("r0")|| is_empty(r0) ){
+    if (!exists("r0")|| sjmisc::is_empty(r0) ){
       # (i) A0 = (I - Bx(W*Bx)^(-1)*W)*Ax0;
       # (ii) A1 = (I - Bx(W*Bx)^(-1)*W)*Axr;
       # (iii) APer= We * A1
@@ -1355,7 +1350,7 @@ A0N_MLEdensity_WOE__jointQ_Bootstrap <- function(K1XQ, r0, SSZ, K0Z, K1Z, se, Gy
     }
     eQ <- Peo[,t] - Pe[,t]
 
-    if (!exists("se")|| is_empty(se) ){
+    if (!exists("se")|| sjmisc::is_empty(se) ){
       se<- rep(NA, times= C)
       idx0 <-0
       for (i in 1:C){
@@ -1384,18 +1379,18 @@ A0N_MLEdensity_WOE__jointQ_Bootstrap <- function(K1XQ, r0, SSZ, K0Z, K1Z, se, Gy
       se <- se[seq(1, CJ-CN, by=J-N)] # Recast se
 
       # time series density:
-      if ((!exists("K0Z")||is_empty(K0Z)) & (ModelType == 'VAR jointQ')){
+      if ((!exists("K0Z")|| sjmisc::is_empty(K0Z)) & (ModelType == 'VAR jointQ')){
         VARpara <- VAR(Z, VARtype= "unconstrained", Bcon = NULL)
         K0Z <- VARpara$K0Z  # Column vector (Kx1)
         K1Z <-  VARpara$K1Z # matrix (KxK)
       }
-      if ( (!exists("K0Z")||is_empty(K0Z)) & (ModelType == 'GVAR sepQ' || ModelType == 'GVAR jointQ') ){
+      if ( (!exists("K0Z")|| sjmisc::is_empty(K0Z)) & (ModelType == 'GVAR sepQ' || ModelType == 'GVAR jointQ') ){
         # Estimate GVAR(1)
         GVARPara <- GVAR(GVARinputs, N)
         K0Z <- GVARPara$F0 # Column vector (Kx1)
         K1Z <- GVARPara$F1 # matrix (KxK)
       }
-      if ((!exists("K0Z")||is_empty(K0Z)) & (ModelType == 'JLL jointSigma')){
+      if ((!exists("K0Z")|| sjmisc::is_empty(K0Z)) & (ModelType == 'JLL jointSigma')){
         JLLinputs$WishSigmas == 0 # Avoid recomputing the variance-covariance matrices
         JLLPara <- JLL(Z, N, JLLinputs)
         K0Z <-  JLLPara$k0 # Column vector (Kx1)
@@ -1547,7 +1542,6 @@ A0N_MLEdensity_WOE__jointQ_Bootstrap <- function(K1XQ, r0, SSZ, K0Z, K1Z, se, Gy
 #'@param nargout if nargout== 1: provides only the values of the likelihood; if nargout== 2: complete ATSM outputs
 #'
 #'@importFrom pracma mldivide mrdivide
-#'@importFrom sjmisc is_empty
 #'
 #'@references
 #' This function is modified version of the "A0N_MLEdensity_WOE" function by Le and Singleton (2018).\cr
@@ -1555,7 +1549,7 @@ A0N_MLEdensity_WOE__jointQ_Bootstrap <- function(K1XQ, r0, SSZ, K0Z, K1Z, se, Gy
 #'  (Euro Area Business Cycle Network Training School - Term Structure Modelling).
 #'  Available at: https://cepr.org/40029
 #'
-#'@export
+
 
 
 
@@ -1587,7 +1581,7 @@ A0N_MLEdensity_WOE__jointQ_sepSigma_Bootstrap <- function(K1XQ, r0, SSZ, K0Z, K1
   if (!exists("K0Z")){ K0Z <- matrix(, nrow=N, ncol=0)}
   if (!exists("K1Z")){ K1Z <- matrix(, nrow=N*N, ncol=0)}
   #############################################################################
-  if (is_empty(K0Z) || is_empty(K1Z) ){
+  if (sjmisc::is_empty(K0Z) || sjmisc::is_empty(K1Z) ){
     x <- rbind(t(t(as.vector(K1XQ))), t(t(as.vector(SSZ))), r0, se, K0Z, K1Z )
   } else{
     x <- rbind(t(t(as.vector(K1XQ))), t(t(as.vector(SSZ))), r0, se, t(t(as.vector(K0Z))), t(t(as.vector(K1Z))) )
@@ -1623,7 +1617,7 @@ A0N_MLEdensity_WOE__jointQ_sepSigma_Bootstrap <- function(K1XQ, r0, SSZ, K0Z, K1
     betan <- t(t(betan/dt))
 
 
-    if (!exists("r0")|| is_empty(r0) ){
+    if (!exists("r0")|| sjmisc::is_empty(r0) ){
       # (i) A0 = (I - Bx(W*Bx)^(-1)*W)*Ax0;
       # (ii) A1 = (I - Bx(W*Bx)^(-1)*W)*Axr;
       # (iii) APer= We * A1
@@ -1683,7 +1677,7 @@ A0N_MLEdensity_WOE__jointQ_sepSigma_Bootstrap <- function(K1XQ, r0, SSZ, K0Z, K1
     }
     eQ <- Peo[,t] - Pe[,t]
 
-    if (!exists("se")|| is_empty(se) ){
+    if (!exists("se")|| sjmisc::is_empty(se) ){
       se<- rep(NA, times= C)
       idx0 <-0
       for (i in 1:C){
@@ -1714,7 +1708,7 @@ A0N_MLEdensity_WOE__jointQ_sepSigma_Bootstrap <- function(K1XQ, r0, SSZ, K0Z, K1
 
       # time series density:
 
-      if (!exists("K0Z")||is_empty(K0Z)){
+      if (!exists("K0Z")|| sjmisc::is_empty(K0Z)){
       JLLinputs$WishSigmas <- 1
       JLLinputs$SigmaNonOrtho <- SSZ
 

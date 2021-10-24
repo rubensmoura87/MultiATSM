@@ -3,6 +3,14 @@
 #'@param StationaryEigenvalues Binary variable: set "1" if the user whises the largest eigenvalue
 #'                            to be strictly smaller than 1. Set "0", otherwise
 #'
+#'@examples
+#' stat <- 1 # Takes values 1 and 0
+#'K1XQStationary(stat)
+#'
+#'
+#'@returns
+#'list
+#'
 #'@export
 
 K1XQStationary<- function(StationaryEigenvalues){
