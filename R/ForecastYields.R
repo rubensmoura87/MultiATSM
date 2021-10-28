@@ -11,9 +11,7 @@
 #'
 
 #'@examples
-#'\dontrun{
 #' # See examples in the vignette file of this package (Section 4).
-#'}
 #'
 #'
 #'@returns
@@ -226,7 +224,7 @@ ForecastYieldsSepQ <- function(ModelType, ModelPara, InputsForOutputs, FactorLab
   OutofSampleForecast <- append(OutofSampleForecast[[ModelType]], RMSE)
 
 
-  saveRDS(OutofSampleForecast, paste("Forecast_", InputsForOutputs$'Label Outputs','.rds',sep=""))
+  saveRDS(OutofSampleForecast, paste(tempdir(),"/Forecast_", InputsForOutputs$'Label Outputs','.rds',sep=""))
 
   return(OutofSampleForecast)
 
@@ -518,7 +516,7 @@ IdxAllSpanned <- function(ModelType, FactorLabels, Economies){
 SpannedFactorsSepQ <- function(ModelType, ModelPara, Economies, t0Sample, tlastObserved){
 
   C <- length(Economies)
-  N <- ModelPara[[ModelType]]$inputs$N
+  N <- ModelPara[[ModelType]][[Economies[1]]]$inputs$N
 
   PPALL <- matrix()
 

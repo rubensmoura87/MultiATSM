@@ -33,7 +33,9 @@ For the models 'JLL original' or "JLL jointSigma" the name of one dominant econo
 For the model 'JLL  NoDomUnit', the name of one dominant economy must be set as "None".
 }
 \examples{
-\dontrun{
+\donttest{
+if (requireNamespace('neldermead', quietly = TRUE)) {
+
 data(CM_Factors)
 ZZ <- RiskFactors
 N <- 3
@@ -45,6 +47,10 @@ JLLinputs$WishSigmas <- 1
 JLLinputs$SigmaNonOrtho <- NULL
 JLLinputs$JLLModelType <- "JLL original"
 JLL(ZZ, N, JLLinputs)
+
+#'} else {
+ message("skipping functionality due to missing Suggested dependency")
+}
 }
 }
 \references{

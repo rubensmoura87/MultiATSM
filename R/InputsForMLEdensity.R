@@ -17,7 +17,7 @@
 #'
 #'@return List of necessary inputs  for constructing the model's log-likelihood function
 #'@examples
-#'\dontrun{
+#'\donttest{
 #' # Example 1:
 #' data(CM_Factors)
 #' data(CM_Yields)
@@ -66,10 +66,10 @@
 
 #'ATSMInputs <- InputsForMLEdensity(ModelType, Yields, Factors, FactorLabels, mat, Economies,
 #'                                  DataFrequency, JLLinputs= NULL , GVARinputs)
-
-
-
-#'# Example 3:
+#'
+#' # Example 3:
+#' if (requireNamespace('neldermead', quietly = TRUE)) {
+#'
 #' data(CM_Factors)
 #' data(CM_Yields)
 #' ModelType <- "JLL jointSigma"
@@ -92,7 +92,14 @@
 #'
 #' ATSMInputs <- InputsForMLEdensity(ModelType, Yields, Factors, FactorLabels, mat, Economies,
 #'                                  DataFrequency, JLLinputs)
+#'} else {
+#'  message("skipping functionality due to missing Suggested dependency")
+#'}
 #'
+#'
+
+
+
 #'}
 #' @details
 #' To ensure that the risk factors matrix is correctly built for the model "JPS", the global factors should be allocated on the first G rows of this matrix.
@@ -251,10 +258,10 @@ if (DataFrequency == "Annually"){ dt <- 1}
 #'@param DataFrequency  character-based-vector. Avaialable options are: "Daily All Days", "Daily Business Days", "Weekly", "Monthly", "Quarterly", "Annually"
 #'@param JLLinputs    list of necessary inputs for the estimation of JLL-based models (see "JLL" function)
 #'@param GVARinputs   list of necessary inputs for the estimation of GVAR-based models (see "GVAR" function)
-
+#'
 #'@importFrom pracma null
 #'
-#'@export
+
 
 
 InputsForMLEdensity_BS <- function(ModelType, Y_artificial, Z_artificial, FactorLabels, mat,
@@ -343,7 +350,6 @@ InputsForMLEdensity_BS <- function(ModelType, Y_artificial, Z_artificial, Factor
   }
 
   if (ModelType == 'GVAR sepQ'|| ModelType == 'GVAR jointQ'){
-    #Economies <- get("Economies", envir = .GlobalEnv) # Redefine "economies" as the set of economies of the system
     GVARpara <- GVAR(GVARinputs, N)
     K0Z_artificial <- GVARpara$F0
     K1Z_artificial <- GVARpara$F1

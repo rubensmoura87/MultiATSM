@@ -65,9 +65,7 @@ the specification of f. In this case, no starting value is needed for this parti
 can be provided as a starting value).
 }
 \examples{
-\dontrun{
-# See examples in the vignette file of this package (Section 4).
-}
+#' # See examples in the vignette file of this package (Section 4).
 
 }
 \references{

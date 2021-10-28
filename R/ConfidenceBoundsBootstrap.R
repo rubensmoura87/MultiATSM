@@ -11,14 +11,14 @@
 BootstrapBoundsSet <- function(ModelType, ModelBootstrap, NumOutPE, InputsForOutputs, Economies){
 
   # Generate the graph paths and the graph folders
-  dir.create(paste("Outputs", "/", ModelType, "/Bootstrap", sep=""))
+  dir.create(paste(tempdir(), "/Outputs/", ModelType, "/Bootstrap", sep=""))
   PathsGraphs <- FolderCreationBoot(ModelType, Economies)
 
 
   # If one chooseS models in which the estimation is done country-by-country
   if ( "JPS" %in% ModelType || "JPS jointP" %in% ModelType ||  "GVAR sepQ" %in% ModelType){
 
-    for (i in 1:length(Economies)){dir.create( paste("Outputs/", ModelType, "/Bootstrap/Model ", Economies[i], sep=""))}
+    for (i in 1:length(Economies)){dir.create( paste(tempdir(), "/Outputs/", ModelType, "/Bootstrap/Model ", Economies[i], sep=""))}
 
 
     IRFandGIRFsep <- IRFandGIRFbs_sepQ(ModelType, ModelBootstrap, NumOutPE, InputsForOutputs, Economies, PathsGraphs)
@@ -227,8 +227,8 @@ print('################################# Generating IRFs/GIRFs graphs (Bootstrap
       for (f in 1:C){
         for (d in IdxFacGraphs){
   # Folder Creation
-  dir.create( paste("Outputs/", ModelType, "/Bootstrap/Model ", Economies[f], "/", LabIRF[d], sep=""))
-  dir.create( paste("Outputs/", ModelType, "/Bootstrap/Model ", Economies[f], "/", LabIRF[d], "/Factors", sep=""))
+  dir.create( paste(tempdir(), "/Outputs/", ModelType, "/Bootstrap/Model ", Economies[f], "/", LabIRF[d], sep=""))
+  dir.create( paste(tempdir(), "/Outputs/", ModelType, "/Bootstrap/Model ", Economies[f], "/", LabIRF[d], "/Factors", sep=""))
 
           for (b in 1:K){
             for (i in 1:K){
@@ -274,8 +274,8 @@ print('################################# Generating IRFs/GIRFs graphs (Bootstrap
         for (d in IdxYieldsGraphs){
 
           # Folder Creation
-          dir.create( paste("Outputs/", ModelType, "/Bootstrap/Model ", Economies[f], "/", LabIRF[d], sep=""))
-          dir.create( paste("Outputs/", ModelType, "/Bootstrap/Model ", Economies[f], "/", LabIRF[d], "/Yields", sep=""))
+          dir.create( paste(tempdir(), "/Outputs/", ModelType, "/Bootstrap/Model ", Economies[f], "/", LabIRF[d], sep=""))
+          dir.create( paste(tempdir(), "/Outputs/", ModelType, "/Bootstrap/Model ", Economies[f], "/", LabIRF[d], "/Yields", sep=""))
 
           for (b in 1:K){
             for (i in 1:J){
@@ -448,8 +448,8 @@ FEVDandGFEVDbs_sepQ <- function(ModelType, ModelBootstrap, NumOutPE, InputsForOu
     for (f in 1:C){
       for (d in 1:length(LabFEVD)){
     # Folder Creation
-      dir.create( paste("Outputs/", ModelType, "/Bootstrap/Model ", Economies[f], "/", LabFEVD[d], sep=""))
-      dir.create( paste("Outputs/", ModelType, "/Bootstrap/Model ", Economies[f], "/", LabFEVD[d], "/Factors", sep=""))
+      dir.create( paste(tempdir(), "/Outputs/", ModelType, "/Bootstrap/Model ", Economies[f], "/", LabFEVD[d], sep=""))
+      dir.create( paste(tempdir(), "/Outputs/", ModelType, "/Bootstrap/Model ", Economies[f], "/", LabFEVD[d], "/Factors", sep=""))
 
         for (b in 1:K){
           for (i in 1:K){
@@ -495,8 +495,8 @@ FEVDandGFEVDbs_sepQ <- function(ModelType, ModelBootstrap, NumOutPE, InputsForOu
       for (d in 1:length(LabFEVD)){
 
         # Folder Creation
-        dir.create( paste("Outputs/", ModelType, "/Bootstrap/Model ", Economies[f], "/", LabFEVD[d], sep=""))
-        dir.create( paste("Outputs/", ModelType, "/Bootstrap/Model ", Economies[f], "/", LabFEVD[d], "/Yields", sep=""))
+        dir.create( paste(tempdir(), "/Outputs/", ModelType, "/Bootstrap/Model ", Economies[f], "/", LabFEVD[d], sep=""))
+        dir.create( paste(tempdir(), "/Outputs/", ModelType, "/Bootstrap/Model ", Economies[f], "/", LabFEVD[d], "/Yields", sep=""))
 
         for (b in 1:J){
         for (i in 1:K){
@@ -691,8 +691,8 @@ IRFandGIRFbs_jointQ <- function(ModelType, ModelBootstrap, NumOutPE, InputsForOu
 
       for (d in 1:length(LabIRF)){
         # Folder Creation
-        dir.create( paste("Outputs/", ModelType, "/Bootstrap/", LabIRF[d], sep=""))
-        dir.create( paste("Outputs/", ModelType, "/Bootstrap/", LabIRF[d], "/Factors", sep=""))
+        dir.create( paste(tempdir(), "/Outputs/", ModelType, "/Bootstrap/", LabIRF[d], sep=""))
+        dir.create( paste(tempdir(), "/Outputs/", ModelType, "/Bootstrap/", LabIRF[d], "/Factors", sep=""))
 
         for (b in 1:K){
           for (i in 1:K){
@@ -739,8 +739,8 @@ IRFandGIRFbs_jointQ <- function(ModelType, ModelBootstrap, NumOutPE, InputsForOu
       for (d in 1:length(LabIRF)){
 
         # Folder Creation
-        dir.create( paste("Outputs/", ModelType, "/Bootstrap/", LabIRF[d], sep=""))
-        dir.create( paste("Outputs/", ModelType, "/Bootstrap/", LabIRF[d], "/Yields", sep=""))
+        dir.create( paste(tempdir(), "/Outputs/", ModelType, "/Bootstrap/", LabIRF[d], sep=""))
+        dir.create( paste(tempdir(), "/Outputs/", ModelType, "/Bootstrap/", LabIRF[d], "/Yields", sep=""))
 
         for (b in 1:K){
           for (i in 1:CJ){
@@ -929,8 +929,8 @@ FEVDandGFEVDbs_jointQ <- function(ModelType, ModelBootstrap, NumOutPE, InputsFor
 
       for (d in 1:length(LabFEVD)){
         # Folder Creation
-        dir.create( paste("Outputs/", ModelType, "/Bootstrap/", LabFEVD[d], sep=""))
-        dir.create( paste("Outputs/", ModelType, "/Bootstrap/", LabFEVD[d], "/Factors", sep=""))
+        dir.create( paste(tempdir(), "/Outputs/", ModelType, "/Bootstrap/", LabFEVD[d], sep=""))
+        dir.create( paste(tempdir(), "/Outputs/", ModelType, "/Bootstrap/", LabFEVD[d], "/Factors", sep=""))
 
 
         for (b in 1:K){
@@ -979,8 +979,8 @@ FEVDandGFEVDbs_jointQ <- function(ModelType, ModelBootstrap, NumOutPE, InputsFor
 
       for (d in 1:length(LabFEVD)){
         # Folder Creation
-        dir.create( paste("Outputs/", ModelType, "/Bootstrap/", LabFEVD[d], sep=""))
-        dir.create( paste("Outputs/", ModelType, "/Bootstrap/", LabFEVD[d], "/Yields", sep=""))
+        dir.create( paste(tempdir(), "/Outputs/", ModelType, "/Bootstrap/", LabFEVD[d], sep=""))
+        dir.create( paste(tempdir(), "/Outputs/", ModelType, "/Bootstrap/", LabFEVD[d], "/Yields", sep=""))
 
         for (b in 1:CJ){
           for (i in 1:K){
@@ -1154,9 +1154,9 @@ IRFandGIRFbs_jointQ_Ortho <- function(ModelType, ModelBootstrap, NumOutPE, Input
 
       for (d in 1:length(LabIRF)){
         # Folder Creation
-        dir.create( paste("Outputs/", ModelType, "/Bootstrap/", LabIRF[d], sep=""))
-        dir.create( paste("Outputs/", ModelType, "/Bootstrap/", LabIRF[d], "/Factors", sep=""))
-        dir.create( paste("Outputs/", ModelType, "/Bootstrap/", LabIRF[d], "/Factors/Ortho", sep=""))
+        dir.create( paste(tempdir(), "/Outputs/", ModelType, "/Bootstrap/", LabIRF[d], sep=""))
+        dir.create( paste(tempdir(), "/Outputs/", ModelType, "/Bootstrap/", LabIRF[d], "/Factors", sep=""))
+        dir.create( paste(tempdir(), "/Outputs/", ModelType, "/Bootstrap/", LabIRF[d], "/Factors/Ortho", sep=""))
 
         for (b in 1:K){
           for (i in 1:K){
@@ -1203,9 +1203,9 @@ IRFandGIRFbs_jointQ_Ortho <- function(ModelType, ModelBootstrap, NumOutPE, Input
       for (d in 1:length(LabIRF)){
 
         # Folder Creation
-        dir.create( paste("Outputs/", ModelType, "/Bootstrap/", LabIRF[d], sep=""))
-        dir.create( paste("Outputs/", ModelType, "/Bootstrap/", LabIRF[d], "/Yields", sep=""))
-        dir.create( paste("Outputs/", ModelType, "/Bootstrap/", LabIRF[d], "/Yields/Ortho", sep=""))
+        dir.create( paste(tempdir(), "/Outputs/", ModelType, "/Bootstrap/", LabIRF[d], sep=""))
+        dir.create( paste(tempdir(), "/Outputs/", ModelType, "/Bootstrap/", LabIRF[d], "/Yields", sep=""))
+        dir.create( paste(tempdir(), "/Outputs/", ModelType, "/Bootstrap/", LabIRF[d], "/Yields/Ortho", sep=""))
 
         for (b in 1:K){
           for (i in 1:CJ){
@@ -1374,9 +1374,9 @@ FEVDandGFEVDbs_jointQ_Ortho <- function(ModelType, ModelBootstrap, NumOutPE, Inp
 
       for (d in 1:length(LabFEVD)){
         # Folder Creation
-        dir.create( paste("Outputs/", ModelType, "/Bootstrap/", LabFEVD[d], sep=""))
-        dir.create( paste("Outputs/", ModelType, "/Bootstrap/", LabFEVD[d], "/Factors", sep=""))
-        dir.create( paste("Outputs/", ModelType, "/Bootstrap/", LabFEVD[d], "/Factors/Ortho", sep=""))
+        dir.create( paste(tempdir(), "/Outputs/", ModelType, "/Bootstrap/", LabFEVD[d], sep=""))
+        dir.create( paste(tempdir(), "/Outputs/", ModelType, "/Bootstrap/", LabFEVD[d], "/Factors", sep=""))
+        dir.create( paste(tempdir(), "/Outputs/", ModelType, "/Bootstrap/", LabFEVD[d], "/Factors/Ortho", sep=""))
 
 
         for (b in 1:K){
@@ -1423,9 +1423,9 @@ FEVDandGFEVDbs_jointQ_Ortho <- function(ModelType, ModelBootstrap, NumOutPE, Inp
 
       for (d in 1:length(LabFEVD)){
         # Folder Creation
-        dir.create( paste("Outputs/", ModelType, "/Bootstrap/", LabFEVD[d], sep=""))
-        dir.create( paste("Outputs/", ModelType, "/Bootstrap/", LabFEVD[d], "/Yields", sep=""))
-        dir.create( paste("Outputs/", ModelType, "/Bootstrap/", LabFEVD[d], "/Yields/Ortho", sep=""))
+        dir.create( paste(tempdir(), "/Outputs/", ModelType, "/Bootstrap/", LabFEVD[d], sep=""))
+        dir.create( paste(tempdir(), "/Outputs/", ModelType, "/Bootstrap/", LabFEVD[d], "/Yields", sep=""))
+        dir.create( paste(tempdir(), "/Outputs/", ModelType, "/Bootstrap/", LabFEVD[d], "/Yields/Ortho", sep=""))
 
 
         for (b in 1:CJ){

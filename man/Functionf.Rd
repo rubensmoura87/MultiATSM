@@ -26,8 +26,6 @@ objective function
 Set up the vector-valued objective function (Point estimate)
 }
 \examples{
-\dontrun{
 # See examples in the vignette file of this package (Section 4).
-}
 
 }

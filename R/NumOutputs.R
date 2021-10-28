@@ -8,9 +8,7 @@
 #'
 #'
 #'@examples
-#'\dontrun{
 #' # See examples in the vignette file of this package (Section 4).
-#'}
 #'
 #'
 #'@returns
@@ -63,7 +61,7 @@ NumOutputs <- function(ModelType, ModelPara, InputsForOutputs, FactorLabels, Eco
 
   PEoutputs<- list(ModelPara, AllNumOutputs)
   names(PEoutputs) <- c("Model Parameters", "Numerical Outputs")
-  saveRDS(PEoutputs, paste("PEoutputs_", InputsForOutputs$'Label Outputs','.rds',sep=""))
+  saveRDS(PEoutputs, paste(tempdir(),"/PEoutputs_", InputsForOutputs$'Label Outputs','.rds',sep=""))
 
   # Generate graphs, if previously selected
   GraphicalOutputs(ModelType, ModelPara, AllNumOutputs, InputsForOutputs, Economies, FactorLabels)
@@ -1162,7 +1160,11 @@ FEVDjoint <- function(ModelType, ModelPara, FEVDhoriz, FactorLabels, Economies){
     invG[!is.finite(invG)] <- 0
     invGSigmau <- solve(G0)%*%Sigma_y
 
-    P <- t(chol(invGSigmau))
+    # Choleski term
+    if ( ModelType == "JLL original" || ModelType == "JLL NoDomUnit" || ModelType == "JLL jointSigma" ){
+      P <- ModelPara[[ModelTypeSet[[j]]]]$ests$JLLoutcomes$Sigmas$Sigma_Y
+    }else{ P <- t(chol(Sigma_y))}
+
     scale <- 1
 
     # 2.2) Factor loadings preparation
@@ -1690,7 +1692,9 @@ FEVDjointOrthogoJLL <- function(ModelType, ModelPara, FEVDhoriz, FactorLabels, E
     invG[!is.finite(invG)] <- 0
     invGSigmau <- solve(G0)%*%Sigma_y
 
-    P <- t(chol(invGSigmau))
+    # Choleski term
+    P <- ModelPara[[ModelTypeSet[[j]]]]$ests$JLLoutcomes$Sigmas$Sigma_Ye
+
     scale <- 1
 
     # 2.2) Factor loadings preparation

@@ -46,13 +46,13 @@ Transition_Matrix <- function(t_First, t_Last, Economies, type, DataPath = NULL,
 
   L <- length(list_all_Trade)
 
-  options(warn=-1)
+  suppressWarnings()
   for (i in 1:L){
     Countries <- list_all_Trade[[i]][[1]]
     list_all_Trade[[i]] <- list_all_Trade[[i]][,-1]
     row.names(list_all_Trade[[i]]) <- Countries
   }
-  options(warn=0)
+
 
   Data <- list_all_Trade
   }

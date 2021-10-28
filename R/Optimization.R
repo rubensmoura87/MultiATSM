@@ -33,9 +33,7 @@
 #'
 #'
 #'@examples
-#'\dontrun{
-#' # See examples in the vignette file of this package (Section 4).
-#'}
+#'#' # See examples in the vignette file of this package (Section 4).
 #'
 #'@return
 #' (i) out: list of second output produced by f (the first output of f must be the objective value to be minimized). \cr

@@ -18,9 +18,7 @@
 #'
 #'
 #'@examples
-#'\dontrun{
 #' # See examples in the vignette file of this package (Section 4).
-#'}
 #'
 #'@returns
 #'list containing the following elements:
@@ -302,7 +300,7 @@ Bootstrap <- function(ModelType, ModelParaPE, NumOutPE, mat, Economies, InputsFo
                                                                   Economies, ModelType, JLLinputs)
   }
 
-saveRDS(ModelBootstrap, paste("Bootstrap_", InputsForOutputs$'Label Outputs','.rds',sep="")) # if the optmization crashs after some draws,
+saveRDS(ModelBootstrap, paste(tempdir(),"/Bootstrap_", InputsForOutputs$'Label Outputs','.rds',sep="")) # if the optmization crashs after some draws,
           # we can keep the ouputs of draws before
       tt<-tt+1
 
@@ -339,7 +337,7 @@ saveRDS(ModelBootstrap, paste("Bootstrap_", InputsForOutputs$'Label Outputs','.r
 
     }
 
-    saveRDS(ModelBootstrap, paste("Bootstrap_", InputsForOutputs$'Label Outputs','.rds',sep=""))
+    saveRDS(ModelBootstrap, paste(tempdir(),"/Bootstrap_", InputsForOutputs$'Label Outputs','.rds',sep=""))
 
     return(ModelBootstrap)
 

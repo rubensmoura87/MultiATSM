@@ -1,10 +1,16 @@
-## Test environments
-* local R installation, R 3.6.1
-* ubuntu 16.04 (on travis-ci), R 3.6.1
-* win-builder (devel)
+## Resubmission
+This is a resubmission. In this version I have:
 
-## R CMD check results
+* removed "This package" as the initial words from the description;
 
-0 errors | 0 warnings | 1 note
+* written the package description containing capital letters only in the begining of sentences and names; 
 
-* This is a new release.
+* added the references (doi, https) to the quoted research papers
+
+* specified \value for DataForEstimation.Rd and set InputsForMLEdensity_BS.Rd as non-exportable;
+
+* unwraped the examples for the functions which are executable functions in < 5 seconds. For the others, I have set "\donttest{}";
+
+* removed the commands that were saving files on the user's home filespace. In its current form, the package saves these files on the user's temporary directory; 
+
+* replaced "option(warm=-1)" by "suppressWarnings()" in the Transition_Matrix.Rd.

@@ -44,9 +44,7 @@ List containg the following elements
 Gather bond yields forecasts for all the model types
 }
 \examples{
-\dontrun{
 # See examples in the vignette file of this package (Section 4).
-}
 
 
 }

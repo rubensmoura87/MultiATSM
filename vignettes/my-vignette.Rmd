@@ -231,7 +231,7 @@ WishGraphYields <- 1 #    YES: 1; No = 0.
 WishOrthoJLLgraphs <- 0 # YES: 1; No = 0.
 ```
 
-The function *InputsForOutputs* can provide some  guidance for customizing the features of the wished outputs. Conditional on these settings, individual folders are created to store the different types of the desired graphical outputs. 
+The function *InputsForOutputs* can provide some guidance for customizing the features of the wished outputs. Conditional to these settings, individual folders are created at your *temporary directory* to store the different types of the desired graphical outputs. 
 
 ### Bootstrap settings
 If the user intends to generate confidence bands through some bootstrap procedure, an additional list of inputs is required. Specifically:

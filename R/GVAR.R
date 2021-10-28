@@ -4,7 +4,7 @@
 #'@param GVARinputs List containing the following necessary inputs for the estimation of the GVAR:
 #' \enumerate{
 #'        \item  Economies:  string-vector containing the names of the economies which are part of the economic system
-#'        \item  'GVARFactors': list of all variables to be used in the estimation of the VARX \cr
+#'        \item  'GVARFactors': list of all variables that are used in the estimation of the VARX \cr
 #'                (see e.g. 'CM_Factors_GVAR' file);
 #'        \item 'VARXtype': character-vector containing two possibilities:
 #'  \itemize{
@@ -37,9 +37,9 @@
 #' \item Sigma_y (F x F)
 #'}
 #'}
-
+#'
+#'
 #'@examples
-#'\dontrun{
 #' data(CM_Factors_GVAR)
 #'
 #' N <- 3
@@ -54,7 +54,7 @@
 #'                               0.03, 0.05, 0.01, 0), nrow = 4, ncol = 4)
 #'
 #' GVAR(GVARinputs, N)
-#'}
+
 #'@references
 #' Chudik and Pesaran, (2016). "Theory and Practice of GVAR modelling" (Journal of Economic Surveys)
 #'@export

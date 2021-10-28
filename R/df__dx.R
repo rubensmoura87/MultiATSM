@@ -91,7 +91,7 @@ df__dx <-function(f, x){
     fx0 <- fx0_o
     tempy <- y
     y <- NULL
-    fnames <- names(fx0) # Check!
+    fnames <- names(fx0)
     count <- 0
     for (i in 1:numel(fnames)){
       ind <- (count+1:count+numel(fx0$fnames[i]))

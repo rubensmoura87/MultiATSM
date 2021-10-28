@@ -785,7 +785,9 @@ IRFjoint_BS <- function(ModelType, ModelParaBoot, IRFhoriz, FactorLabels, Econom
         tempYields  <- array(0, c(CJ,K,IRFhoriz))
 
         # Compute the IRFs
-        S <- ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[tt]]$ests$JLLoutcomes$Sigmas$Sigma_Y # Choleski term
+      if (ModelType== "JLL original" || ModelType== "JLL NoDomUnit" || ModelType== "JLL jointSigma"){  # Choleski term
+        S <- ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[tt]]$ests$JLLoutcomes$Sigmas$Sigma_Y }
+        else{   S <- t(chol(SIGMA)) }
         # Shock at t=0:
         tempFactors[ ,  , 1] <- S
         tempYields[ , , 1]  <- B %*% S
@@ -898,7 +900,11 @@ FEVDjoint_BS <- function(ModelType, ModelParaBoot, FEVDhoriz, FactorLabels, Econ
         invG[!is.finite(invG)] <- 0
         invGSigmau <- solve(G0)%*%Sigma_y
 
-        P <- t(chol(invGSigmau))
+        # Choleski term
+        if ( ModelType == "JLL original" || ModelType == "JLL NoDomUnit" || ModelType == "JLL jointSigma" ){
+          P <- ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[tt]]$ests$JLLoutcomes$Sigmas$Sigma_Y
+        }else{ P <- t(chol(invGSigmau)) }
+
         scale <- 1
 
         # 2.2) Factor loadings preparation
@@ -1457,7 +1463,7 @@ FEVDjointOrthogoJLL_BS <- function(ModelType, ModelParaBoot, FEVDhoriz, FactorLa
       invG[!is.finite(invG)] <- 0
       invGSigmau <- solve(G0)%*%Sigma_y
 
-      P <- t(chol(invGSigmau))
+      P <- ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[tt]]$ests$JLLoutcomes$Sigmas$Sigma_Ye
       scale <- 1
 
       # 2.2) Factor loadings preparation

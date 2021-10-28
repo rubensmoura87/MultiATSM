@@ -14,7 +14,9 @@
 #'  }
 
 #'@examples
-#'\dontrun{
+#'\donttest{
+#'if (requireNamespace('neldermead', quietly = TRUE)) {
+#'
 #'data(CM_Factors)
 #' ZZ <- RiskFactors
 #' N <- 3
@@ -27,6 +29,10 @@
 #' JLLinputs$JLLModelType <- "JLL original"
 
 #' JLL(ZZ, N, JLLinputs)
+#'
+#' #'} else {
+#'  message("skipping functionality due to missing Suggested dependency")
+#'}
 #'}
 
 #'@details

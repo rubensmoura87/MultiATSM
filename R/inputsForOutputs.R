@@ -42,7 +42,6 @@
 #'
 #'InputsList <- InputsForOutputs(ModelType, Horiz, DesiredOutputGraphs, OutputLabel,
 #'                               WishStationarityQ, WishGraphYields, WishGraphRiskFac)
-#'
 #'@returns
 #' List of necessary inputs to generate the graphs of the outputs of the desired model
 #'@export

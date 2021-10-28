@@ -38,6 +38,15 @@ DataForEstimation(
 
 \item{Wgvar}{GVAR transition matrix, if GVAR type model is chosen; default is set to NULL.}
 }
+\value{
+A list containing the
+\enumerate{
+\item time series of the complete set of bond yields (matrix, JxT or CJxT);
+\item time series of the complete set risk factors (matrix, KxT);
+\item 'GVARFactors': list of all variables that are used in the estimation of the VARX \cr
+               (see e.g. 'CM_Factors_GVAR' file). If the estimated model type is not GVAR-based, then returns NULL.
+}
+}
 \description{
 Retrieve data from Excel and build the database used in the model estimation
 }

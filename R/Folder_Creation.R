@@ -27,10 +27,12 @@ for (h in 1:length(OutputTypeSet)){
   for (v in 1:length(VarTypeSet)){
   for (i in 1:C){
     if (h==1){
-    PathsGraphs[[ModelType]][[OutputTypeSet[h]]][[Economies[i]]]  <- paste("Outputs/", ModelType, "/Point Estimate/Model ",
-                                                                           Economies[i], "/", OutputTypeSet[h], sep="")
+    PathsGraphs[[ModelType]][[OutputTypeSet[h]]][[Economies[i]]]  <- paste(tempdir(), "/Outputs/", ModelType,
+                                                                           "/Point Estimate/Model ", Economies[i], "/",
+                                                                           OutputTypeSet[h], sep="")
     } else{
-      PathsGraphs[[ModelType]][[OutputTypeSet[h]]][[Economies[i]]][[VarTypeSet[v]]]  <- paste("Outputs/", ModelType, "/Point Estimate/Model ",
+      PathsGraphs[[ModelType]][[OutputTypeSet[h]]][[Economies[i]]][[VarTypeSet[v]]]  <- paste(tempdir(), "/Outputs/",
+                                                                                              ModelType, "/Point Estimate/Model ",
                                                                                               Economies[i], "/", OutputTypeSet[h], "/",
                                                                                               VarTypeSet[v], sep="")
        }
@@ -42,11 +44,12 @@ for (h in 1:length(OutputTypeSet)){
   for (h in 1:length(OutputTypeSet)){
     for (v in 1:length(VarTypeSet)){
         if (h==1){
-          PathsGraphs[[ModelType]][[OutputTypeSet[h]]]  <- paste("Outputs/", ModelType, "/Point Estimate/",
+          PathsGraphs[[ModelType]][[OutputTypeSet[h]]]  <- paste(tempdir(),"/Outputs/", ModelType, "/Point Estimate/",
                                                                   OutputTypeSet[h], sep="")
         } else{
-          PathsGraphs[[ModelType]][[OutputTypeSet[h]]][[VarTypeSet[v]]]  <- paste("Outputs/", ModelType, "/Point Estimate/",
-                                                                                  OutputTypeSet[h], "/", VarTypeSet[v], sep="")
+          PathsGraphs[[ModelType]][[OutputTypeSet[h]]][[VarTypeSet[v]]]  <- paste(tempdir(),"/Outputs/", ModelType,
+                                                                                  "/Point Estimate/", OutputTypeSet[h],
+                                                                                  "/", VarTypeSet[v], sep="")
 
         }
 
@@ -54,7 +57,7 @@ for (h in 1:length(OutputTypeSet)){
   if (ModelType == "JLL original" || ModelType == "JLL NoDomUnit" || ModelType == "JLL jointSigma"){
     if (h !=1){
     OrthoLabel <- paste(VarTypeSet,"Ortho")
-    PathsGraphs[[ModelType]][[OutputTypeSet[h]]][[OrthoLabel[v]]] <- paste("Outputs/", ModelType, "/Point Estimate/",
+    PathsGraphs[[ModelType]][[OutputTypeSet[h]]][[OrthoLabel[v]]] <- paste(tempdir(),"/Outputs/", ModelType, "/Point Estimate/",
                                                                            OutputTypeSet[h], "/", VarTypeSet[v],
                                                                            "/Ortho", sep="")
     }
@@ -98,10 +101,10 @@ FolderCreationBoot <- function(ModelType, Economies){
       for (v in 1:length(VarTypeSet)){
         for (i in 1:C){
           if (h==1){
-            PathsGraphs[[ModelType]][[OutputTypeSet[h]]][[Economies[i]]]  <- paste("Outputs/", ModelType, "/Bootstrap/Model ",
+            PathsGraphs[[ModelType]][[OutputTypeSet[h]]][[Economies[i]]]  <- paste(tempdir(),"/Outputs/", ModelType, "/Bootstrap/Model ",
                                                                                    Economies[i], "/", OutputTypeSet[h], sep="")
           } else{
-            PathsGraphs[[ModelType]][[OutputTypeSet[h]]][[Economies[i]]][[VarTypeSet[v]]]  <- paste("Outputs/", ModelType, "/Bootstrap/Model ",
+            PathsGraphs[[ModelType]][[OutputTypeSet[h]]][[Economies[i]]][[VarTypeSet[v]]]  <- paste(tempdir(),"/Outputs/", ModelType, "/Bootstrap/Model ",
                                                                                                     Economies[i], "/", OutputTypeSet[h], "/",
                                                                                                     VarTypeSet[v], sep="")
           }
@@ -114,10 +117,10 @@ FolderCreationBoot <- function(ModelType, Economies){
     for (h in 1:length(OutputTypeSet)){
       for (v in 1:length(VarTypeSet)){
         if (h==1){
-          PathsGraphs[[ModelType]][[OutputTypeSet[h]]]  <- paste("Outputs/", ModelType, "/Bootstrap/",
+          PathsGraphs[[ModelType]][[OutputTypeSet[h]]]  <- paste(tempdir(),"/Outputs/", ModelType, "/Bootstrap/",
                                                                  OutputTypeSet[h], sep="")
         } else{
-          PathsGraphs[[ModelType]][[OutputTypeSet[h]]][[VarTypeSet[v]]]  <- paste("Outputs/", ModelType, "/Bootstrap/",
+          PathsGraphs[[ModelType]][[OutputTypeSet[h]]][[VarTypeSet[v]]]  <- paste(tempdir(),"/Outputs/", ModelType, "/Bootstrap/",
                                                                                   OutputTypeSet[h], "/", VarTypeSet[v], sep="")
 
         }
@@ -126,7 +129,7 @@ FolderCreationBoot <- function(ModelType, Economies){
         if (ModelType == "JLL original" || ModelType == "JLL NoDomUnit" || ModelType == "JLL jointSigma"){
           if (h !=1){
             OrthoLabel <- paste(VarTypeSet,"Ortho")
-            PathsGraphs[[ModelType]][[OutputTypeSet[h]]][[OrthoLabel[v]]] <- paste("Outputs/", ModelType, "/Bootstrap/",
+            PathsGraphs[[ModelType]][[OutputTypeSet[h]]][[OrthoLabel[v]]] <- paste(tempdir(),"/Outputs/", ModelType, "/Bootstrap/",
                                                                                    OutputTypeSet[h], "/", VarTypeSet[v],
                                                                                    "/Ortho", sep="")
           }

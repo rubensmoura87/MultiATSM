@@ -31,9 +31,7 @@ List of the model numerical outputs, namely
 Construct the model numerical outputs (model fit, IRFs, GIRFs, FEVDs, and GFEVDs)
 }
 \examples{
-\dontrun{
 # See examples in the vignette file of this package (Section 4).
-}
 
 
 }

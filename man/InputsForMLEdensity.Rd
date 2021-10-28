@@ -47,7 +47,7 @@ Generates several  inputs that are necessary to build the likelihood function
 To ensure that the risk factors matrix is correctly built for the model "JPS", the global factors should be allocated on the first G rows of this matrix.
 }
 \examples{
-\dontrun{
+\donttest{
 # Example 1:
 data(CM_Factors)
 data(CM_Yields)
@@ -91,7 +91,10 @@ GVARinputs$Wgvar <- matrix( c(0, 0.83, 0.86, 0.38,
                0.03, 0.05, 0.01, 0), nrow = 4, ncol = 4)
 ATSMInputs <- InputsForMLEdensity(ModelType, Yields, Factors, FactorLabels, mat, Economies,
                                  DataFrequency, JLLinputs= NULL , GVARinputs)
+
 # Example 3:
+if (requireNamespace('neldermead', quietly = TRUE)) {
+
 data(CM_Factors)
 data(CM_Yields)
 ModelType <- "JLL jointSigma"
@@ -113,6 +116,10 @@ JLLinputs$JLLModelType <- ModelType
 
 ATSMInputs <- InputsForMLEdensity(ModelType, Yields, Factors, FactorLabels, mat, Economies,
                                  DataFrequency, JLLinputs)
+} else {
+ message("skipping functionality due to missing Suggested dependency")
+}
+
 
 }
 }

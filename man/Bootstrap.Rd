@@ -53,9 +53,7 @@ list containing the following elements:
 Generates the bootstrap-related outputs
 }
 \examples{
-\dontrun{
 # See examples in the vignette file of this package (Section 4).
-}
 
 }
 \references{

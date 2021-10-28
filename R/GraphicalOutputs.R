@@ -15,9 +15,10 @@ GraphicalOutputs <- function(ModelType, ModelPara, NumOut, InputsForOutputs, Eco
 
 # Generate the graph paths and the graph folders
   # Create the folder output folder in which the outputs will be stored
-  dir.create("Outputs")
-  dir.create(paste("Outputs", "/", ModelType, sep=""))
-  dir.create(paste("Outputs", "/", ModelType, "/Point Estimate", sep=""))
+  dir.create(paste(tempdir(), "/Outputs", sep=""))
+  dir.create(paste(tempdir(), "/Outputs/",  ModelType, sep=""))
+  dir.create(paste(tempdir(), "/Outputs/",  ModelType, "/Point Estimate", sep=""))
+
 
   PathsGraphs <- FolderCreationPoint(ModelType, Economies)
 
@@ -28,7 +29,7 @@ GraphicalOutputs <- function(ModelType, ModelPara, NumOut, InputsForOutputs, Eco
 # 1) Models for which the estimation is done on a country-by-country basis
 if ( "JPS" %in% ModelType || "JPS jointP" %in% ModelType ||  "GVAR sepQ" %in% ModelType){
 
-  for (i in 1:length(Economies)){dir.create( paste("Outputs/", ModelType, "/Point Estimate/Model ", Economies[i], sep=""))}
+    for (i in 1:length(Economies)){dir.create(paste(tempdir(),"/Outputs/", ModelType, "/Point Estimate/Model ", Economies[i], sep=""))}
 
   # Model fit
   FitgraphsSep(ModelType, InputsForOutputs[[ModelType]]$Fit$WishGraphs, ModelPara, NumOut, Economies, PathsGraphs)
@@ -147,7 +148,7 @@ RiskFactorsGraphs <- function(ModelType, ModelOutputs, Economies, FactorLabels){
   T <- ncol(Factors)
 
   TitleGraphs <- c(FactorLabels$Global, FactorLabels$Domestic)
-  Folder2save <-  paste("Outputs", "/", ModelType, sep="")
+  Folder2save <-  paste(tempdir(), "/Outputs", "/", ModelType, sep="")
 
   # 0) Preliminary work
   Factors <- t(Factors)
@@ -257,7 +258,7 @@ FitgraphsSep  <- function(ModelType, WishFitgraphs, ModelPara, NumOut, Economies
     C <- length(Economies)
 
     for( i in 1:C){
-      dir.create( paste("Outputs/", ModelType, "/Point Estimate/Model ", Economies[i], "/Fit", sep=""))
+      dir.create( paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/Model ", Economies[i], "/Fit", sep=""))
 
 
     mat <- (ModelPara[[ModelType]][[Economies[i]]]$inputs$mat)*12
@@ -361,7 +362,7 @@ IRFgraphsSep <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsgraph
 
 
     for (i in 1:C){
-      dir.create( paste("Outputs/", ModelType, "/Point Estimate/Model ", Economies[i], "/IRF", sep="")) # Folder Creation
+      dir.create( paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/Model ", Economies[i], "/IRF", sep="")) # Folder Creation
 
         K <- dim(NumOut$IRF[[ModelType]][[Economies[i]]]$Factors)[2] # Total number of risk factors
         J <- dim(NumOut$IRF[[ModelType]][[Economies[i]]]$Yields)[2] # Total number of yields
@@ -380,7 +381,8 @@ IRFgraphsSep <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsgraph
 
         ########################### IRF FACTORS ########################################################
         if (WishPdynamicsgraphs == 1){
-          dir.create( paste("Outputs/", ModelType, "/Point Estimate/Model ", Economies[i], "/IRF/Factors", sep=""))
+          dir.create(paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/Model ", Economies[i],
+                           "/IRF/Factors", sep=""))
 
           plot_list <- list()
           for(h in 1:K){
@@ -401,7 +403,8 @@ IRFgraphsSep <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsgraph
         }
         ############################ IRF Yields ########################################################
         if (WishYieldsgraphs == 1){
-          dir.create( paste("Outputs/", ModelType, "/Point Estimate/Model ", Economies[i], "/IRF/Yields", sep=""))
+          dir.create( paste(tempdir(),"/Outputs/", ModelType, "/Point Estimate/Model ",
+                            Economies[i], "/IRF/Yields", sep=""))
 
           plot_list <- list()
 
@@ -459,10 +462,10 @@ FEVDgraphsSep <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsgrap
 
       for (h in 1:C){
 
-        dir.create( paste("Outputs/", ModelType, "/Point Estimate/Model ", Economies[h], "/FEVD", sep=""))
+        dir.create( paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/Model ", Economies[h], "/FEVD", sep=""))
   ######################################### Factors #########################################################
       if (WishPdynamicsgraphs == 1){
-        dir.create( paste("Outputs/", ModelType, "/Point Estimate/Model ", Economies[h], "/FEVD/Factors", sep=""))
+        dir.create( paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/Model ", Economies[h], "/FEVD/Factors", sep=""))
 
           FEVDFactors <- list()
           K <- dim(NumOut$FEVD[[ModelType]][[Economies[h]]]$Factors)[2] # Total number of risk factors
@@ -493,7 +496,7 @@ FEVDgraphsSep <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsgrap
 }
           ############################################ Yields #########################################################
           if (WishYieldsgraphs == 1){
-            dir.create( paste("Outputs/", ModelType, "/Point Estimate/Model ", Economies[h], "/FEVD/Yields", sep=""))
+            dir.create( paste(tempdir(),"/Outputs/", ModelType, "/Point Estimate/Model ", Economies[h], "/FEVD/Yields", sep=""))
 
             FEVDYields <- list()
             J <- dim(NumOut$FEVD[[ModelType]][[Economies[h]]]$Yields)[3] # Total number of yields of the system
@@ -557,7 +560,7 @@ GIRFgraphsSep <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsgrap
 
     for (i in 1:C){
 
-      dir.create( paste("Outputs/", ModelType, "/Point Estimate/Model ", Economies[i], "/GIRF", sep=""))
+      dir.create( paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/Model ", Economies[i], "/GIRF", sep=""))
 
         K <- dim(NumOut$GIRF[[ModelType]][[Economies[i]]]$Factors)[2] # Total number of risk factors
         J <- dim(NumOut$GIRF[[ModelType]][[Economies[i]]]$Yields)[2] # Total number of yields
@@ -577,7 +580,7 @@ GIRFgraphsSep <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsgrap
         ########################### GIRF FACTORS ########################################################
         if (WishPdynamicsgraphs == 1){
 
-          dir.create( paste("Outputs/", ModelType, "/Point Estimate/Model ", Economies[i], "/GIRF/Factors", sep=""))
+          dir.create( paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/Model ", Economies[i], "/GIRF/Factors", sep=""))
 
           plot_list <- list()
           for(h in 1:K){
@@ -599,7 +602,7 @@ GIRFgraphsSep <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsgrap
         ############################ GIRF Yields ########################################################
         if (WishYieldsgraphs == 1){
 
-          dir.create( paste("Outputs/", ModelType, "/Point Estimate/Model ", Economies[i], "/GIRF/Yields", sep=""))
+          dir.create(paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/Model ", Economies[i], "/GIRF/Yields", sep=""))
 
           plot_list <- list()
           for(l in 1:K){
@@ -649,12 +652,12 @@ GFEVDgraphsSep <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsgra
       C <- length(Economies)
       for (h in 1:C){
 
-        dir.create( paste("Outputs/", ModelType, "/Point Estimate/Model ", Economies[h], "/GFEVD", sep=""))
+        dir.create(paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/Model ", Economies[h], "/GFEVD", sep=""))
 
           ######################################### Factors #########################################################
           if (WishPdynamicsgraphs == 1){
 
-            dir.create( paste("Outputs/", ModelType, "/Point Estimate/Model ", Economies[h], "/GFEVD/Factors", sep=""))
+            dir.create(paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/Model ", Economies[h], "/GFEVD/Factors", sep=""))
 
             GFEVDFactors <- list()
           K <- dim(NumOut$GFEVD[[ModelType]][[Economies[h]]]$Factors)[2] # Total number of risk factors
@@ -685,7 +688,7 @@ GFEVDgraphsSep <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsgra
           ############################################ Yields #########################################################
           if (WishYieldsgraphs == 1){
 
-      dir.create( paste("Outputs/", ModelType, "/Point Estimate/Model ", Economies[h], "/GFEVD/Yields", sep=""))
+      dir.create( paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/Model ", Economies[h], "/GFEVD/Yields", sep=""))
 
             GFEVDYields <- list()
             J <- dim(NumOut$GFEVD[[ModelType]][[Economies[h]]]$Yields)[3] # Total number of yields of the system
@@ -758,7 +761,7 @@ FitgraphsJoint  <- function(ModelType, WishFitgraphs, ModelPara, NumOut, Economi
     print('################################# Generating Fit graphs #################################' )
 
 
-    dir.create( paste("Outputs/", ModelType, "/Point Estimate/Fit", sep=""))  # Folder creation
+    dir.create( paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/Fit", sep=""))  # Folder creation
 
   mat <- (ModelPara[[ModelType]]$inputs$mat)*12
   C <- length(Economies)
@@ -873,7 +876,7 @@ IRFgraphsJoint <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsgra
 
         print('################################# Generating IRFs graphs #################################' )
 
-      dir.create( paste("Outputs/", ModelType, "/Point Estimate/IRF", sep="")) # Folder Creation
+      dir.create( paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/IRF", sep="")) # Folder Creation
 
       IRFFactors <- list()
       IRFYields <- list()
@@ -904,7 +907,7 @@ IRFgraphsJoint <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsgra
         ########################### IRF FACTORS ########################################################
         if (WishPdynamicsgraphs == 1){
 
-          dir.create( paste("Outputs/", ModelType, "/Point Estimate/IRF/Factors", sep="")) # Folder Creation
+          dir.create( paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/IRF/Factors", sep="")) # Folder Creation
 
             plot_list <- list()
           for(h in 1:K){
@@ -925,7 +928,7 @@ IRFgraphsJoint <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsgra
         ############################ IRF Yields ########################################################
         if (WishYieldsgraphs == 1){
 
-          dir.create( paste("Outputs/", ModelType, "/Point Estimate/IRF/Yields", sep="")) # Folder Creation
+          dir.create( paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/IRF/Yields", sep="")) # Folder Creation
 
           plot_list <- list()
           for(l in 1:K){
@@ -975,12 +978,12 @@ FEVDgraphsJoint <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsgr
 
         print('################################# Generating FEVDs graph #################################' )
 
-        dir.create( paste("Outputs/", ModelType, "/Point Estimate/FEVD", sep="")) # Folder Creation
+        dir.create( paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/FEVD", sep="")) # Folder Creation
 
  ######################################### Factors #########################################################
         if (WishPdynamicsgraphs == 1){
 
-          dir.create( paste("Outputs/", ModelType, "/Point Estimate/FEVD/Factors", sep="")) # Folder Creation
+          dir.create( paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/FEVD/Factors", sep="")) # Folder Creation
 
           FEVDFactors <- list()
 
@@ -1024,7 +1027,7 @@ FEVDgraphsJoint <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsgr
         ############################################ Yields #########################################################
         if (WishYieldsgraphs == 1){
 
-          dir.create( paste("Outputs/", ModelType, "/Point Estimate/FEVD/Yields", sep="")) # Folder Creation
+          dir.create( paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/FEVD/Yields", sep="")) # Folder Creation
 
           FEVDYields <- list()
 
@@ -1099,7 +1102,7 @@ GIRFgraphsJoint <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsgr
 
         print('################################# Generating GIRFs graphs #################################' )
 
-        dir.create( paste("Outputs/", ModelType, "/Point Estimate/GIRF", sep="")) # Folder Creation
+        dir.create(paste(tempdir(),"/Outputs/", ModelType, "/Point Estimate/GIRF", sep="")) # Folder Creation
 
       GIRFFactors <- list()
       GIRFYields <- list()
@@ -1130,7 +1133,7 @@ GIRFgraphsJoint <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsgr
         ########################### GIRF FACTORS ########################################################
         if (WishPdynamicsgraphs == 1){
 
-          dir.create( paste("Outputs/", ModelType, "/Point Estimate/GIRF/Factors", sep="")) # Folder Creation
+          dir.create( paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/GIRF/Factors", sep="")) # Folder Creation
 
           plot_list <- list()
           for(h in 1:K){
@@ -1151,7 +1154,7 @@ GIRFgraphsJoint <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsgr
         ############################ IRF Yields ########################################################
         if (WishYieldsgraphs == 1){
 
-          dir.create( paste("Outputs/", ModelType, "/Point Estimate/GIRF/Yields", sep="")) # Folder Creation
+          dir.create( paste(tempdir(),"/Outputs/", ModelType, "/Point Estimate/GIRF/Yields", sep="")) # Folder Creation
 
           plot_list <- list()
           for(l in 1:K){
@@ -1203,10 +1206,10 @@ GFEVDgraphsJoint <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsg
         print('################################# Generating GFEVD graphs #################################' )
 
 
-        dir.create( paste("Outputs/", ModelType, "/Point Estimate/GFEVD", sep="")) # Folder Creation
+        dir.create( paste(tempdir(),"/Outputs/", ModelType, "/Point Estimate/GFEVD", sep="")) # Folder Creation
         ######################################### Factors #########################################################
         if (WishPdynamicsgraphs == 1){
-          dir.create( paste("Outputs/", ModelType, "/Point Estimate/GFEVD/Factors", sep="")) # Folder Creation
+          dir.create( paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/GFEVD/Factors", sep="")) # Folder Creation
 
           GFEVDFactors <- list()
 
@@ -1249,7 +1252,7 @@ GFEVDgraphsJoint <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsg
         ############################################ Yields #########################################################
         if (WishYieldsgraphs == 1){
 
-          dir.create( paste("Outputs/", ModelType, "/Point Estimate/GFEVD/Yields", sep="")) # Folder Creation
+          dir.create( paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/GFEVD/Yields", sep="")) # Folder Creation
 
           GFEVDYields <- list()
 
@@ -1343,7 +1346,7 @@ IRFgraphsJLLOrtho <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYields
         ########################### IRF FACTORS ########################################################
         if (WishPdynamicsgraphs == 1){
 
-          dir.create( paste("Outputs/", ModelType, "/Point Estimate/IRF/Factors/Ortho", sep="")) # Folder Creation
+          dir.create( paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/IRF/Factors/Ortho", sep="")) # Folder Creation
 
           plot_list <- list()
           for(h in 1:K){
@@ -1364,7 +1367,7 @@ IRFgraphsJLLOrtho <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYields
         ############################ IRF Yields ########################################################
         if (WishYieldsgraphs == 1){
 
-          dir.create( paste("Outputs/", ModelType, "/Point Estimate/IRF/Yields/Ortho", sep="")) # Folder Creation
+          dir.create( paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/IRF/Yields/Ortho", sep="")) # Folder Creation
 
           plot_list <- list()
           for(l in 1:K){
@@ -1415,7 +1418,7 @@ FEVDgraphsJLLOrtho <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYield
         ######################################### Factors #########################################################
         if (WishPdynamicsgraphs == 1){
 
-          dir.create( paste("Outputs/", ModelType, "/Point Estimate/FEVD/Factors/Ortho", sep="")) # Folder Creation
+          dir.create( paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/FEVD/Factors/Ortho", sep="")) # Folder Creation
 
           FEVDFactors <- list()
           K <- dim(NumOut$FEVD[[ModelType]]$Factors$Ortho)[2] # Total number of risk factors
@@ -1447,7 +1450,7 @@ FEVDgraphsJLLOrtho <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYield
         ############################################ Yields #########################################################
         if (WishYieldsgraphs == 1){
 
-          dir.create( paste("Outputs/", ModelType, "/Point Estimate/FEVD/Yields/Ortho", sep="")) # Folder Creation
+          dir.create( paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/FEVD/Yields/Ortho", sep="")) # Folder Creation
 
           FEVDYields <- list()
           CJ <- dim(NumOut$FEVD[[ModelType]]$Yields$Ortho)[3] # Total number of yields of the system
@@ -1525,7 +1528,7 @@ GIRFgraphsJLLOrtho <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYield
         ########################### GIRF FACTORS ########################################################
         if (WishPdynamicsgraphs == 1){
 
-          dir.create( paste("Outputs/", ModelType, "/Point Estimate/GIRF/Factors/Ortho", sep="")) # Folder Creation
+          dir.create( paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/GIRF/Factors/Ortho", sep="")) # Folder Creation
 
           plot_list <- list()
           for(h in 1:K){
@@ -1545,7 +1548,7 @@ GIRFgraphsJLLOrtho <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYield
         ############################ IRF Yields ########################################################
         if (WishYieldsgraphs == 1){
 
-          dir.create( paste("Outputs/", ModelType, "/Point Estimate/GIRF/Yields/Ortho", sep="")) # Folder Creation
+          dir.create( paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/GIRF/Yields/Ortho", sep="")) # Folder Creation
 
           plot_list <- list()
           for(l in 1:K){
@@ -1596,7 +1599,7 @@ GFEVDgraphsJLLOrtho <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYiel
   ######################################### Factors #########################################################
   if (WishPdynamicsgraphs == 1){
 
-    dir.create( paste("Outputs/", ModelType, "/Point Estimate/GFEVD/Factors/Ortho", sep="")) # Folder Creation
+    dir.create( paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/GFEVD/Factors/Ortho", sep="")) # Folder Creation
 
         GFEVDFactors <- list()
           K <- dim(NumOut$GFEVD[[ModelType]]$Factors$Ortho)[2] # Total number of risk factors
@@ -1626,7 +1629,7 @@ GFEVDgraphsJLLOrtho <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYiel
         ############################################ Yields #########################################################
         if (WishYieldsgraphs == 1){
 
-          dir.create( paste("Outputs/", ModelType, "/Point Estimate/GFEVD/Yields/Ortho", sep="")) # Folder Creation
+          dir.create( paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/GFEVD/Yields/Ortho", sep="")) # Folder Creation
 
           GFEVDYields <- list()
           CJ <- dim(NumOut$GFEVD[[ModelType]]$Yields$Ortho)[3] # Total number of yields of the system
