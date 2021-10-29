@@ -31,7 +31,7 @@
 #' JLL(ZZ, N, JLLinputs)
 #'
 #' #'} else {
-#'  message("skipping functionality due to missing Suggested dependency")
+#'  message("skiping functionality due to missing Suggested dependency")
 #'}
 #'}
 
