@@ -67,9 +67,8 @@ colnames(Tab) <- ColNames
 
 
 # Generate the table
-options(warn=-1)
-library(magrittr)
-options(warn=0)
+suppressWarnings(library(magrittr))
+
 
 kableExtra::kbl(Tab, align = "c", caption = "Model Features") %>%
   kableExtra::kable_classic("striped", full_width = F)  %>%

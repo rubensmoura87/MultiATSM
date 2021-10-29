@@ -72,8 +72,8 @@ Reg_K1Q <- function(Y, mat, Z, dt,type){
   }
 
   K1Qh <- mldivide(RHS,LHS)
-  options(warn = -1)
-  K1Q <- powerplus::Matpow(K1Qh, numer=1, denom = h)
+
+  K1Q <- suppressWarnings(powerplus::Matpow(K1Qh, numer=1, denom = h))
 
 
   #Step 7: Convert  K1Q into Jordan form
