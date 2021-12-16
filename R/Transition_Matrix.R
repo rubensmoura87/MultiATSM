@@ -41,16 +41,16 @@ Transition_Matrix <- function(t_First, t_Last, Economies, type, DataPath = NULL,
   if (sjmisc::is_empty(DataPath)){ DataPath <- system.file("extdata", "TradeData.xlsx", package = "MultiATSM") }
 
   tab_names_Trade <- readxl::excel_sheets(DataPath)
-  list_all_Trade <- lapply(tab_names_Trade, function(x) readxl::read_excel(path = DataPath, sheet = x))
+  list_all_Trade <- suppressMessages(lapply(tab_names_Trade, function(x) readxl::read_excel(path = DataPath, sheet = x)))
   names(list_all_Trade) <- tab_names_Trade
 
   L <- length(list_all_Trade)
 
-  suppressWarnings()
+
   for (i in 1:L){
     Countries <- list_all_Trade[[i]][[1]]
     list_all_Trade[[i]] <- list_all_Trade[[i]][,-1]
-    row.names(list_all_Trade[[i]]) <- Countries
+    row.names(list_all_Trade[[i]]) <- suppressMessages(Countries)
   }
 
 
