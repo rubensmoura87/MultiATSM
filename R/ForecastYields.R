@@ -213,7 +213,7 @@ ForecastYieldsSepQ <- function(ModelType, ModelPara, InputsForOutputs, FactorLab
 
       print(paste(ModelType, Economies[i], ": Out-of-sample forecast for information set available until", ForecastDate))
 
-      saveRDS(OutofSampleForecast, paste(tempdir(),"/", InputsForOutputs$'Label Outputs','.rds',sep=""))
+      saveRDS(OutofSampleForecast, paste(tempdir(),"/Forecast_", InputsForOutputs$'Label Outputs','.rds',sep=""))
     }
   }
 
@@ -225,7 +225,7 @@ ForecastYieldsSepQ <- function(ModelType, ModelPara, InputsForOutputs, FactorLab
   OutofSampleForecast <- append(OutofSampleForecast[[ModelType]], RMSE)
 
 
-  saveRDS(OutofSampleForecast, paste(tempdir(),"/", InputsForOutputs$'Label Outputs','.rds',sep=""))
+  saveRDS(OutofSampleForecast, paste(tempdir(),"/Forecast_", InputsForOutputs$'Label Outputs','.rds',sep=""))
 
   return(OutofSampleForecast)
 
@@ -388,7 +388,7 @@ ForecastYieldsJointQ <- function(ModelType, ModelPara, InputsForOutputs, FactorL
 
       print(paste(ModelType, ": Out-of-sample forecast for information set available until", ForecastDate))
 
-      saveRDS(OutofSampleForecast, paste(tempdir(),"/", InputsForOutputs$'Label Outputs','.rds',sep=""))
+      saveRDS(OutofSampleForecast, paste(tempdir(),"/Forecast_", InputsForOutputs$'Label Outputs','.rds',sep=""))
   }
 
 
@@ -399,7 +399,7 @@ ForecastYieldsJointQ <- function(ModelType, ModelPara, InputsForOutputs, FactorL
   OutofSampleForecast <- append(OutofSampleForecast[[ModelType]], RMSE)
 
 
-  saveRDS(OutofSampleForecast, paste(tempdir(),"/", InputsForOutputs$'Label Outputs','.rds',sep=""))
+  saveRDS(OutofSampleForecast, paste(tempdir(),"/Forecast_", InputsForOutputs$'Label Outputs','.rds',sep=""))
 
   return(OutofSampleForecast)
 
