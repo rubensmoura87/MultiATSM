@@ -41,16 +41,16 @@ rownames(Tab) <- ModelLabels
 EmptyCol <- c("", "", "", "", "", "", "", "") 
 Tab$EmptyCol0 <- EmptyCol
 # P-dynamics + 2 empty spaces
-Tab$PdynIndUnco <- c("x", "x", "", "", "", "", "", "")
+Tab$PdynIndUnco <- c("x", "", "", "", "", "", "", "")
 Tab$PdynIndCo <- c("", "", "", "", "", "", "", "")
-Tab$PdynJointUnco <- c("", "", "x", "", "", "", "", "")
+Tab$PdynJointUnco <- c("", "x", "x", "", "", "", "", "")
 Tab$PdynJointJLL <- c("", "", "", "", "", "x", "x", "x")
 Tab$PdynJointGVAR <- c("", "", "", "x", "x", "", "", "")
 Tab$EmptyCol1 <- EmptyCol
 Tab$EmptyCol2 <- EmptyCol
 # Q-dynamics + 2 empty spaces
-Tab$QdynInd <- c("x", "", "", "x", "", "", "", "")   
-Tab$QdynJoint <- c("", "x", "x", "", "x", "x", "x", "x") 
+Tab$QdynInd <- c("x", "x", "", "x", "", "", "", "")   
+Tab$QdynJoint <- c("", "", "x", "", "x", "x", "x", "x") 
 Tab$EmptyCol3 <- EmptyCol
 Tab$EmptyCol4 <- EmptyCol
 # Sigma + 2 empty spaces
@@ -167,13 +167,14 @@ Some additional inputs are required if the user intends to estimate the GVAR-ATS
 
 - **Economies**: a string-vector containing the names of the economies as described above;  
 - **GVAR list of risk factors**:  a list of risk factors sorted by country in addition to the global variables. See function *DatabasePrep*;
-- **VARX type**: a string-vector containing the desired estimated form of the VARX(1,1,1). Two possibilities are available. The *"unconstrained"* form estimates the model without any constrains using standard OLS regressions for each one of the model equations. The *"constrained"* form prevents foreign-spanned-factors to impact any domestic factor. In such a case, the VARX(1,1,1) is estimated by restricted least squares.
+- **VARX type**: a string-vector containing the desired estimated form of the VARX(1,1,1). Two possibilities are available. The *"unconstrained"* form estimates the model without any constrains using standard OLS regressions for each one of the model equations. The *"constrained: Spanned Factors"* form prevents foreign-spanned-factors to impact any domestic factor in the feedback matrix, whereas *"constrained: '* followed by the name of the risk factor restricts this same factor to be influenced only by its own lagged values and the lagged values of its own star variables. In the last two cases, the VARX(1,1,1) is estimated by restricted least squares.
+
 
 ```{r}
 GVARinputs <- list()
 GVARinputs$Economies <- Economies
 GVARinputs$GVARFactors <- FactorsGVAR
-GVARinputs$VARXtype <- "unconstrained"
+GVARinputs$VARXtype <- "constrained: Inflation"
 ```
 
 Furthermore, the estimation of the GVAR requires the specification of the necessary inputs to build the **transition matrix** (see Section \@ref(S:SectionGVAR) for more details). One example of this list of inputs is
@@ -567,8 +568,8 @@ for (i in 1:C){
 
   # 6) Optimization of the model
   if (ModelType == 'JPS' || ModelType == 'JPS jointP' || ModelType == "GVAR sepQ"){
-    ModelParaList[[ModelType]][[Economies[i]]] <- Optimization(f, tol, varargin, FactorLabels, Economies, ModelType)$Summary
-  }else{ ModelParaList[[ModelType]] <- Optimization(f, tol, varargin, FactorLabels, Economies, ModelType, JLLinputs)$Summary}
+    ModelParaList[[ModelType]][[Economies[i]]] <- Optimization(f, tol, varargin, FactorLabels, Economies, ModelType, JLLinputs, GVARinputs)$Summary
+  }else{ ModelParaList[[ModelType]] <- Optimization(f, tol, varargin, FactorLabels, Economies, ModelType, JLLinputs, GVARinputs)$Summary}
 
 }
 
@@ -871,7 +872,7 @@ f <- Functionf(ATSMInputs, Economies, mat, DataFrequency, FactorLabels, ModelTyp
 VarLab <- ParaLabels(ModelType, StationarityUnderQ)
 
 varargin <- list()
-varargin$K1XQ <-list(K1XQ, VarLab[[ModelType]][["K1XQ"]] , NULL , NULL)
+varargin$K1XQ <-list(K1XQ, VarLab[[ModelType]][["K1XQ"]], NULL , NULL)
 varargin$SSZ <- list(SSZ, VarLab[[ModelType]][["SSZ"]], NULL, NULL)
 varargin$r0 <- list(NULL, VarLab[[ModelType]][["r0"]], NULL, NULL)
 varargin$se <- list(NULL, VarLab[[ModelType]][["se"]], 1e-6, NULL)
@@ -885,7 +886,7 @@ for (d in 1:(length(varargin)-1)){ names(varargin[[d]]) <-  LabelVar}
 tol <- 1e-4
 
 # 6) Optimization of the model
-ModelParaList[[ModelType]] <- Optimization(f, tol, varargin, FactorLabels, Economies, ModelType, JLLinputs)$Summary
+ModelParaList[[ModelType]] <- Optimization(f, tol, varargin, FactorLabels, Economies, ModelType, JLLinputs, GVARinputs)$Summary
 
 
 # 7) Numerical and graphical outputs

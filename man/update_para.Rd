@@ -13,6 +13,7 @@ update_para(
   FactorLabels,
   Economies,
   JLLinputs = NULL,
+  GVARinputs = NULL,
   varargin
 )
 }
@@ -31,6 +32,8 @@ contains @ to empty}
 \item{Economies}{string-vector containing the names of the economies which are part of the economic system}
 
 \item{JLLinputs}{Set of necessary inputs used in the estimation of the JLL-based models}
+
+\item{GVARinputs}{Set of necessary inputs used in the estimation of the GVAR-based models}
 
 \item{varargin}{variable inputs used in the optimization (see "Optimization" function)}
 }

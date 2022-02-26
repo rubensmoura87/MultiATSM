@@ -334,9 +334,13 @@ true2aux <- function(b, ctype, lb, ub, Economies, FactorLabels, JLLinputs =NULL)
       N <- dim(d)[1]
       atemp <- c()
       Mat1s <- matrix(1, nrow =N, ncol =N)
+      ZeroIdx <- which(d==0) # Find the indexes of the zero elements (if any)
       for (i in 1:M){
         halfm <- sqrtm_robust(d[ ,(N*(i-1)+1):(N*i)]) # sqrtm (): computes a matrix square root such that Y=X^(1/2)*X^(1/2).
-        atemp<- rbind(atemp, t(t(halfm[which(tril(Mat1s )==1)])) )
+        halfm[ZeroIdx] <- 0 # if there are zero restrictions, ensure that the zeros are properly set after applying "sqrtm_robust".
+        ab <- halfm[which(tril(Mat1s )==1)]
+        ab <- t(t(ab[ab!=0]))
+        atemp<- rbind(atemp, ab)
       }
       }
       a <- append(a,atemp)

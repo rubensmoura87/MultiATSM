@@ -171,7 +171,8 @@ ForecastYieldsSepQ <- function(ModelType, ModelPara, InputsForOutputs, FactorLab
 
       tol <- 1e-4
 
-      FullModelParaList[[ModelType]][[Economies[i]]] <- Optimization(f, tol, varargin, FactorLabels, Economies, ModelType)$Summary
+      FullModelParaList[[ModelType]][[Economies[i]]] <- Optimization(f, tol, varargin, FactorLabels, Economies, ModelType,
+                                                                     JLLinputs, GVARinputs)$Summary
 
 
       # 3) Forecasting
@@ -344,7 +345,7 @@ ForecastYieldsJointQ <- function(ModelType, ModelPara, InputsForOutputs, FactorL
 
 
       invisible(utils::capture.output(FullModelParaList[[ModelType]] <- Optimization(f, tol, varargin, FactorLabels,
-                                                     Economies, ModelType, JLLinputs)$Summary))
+                                                     Economies, ModelType, JLLinputs, GVARinputs)$Summary))
 
 
       # 3) Forecasting

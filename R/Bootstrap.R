@@ -294,10 +294,11 @@ Bootstrap <- function(ModelType, ModelParaPE, NumOutPE, mat, Economies, InputsFo
     ## STEP 6: Run the optimization
   if (ModelType == 'JPS' || ModelType == 'JPS jointP' || ModelType == "GVAR sepQ"){
   ModelBootstrap$ParaDraws[[ModelType]][[Economies[i]]][[tt]] <- Optimization_Boot(f, tol, varargin, FactorLabels,
-                                                                                   Economies, ModelType)
+                                                                                   Economies, ModelType, JLLinputs,
+                                                                                   GVARinputs)
   }else{
   ModelBootstrap$ParaDraws[[ModelType]][[tt]] <- Optimization_Boot(f, tol, varargin, FactorLabels,
-                                                                  Economies, ModelType, JLLinputs)
+                                                                  Economies, ModelType, JLLinputs, GVARinputs)
   }
 
 saveRDS(ModelBootstrap, paste(tempdir(),"/Bootstrap_", InputsForOutputs$'Label Outputs','.rds',sep="")) # if the optmization crashs after some draws,

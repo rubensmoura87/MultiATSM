@@ -14,6 +14,7 @@ f_with_vectorized_parameters(
   FactorLabels,
   Economies,
   JLLinputs,
+  GVARinputs,
   nargout
 )
 }
@@ -36,6 +37,8 @@ contains @ to empty}
 \item{Economies}{string-vector containing the names of the economies which are part of the economic system}
 
 \item{JLLinputs}{Set of necessary inputs used in the estimation of the JLL-based models (see "JLL" function)}
+
+\item{GVARinputs}{Set of necessary inputs used in the estimation of the GVAR-based models (see "GVAR" function)}
 
 \item{nargout}{if nargout <- 1, returns only the values of the likelihood function.\cr
 If nargout <- 2, generates the entire set of outputs}

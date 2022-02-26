@@ -30,7 +30,7 @@
 #' @param Economies string-vector containing the names of the economies which are part of the economic system
 #' @param ModelType string-vector containing the label of the model to be estimated
 #' @param JLLinputs inputs used in the estimation of the JLL-based models; Default is set to NULL
-#'
+#' @param GVARinputs inputs used in the estimation of the GVAR-based models; Default is set to NULL
 #'
 #'@examples
 #'#' # See examples in the vignette file of this package (Section 4).
@@ -56,7 +56,7 @@
 #'
 #'@export
 
-Optimization <- function(f, tol, varargin, FactorLabels, Economies, ModelType, JLLinputs = NULL){
+Optimization <- function(f, tol, varargin, FactorLabels, Economies, ModelType, JLLinputs = NULL, GVARinputs= NULL){
   Jmisc::tic()
 
   print('#########################################################################################################')
@@ -86,7 +86,7 @@ Optimization <- function(f, tol, varargin, FactorLabels, Economies, ModelType, J
 
   # Value of the likelihood function:
   FFvec <- functional::Curry(f_with_vectorized_parameters, sizex= AuxVal$sizex , f, con = 'concentration', varargin, ModelType,
-                 FactorLabels, Economies, JLLinputs, nargout=1)
+                 FactorLabels, Economies, JLLinputs, GVARinputs, nargout=1)
   FF <-function(x0){ mean(FFvec(x=x0))   }
 
   options200 <- neldermead::optimset(MaxFunEvals = 200*numel(AuxVal$x0), Display = iter,
@@ -146,9 +146,9 @@ Optimization <- function(f, tol, varargin, FactorLabels, Economies, ModelType, J
 
   # Build the full auxiliary vector, including concentrated parameters
   ud <- update_para(AuxVal$x0, sizex= AuxVal$sizex, ii= NULL, con= 'concentration',
-                    FactorLabels, Economies, JLLinputs, varargin) # update the parameter set which were NOT concentrated out after the optimization.
+                    FactorLabels, Economies, JLLinputs, GVARinputs, varargin) # update the parameter set which were NOT concentrated out after the optimization.
   FF <- functional::Curry(f_with_vectorized_parameters, sizex= AuxVal$sizex, f, con = 'concentration', varargin=ud,
-              ModelType, FactorLabels, Economies, JLLinputs, nargout=2)
+              ModelType, FactorLabels, Economies, JLLinputs, GVARinputs, nargout=2)
 
 
 
@@ -179,7 +179,7 @@ Optimization <- function(f, tol, varargin, FactorLabels, Economies, ModelType, J
   x.vec_ <- x0 # Vector of auxiliary parameters.
 
   FF <- functional::Curry(f_with_vectorized_parameters, sizex=sizex, f=f, con='', varargin=ud, ModelType,
-              FactorLabels, Economies, JLLinputs, nargout=2)
+              FactorLabels, Economies, JLLinputs, GVARinputs, nargout=2)
   out <- FF(x=x0)$out
 
 
@@ -188,7 +188,8 @@ Optimization <- function(f, tol, varargin, FactorLabels, Economies, ModelType, J
   x[[1]] <- x.vec_
 
   for (i in 1:dim(sizex)[1]){
-    Fi <- functional::Curry(update_para, sizex=sizex, ii=i , con='', FactorLabels, Economies, JLLinputs, varargin= ud)
+    Fi <- functional::Curry(update_para, sizex=sizex, ii=i , con='', FactorLabels, Economies,
+                            JLLinputs, GVARinputs, varargin= ud)
     if (!isempty(namex[i]) ){
       x[[i+1]] <- Fi(x=x.vec_)
     }
@@ -241,6 +242,7 @@ Optimization <- function(f, tol, varargin, FactorLabels, Economies, ModelType, J
 #' @param Economies string-vector containing the names of the economies which are part of the economic system
 #' @param ModelType string-vector containing the label of the model to be estimated
 #' @param JLLinputs inputs used in the estimation of the JLL-based models; Default is set to NULL
+#' @param GVARinputs inputs used in the estimation of the GVAR-based models; Default is set to NULL
 
 
 #'@return
@@ -264,7 +266,7 @@ Optimization <- function(f, tol, varargin, FactorLabels, Economies, ModelType, J
 
 
 
-Optimization_Boot <- function(f, tol, varargin, FactorLabels, Economies, ModelType, JLLinputs = NULL){
+Optimization_Boot <- function(f, tol, varargin, FactorLabels, Economies, ModelType, JLLinputs = NULL, GVARinputs = NULL){
 
 
 
@@ -289,7 +291,7 @@ Optimization_Boot <- function(f, tol, varargin, FactorLabels, Economies, ModelTy
 
   # Value of the likelihood function:
   FFvec <- functional::Curry(f_with_vectorized_parameters, sizex= AuxVal$sizex , f, con = 'concentration', varargin,
-                 ModelType, FactorLabels, Economies, JLLinputs, nargout=1)
+                 ModelType, FactorLabels, Economies, JLLinputs, GVARinputs, nargout=1)
   FF <-function(x0){ mean(FFvec(x=x0))   }
 
   options200 <- neldermead::optimset(MaxFunEvals = 200*numel(AuxVal$x0), Display = iter,
@@ -350,9 +352,9 @@ Optimization_Boot <- function(f, tol, varargin, FactorLabels, Economies, ModelTy
 
   # now build the full auxiliary vector, including concentrated parameters
   ud <- update_para(AuxVal$x0, sizex= AuxVal$sizex, ii= NULL, con= 'concentration',
-                    FactorLabels, Economies, JLLinputs, varargin) # update the parameter set which were NOT concentrated out after the optimization.
+                    FactorLabels, Economies, JLLinputs, GVARinputs, varargin) # update the parameter set which were NOT concentrated out after the optimization.
   FF <- functional::Curry(f_with_vectorized_parameters, sizex= AuxVal$sizex, f, con = 'concentration', varargin=ud,
-              ModelType, FactorLabels, Economies, JLLinputs, nargout=2)
+              ModelType, FactorLabels, Economies, JLLinputs, GVARinputs, nargout=2)
 
 
   tryCatch({
@@ -382,7 +384,7 @@ Optimization_Boot <- function(f, tol, varargin, FactorLabels, Economies, ModelTy
   x.vec_ <- x0 # Vector of auxiliary parameters.
 
   FF <- functional::Curry(f_with_vectorized_parameters, sizex=sizex, f=f, con='', varargin=ud,
-              ModelType, FactorLabels, Economies, JLLinputs, nargout=2)
+              ModelType, FactorLabels, Economies, JLLinputs, GVARinputs, nargout=2)
   out <- FF(x=x0)$out
 
 

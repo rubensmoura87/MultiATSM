@@ -4,7 +4,17 @@
 \alias{aux2true}
 \title{Map auxiliary (unconstrained) parameters a to constrained parameters b}
 \usage{
-aux2true(a, ctype, lb, ub, FactorLabels, Economies, JLLinputs = NULL, nargout)
+aux2true(
+  a,
+  ctype,
+  lb,
+  ub,
+  FactorLabels,
+  Economies,
+  JLLinputs = NULL,
+  GVARinputs = NULL,
+  nargout
+)
 }
 \arguments{
 \item{a}{unconstrained auxiliary parameter}
@@ -31,6 +41,8 @@ aux2true(a, ctype, lb, ub, FactorLabels, Economies, JLLinputs = NULL, nargout)
 \item{Economies}{string-vector containing the names of the economies which are part of the economic system}
 
 \item{JLLinputs}{Inputs used in the estimation of the JLL-based models}
+
+\item{GVARinputs}{Inputs used in the estimation of the GVAR-based models}
 
 \item{nargout}{"nargout <- 1" returns a constrained scalar or matrix \cr
 "nargout <- 2" returns a list of parameters}

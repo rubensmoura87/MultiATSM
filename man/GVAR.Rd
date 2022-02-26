@@ -15,10 +15,13 @@ GVAR(GVARinputs, N)
        \item 'VARXtype': character-vector containing two possibilities:
  \itemize{
        \item 'unconstrained': model is estimated without any constrained (each equation is estimated individually by OLS);
-       \item "constrained": model is estimated taking into account the fact that foreign-pricing-factors
+       \item 'constrained: Spanned Factors': model is estimated taking into account the fact that foreign-pricing-factors
                              do NOT impirge on
                               (i) domestic economic variables and (ii) domestic pricing factors.
                               (equations are estimated by restricted least squares)
+       \item 'constrained: ' extended by the name of the risk factor: model is estimated taking into account the fact that
+                             the restricted factor is only affected by its own lagged values and the lagged values of its own star variables.
+       (equations are estimated by restricted least squares)
          }
          \item 'Wgvar':  GVAR transition matrix (C x C) - see the output from 'Transition_Matrix' function
 }}

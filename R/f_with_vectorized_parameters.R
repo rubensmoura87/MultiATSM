@@ -10,6 +10,7 @@
 #'@param FactorLabels string-list based which contains the labels of all the variables present in the model
 #'@param Economies string-vector containing the names of the economies which are part of the economic system
 #'@param JLLinputs Set of necessary inputs used in the estimation of the JLL-based models (see "JLL" function)
+#'@param GVARinputs Set of necessary inputs used in the estimation of the GVAR-based models (see "GVAR" function)
 #'@param nargout if nargout <- 1, returns only the values of the likelihood function.\cr
 #'               If nargout <- 2, generates the entire set of outputs
 #'
@@ -22,19 +23,20 @@
 
 
 f_with_vectorized_parameters <- function(x, sizex, f, con, varargin, ModelType, FactorLabels, Economies,
-                                         JLLinputs, nargout){
+                                         JLLinputs, GVARinputs, nargout){
 
 
   FF <- 1e9; out <- NULL; to_continue <- NULL
 
   if (!(any(is.na(x)) || any(is.infinite(x)) ||any(Im(x))) ){
-    to_continue <- update_para(x, sizex, ii = NULL, con, FactorLabels, Economies, JLLinputs, varargin)
+    to_continue <- update_para(x, sizex, ii = NULL, con, FactorLabels, Economies, JLLinputs, GVARinputs, varargin)
     para <- getpara(to_continue) # extract only the numerical parameters of each variable that will not be concetrated out of the likelihood function.
   }
 
 
   if (nargout>1){
-    out <- NULL
+
+        out <- NULL
     tryCatch({
       if (ModelType == "JLL original" || ModelType == "JLL NoDomUnit"){
         FF <- unlist(f(K1XQ= para[[1]],nargout = 2)$llk)
@@ -91,6 +93,7 @@ f_with_vectorized_parameters <- function(x, sizex, f, con, varargin, ModelType, 
 #'@param FactorLabels string-list based which contains the labels of all the variables present in the model
 #'@param Economies string-vector containing the names of the economies which are part of the economic system
 #'@param JLLinputs Set of necessary inputs used in the estimation of the JLL-based models
+#'@param GVARinputs Set of necessary inputs used in the estimation of the GVAR-based models
 #'@param varargin variable inputs used in the optimization (see "Optimization" function)
 #'
 #'@return
@@ -107,7 +110,7 @@ f_with_vectorized_parameters <- function(x, sizex, f, con, varargin, ModelType, 
 
 
 
-update_para <-function(x, sizex, ii, con, FactorLabels, Economies, JLLinputs=NULL, varargin) {
+update_para <-function(x, sizex, ii, con, FactorLabels, Economies, JLLinputs=NULL, GVARinputs= NULL, varargin) {
 
 
   if (!exists('ii')|| is.null(ii)){
@@ -128,7 +131,7 @@ update_para <-function(x, sizex, ii, con, FactorLabels, Economies, JLLinputs=NUL
           ud[[i]]$Value <- NULL
         }else{
           ud[[i]]$Value <- aux2true(a=temp, ctype= ud[[i]]$Label, lb = ud[[i]]$LB, ub=ud[[i]]$UB,
-                                    FactorLabels, Economies, JLLinputs,  nargout=1)
+                                    FactorLabels, Economies, JLLinputs, GVARinputs, nargout=1)
         }
       }
 
@@ -142,7 +145,7 @@ update_para <-function(x, sizex, ii, con, FactorLabels, Economies, JLLinputs=NUL
 
     if (!is.null(temp)){
       ud <- aux2true(a=temp, ctype= varargin[[ii]]$Label, lb = varargin[[ii]]$LB, ub=varargin[[ii]]$UB,
-                     FactorLabels, Economies, JLLinputs, nargout=1)
+                     FactorLabels, Economies, JLLinputs, GVARinputs, nargout=1)
     }else{
       ud <- varargin[[ii]]$Value
     }
@@ -176,6 +179,7 @@ update_para <-function(x, sizex, ii, con, FactorLabels, Economies, JLLinputs=NUL
 #'@param FactorLabels string-list based which contains the labels of all the variables present in the model
 #'@param Economies string-vector containing the names of the economies which are part of the economic system
 #'@param JLLinputs Inputs used in the estimation of the JLL-based models
+#'@param GVARinputs Inputs used in the estimation of the GVAR-based models
 #'@param nargout "nargout <- 1" returns a constrained scalar or matrix \cr
 #'              "nargout <- 2" returns a list of parameters
 #'
@@ -188,7 +192,7 @@ update_para <-function(x, sizex, ii, con, FactorLabels, Economies, JLLinputs=NUL
 #'
 
 
-aux2true <-function(a, ctype, lb, ub, FactorLabels, Economies, JLLinputs= NULL,  nargout){
+aux2true <-function(a, ctype, lb, ub, FactorLabels, Economies, JLLinputs= NULL, GVARinputs= NULL, nargout){
 
 
   a <- Re(a)
@@ -373,7 +377,46 @@ aux2true <-function(a, ctype, lb, ub, FactorLabels, Economies, JLLinputs= NULL, 
     K <- length(FactorLabels$Domestic)
     C <- length(Economies)
 
+
     step <- c(G*(G+1)/2,rep(K*(K+1)/2, times=C))
+
+    # Input the zeros restrictions to the optmization vector (for the GVAR constrained models):
+    if (any(GVARinputs$VARXtype == paste("constrained:", FactorLabels$Domestic))){
+    # Identify the index of the constrained variable
+      zz <- stringr::str_length("constrained: ")
+      VarInt <- substr(GVARinputs$VARXtype, start = zz+1, stop = stringr::str_length(GVARinputs$VARXtype) )
+      IdxInt <- which(FactorLabels$Domestic == VarInt)
+
+    # Identify the indexes of the zero restrictions within the optimization vector
+      MatIntVector <- matrix(NA, nrow = K, ncol=K)
+      MatIntVector[IdxInt, - IdxInt] <- 0
+      MatIntVector[-IdxInt, IdxInt] <- 0
+
+      IdxZeroRest <- MatIntVector[lower.tri(MatIntVector, diag = TRUE)] # indexes of the non-zero restrictions
+      IdxNonZero <- which(is.na(IdxZeroRest)) # indexes of the zero restrictions
+
+    # Initialize the complete vector (including the zero and the non-zero restrictions)
+      stepRest <- (length(a) - step[1])/C # number of parameters of the restricted vector
+      ss <- rep(0, times= step[2]) # unrestricted vector of parameters per country
+      tt<- rep(0, times= sum(step)) # complete unrestricted vector of parameters (per country + global)
+
+    # Include the parameters of the marginal model
+      idxI <- step[1]
+       tt[seqi(1,step[1])] <- a[seqi(1,step[1])]
+
+    # Include the parameters of the country-specific VARXs
+      for (i in 1:C){
+      idxF <- idxI+stepRest
+      ss[IdxNonZero] <- a[(idxI+1):idxF]
+      IdxFull <- sum(step[1:i])
+      tt[(IdxFull+1):(IdxFull+length(ss))] <- ss
+      idxI <- idxF
+      }
+
+      a <- tt
+      }
+
+
 
     idx0 <- 0
 

@@ -11,7 +11,8 @@ Optimization(
   FactorLabels,
   Economies,
   ModelType,
-  JLLinputs = NULL
+  JLLinputs = NULL,
+  GVARinputs = NULL
 )
 }
 \arguments{
@@ -51,6 +52,8 @@ Optimization(
 \item{ModelType}{string-vector containing the label of the model to be estimated}
 
 \item{JLLinputs}{inputs used in the estimation of the JLL-based models; Default is set to NULL}
+
+\item{GVARinputs}{inputs used in the estimation of the GVAR-based models; Default is set to NULL}
 }
 \value{
 (i) out: list of second output produced by f (the first output of f must be the objective value to be minimized). \cr

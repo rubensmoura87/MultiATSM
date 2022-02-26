@@ -1,4 +1,9 @@
 ## Resubmission
 This is a resubmission. In this version I have:
 
-* replaced "option(warm=-1)" by "suppressWarnings()" in Reg_K1Q.Rd and inst/doc/my-vignette.R 
+* fixed bugs in "Transition_Matrix" and "ForecastYields" forecast functions
+* update the package dataset
+* fixed a typo in the vignette's table "Model Feautures" concerning the features of the "JPS jointP" model
+* expanded the "GVAR"" function to accommodate a completely exogenous risk factor
+
+

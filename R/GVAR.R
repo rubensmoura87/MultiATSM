@@ -9,10 +9,13 @@
 #'        \item 'VARXtype': character-vector containing two possibilities:
 #'  \itemize{
 #'        \item 'unconstrained': model is estimated without any constrained (each equation is estimated individually by OLS);
-#'        \item "constrained": model is estimated taking into account the fact that foreign-pricing-factors
+#'        \item 'constrained: Spanned Factors': model is estimated taking into account the fact that foreign-pricing-factors
 #'                              do NOT impirge on
 #'                               (i) domestic economic variables and (ii) domestic pricing factors.
 #'                               (equations are estimated by restricted least squares)
+#'        \item 'constrained: ' extended by the name of the risk factor: model is estimated taking into account the fact that
+#'                              the restricted factor is only affected by its own lagged values and the lagged values of its own star variables.
+#'        (equations are estimated by restricted least squares)
 #'          }
 #'          \item 'Wgvar':  GVAR transition matrix (C x C) - see the output from 'Transition_Matrix' function
 #' }
@@ -171,8 +174,8 @@ C <- length(GVARinputs$Economies) # Number of economies in the system
     }
   }
 
-  # b) constrained system:
-  if (GVARinputs$VARXtype == 'constrained'){
+  # b) constrained system: zero restrictions for the spanned factors in the feedback matrix
+  if (GVARinputs$VARXtype == 'constrained: Spanned Factors'){
     idxIntercept<- 1
     idxM <- idxIntercept + M
     idxP <- idxM + N
@@ -199,6 +202,47 @@ C <- length(GVARinputs$Economies) # Number of economies in the system
     }
     names(Coeff) <- GVARinputs$Economies
   }
+
+
+  # c) constrained system: one variable of the system is only affected by its own lags and the star counterparts
+  if (any(GVARinputs$VARXtype == paste("constrained:", DomLabels))){
+    VARXLabs <- c("Intercept", DomLabels, StarLabels, GlobalLabels)
+    zz <- stringr::str_length("constrained: ")
+    VarInt <- substr(GVARinputs$VARXtype, start = zz+1, stop = stringr::str_length(GVARinputs$VARXtype) )
+
+    idxIntercept<- 1
+    idxCol <- which(grepl(VarInt, VARXLabs))
+    idxRow <- which(grepl(VarInt, DomLabels))
+
+    Bcon <- list()
+    Coeff <- list()
+    eT <- list()
+    SigmaUnrest <- list()
+    Sigma <- list()
+
+    for (i in 1:C){
+
+      Bcon[[i]] <- matrix(NaN, nrow= nrow(LHS[[i]]), ncol=nrow(RHS[[i]])) # (M+N)x (2*(M+N)+G+1)
+      # c.1) Identify the zero-restrictions:
+      rownames(Bcon[[i]]) <- DomLabels
+      colnames(Bcon[[i]]) <- VARXLabs
+      Bcon[[i]][idxRow, -c(idxIntercept, idxCol)] <- 0
+
+      Coeff[[i]] <- Reg__OLSconstrained(Y= LHS[[i]], X= RHS[[i]],Bcon[[i]], G=NULL)
+      colnames(Coeff[[i]]) <- VARXLabs
+      rownames(Coeff[[i]]) <- DomLabels
+
+      eT[[i]] <- LHS[[i]] - Coeff[[i]]%*%RHS[[i]]
+      SigmaUnrest[[i]] <- (eT[[i]]%*%t(eT[[i]]))/T # Initial guess
+
+      # Estimate sigma with restrictions
+      Sigma[[i]] <- EstimationSigma_GVARrest(SigmaUnrest[[i]], eT[[i]], idxRow)
+
+    }
+    names(Coeff) <- GVARinputs$Economies
+  }
+
+
 
   # 3) Prepare outputs:
   ParaVARX <- list()
@@ -404,5 +448,55 @@ C <- length(GVARinputs$Economies) # Number of economies in the system
   return(GVARoutputs)
 
 }
+
+#####################################################################################################################
+#####################################################################################################################
+#' Estimate numerically the variance-covariance matrix from the GVAR-based models
+#'
+#'@param SigmaUnres Unrestricted variance-covariance matrix (K x K)
+#'@param res residuals from the VAR of a GVAR model (K x T)
+#'@param IdxVarRest index of the variable that is selected as strictly exogenous
+#'
+#'
+#'
+#'@keywords internal
+#'@return  restricted version of the variance-covariance matrix a GVAR model (K x K)
+
+
+EstimationSigma_GVARrest <- function(SigmaUnres, res, IdxVarRest){
+
+  # Choleski Factor
+  Se <- t(chol(SigmaUnres))
+  Se[IdxVarRest, -IdxVarRest] <- 0
+  Se[-IdxVarRest, IdxVarRest] <- 0
+
+  K <- nrow(SigmaUnres)
+
+
+  # Set the constraints in the Sigma matrix
+  IdxNONzeroGVAR <- which(Se!=0)
+  x <- Se[IdxNONzeroGVAR] # vector containing the initial guesses
+
+
+  MLfunction <- functional::Curry(llk_JLL_Sigma, res=res, IdxNONzero= IdxNONzeroGVAR, K=K)
+
+  iter <- 'off' # hides the outputs of each iteration. If one wants to display these features then set 'iter'
+  options200 <- neldermead::optimset(MaxFunEvals = 200000*length(x), Display = iter,
+                                     MaxIter = 200000, GradObj='off', TolFun= 10^-2, TolX= 10^-2)
+
+
+  Xmax <- neldermead::fminsearch(MLfunction, x, options200)$optbase$xopt
+  SIGMA_Ye <- matrix(0, K,K)
+  SIGMA_Ye[IdxNONzeroGVAR]<- Xmax # Cholesky term (orthogonalized factors)
+  SIGMA_Res <- SIGMA_Ye%*%t(SIGMA_Ye)
+
+  #Labels
+  rownames(SIGMA_Res) <- rownames(SigmaUnres)
+  colnames(SIGMA_Res) <- rownames(SigmaUnres)
+
+  return(SIGMA_Res)
+}
+
+
 
 
