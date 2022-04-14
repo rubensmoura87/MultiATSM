@@ -264,6 +264,7 @@ if (DataFrequency == "Annually"){ dt <- 1}
 
 
 
+
 InputsForMLEdensity_BS <- function(ModelType, Y_artificial, Z_artificial, FactorLabels, mat,
                                    Economies, DataFrequency, JLLinputs = NULL, GVARinputs= NULL){
 
@@ -312,8 +313,10 @@ InputsForMLEdensity_BS <- function(ModelType, Y_artificial, Z_artificial, Factor
     ######################################################
     # Ensures that the weghts can be properly interpreted
     if (all(Wpca_CS[1,] < 0)){   Wpca_CS[1,] <- Wpca_CS[1,]*(-1)   }
-    if (Wpca_CS[2,1] > Wpca_CS[2,J]){   Wpca_CS[2,] <- Wpca_CS[2,]*(-1)   }
-    if (Wpca_CS[3,1] > Wpca_CS[3,M] & Wpca_CS[3,J] > Wpca_CS[3,M]){ Wpca_CS[3,] <- Wpca_CS[3,]*(-1) }
+    if (N ==2){   if (Wpca_CS[2,1] > Wpca_CS[2,J]){   Wpca_CS[2,] <- Wpca_CS[2,]*(-1)   }}
+    if (N > 3){   if (Wpca_CS[2,1] > Wpca_CS[2,J]){   Wpca_CS[2,] <- Wpca_CS[2,]*(-1)}
+      Med <- round(stats::median(1:J))
+      if (Wpca_CS[3,1] > Wpca_CS[3,Med] & Wpca_CS[3,J] > Wpca_CS[3,Med]){ Wpca_CS[3,] <- Wpca_CS[3,]*(-1) } }
     ####################################################
     We_CS  <- t(null(Wpca_CS))
     WpcaFull_CS <- rbind(Wpca_CS, We_CS)

@@ -215,10 +215,15 @@ IRFandGIRFbs_sepQ <- function(ModelType, ModelBootstrap, NumOutPE, InputsForOutp
   #################################################################################################################
 
   ########################################  Factors ###############################################################
-  IdxFacGraphs <- which(c(InputsForOutputs[[ModelType]]$IRF$WishGraphs$RiskFactorsBootstrap,
-         InputsForOutputs[[ModelType]]$GIRF$WishGraphs$RiskFactorsBootstrap) == 1)
 
-  if (any(IdxFacGraphs==1)){
+  GraphsBinaryFactors <- c(InputsForOutputs[[ModelType]]$IRF$WishGraphs$RiskFactorsBootstrap,
+                           InputsForOutputs[[ModelType]]$GIRF$WishGraphs$RiskFactorsBootstrap)
+
+  IdxFacGraphs <- which(GraphsBinaryFactors == 1)
+
+
+
+   if (any(GraphsBinaryFactors==1)){
 
 print('################################# Generating IRFs/GIRFs graphs (Bootstrap) #################################' )
 
@@ -263,11 +268,15 @@ print('################################# Generating IRFs/GIRFs graphs (Bootstrap
   }
 
   ########################################  Yields ###############################################################
-  IdxYieldsGraphs <- which(c(InputsForOutputs[[ModelType]]$IRF$WishGraphs$YieldsBootstrap,
-                          InputsForOutputs[[ModelType]]$GIRF$WishGraphs$YieldsBootstrap) == 1)
+
+  GraphsBinaryYields <- c(InputsForOutputs[[ModelType]]$IRF$WishGraphs$YieldsBootstrap,
+                           InputsForOutputs[[ModelType]]$GIRF$WishGraphs$YieldsBootstrap)
+
+  IdxYieldsGraphs <- which(GraphsBinaryYields == 1)
 
 
-  if (any(IdxYieldsGraphs==1)){
+
+  if (any(GraphsBinaryYields==1)){
 
     plot_list <- list()
       for (f in 1:C){
@@ -437,16 +446,20 @@ FEVDandGFEVDbs_sepQ <- function(ModelType, ModelBootstrap, NumOutPE, InputsForOu
 
   ########################################  Factors ###############################################################
 
-  IdxFacGraphs <- which(c(InputsForOutputs[[ModelType]]$FEVD$WishGraphs$RiskFactorsBootstrap,
-                          InputsForOutputs[[ModelType]]$GFEVD$WishGraphs$RiskFactorsBootstrap) == 1)
+  GraphsBinaryFactors <- c(InputsForOutputs[[ModelType]]$FEVD$WishGraphs$RiskFactorsBootstrap,
+                          InputsForOutputs[[ModelType]]$GFEVD$WishGraphs$RiskFactorsBootstrap)
 
-  if (any(IdxFacGraphs==1)){
+  IdxFactorsGraphs <- which(GraphsBinaryFactors == 1)
+
+
+
+  if (any(GraphsBinaryFactors==1)){
 
     print('################################# Generating FEVDs/GFEVDs graphs (Bootstrap) #################################' )
 
     plot_list <- list()
     for (f in 1:C){
-      for (d in 1:length(LabFEVD)){
+      for (d in IdxFactorsGraphs){
     # Folder Creation
       dir.create( paste(tempdir(), "/Outputs/", ModelType, "/Bootstrap/Model ", Economies[f], "/", LabFEVD[d], sep=""))
       dir.create( paste(tempdir(), "/Outputs/", ModelType, "/Bootstrap/Model ", Economies[f], "/", LabFEVD[d], "/Factors", sep=""))
@@ -484,15 +497,19 @@ FEVDandGFEVDbs_sepQ <- function(ModelType, ModelBootstrap, NumOutPE, InputsForOu
   }
 
   ########################################  Yields ###############################################################
-  IdxYieldsGraphs <- which(c(InputsForOutputs[[ModelType]]$FEVD$WishGraphs$YieldsBootstrap,
-                             InputsForOutputs[[ModelType]]$GFEVD$WishGraphs$YieldsBootstrap) == 1)
+
+  GraphsBinaryYields <- c(InputsForOutputs[[ModelType]]$FEVD$WishGraphs$YieldsBootstrap,
+                           InputsForOutputs[[ModelType]]$GFEVD$WishGraphs$YieldsBootstrap)
+
+  IdxYieldsGraphs <- which(GraphsBinaryYields == 1)
 
 
-  if (any(IdxYieldsGraphs==1)){
+
+  if (any(GraphsBinaryYields==1)){
 
     plot_list <- list()
     for (f in 1:C){
-      for (d in 1:length(LabFEVD)){
+      for (d in IdxYieldsGraphs){
 
         # Folder Creation
         dir.create( paste(tempdir(), "/Outputs/", ModelType, "/Bootstrap/Model ", Economies[f], "/", LabFEVD[d], sep=""))
@@ -678,18 +695,20 @@ IRFandGIRFbs_jointQ <- function(ModelType, ModelBootstrap, NumOutPE, InputsForOu
 
   ########################################  Factors ###############################################################
 
-  IdxFacGraphs <- which(c(InputsForOutputs[[ModelType]]$IRF$WishGraphs$RiskFactorsBootstrap,
-                          InputsForOutputs[[ModelType]]$GIRF$WishGraphs$RiskFactorsBootstrap) == 1)
+  GraphsBinaryFactors <- c(InputsForOutputs[[ModelType]]$IRF$WishGraphs$RiskFactorsBootstrap,
+                          InputsForOutputs[[ModelType]]$GIRF$WishGraphs$RiskFactorsBootstrap)
+
+  IdxFacGraphs <- which(GraphsBinaryFactors == 1)
 
 
-  if (any(IdxFacGraphs==1)){
+  if (any(GraphsBinaryFactors==1)){
 
     print('################################# Generating IRFs/GIRFs graphs (Bootstrap) #################################' )
 
     plot_list <- list()
 
 
-      for (d in 1:length(LabIRF)){
+      for (d in IdxFacGraphs){
         # Folder Creation
         dir.create( paste(tempdir(), "/Outputs/", ModelType, "/Bootstrap/", LabIRF[d], sep=""))
         dir.create( paste(tempdir(), "/Outputs/", ModelType, "/Bootstrap/", LabIRF[d], "/Factors", sep=""))
@@ -728,15 +747,17 @@ IRFandGIRFbs_jointQ <- function(ModelType, ModelBootstrap, NumOutPE, InputsForOu
 
   ########################################  Yields ###############################################################
 
-  IdxYieldsGraphs <- which(c(InputsForOutputs[[ModelType]]$IRF$WishGraphs$YieldsBootstrap,
-                             InputsForOutputs[[ModelType]]$GIRF$WishGraphs$YieldsBootstrap) == 1)
+  GraphsBinaryYields <- c(InputsForOutputs[[ModelType]]$IRF$WishGraphs$YieldsBootstrap,
+                          InputsForOutputs[[ModelType]]$GIRF$WishGraphs$YieldsBootstrap)
+
+  IdxYieldsGraphs <- which(GraphsBinaryYields == 1)
 
 
-  if (any(IdxYieldsGraphs==1)){
+  if (any(GraphsBinaryYields==1)){
 
     plot_list <- list()
 
-      for (d in 1:length(LabIRF)){
+      for (d in IdxYieldsGraphs){
 
         # Folder Creation
         dir.create( paste(tempdir(), "/Outputs/", ModelType, "/Bootstrap/", LabIRF[d], sep=""))
@@ -916,18 +937,21 @@ FEVDandGFEVDbs_jointQ <- function(ModelType, ModelBootstrap, NumOutPE, InputsFor
   #################################################################################################################
 
   ########################################  Factors ###############################################################
+  GraphsBinaryFactors <- c(InputsForOutputs[[ModelType]]$FEVD$WishGraphs$RiskFactorsBootstrap,
+                           InputsForOutputs[[ModelType]]$GFEVD$WishGraphs$RiskFactorsBootstrap)
 
-  IdxFacGraphs <- which(c(InputsForOutputs[[ModelType]]$FEVD$WishGraphs$RiskFactorsBootstrap,
-                          InputsForOutputs[[ModelType]]$GFEVD$WishGraphs$RiskFactorsBootstrap) == 1)
+  IdxFacGraphs <- which(GraphsBinaryFactors == 1)
 
-  if (any(IdxFacGraphs==1)){
+
+
+  if (any(GraphsBinaryFactors==1)){
 
     print('################################# Generating FEVDs/GFEVDs graphs (Bootstrap) #################################' )
 
     plot_list <- list()
 
 
-      for (d in 1:length(LabFEVD)){
+      for (d in IdxFacGraphs){
         # Folder Creation
         dir.create( paste(tempdir(), "/Outputs/", ModelType, "/Bootstrap/", LabFEVD[d], sep=""))
         dir.create( paste(tempdir(), "/Outputs/", ModelType, "/Bootstrap/", LabFEVD[d], "/Factors", sep=""))
@@ -968,16 +992,18 @@ FEVDandGFEVDbs_jointQ <- function(ModelType, ModelBootstrap, NumOutPE, InputsFor
 
   ########################################  Yields ###############################################################
 
-  IdxYieldsGraphs <- which(c(InputsForOutputs[[ModelType]]$FEVD$WishGraphs$YieldsBootstrap,
-                             InputsForOutputs[[ModelType]]$GFEVD$WishGraphs$YieldsBootstrap) == 1)
+  GraphsBinarYields <- c(InputsForOutputs[[ModelType]]$FEVD$WishGraphs$YieldsBootstrap,
+                           InputsForOutputs[[ModelType]]$GFEVD$WishGraphs$YieldsBootstrap)
+
+  IdxYieldGraphs <- which(GraphsBinarYields == 1)
 
 
-  if (any(IdxYieldsGraphs==1)){
+  if (any(GraphsBinarYields==1)){
 
 
     plot_list <- list()
 
-      for (d in 1:length(LabFEVD)){
+      for (d in IdxYieldGraphs){
         # Folder Creation
         dir.create( paste(tempdir(), "/Outputs/", ModelType, "/Bootstrap/", LabFEVD[d], sep=""))
         dir.create( paste(tempdir(), "/Outputs/", ModelType, "/Bootstrap/", LabFEVD[d], "/Yields", sep=""))
@@ -1142,17 +1168,20 @@ IRFandGIRFbs_jointQ_Ortho <- function(ModelType, ModelBootstrap, NumOutPE, Input
   #################################################################################################################
 
   ########################################  Factors ###############################################################
-  IdxFacGraphs <- which(c(InputsForOutputs[[ModelType]]$IRF$WishGraphsOrtho$RiskFactorsBootstrap,
-                          InputsForOutputs[[ModelType]]$GIRF$WishGraphsOrtho$RiskFactorsBootstrap) == 1)
+  GraphsBinarFactors <- c(InputsForOutputs[[ModelType]]$IRF$WishGraphsOrtho$RiskFactorsBootstrap,
+                         InputsForOutputs[[ModelType]]$GIRF$WishGraphsOrtho$RiskFactorsBootstrap)
 
-  if (any(IdxFacGraphs==1)){
+  IdxFactorsGraphs <- which(GraphsBinarFactors == 1)
+
+
+  if (any(GraphsBinarFactors==1)){
 
     print('################################# Generating IRFs/GIRFs-Ortho graphs (Bootstrap) #################################' )
 
     plot_list <- list()
 
 
-      for (d in 1:length(LabIRF)){
+      for (d in IdxFactorsGraphs){
         # Folder Creation
         dir.create( paste(tempdir(), "/Outputs/", ModelType, "/Bootstrap/", LabIRF[d], sep=""))
         dir.create( paste(tempdir(), "/Outputs/", ModelType, "/Bootstrap/", LabIRF[d], "/Factors", sep=""))
@@ -1190,17 +1219,19 @@ IRFandGIRFbs_jointQ_Ortho <- function(ModelType, ModelBootstrap, NumOutPE, Input
 
   ########################################  Yields ###############################################################
 
-  IdxYieldsGraphs <- which(c(InputsForOutputs[[ModelType]]$IRF$WishGraphsOrtho$YieldsBootstrap,
-                             InputsForOutputs[[ModelType]]$GIRF$WishGraphsOrtho$YieldsBootstrap) == 1)
+  GraphsBinarYields <- c(InputsForOutputs[[ModelType]]$IRF$WishGraphsOrtho$YieldsBootstrap,
+                          InputsForOutputs[[ModelType]]$GIRF$WishGraphsOrtho$YieldsBootstrap)
+
+  IdxYieldssGraphs <- which(GraphsBinarYields == 1)
 
 
-  if (any(IdxYieldsGraphs==1)){
+  if (any(GraphsBinarYields==1)){
 
 
     plot_list <- list()
 
 
-      for (d in 1:length(LabIRF)){
+      for (d in IdxYieldssGraphs){
 
         # Folder Creation
         dir.create( paste(tempdir(), "/Outputs/", ModelType, "/Bootstrap/", LabIRF[d], sep=""))
@@ -1363,16 +1394,20 @@ FEVDandGFEVDbs_jointQ_Ortho <- function(ModelType, ModelBootstrap, NumOutPE, Inp
 
   ########################################  Factors ###############################################################
 
-  IdxFacGraphs <- which(c(InputsForOutputs[[ModelType]]$FEVD$WishGraphsOrtho$RiskFactorsBootstrap,
-                          InputsForOutputs[[ModelType]]$GFEVD$WishGraphsOrtho$RiskFactorsBootstrap) == 1)
+  GraphsBinarFactors <- c(InputsForOutputs[[ModelType]]$FEVD$WishGraphsOrtho$RiskFactorsBootstrap,
+                         InputsForOutputs[[ModelType]]$GFEVD$WishGraphsOrtho$RiskFactorsBootstrap)
 
-  if (any(IdxFacGraphs==1)){
+  IdxFactorsGraphs <- which(GraphsBinarFactors == 1)
+
+
+
+  if (any(GraphsBinarFactors==1)){
 
     print('################################# Generating FEVDs/GFEVDs-Ortho graphs (Bootstrap) #################################' )
 
     plot_list <- list()
 
-      for (d in 1:length(LabFEVD)){
+      for (d in IdxFactorsGraphs){
         # Folder Creation
         dir.create( paste(tempdir(), "/Outputs/", ModelType, "/Bootstrap/", LabFEVD[d], sep=""))
         dir.create( paste(tempdir(), "/Outputs/", ModelType, "/Bootstrap/", LabFEVD[d], "/Factors", sep=""))
@@ -1411,17 +1446,19 @@ FEVDandGFEVDbs_jointQ_Ortho <- function(ModelType, ModelBootstrap, NumOutPE, Inp
 
   ########################################  Yields ###############################################################
 
-  IdxYieldsGraphs <- which(c(InputsForOutputs[[ModelType]]$FEVD$WishGraphsOrtho$YieldsBootstrap,
-                             InputsForOutputs[[ModelType]]$GFEVD$WishGraphsOrtho$YieldsBootstrap) == 1)
+  GraphsBinarYields <- c(InputsForOutputs[[ModelType]]$FEVD$WishGraphsOrtho$YieldsBootstrap,
+                         InputsForOutputs[[ModelType]]$GFEVD$WishGraphsOrtho$YieldsBootstrap)
+
+  IdxYieldsGraphs <- which(GraphsBinarYields == 1)
 
 
-  if (any(IdxYieldsGraphs==1)){
 
+    if (any(GraphsBinarYields==1)){
 
     plot_list <- list()
 
 
-      for (d in 1:length(LabFEVD)){
+      for (d in IdxYieldsGraphs){
         # Folder Creation
         dir.create( paste(tempdir(), "/Outputs/", ModelType, "/Bootstrap/", LabFEVD[d], sep=""))
         dir.create( paste(tempdir(), "/Outputs/", ModelType, "/Bootstrap/", LabFEVD[d], "/Yields", sep=""))
