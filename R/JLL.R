@@ -188,7 +188,7 @@ PIac <- diag(K)
 idxRow00 <- G
 for (i in 1:C){
   idxRow11 <- idxRow00+ M
-  PIac[(idxRow00+1):idxRow11, 1:M] <- a_W[[JLLinputs$Economies[i]]]
+  PIac[(idxRow00+1):idxRow11, 1:G] <- a_W[[JLLinputs$Economies[i]]]
   idxRow00 <- idxRow11+N
 }
 

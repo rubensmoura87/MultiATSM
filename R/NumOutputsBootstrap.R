@@ -509,7 +509,7 @@ GFEVDsep_BS <- function(ModelType, ModelParaBoot, GFEVDhoriz, FactorLabels, Econ
         G0 <-  ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[Economies[i]]][[tt]]$ests$Gy.0
         Sigma_y <- ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[Economies[i]]][[tt]]$ests$SSZ
         F1 <- ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[Economies[i]]][[tt]]$ests$K1Z
-        SIGMA_yields <- ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[Economies[i]]][[tt]]$ests$VarYields
+
 
         # 1) Dynamic multipliers
         Ry.h <- array(NA, c(K,K,GFEVDhoriz))
@@ -566,8 +566,6 @@ GFEVDsep_BS <- function(ModelType, ModelParaBoot, GFEVDhoriz, FactorLabels, Econ
         # Get the full B
         Bfull <- BUnspannedAdapSep_BS(G, M, ModelParaBoot, Economies, Economies[i], ModelTypeSet[j], tt)
 
-        # Compute the variance of the yields
-        scaleYields <- 1/as.vector(SIGMA_yields)
 
 
         # Initialization
@@ -584,7 +582,9 @@ GFEVDsep_BS <- function(ModelType, ModelParaBoot, GFEVDhoriz, FactorLabels, Econ
           num <- num + acc1
           acc2 <- diag(eslctYie%*%Bfull%*%Ry.h[,,l]%*%invGSigmau%*%t(invG)%*%t(Ry.h[,,l])%*%t(Bfull)%*%eslctYie)
           den <- den + acc2
-          GFEVDresYie[ ,,l] <- scaleYields*num/den # note: unlike the GFEVD of the factors, note that the "scale" variable is now at the acc1
+          for (q in 1:K){
+            GFEVDresYie[ ,q,l] <- scale[q]*(num/den)[,q] # note: unlike the GFEVD of the factors, note that the "scale" variable is now at the acc1
+          }
         }
 
 
@@ -1163,7 +1163,6 @@ GFEVDjoint_BS <- function(ModelType, ModelParaBoot, GFEVDhoriz, FactorLabels, Ec
         G0 <- ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[tt]]$ests$Gy.0
         Sigma_y <- ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[tt]]$ests$SSZ
         F1 <- ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[tt]]$ests$K1Z
-        SIGMA_yields <- ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[tt]]$ests$VarYields
 
         # 1) Dynamic multipliers
         Ry.h <- array(NA, c(K,K,GFEVDhoriz))
@@ -1222,10 +1221,6 @@ GFEVDjoint_BS <- function(ModelType, ModelParaBoot, GFEVDhoriz, FactorLabels, Ec
         BSpanned <- ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[tt]]$rot$P$B
         B <- BUnspannedAdapJoint(G,M,N,C, J, BSpanned)
 
-        # Compute the variance of the yields
-        scaleYields <- 1/as.vector(SIGMA_yields)
-
-
 
         # Initialization
         GFEVDresYie <- array(NA, c(nrow = C*J, ncol=K, GFEVDhoriz))
@@ -1241,7 +1236,9 @@ GFEVDjoint_BS <- function(ModelType, ModelParaBoot, GFEVDhoriz, FactorLabels, Ec
           num <- num + acc1
           acc2 <- diag(eslctYie%*%B%*%Ry.h[,,l]%*%invGSigmau%*%t(invG)%*%t(Ry.h[,,l])%*%t(B)%*%eslctYie)
           den <- den + acc2
-          GFEVDresYie[ ,,l] <- scaleYields*num/den # NOTE: unlike the GFEVD of the factors, note that the "scale" variable is now at the acc1
+          for (q in 1:K){
+            GFEVDresYie[ ,q,l] <- scale[q]*(num/den)[,q] # note: unlike the GFEVD of the factors, note that the "scale" variable is now at the acc1
+          }
         }
 
 
@@ -1720,7 +1717,6 @@ GFEVDjointOrthoJLL_BS <- function(ModelType, ModelParaBoot, GFEVDhoriz, FactorLa
       Sigma_y <- ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[tt]]$ests$JLLoutcomes$Sigmas$VarCov_Ortho
       F1e <- ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[tt]]$ests$JLLoutcomes$k1_e
       PI <- ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[tt]]$ests$JLLoutcomes$PI
-      SIGMA_yields <- ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[tt]]$ests$VarYields
 
       # 1) Dynamic multipliers
       Ry.h <- array(NA, c(K,K,GFEVDhoriz))
@@ -1779,9 +1775,6 @@ GFEVDjointOrthoJLL_BS <- function(ModelType, ModelParaBoot, GFEVDhoriz, FactorLa
       BSpanned <- ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[tt]]$rot$P$B
       B <- BUnspannedAdapJoint(G,M,N,C, J, BSpanned)
 
-      # Compute the variance of the yields
-      scaleYields <- 1/as.vector(SIGMA_yields)
-
 
       # Initialization
       GFEVDresYie <- array(NA, c(nrow = C*J, ncol=K, GFEVDhoriz))
@@ -1796,7 +1789,9 @@ GFEVDjointOrthoJLL_BS <- function(ModelType, ModelParaBoot, GFEVDhoriz, FactorLa
         num <- num + acc1
         acc2 <- diag(eslctYie%*%B%*%PI%*%Ry.h[,,l]%*%invGSigmau%*%t(invG)%*%t(Ry.h[,,l])%*%t(PI)%*%t(B)%*%eslctYie)
         den <- den + acc2
-        GFEVDresYie[ ,,l] <- scaleYields*num/den # note: unlike the GFEVD of the factors, note that the "scale" variable is now at the acc1
+        for (q in 1:K){
+          GFEVDresYie[ ,q,l] <- scale[q]*(num/den)[,q] # note: unlike the GFEVD of the factors, note that the "scale" variable is now at the acc1
+        }
       }
 
 

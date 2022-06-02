@@ -648,7 +648,6 @@ GFEVDsep <- function(ModelType, ModelPara, GFEVDhoriz, FactorLabels, Economies){
       G0 <-  ModelPara[[ModelTypeSet[[j]]]][[Economies[i]]]$ests$Gy.0
       Sigma_y <- ModelPara[[ModelTypeSet[[j]]]][[Economies[i]]]$ests$SSZ
       F1 <- ModelPara[[ModelTypeSet[[j]]]][[Economies[i]]]$ests$K1Z
-      SIGMA_yields <- ModelPara[[ModelTypeSet[[j]]]][[Economies[i]]]$ests$VarYields
 
       # 1) Dynamic multipliers
       Ry.h <- array(NA, c(K,K,GFEVDhoriz))
@@ -705,9 +704,6 @@ GFEVDsep <- function(ModelType, ModelPara, GFEVDhoriz, FactorLabels, Economies){
       # Get the full B
       Bfull <- BUnspannedAdapSep(G,M, ModelPara, Economies, Economies[i], ModelTypeSet[j])
 
-      # Compute the variance of the yields
-      scaleYields <- 1/as.vector(SIGMA_yields)
-
 
       # Initialization
       GFEVDresYie <- array(NA, c(nrow = J, ncol=K, GFEVDhoriz))
@@ -723,8 +719,10 @@ GFEVDsep <- function(ModelType, ModelPara, GFEVDhoriz, FactorLabels, Economies){
         num <- num + acc1
         acc2 <- diag(eslctYie%*%Bfull%*%Ry.h[,,l]%*%invGSigmau%*%t(invG)%*%t(Ry.h[,,l])%*%t(Bfull)%*%eslctYie)
         den <- den + acc2
-        GFEVDresYie[ ,,l] <- scaleYields*num/den # note: unlike the GFEVD of the factors, note that the "scale" variable is now at the acc1
-      }
+        for (q in 1:K){
+          GFEVDresYie[ ,q,l] <- scale[q]*(num/den)[,q] # note: unlike the GFEVD of the factors, note that the "scale" variable is now at the acc1
+          }
+        }
 
 
       GFEVDYields <- aperm(GFEVDresYie, c(3,2,1)) # Non-normalized GFEVD (i.e. rows need not sum up to 1)
@@ -1411,7 +1409,6 @@ GFEVDjoint <- function(ModelType, ModelPara, GFEVDhoriz, FactorLabels, Economies
     Sigma_y <- ModelPara[[ModelTypeSet[[j]]]]$ests$SSZ
     F1 <- ModelPara[[ModelTypeSet[[j]]]]$ests$K1Z
 
-    SIGMA_yields <- ModelPara[[ModelTypeSet[[j]]]]$ests$VarYields
 
     # 1) Dynamic multipliers
     Ry.h <- array(NA, c(K,K,GFEVDhoriz))
@@ -1470,9 +1467,6 @@ GFEVDjoint <- function(ModelType, ModelPara, GFEVDhoriz, FactorLabels, Economies
     BSpanned <- ModelPara[[ModelTypeSet[[j]]]]$rot$P$B
     B <- BUnspannedAdapJoint(G,M,N,C, J, BSpanned)
 
-    #  Obtain the scale factor of yields
-    scaleYields <- 1/as.vector(SIGMA_yields)
-
 
     # Initialization
     GFEVDresYie <- array(NA, c(nrow = C*J, ncol=K, GFEVDhoriz))
@@ -1488,8 +1482,10 @@ GFEVDjoint <- function(ModelType, ModelPara, GFEVDhoriz, FactorLabels, Economies
       num <- num + acc1
       acc2 <- diag(eslctYie%*%B%*%Ry.h[,,l]%*%invGSigmau%*%t(invG)%*%t(Ry.h[,,l])%*%t(B)%*%eslctYie)
       den <- den + acc2
-      GFEVDresYie[ ,,l] <- scaleYields*num/den # note: unlike the GFEVD of the factors, note that the "scale" variable is now at the acc1
+      for (q in 1:K){
+      GFEVDresYie[ ,q,l] <- scale[q]*(num/den)[,q] # note: unlike the GFEVD of the factors, note that the "scale" variable is now at the acc1
     }
+      }
 
 
     GFEVDYields <- aperm(GFEVDresYie, c(3,2,1))
@@ -1944,7 +1940,7 @@ GFEVDjointOrthoJLL <- function(ModelType, ModelPara, GFEVDhoriz, FactorLabels, E
     F1e <- ModelPara[[ModelTypeSet[[j]]]]$ests$JLLoutcomes$k1_e
     PI <- ModelPara[[ModelTypeSet[[j]]]]$ests$JLLoutcomes$PI
 
-    SIGMA_yields <- ModelPara[[ModelTypeSet[[j]]]]$ests$VarYields
+
     # 1) Dynamic multipliers
     Ry.h <- array(NA, c(K,K,GFEVDhoriz))
     Ry.h[, ,1] <- diag(K) # dynamic multiplier at t=0
@@ -2003,8 +1999,7 @@ GFEVDjointOrthoJLL <- function(ModelType, ModelPara, GFEVDhoriz, FactorLabels, E
     B <- BUnspannedAdapJoint(G,M,N,C, J, BSpanned)
 
 
-    # Obtain the scale yields factos
-    scaleYields <- 1/as.vector(SIGMA_yields)
+
 
     # Initialization
     GFEVDresYie <- array(NA, c(nrow = C*J, ncol=K, GFEVDhoriz))
@@ -2019,7 +2014,9 @@ GFEVDjointOrthoJLL <- function(ModelType, ModelPara, GFEVDhoriz, FactorLabels, E
       num <- num + acc1
       acc2 <- diag(eslctYie%*%B%*%PI%*%Ry.h[,,l]%*%invGSigmau%*%t(invG)%*%t(Ry.h[,,l])%*%t(PI)%*%t(B)%*%eslctYie)
       den <- den + acc2
-      GFEVDresYie[ ,,l] <- scaleYields*num/den # note: unlike the GFEVD of the factors, note that the "scale" variable is now at the acc1
+      for (q in 1:K){
+        GFEVDresYie[ ,q,l] <- scale[q]*(num/den)[,q] # note: unlike the GFEVD of the factors, note that the "scale" variable is now at the acc1
+      }
     }
 
 
