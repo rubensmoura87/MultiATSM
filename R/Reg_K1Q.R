@@ -30,7 +30,6 @@
 
 
 
-
 Reg_K1Q <- function(Y, mat, Z, dt,type){
 
 
@@ -73,7 +72,7 @@ Reg_K1Q <- function(Y, mat, Z, dt,type){
 
   K1Qh <- mldivide(RHS,LHS)
 
-  K1Q <- suppressWarnings(powerplus::Matpow(K1Qh, numer=1, denom = h))
+  K1Q <- suppressWarnings(Re(powerplus::Matpow(K1Qh, numer=1, denom = h)))
 
 
   #Step 7: Convert  K1Q into Jordan form
@@ -111,7 +110,6 @@ Reg_K1Q <- function(Y, mat, Z, dt,type){
 Convert2JordanForm <- function(K1XQ) {
 
 
-
   x <- t(eigen(K1XQ)$values) # Extract the eignevalues of matrix K1XQ.
 
   idx <- numeric(length(x))
@@ -143,7 +141,7 @@ Convert2JordanForm <- function(K1XQ) {
     lQ <- rbind(lQ, Re(imagx[2*h-1]), -abs(Im(imagx[2*h-1]))^2)
   }
 
-  N<- numel(lQ)
+  N <- numel(lQ)
   K1Q <- rbind(zeros(1,N), eye(N-1,N))
   i0 <- 0
 

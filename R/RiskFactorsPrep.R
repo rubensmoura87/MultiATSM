@@ -18,7 +18,7 @@ RiskFactorsPrep <- function(FactorSet, Economies, FactorLabels, Initial_Date, Fi
   Initial_Date <- as.Date(Initial_Date)
   Final_Date <- as.Date(Final_Date)
 
-  G <- length(FactorLabels$Global)
+  G <- length(FactorSet$Global)
   C <- length(Economies) # We subtract 1 because we want to exclude the list of global factors
   N <- length(FactorLabels$Spanned)
   M <- length(FactorLabels$Domestic) - N

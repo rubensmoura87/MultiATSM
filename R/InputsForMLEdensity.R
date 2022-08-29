@@ -156,7 +156,7 @@ if (DataFrequency == "Annually"){ dt <- 1}
       idxJ1 <- idxJ0 + J
       idxN1 <- idxN0 + N
 
-       # Spanned Factors (N x T)
+             # Spanned Factors (N x T)
       YCS <- Yields[(idxJ0+1):idxJ1,] # Yields (JxT)
       WpcaCS <- 100*pca_weights_one_country(YCS, Economy= Economies[i])[1:N,] # matrix of weigths for the portfolio without errors (N x J)
       WeCS <- t(null(WpcaCS)) # matrix of weigths for the yield portfolios priced with errors
