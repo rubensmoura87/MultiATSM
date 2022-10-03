@@ -55,7 +55,7 @@ DatabasePrep <- function(t_First, t_Last, Economies, N, FactorLabels, ModelType,
 
   t_First <- as.POSIXct(as.Date(t_First, "%Y-%m-%d"))
   t_Last <- as.POSIXct(as.Date(t_Last, "%Y-%m-%d"))
-  Idx <- match(c(t_First,t_Last),list_all_Macro[["Global"]]$Period) # Find the indexes of the first and last observation of the desired sample
+  Idx <- match(unclass(c(t_First, t_Last)), unclass(list_all_Macro[["Global"]]$Period)) # Find the indexes of the first and last observation of the desired sample
 
   SampleMacro <- lapply(list_all_Macro, "[", Idx[1]:Idx[2], )
   SampleYields <- lapply(list_all_Yields, "[", Idx[1]:Idx[2], )
