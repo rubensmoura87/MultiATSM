@@ -1,7 +1,7 @@
 ## Resubmission
 This is a resubmission. In this version I have:
 
-* fixed a bug in function "Reg_K1Q"
-* fixed a bug in function "RiskFactorsPrep"
+* fixed a bug in the function "DatabasePrep" to accommodate the recent changes in R-devel which changes match()
+ 
 
 
