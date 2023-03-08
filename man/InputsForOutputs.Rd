@@ -10,9 +10,12 @@ InputsForOutputs(
   ListOutputWished,
   OutputLabel,
   WishStationarityQ,
+  UnitYields,
   WishGraphYields = 0,
   WishGraphRiskFactors = 0,
   WishOrthoJLLgraphs = 0,
+  WishForwardPremia = 0,
+  LimFP = NULL,
   WishBootstrap = 0,
   ListBoot = NULL,
   WishForecast = 0,
@@ -31,12 +34,19 @@ InputsForOutputs(
 \item{WishStationarityQ}{User must set 1 is she whises to impose the largest eigenvalue under the Q to be strictly
 smaller than 1, otherwise set 0.}
 
+\item{UnitYields}{(i) "Month": if maturity of yields are expressed in months or
+(ii) "Year": if maturity of yields are expressed in years}
+
 \item{WishGraphYields}{Binary variable: set 1, if the user wishes graphs to be generated; or set 0, otherwise. Default is set as "0".}
 
 \item{WishGraphRiskFactors}{Binary variable: set 1, if the user wishes graphs to be generated; or set 0, otherwise. Default is set as "0".}
 
 \item{WishOrthoJLLgraphs}{Binary variable: set 1, if the user wishes orthogonalized JLL-based graphs to be generated; or set 0, otherwise.
 Default is set as "0"}
+
+\item{WishForwardPremia}{Binary variable: set 1, if the user wishes graphs to be generated; or set 0, otherwise. Default is set as "0".}
+
+\item{LimFP}{Numerical vector containing the maturties associated with the starting and the ending date of the loan}
 
 \item{WishBootstrap}{Binary variable: set 1, if the user wishes graphs to be generated; or set 0, otherwise. Default is set as "0".}
 

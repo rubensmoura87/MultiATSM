@@ -28,9 +28,9 @@ f_with_vectorized_parameters <- function(x, sizex, f, con, varargin, ModelType, 
 
   FF <- 1e9; out <- NULL; to_continue <- NULL
 
-  if (!(any(is.na(x)) || any(is.infinite(x)) ||any(Im(x))) ){
+  if ( any(is.na(x)==0) & any(is.infinite(x) ==0) & any(Im(x)==0) ) {
     to_continue <- update_para(x, sizex, ii = NULL, con, FactorLabels, Economies, JLLinputs, GVARinputs, varargin)
-    para <- getpara(to_continue) # extract only the numerical parameters of each variable that will not be concetrated out of the likelihood function.
+  para <- getpara(to_continue) # extract only the numerical parameters of each variable that will not be concetrated out of the likelihood function.
   }
 
 
@@ -58,11 +58,12 @@ f_with_vectorized_parameters <- function(x, sizex, f, con, varargin, ModelType, 
       FF <- f(K1XQ= para[[1]], nargout = 1)
     }else{
       FF <- f(K1XQ= para[[1]], SSZ=para[[2]], nargout = 1)
-    }
+
+      }
   }
 
 
-  if (is.numeric(FF) & (any(is.nan(FF)) || any(is.infinite(FF)) || any(Im(FF)) ) ){
+  if (is.numeric(FF) & (any(is.nan(FF)) || any(is.infinite(FF)) || any(Im(FF) ==1) ) ){
     d <-numel(FF)
     FF[1:d] <- 1e9
   }

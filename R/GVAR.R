@@ -6,7 +6,7 @@
 #'        \item  Economies:  string-vector containing the names of the economies which are part of the economic system
 #'        \item  'GVARFactors': list of all variables that are used in the estimation of the VARX \cr
 #'                (see e.g. 'CM_Factors_GVAR' file);
-#'        \item 'VARXtype': character-vector containing two possibilities:
+#'        \item 'VARXtype': character-vector containing three possibilities:
 #'  \itemize{
 #'        \item 'unconstrained': model is estimated without any constrained (each equation is estimated individually by OLS);
 #'        \item 'constrained: Spanned Factors': model is estimated taking into account the fact that foreign-pricing-factors

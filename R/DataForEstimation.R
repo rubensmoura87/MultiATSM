@@ -7,9 +7,17 @@
 #' @param FactorLabels String-list based which contains the labels of all the variables present in the model
 #' @param ModelType   String-vector containing the label of the model to be estimated
 #' @param DataFrequency  Character-based-vector. Avaialable options are: "Daily All Days", "Daily Business Days", "Weekly", "Monthly", "Quarterly", "Annually"
+#' @param W_type Three possibilities:
+#'\itemize{
+#'      \item "Full Sample": if one wishes ALL weight matrices of each year from which data is available (it may extrapolate the sample period);
+#'      \item "Sample Mean": if one wishes a SINGLE weight matrix containing the average of weights over of the entire sample period;
+#'      \item Some year in particular (e.g. "1998", "2005" ...).
+#'}
+#' @param t_First_Wgvar Sample starting date (year)
+#' @param t_Last_Wgvar Sample last date (year)
 #' @param DataPathMacro  Path of the Excel file conating the macroeconomic data (if any). The default is linked to the excel file present in the package.
 #' @param DataPathYields  Path of the Excel file conating the yields data (if any). The default is linked to the excel file present in the package.
-#' @param Wgvar   GVAR transition matrix, if GVAR type model is chosen; default is set to NULL.
+#' @param DataPathTrade Path of the Excel file conating the trade data (if any). The default is linked to the excel file present in the package.
 #'
 #'
 #'@return   A list containing the
@@ -36,12 +44,16 @@
 #'
 #' @export
 
-DataForEstimation <- function(t0, tF, Economies, N, FactorLabels, ModelType, DataFrequency,
-                              DataPathMacro = NULL, DataPathYields = NULL, Wgvar = NULL){
+DataForEstimation <- function(t0, tF, Economies, N, FactorLabels, ModelType, DataFrequency, W_type= NULL,
+                              t_First_Wgvar= NULL, t_Last_Wgvar = NULL, DataPathMacro = NULL, DataPathYields = NULL,
+                              DataPathTrade = NULL){
 
 
 C <- length(Economies)
 
+if (ModelType == 'GVAR sepQ' || ModelType == 'GVAR jointQ'){
+  Wgvar <- Transition_Matrix(t_First_Wgvar, t_Last_Wgvar, Economies, W_type, DataPathTrade)
+}
 FactorSet <- DatabasePrep(t0, tF, Economies, N, FactorLabels, ModelType, Wgvar, DataPathMacro, DataPathYields)
 
 # Gather all bond yields of all countries
@@ -56,6 +68,7 @@ for (i in 1:C){
 
 
 # Gather the spanned and unspanned factors
+
 RiskFactors <- RiskFactorsPrep(FactorSet, Economies, FactorLabels, t0, tF, DataFrequency)
 
 # Gather the factors used in the GVAR estimation
@@ -66,6 +79,7 @@ GVARFactors <-  DataSet_BS(ModelType, RiskFactors, Wgvar, Economies, FactorLabel
 
 Outputs <-list(Yields, RiskFactors, GVARFactors)
 names(Outputs) <- c("Yields", "RiskFactors", "GVARFactors")
+
 
 return(Outputs)
 }

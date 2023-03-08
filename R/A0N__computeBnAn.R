@@ -3,7 +3,7 @@
 #'@param mat       vector of maturities (J x 1). Maturities are in multiples of the discrete interval
 #'                 used in the model
 #'@param K1XQ      risk neutral feedback matrix (N x N)
-#'@param dx        state loadings for the one-period rate (1xN). Default is a vector of ones
+#'@param dX        state loadings for the one-period rate (1xN). Default is a vector of ones
 #'@param r0        the long run risk neutral mean of the short rate (scalar)
 #'@param SSX       the covariance matrix of the errors (N x N)
 #'
@@ -27,7 +27,7 @@
 
 
 
-A0N__computeBnAn_sepQ <- function(mat, K1XQ, dx, r0, SSX){
+A0N__computeBnAn_sepQ <- function(mat, K1XQ, dX, r0, SSX){
 
 
   mat <- round(mat[])
@@ -38,7 +38,7 @@ A0N__computeBnAn_sepQ <- function(mat, K1XQ, dx, r0, SSX){
   if (!exists("dX", inherits = FALSE) || is.null(dX) ){
     dX <- rep(1, times=N)
   }
-  dX <- as.vector(dX)
+  dX <- c(dX)
 
   BnX <- matrix(0, nrow = K+1, ncol= N)
   AnX <- matrix(0, nrow = K+1, ncol=1)
@@ -57,7 +57,7 @@ A0N__computeBnAn_sepQ <- function(mat, K1XQ, dx, r0, SSX){
 
 
   if (!exists("r0", inherits = FALSE) || is.null(r0) ){
-    betan <- as.numeric(vector())
+    betan <- c()
   } else {
     AnX <- AnX[mat+1]/mat # Adjust the loading for the maturity
     betan <- AnX - r0
@@ -77,7 +77,7 @@ A0N__computeBnAn_sepQ <- function(mat, K1XQ, dx, r0, SSX){
 #'@param mat       vector of maturities (J x 1). Maturities are in multiples of the discrete interval
 #'                 used in the model
 #'@param K1XQ      risk neutral feedback matrix (N x N)
-#'@param dx        state loadings for the one-period rate (1xN). Default is a vector of ones
+#'@param dX        state loadings for the one-period rate (1xN). Default is a vector of ones
 #'@param r0        the long run risk neutral mean of the short rate (scalar)
 #'@param SSX       the covariance matrix of the errors (N x N)
 #'@param Economies Set of economies that are part of the economic system (vector of text)
@@ -99,7 +99,7 @@ A0N__computeBnAn_sepQ <- function(mat, K1XQ, dx, r0, SSX){
 
 
 
-A0N__computeBnAn_jointQ <- function(mat, K1XQ, dx, r0, SSX, Economies){
+A0N__computeBnAn_jointQ <- function(mat, K1XQ, dX, r0, SSX, Economies){
 
   C <- length(Economies)
   mat <- round(mat[])

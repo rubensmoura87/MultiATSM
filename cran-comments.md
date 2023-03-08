@@ -1,7 +1,11 @@
 ## Resubmission
 This is a resubmission. In this version I have:
 
-* fixed a bug in the function "DatabasePrep" to accommodate the recent changes in R-devel which changes match()
- 
+* included risk premium analysis
+* included BRW (2012) - *Bias_Correc_VAR* function and all related ones
+* updated "DataForEstimation" function (included the computation of the transition matrix inside that function)
+* included the ListModelInputs function
+* Update package vignette
+
 
 

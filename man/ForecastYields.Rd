@@ -12,7 +12,8 @@ ForecastYields(
   Economies,
   DataFrequency,
   JLLinputs,
-  GVARinputs
+  GVARinputs,
+  BRWinputs
 )
 }
 \arguments{
@@ -31,6 +32,8 @@ ForecastYields(
 \item{JLLinputs}{list of necessary inputs for the estimation of JLL-based models (see "JLL" function)}
 
 \item{GVARinputs}{list of necessary inputs for the estimation of GVAR-based models (see "GVAR" function)}
+
+\item{BRWinputs}{list of necessary inputs for performing the bias-corrected estimation (see "Bias_Correc_VAR" function)}
 }
 \value{
 List containg the following elements

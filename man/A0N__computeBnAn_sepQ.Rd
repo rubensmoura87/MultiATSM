@@ -4,7 +4,7 @@
 \alias{A0N__computeBnAn_sepQ}
 \title{Compute the cross-section loadings of yields of a canonical A0_N model ("sep Q" models)}
 \usage{
-A0N__computeBnAn_sepQ(mat, K1XQ, dx, r0, SSX)
+A0N__computeBnAn_sepQ(mat, K1XQ, dX, r0, SSX)
 }
 \arguments{
 \item{mat}{vector of maturities (J x 1). Maturities are in multiples of the discrete interval
@@ -12,7 +12,7 @@ used in the model}
 
 \item{K1XQ}{risk neutral feedback matrix (N x N)}
 
-\item{dx}{state loadings for the one-period rate (1xN). Default is a vector of ones}
+\item{dX}{state loadings for the one-period rate (1xN). Default is a vector of ones}
 
 \item{r0}{the long run risk neutral mean of the short rate (scalar)}
 

@@ -13,13 +13,11 @@ C <- length(Economies)
 
 PathsGraphs <- list()
 
-OutputTypeSet <- c("Fit", "IRF", "FEVD", "GIRF", "GFEVD")
+OutputTypeSet <- c("Fit", "IRF", "FEVD", "GIRF", "GFEVD", "TermPremia")
 VarTypeSet <- c("Factors", "Yields")
 
 
-  for (h in 1:length(OutputTypeSet)){
-    PathsGraphs[[ModelType]][[OutputTypeSet[h]]] <- list()
-  }
+  for (h in 1:length(OutputTypeSet)){PathsGraphs[[ModelType]][[OutputTypeSet[h]]] <- list()}
 
 
 if (ModelType == "JPS" || ModelType == "JPS jointP" || ModelType == "GVAR sepQ"){
@@ -30,41 +28,51 @@ for (h in 1:length(OutputTypeSet)){
     PathsGraphs[[ModelType]][[OutputTypeSet[h]]][[Economies[i]]]  <- paste(tempdir(), "/Outputs/", ModelType,
                                                                            "/Point Estimate/Model ", Economies[i], "/",
                                                                            OutputTypeSet[h], sep="")
-    } else{
+    }
+    if (h>=2 & h <=5){
       PathsGraphs[[ModelType]][[OutputTypeSet[h]]][[Economies[i]]][[VarTypeSet[v]]]  <- paste(tempdir(), "/Outputs/",
                                                                                               ModelType, "/Point Estimate/Model ",
                                                                                               Economies[i], "/", OutputTypeSet[h], "/",
                                                                                               VarTypeSet[v], sep="")
        }
-    }
+    if (h==6){
+      PathsGraphs[[ModelType]][[OutputTypeSet[h]]][[Economies[i]]]  <- paste(tempdir(), "/Outputs/", ModelType,
+                                                                             "/Point Estimate/Model ", Economies[i], "/",
+                                                                             OutputTypeSet[h], sep="")
+          }
+      }
 }
 }
-} else{
+  }else{
 
   for (h in 1:length(OutputTypeSet)){
     for (v in 1:length(VarTypeSet)){
         if (h==1){
           PathsGraphs[[ModelType]][[OutputTypeSet[h]]]  <- paste(tempdir(),"/Outputs/", ModelType, "/Point Estimate/",
                                                                   OutputTypeSet[h], sep="")
-        } else{
+          }
+      if (h>=2 & h <=5){
           PathsGraphs[[ModelType]][[OutputTypeSet[h]]][[VarTypeSet[v]]]  <- paste(tempdir(),"/Outputs/", ModelType,
                                                                                   "/Point Estimate/", OutputTypeSet[h],
                                                                                   "/", VarTypeSet[v], sep="")
 
-        }
+          if (ModelType == "JLL original" || ModelType == "JLL NoDomUnit" || ModelType == "JLL jointSigma"){
 
+              OrthoLabel <- paste(VarTypeSet,"Ortho")
+              PathsGraphs[[ModelType]][[OutputTypeSet[h]]][[OrthoLabel[v]]] <- paste(tempdir(),"/Outputs/", ModelType, "/Point Estimate/",
+                                                                                     OutputTypeSet[h], "/", VarTypeSet[v],
+                                                                                     "/Ortho", sep="")
+          }
+      }
 
-  if (ModelType == "JLL original" || ModelType == "JLL NoDomUnit" || ModelType == "JLL jointSigma"){
-    if (h !=1){
-    OrthoLabel <- paste(VarTypeSet,"Ortho")
-    PathsGraphs[[ModelType]][[OutputTypeSet[h]]][[OrthoLabel[v]]] <- paste(tempdir(),"/Outputs/", ModelType, "/Point Estimate/",
-                                                                           OutputTypeSet[h], "/", VarTypeSet[v],
-                                                                           "/Ortho", sep="")
-    }
+      if (h==6){
+        PathsGraphs[[ModelType]][[OutputTypeSet[h]]]  <- paste(tempdir(),"/Outputs/", ModelType, "/Point Estimate/",
+                                                               OutputTypeSet[h], sep="")
+}
+
     }
     }
   }
-}
 
 
 return(PathsGraphs)
@@ -87,7 +95,7 @@ FolderCreationBoot <- function(ModelType, Economies){
 
   PathsGraphs <- list()
 
-  OutputTypeSet <- c("Fit", "IRF", "FEVD", "GIRF", "GFEVD")
+  OutputTypeSet <- c("Fit", "IRF", "FEVD", "GIRF", "GFEVD", "TermPremia")
   VarTypeSet <- c("Factors", "Yields")
 
 
@@ -103,10 +111,15 @@ FolderCreationBoot <- function(ModelType, Economies){
           if (h==1){
             PathsGraphs[[ModelType]][[OutputTypeSet[h]]][[Economies[i]]]  <- paste(tempdir(),"/Outputs/", ModelType, "/Bootstrap/Model ",
                                                                                    Economies[i], "/", OutputTypeSet[h], sep="")
-          } else{
+          }
+          if (h>=2 & h <=5){
             PathsGraphs[[ModelType]][[OutputTypeSet[h]]][[Economies[i]]][[VarTypeSet[v]]]  <- paste(tempdir(),"/Outputs/", ModelType, "/Bootstrap/Model ",
                                                                                                     Economies[i], "/", OutputTypeSet[h], "/",
                                                                                                     VarTypeSet[v], sep="")
+          }
+          if (h==6){
+            PathsGraphs[[ModelType]][[OutputTypeSet[h]]][[Economies[i]]]  <- paste(tempdir(),"/Outputs/", ModelType, "/Bootstrap/Model ",
+                                                                                   Economies[i], "/", OutputTypeSet[h], sep="")
           }
         }
       }
@@ -119,26 +132,29 @@ FolderCreationBoot <- function(ModelType, Economies){
         if (h==1){
           PathsGraphs[[ModelType]][[OutputTypeSet[h]]]  <- paste(tempdir(),"/Outputs/", ModelType, "/Bootstrap/",
                                                                  OutputTypeSet[h], sep="")
-        } else{
+        }
+        if (h>=2 & h <=5){
           PathsGraphs[[ModelType]][[OutputTypeSet[h]]][[VarTypeSet[v]]]  <- paste(tempdir(),"/Outputs/", ModelType, "/Bootstrap/",
                                                                                   OutputTypeSet[h], "/", VarTypeSet[v], sep="")
 
-        }
 
 
         if (ModelType == "JLL original" || ModelType == "JLL NoDomUnit" || ModelType == "JLL jointSigma"){
-          if (h !=1){
             OrthoLabel <- paste(VarTypeSet,"Ortho")
             PathsGraphs[[ModelType]][[OutputTypeSet[h]]][[OrthoLabel[v]]] <- paste(tempdir(),"/Outputs/", ModelType, "/Bootstrap/",
                                                                                    OutputTypeSet[h], "/", VarTypeSet[v],
                                                                                    "/Ortho", sep="")
           }
         }
+        if (h==6){
+          PathsGraphs[[ModelType]][[OutputTypeSet[h]]]  <- paste(tempdir(),"/Outputs/", ModelType, "/Bootstrap/",
+                                                                 OutputTypeSet[h], sep="")
+
       }
     }
   }
 
-
+}
   return(PathsGraphs)
 }
 

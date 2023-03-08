@@ -6,10 +6,14 @@
 #'@param OutputLabel Name of the output label to be stored
 #'@param WishStationarityQ User must set 1 is she whises to impose the largest eigenvalue under the Q to be strictly
 #'                       smaller than 1, otherwise set 0.
+#'@param UnitYields  (i) "Month": if maturity of yields are expressed in months or
+#'                      (ii) "Year": if maturity of yields are expressed in years
 #'@param WishGraphYields Binary variable: set 1, if the user wishes graphs to be generated; or set 0, otherwise. Default is set as "0".
 #'@param WishGraphRiskFactors Binary variable: set 1, if the user wishes graphs to be generated; or set 0, otherwise. Default is set as "0".
 #'@param WishOrthoJLLgraphs Binary variable: set 1, if the user wishes orthogonalized JLL-based graphs to be generated; or set 0, otherwise.
 #'                         Default is set as "0"
+#'@param WishForwardPremia Binary variable: set 1, if the user wishes graphs to be generated; or set 0, otherwise. Default is set as "0".
+#'@param LimFP Numerical vector containing the maturties associated with the starting and the ending date of the loan
 #'@param WishBootstrap  Binary variable: set 1, if the user wishes graphs to be generated; or set 0, otherwise. Default is set as "0".
 #'@param ListBoot       List containing the four following elements:
 #'\enumerate{
@@ -47,30 +51,35 @@
 #'@export
 
 
-InputsForOutputs <- function(ModelType, Horiz, ListOutputWished, OutputLabel, WishStationarityQ,
+InputsForOutputs <- function(ModelType, Horiz, ListOutputWished, OutputLabel, WishStationarityQ, UnitYields,
                              WishGraphYields = 0, WishGraphRiskFactors=0, WishOrthoJLLgraphs=0,
-                             WishBootstrap =0, ListBoot = NULL, WishForecast = 0, ListForecast= NULL){
+                             WishForwardPremia=0, LimFP = NULL, WishBootstrap =0, ListBoot = NULL,
+                             WishForecast = 0, ListForecast= NULL){
 
 
-OutputTypeSet <- c("Fit","IRF", "FEVD", "GIRF", "GFEVD")
+OutputTypeSet <- c("Fit","IRF", "FEVD", "GIRF", "GFEVD", "TermPremia", "ForwardPremia")
 IdxWishOut <- match(ListOutputWished, OutputTypeSet)
 
 if ('Fit' %in% ListOutputWished) {WishFitGraph <- 1}
+if ('TermPremia' %in% ListOutputWished) {WishTPGraph <- 1}
+
 
 # 1) Point estimate list
 InputsForOutputs <- list()
 
 InputsForOutputs[[1]] <- OutputLabel
 InputsForOutputs[[2]] <- WishStationarityQ
-names(InputsForOutputs) <- c("Label Outputs", "StationaryQ")
+InputsForOutputs[[3]] <- UnitYields
+InputsForOutputs[[4]] <- WishForwardPremia
+names(InputsForOutputs) <- c("Label Outputs", "StationaryQ", "UnitMatYields", "ForwardPremia")
 
 
 # Initialization
 for (h in 1:length(OutputTypeSet)){
 
-  if (h==1){
-    InputsForOutputs[[ModelType]]$Fit$WishGraphs <- 0
-  } else {
+  if (h==1){InputsForOutputs[[ModelType]]$Fit$WishGraphs <- 0}
+  if(h>=2 & h <=5){
+
 
   InputsForOutputs[[ModelType]][[OutputTypeSet[h]]]$horiz <- Horiz
 
@@ -85,16 +94,21 @@ for (h in 1:length(OutputTypeSet)){
     InputsForOutputs[[ModelType]][[OutputTypeSet[h]]]$WishGraphsOrtho$RiskFactorsBootstrap <- 0
     InputsForOutputs[[ModelType]][[OutputTypeSet[h]]]$WishGraphsOrtho$YieldsBootstrap <- 0
     }
-}
+
+  }
+  if(h > 5){
+  InputsForOutputs[[ModelType]]$RiskPremia$WishGraphs <- 0
+  InputsForOutputs[[ModelType]]$ForwardPremia$Limits <- LimFP
+  }
 }
 
 
 # Filling up the desired outputs
 for (h in IdxWishOut){
 
-  if (h==1){
-    InputsForOutputs[[ModelType]]$Fit$WishGraphs <- WishFitGraph
-  } else {
+  if (h==1){InputsForOutputs[[ModelType]]$Fit$WishGraphs <- WishFitGraph}
+
+  if(h>=2 & h <=5){
 
 InputsForOutputs[[ModelType]][[OutputTypeSet[h]]]$horiz <- Horiz
 
@@ -116,8 +130,10 @@ InputsForOutputs[[ModelType]][[OutputTypeSet[h]]]$WishGraphsOrtho$YieldsBootstra
 }
 }
 }
-}
 
+  if(h == 6){InputsForOutputs[[ModelType]]$RiskPremia$WishGraphs <- WishTPGraph}
+
+}
 
 # 2) Bootstrap list
 if (WishBootstrap==0){

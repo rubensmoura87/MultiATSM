@@ -8,8 +8,8 @@
 #'@param DataFrequency text: "Daily All Days", "Daily Business Days", "Weekly", "Monthly", "Quarterly", "Annually"
 #'@param JLLinputs list of necessary inputs for the estimation of JLL-based models (see "JLL" function)
 #'@param GVARinputs list of necessary inputs for the estimation of GVAR-based models (see "GVAR" function)
+#'@param BRWinputs  list of necessary inputs for performing the bias-corrected estimation (see "Bias_Correc_VAR" function)
 #'
-
 #'@examples
 #' # See examples in the vignette file of this package (Section 4).
 #'
@@ -25,7 +25,7 @@
 #'@export
 
 ForecastYields <- function(ModelType, ModelPara, InputsForOutputs, FactorLabels, Economies, DataFrequency,
-                               JLLinputs, GVARinputs){
+                               JLLinputs, GVARinputs, BRWinputs){
 
 
   WishForecast <- InputsForOutputs[[ModelType]]$Forecasting$WishForecast
@@ -36,7 +36,7 @@ ForecastYields <- function(ModelType, ModelPara, InputsForOutputs, FactorLabels,
   # If one chooseS models in which the estimation is done country-by-country
   if ( "JPS" %in% ModelType || "JPS jointP" %in% ModelType ||  "GVAR sepQ" %in% ModelType){
     ForeYie <- ForecastYieldsSepQ(ModelType, ModelPara, InputsForOutputs, FactorLabels, Economies, DataFrequency,
-                                  JLLinputs, GVARinputs)
+                                  JLLinputs, GVARinputs, BRWinputs)
 
   }
   # If one chooseS models in which the estimation is done jointly for all countries
@@ -44,7 +44,7 @@ ForecastYields <- function(ModelType, ModelPara, InputsForOutputs, FactorLabels,
        || "JLL NoDomUnit" %in% ModelType || "JLL jointSigma" %in% ModelType){
 
     ForeYie <- ForecastYieldsJointQ(ModelType, ModelPara, InputsForOutputs, FactorLabels, Economies, DataFrequency,
-                                  JLLinputs, GVARinputs)
+                                  JLLinputs, GVARinputs, BRWinputs)
 
   }
       Jmisc::toc()
@@ -64,12 +64,12 @@ ForecastYields <- function(ModelType, ModelPara, InputsForOutputs, FactorLabels,
 #'@param DataFrequency character-based vector: "Daily All Days", "Daily Business Days", "Weekly", "Monthly", "Quarterly", "Annually"
 #'@param JLLinputs list of necessary inputs for the estimation of JLL-based models (see "JLL" function)
 #'@param GVARinputs list of necessary inputs for the estimation of GVAR-based models (see "GVAR" function)
-#'
+#'@param BRWinputs  list of necessary inputs for performing the bias-corrected estimation (see "Bias_Correc_VAR" function)
 #'
 
 
 ForecastYieldsSepQ <- function(ModelType, ModelPara, InputsForOutputs, FactorLabels, Economies, DataFrequency,
-                               JLLinputs, GVARinputs){
+                               JLLinputs, GVARinputs, BRWinputs){
 
 
 
@@ -144,8 +144,8 @@ ForecastYieldsSepQ <- function(ModelType, ModelPara, InputsForOutputs, FactorLab
       #  estimated conditionally on the full information set
     }
     # Compute the inputs that go directly into the log-likelihood function
-    ATSMInputs <- InputsForMLEdensity(ModelType, YYtemp, ZZtemp, FactorLabels, mat, Economies, DataFrequency,
-                                        JLLinputs, GVARinputs)
+    invisible(utils::capture.output(ATSMInputs <- InputsForMLEdensity(ModelType, YYtemp, ZZtemp, FactorLabels, mat, Economies, DataFrequency,
+                                        JLLinputs, GVARinputs, BRWinputs)))
 
   # Initial guesses for Variables that will be concentrared out of from the log-likelihood function
       K1XQ <- ATSMInputs$K1XQ
@@ -171,8 +171,9 @@ ForecastYieldsSepQ <- function(ModelType, ModelPara, InputsForOutputs, FactorLab
 
       tol <- 1e-4
 
-      FullModelParaList[[ModelType]][[Economies[i]]] <- Optimization(f, tol, varargin, FactorLabels, Economies, ModelType,
-                                                                     JLLinputs, GVARinputs)$Summary
+      invisible(utils::capture.output(FullModelParaList[[ModelType]][[Economies[i]]] <- Optimization(f, tol, varargin,
+                                                                                   FactorLabels, Economies, ModelType,
+                                                                                   JLLinputs, GVARinputs)$Summary))
 
 
       # 3) Forecasting
@@ -243,12 +244,12 @@ ForecastYieldsSepQ <- function(ModelType, ModelPara, InputsForOutputs, FactorLab
 #'@param DataFrequency character-based vector: "Daily All Days", "Daily Business Days", "Weekly", "Monthly", "Quarterly", "Annually"
 #'@param JLLinputs list of necessary inputs for the estimation of JLL-based models (see "JLL" function)
 #'@param GVARinputs list of necessary inputs for the estimation of GVAR-based models (see "GVAR" function)
-#'
+#'@param BRWinputs  list of necessary inputs for performing the bias-corrected estimation (see "Bias_Correc_VAR" function)
 #'
 
 
 ForecastYieldsJointQ <- function(ModelType, ModelPara, InputsForOutputs, FactorLabels, Economies, DataFrequency,
-                               JLLinputs, GVARinputs){
+                               JLLinputs, GVARinputs, BRWinputs){
 
   print('#########################################################################################################')
   print( paste('#################################', 'Forecasting', ModelType, '#################################' ))
@@ -316,8 +317,8 @@ ForecastYieldsJointQ <- function(ModelType, ModelPara, InputsForOutputs, FactorL
         #  estimated conditionally on the full information set
       }
       # Compute the inputs that go directly into the log-likelihood function
-      ATSMInputs <- InputsForMLEdensity(ModelType, YYtemp, ZZtemp, FactorLabels, mat, Economies, DataFrequency,
-                                        JLLinputs, GVARinputs)
+      invisible(utils::capture.output(ATSMInputs <- InputsForMLEdensity(ModelType, YYtemp, ZZtemp, FactorLabels, mat, Economies, DataFrequency,
+                                        JLLinputs, GVARinputs, BRWinputs)))
 
       # Initial guesses for Variables that will be concentrared out of from the log-likelihood function
       K1XQ <- ATSMInputs$K1XQ

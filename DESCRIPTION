@@ -1,7 +1,7 @@
 Package: MultiATSM
 Type: Package
 Title: Multicountry Term Structure of Interest Rates Models
-Version: 0.2.4
+Version: 0.3.1
 Date: 2022-10-03
 Author: Rubens Moura
 Maintainer: Rubens Moura <rubens.gtmoura@gmail.com>
