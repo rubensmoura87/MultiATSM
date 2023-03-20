@@ -3,7 +3,7 @@
 #'@param ModelType string-vector containing the label of the model to be estimated
 #'@param Yields time series of yields (JxT or CJ x T)
 #'@param PdynamicsFactors time series of the risk factors (K x T)
-#'@param FactorLabels string-list based which contains the labels of all the variables present in the model
+#'@param FactorLabels string-list based which contains the labels of all variables present in the model
 #'@param mat  vector of maturities (in years) used in the estimation
 #'@param Economies  string-vector containing the names of the economies of the system. \cr
 #'                 If the ModelType selected is "JPS", "JPS jointP", "GVAR sepQ", then only one economy can be selected. \cr
@@ -11,7 +11,7 @@
 #'@param DataFrequency  character-based-vector. Avaialable options are: "Daily All Days", "Daily Business Days", "Weekly", "Monthly", "Quarterly", "Annually"
 #'@param JLLinputs    list of necessary inputs for the estimation of JLL-based models (see "JLL" function)
 #'@param GVARinputs list of necessary inputs for the estimation of GVAR-based models (see "GVAR" function)
-#'
+#'@param BRWinputs list of necessary inputs for performing the bias-corrected estimation (see "Bias_Correc_VAR" function)
 #'
 #'@importFrom pracma null
 #'
@@ -109,7 +109,7 @@
 
 
 InputsForMLEdensity <- function(ModelType, Yields, PdynamicsFactors, FactorLabels,  mat, Economies, DataFrequency,
-                                JLLinputs = NULL, GVARinputs  = NULL){
+                                JLLinputs = NULL, GVARinputs  = NULL, BRWinputs = NULL){
 
 # Check whether the model choice is compatible with the number of countries selected
 if (length(Economies) == 1 &
@@ -200,6 +200,14 @@ if (DataFrequency == "Annually"){ dt <- 1}
   Gy.0 <- diag(K)
 
 # Parameters of the of the P-dynamics
+  if (!is.null(BRWinputs)){
+    BiasCorrec <- Bias_Correc_VAR(ModelType, BRWinputs, t(ZZ), N, Economies, FactorLabels, GVARinputs, JLLinputs)
+    K0Z <- BiasCorrec$mu_tilde
+    K1Z <- BiasCorrec$Phi_tilde
+    SSZ <- BiasCorrec$V_tilde
+    } else{
+
+
   # JPS-related models
   if (ModelType == 'JPS' || ModelType == 'JPS jointP' || ModelType == 'VAR jointQ'){
   VARpara <- VAR(ZZ, VARtype= 'unconstrained', Bcon = NULL)
@@ -234,7 +242,7 @@ if (DataFrequency == "Annually"){ dt <- 1}
     }
 
     }
-
+    }
 
   # Outputs
   Output <- list(Wpca, We, WpcaFull, Y, PP, Gy.0, K1XQ, ZZ, SSZ, K0Z, K1Z, JLLinputs, GVARinputs)
@@ -258,6 +266,8 @@ if (DataFrequency == "Annually"){ dt <- 1}
 #'@param DataFrequency  character-based-vector. Avaialable options are: "Daily All Days", "Daily Business Days", "Weekly", "Monthly", "Quarterly", "Annually"
 #'@param JLLinputs    list of necessary inputs for the estimation of JLL-based models (see "JLL" function)
 #'@param GVARinputs   list of necessary inputs for the estimation of GVAR-based models (see "GVAR" function)
+#'@param BRWinputs  list of necessary inputs for performing the bias-corrected estimation (see "Bias_Correc_VAR" function)
+#'
 #'
 #'@importFrom pracma null
 #'
@@ -265,8 +275,8 @@ if (DataFrequency == "Annually"){ dt <- 1}
 
 
 
-InputsForMLEdensity_BS <- function(ModelType, Y_artificial, Z_artificial, FactorLabels, mat,
-                                   Economies, DataFrequency, JLLinputs = NULL, GVARinputs= NULL){
+InputsForMLEdensity_BS <- function(ModelType, Y_artificial, Z_artificial, FactorLabels, mat, Economies,
+                                   DataFrequency, JLLinputs = NULL, GVARinputs= NULL, BRWinputs= NULL){
 
   # for the cases in which the estimation is done on a country-by-country basis
   if (ModelType == 'JPS' || ModelType == 'JPS jointP' || ModelType == "GVAR sepQ"){
@@ -345,6 +355,16 @@ InputsForMLEdensity_BS <- function(ModelType, Y_artificial, Z_artificial, Factor
   Gy.0 <- diag(K)
 
   # SSZ, K0Z and K1Z
+  if (!is.null(BRWinputs)){
+    invisible(utils::capture.output(BiasCorrec <- Bias_Correc_VAR(ModelType, BRWinputs, t(ZZ_artificial), N, Economies,
+                                                 FactorLabels, GVARinputs, JLLinputs)))
+
+    K0Z_artificial <- BiasCorrec$mu_tilde
+    K1Z_artificial <- BiasCorrec$Phi_tilde
+    SSZ_artificial <- BiasCorrec$V_tilde
+  } else{
+
+
   if (ModelType == 'JPS' || ModelType == 'JPS jointP' || ModelType == 'VAR jointQ'){
     VARpara <- VAR(ZZ_artificial, VARtype= 'unconstrained', Bcon = NULL)
     K0Z_artificial <- VARpara$K0Z
@@ -374,7 +394,7 @@ InputsForMLEdensity_BS <- function(ModelType, Y_artificial, Z_artificial, Factor
     # matrix. We make this adjustment in the function 'A0N_MLEdensity_WOE...' by redefining SSZ before computing A and B.
     # (this avoids overcomplicating the overall structure of the code")
     }
-
+}
   }
   # Prepare the list of outputs:
   ListOutputs <- list(Wpca_artificial, We_artificial, WpcaFull_artificial, Y_artificial, P_artificial, ZZ_artificial,

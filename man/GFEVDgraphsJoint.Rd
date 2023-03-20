@@ -2,7 +2,7 @@
 % Please edit documentation in R/GraphicalOutputs.R
 \name{GFEVDgraphsJoint}
 \alias{GFEVDgraphsJoint}
-\title{GFEVDs graphs for ("joint Q" models)}
+\title{GFEVDs graphs for "joint Q" models}
 \usage{
 GFEVDgraphsJoint(
   ModelType,
@@ -27,5 +27,5 @@ GFEVDgraphsJoint(
 \item{PathsGraphs}{Path of the folder in which the graphs will be saved}
 }
 \description{
-GFEVDs graphs for ("joint Q" models)
+GFEVDs graphs for "joint Q" models
 }

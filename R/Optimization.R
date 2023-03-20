@@ -137,14 +137,15 @@ Optimization <- function(f, tol, varargin, FactorLabels, Economies, ModelType, J
 
     newF <- FF(x=AuxVal$x0)
     print(newF)
+
     converged <-   (abs(oldF - newF)<tol) ||(count>Max_AG_Iteration && newF>Previous_Optimal_Obj)
     oldF <- newF
 
     count <- count+1
 
-  }
+    }
 
-  # Build the full auxiliary vector, including concentrated parameters
+    # Build the full auxiliary vector, including concentrated parameters
   ud <- update_para(AuxVal$x0, sizex= AuxVal$sizex, ii= NULL, con= 'concentration',
                     FactorLabels, Economies, JLLinputs, GVARinputs, varargin) # update the parameter set which were NOT concentrated out after the optimization.
   FF <- functional::Curry(f_with_vectorized_parameters, sizex= AuxVal$sizex, f, con = 'concentration', varargin=ud,
@@ -154,6 +155,7 @@ Optimization <- function(f, tol, varargin, FactorLabels, Economies, ModelType, J
 
   tryCatch({
     out <- FF(x=AuxVal$x0)$out # computes the estimates of all parameters after the optimization.
+    VarLabInt <- intersect(names(varargin), names(out$ests))
 
     for (i in 1:NP){ # for loop: remove the @ from the parameters' labels.
       if (contain('@', ud[[i]]$Label) ) {
@@ -165,7 +167,7 @@ Optimization <- function(f, tol, varargin, FactorLabels, Economies, ModelType, J
           namexi <- substr(namexi, start = 1, stop = si-1 )
         }
 
-        ud[[i]]$Value <- out$ests[[i]]
+        ud[[i]]$Value <- out$ests[[VarLabInt[i]]]
       }
     }
   }, error=function(e){}
@@ -267,7 +269,6 @@ Optimization <- function(f, tol, varargin, FactorLabels, Economies, ModelType, J
 
 
 Optimization_Boot <- function(f, tol, varargin, FactorLabels, Economies, ModelType, JLLinputs = NULL, GVARinputs = NULL){
-
 
 
   NP <- floor(sum(lengths(varargin))/4)

@@ -2,7 +2,8 @@
 % Please edit documentation in R/NumOutputs.R
 \name{OutputConstructionJoint}
 \alias{OutputConstructionJoint}
-\title{Numerical outputs (variance explained, model fit, IRFs, GIRFs, FEVDs, and GFEVDs) for "joint Q" models}
+\title{Numerical outputs (variance explained, model fit, IRFs, GIRFs, FEVDs, GFEVDs and risk premia decomposition)
+for "joint Q" models}
 \usage{
 OutputConstructionJoint(
   ModelType,
@@ -17,12 +18,14 @@ OutputConstructionJoint(
 
 \item{ModelPara}{list of model parameter estimates (see the "Optimization" function)}
 
-\item{InputsForOutputs}{list conataining the desired horizon of analysis for the model fit, IRFs, GIRFs, FEVDs, and GFEVDs}
+\item{InputsForOutputs}{list conataining the desired horizon of analysis for the model fit, IRFs, GIRFs, FEVDs, GFEVDs
+and risk premia decomposition}
 
 \item{FactorLabels}{string-list based which contains all the labels of all the variables present in the model}
 
 \item{Economies}{string-vector containing the names of the economies which are part of the economic system}
 }
 \description{
-Numerical outputs (variance explained, model fit, IRFs, GIRFs, FEVDs, and GFEVDs) for "joint Q" models
+Numerical outputs (variance explained, model fit, IRFs, GIRFs, FEVDs, GFEVDs and risk premia decomposition)
+for "joint Q" models
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/NumOutputs.R
 \name{NumOutputs}
 \alias{NumOutputs}
-\title{Construct the model numerical outputs (model fit, IRFs, GIRFs, FEVDs, and GFEVDs)}
+\title{Construct the model numerical outputs (model fit, IRFs, GIRFs, FEVDs, GFEVDs, and risk premia decomposition)}
 \usage{
 NumOutputs(ModelType, ModelPara, InputsForOutputs, FactorLabels, Economies)
 }
@@ -11,7 +11,8 @@ NumOutputs(ModelType, ModelPara, InputsForOutputs, FactorLabels, Economies)
 
 \item{ModelPara}{List of model parameter estimates (See the "Optimization" function)}
 
-\item{InputsForOutputs}{list conataining the desired horizon of analysis for the model fit, IRFs, GIRFs, FEVDs, and GFEVDs}
+\item{InputsForOutputs}{list conataining the desired horizon of analysis for the model fit, IRFs, GIRFs, FEVDs, GFEVDs
+and risk premia decomposition}
 
 \item{FactorLabels}{a string-list based which contains all the labels of all the variables present in the model}
 
@@ -25,10 +26,11 @@ List of the model numerical outputs, namely
 \item FEVDs
 \item GIRFs
 \item GFEVDs
+\item Risk premia decomposition
 }
 }
 \description{
-Construct the model numerical outputs (model fit, IRFs, GIRFs, FEVDs, and GFEVDs)
+Construct the model numerical outputs (model fit, IRFs, GIRFs, FEVDs, GFEVDs, and risk premia decomposition)
 }
 \examples{
 # See examples in the vignette file of this package (Section 4).

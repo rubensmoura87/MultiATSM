@@ -13,7 +13,8 @@ InputsForMLEdensity_BS(
   Economies,
   DataFrequency,
   JLLinputs = NULL,
-  GVARinputs = NULL
+  GVARinputs = NULL,
+  BRWinputs = NULL
 )
 }
 \arguments{
@@ -36,6 +37,8 @@ If the ModelType selected is "JPS", "JPS jointP", "GVAR sepQ", then only one eco
 \item{JLLinputs}{list of necessary inputs for the estimation of JLL-based models (see "JLL" function)}
 
 \item{GVARinputs}{list of necessary inputs for the estimation of GVAR-based models (see "GVAR" function)}
+
+\item{BRWinputs}{list of necessary inputs for performing the bias-corrected estimation (see "Bias_Correc_VAR" function)}
 }
 \description{
 Generates several  inputs that are necessary to build the likelihood function - Bootstrap version

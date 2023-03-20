@@ -76,7 +76,7 @@ MLEdensity_sepQ <- function(K1XQ, r0, SSZ, K0Z, K1Z, se, Gy.0, mat, Y, Z, P, Wpc
     # Yields can be affine function of Pt's,i.e., Y(t) = AnP +BnP*P(t).
     # Further, we define Z(t) as an affine function of P(t) such that: Z(t) = phi0+ phi1*P(t).
     # As such, we can write P(t) = phi1^(-1)*(Z(t) - phi0).
-    BnX <- A0N__computeBnAn_sepQ(round(mat/dt),K1XQ, dx= NULL, r0= NULL, SSX= NULL)[[1]]/dt
+    BnX <- A0N__computeBnAn_sepQ(round(mat/dt),K1XQ, dX= NULL, r0= NULL, SSX= NULL)[[1]]/dt
     # NOTE: the function "A0N__computeBnAn" generates outputs for interest rates per unit of time interval.
     # Hence, by multiplying by "1/dt" we obtain annualized results.
     BnP <- mrdivide(BnX,Wpca%*%BnX) #  BnP = BnX*(W*BnX)^(-1)
@@ -84,11 +84,10 @@ MLEdensity_sepQ <- function(K1XQ, r0, SSZ, K0Z, K1Z, se, Gy.0, mat, Y, Z, P, Wpc
 
     # Covariance matrix of latent states X:
     WBX <- Wpca%*%BnX # WBX = W * BnX
-    #idxSpanned <- 1:N # TO BE REMOVED
     SSP <- SSZ[idxSpanned,idxSpanned]
-    SSX <- mrdivide(solve(WBX,SSP),t(WBX)) # SSX = (W*BnX)^(-1)*SSP*t((*W*BnX)^(-1))
+    SSX <- mrdivide(solve(WBX,SSP, tol = 1e-50),t(WBX)) # SSX = (W*BnX)^(-1)*SSP*t((*W*BnX)^(-1))
     # Optimal estimate of r0:
-    betan <- A0N__computeBnAn_sepQ(round(mat/dt), K1XQ, dx=NULL , r0=0, SSX)[[3]]  # NOTE: We set r0=0, because when r0=0, An = Betan.
+    betan <- A0N__computeBnAn_sepQ(round(mat/dt), K1XQ, dX=NULL , r0=0, SSX)[[3]]  # NOTE: We set r0=0, because when r0=0, An = Betan.
     betan <- t(t(betan/dt))
 
 
@@ -340,7 +339,7 @@ MLEdensity_jointQ <- function(K1XQ, r0, SSZ, K0Z, K1Z, se, Gy.0, mat, Y, Z, P, W
     # Yields can be affine function of Pt's,i.e., Y(t) = AnP +BnP*P(t).
     # Further, we define Z(t) as an affine function of P(t) such that: Z(t) = phi0+ phi1*P(t).
     # As such, we can write P(t) = phi1^(-1)*(Z(t) - phi0).
-    BnX <- A0N__computeBnAn_jointQ(round(mat/dt),K1XQ, dx= NULL, r0= NULL, SSX= NULL, Economies)[[1]]/dt
+    BnX <- A0N__computeBnAn_jointQ(round(mat/dt),K1XQ, dX= NULL, r0= NULL, SSX= NULL, Economies)[[1]]/dt
     # NOTE: the function "A0N__computeBnAn" generates outputs for interest rates per unit of time interval.
     # Hence by multiplying by "1/dt" we obtain annualized results.
 
@@ -351,10 +350,10 @@ MLEdensity_jointQ <- function(K1XQ, r0, SSZ, K0Z, K1Z, se, Gy.0, mat, Y, Z, P, W
     WBX <- Wpca%*%BnX # WBX = W * BnX
     b <- IdxSpanned(G,M,N,C)
     SSP <- SSZ[b, b]
-    SSX <- mrdivide(solve(WBX,SSP),t(WBX)) # SSX = (W*BnX)^(-1)*SSP*t((*W*BnX)^(-1))
+    SSX <- mrdivide(solve(WBX,SSP, tol = 1e-50),t(WBX)) # SSX = (W*BnX)^(-1)*SSP*t((*W*BnX)^(-1))
 
     # Optimal estimate of r0:
-    betan <- A0N__computeBnAn_jointQ(round(mat/dt), K1XQ, dx=NULL , r0=rep(0, times=C), SSX, Economies)[[3]]  # Note: r0=0, because when r0=0, An = Betan
+    betan <- A0N__computeBnAn_jointQ(round(mat/dt), K1XQ, dX=NULL , r0=rep(0, times=C), SSX, Economies)[[3]]  # Note: r0=0, because when r0=0, An = Betan
     betan <- t(t(betan/dt))
 
 
@@ -429,7 +428,7 @@ MLEdensity_jointQ <- function(K1XQ, r0, SSZ, K0Z, K1Z, se, Gy.0, mat, Y, Z, P, W
 
 
     ## The log-likelihood function:
-    if (is.nan(se)){
+    if (any(is.nan(se) ==1)){
       y <- 1e6*matrix(1,T-1,1);
     }else{
       # Cross-sectional density (i.e. density for the portfolios observed with measurament error)
@@ -569,14 +568,13 @@ MLEdensity_jointQ <- function(K1XQ, r0, SSZ, K0Z, K1Z, se, Gy.0, mat, Y, Z, P, W
       Out$rot$P[["P"]] <- out.rot.P.P
 
 
-
       # P dynamics: PCN as risk factors:
       K0P <- K0Z[b]
       K1P <- K1Z[b, b]
       SSP <- SSZ[b, b]
       out.rot.P.P2 <- list(K0P, K1P, SSP)
       names(out.rot.P.P2) <- c("K0", "K1", "SS" )
-      out.rot.X.P <- FMN__Rotate(out.rot.P.P2, solve(U1), -solve(U1,U0))
+      out.rot.X.P <- FMN__Rotate(out.rot.P.P2, solve(U1,tol = 1e-50), -solve(U1,U0, tol = 1e-50))
       # updating the generated outputs... Once again...
       Out$rot$X[["P"]] <- out.rot.X.P
 
@@ -685,7 +683,7 @@ MLEdensity_jointQ_sepSigma <- function(K1XQ, r0, SSZ, K0Z, K1Z, se, Gy.0, mat, Y
     # Yields can be affine function of Pt's,i.e., Y(t) = AnP +BnP*P(t).
     # Further, we define Z(t) as an affine function of P(t) such that: Z(t) = phi0+ phi1*P(t).
     # As such, we can write P(t) = phi1^(-1)*(Z(t) - phi0).
-    BnX <- A0N__computeBnAn_jointQ(round(mat/dt),K1XQ, dx= NULL, r0= NULL, SSX= NULL, Economies)[[1]]/dt
+    BnX <- A0N__computeBnAn_jointQ(round(mat/dt),K1XQ, dX= NULL, r0= NULL, SSX= NULL, Economies)[[1]]/dt
     # NOTE: the function "A0N__computeBnAn" generates outputs for interest rates per unit of time interval.
     # Hence by multiplying by "1/dt" we obtain annualized results.
     BnP <- mrdivide(BnX,Wpca%*%BnX) #  BnP = BnX*(W*BnX)^(-1)
@@ -694,10 +692,10 @@ MLEdensity_jointQ_sepSigma <- function(K1XQ, r0, SSZ, K0Z, K1Z, se, Gy.0, mat, Y
     WBX <- Wpca%*%BnX # WBX = W * BnX
     b <- IdxSpanned(G,M,N,C)
     SSP <- SSZ[b, b]
-    SSX <- mrdivide(solve(WBX,SSP),t(WBX)) # SSX = (W*BnX)^(-1)*SSP*t((*W*BnX)^(-1))
+    SSX <- mrdivide(solve(WBX,SSP, tol = 1e-50),t(WBX)) # SSX = (W*BnX)^(-1)*SSP*t((*W*BnX)^(-1))
 
     # Optimal estimate of r0:
-    betan <- A0N__computeBnAn_jointQ(round(mat/dt), K1XQ, dx=NULL , r0=rep(0, times=C), SSX, Economies)[[3]]  # Note: r0=0, because when r0=0, An = Betan
+    betan <- A0N__computeBnAn_jointQ(round(mat/dt), K1XQ, dX=NULL , r0=rep(0, times=C), SSX, Economies)[[3]]  # Note: r0=0, because when r0=0, An = Betan
     betan <- t(t(betan/dt))
 
 
@@ -773,7 +771,7 @@ MLEdensity_jointQ_sepSigma <- function(K1XQ, r0, SSZ, K0Z, K1Z, se, Gy.0, mat, Y
 
 
     ## The log-likelihood function:
-    if (is.nan(se)){
+    if (any(is.nan(se) ==1)){
       y <- 1e6*matrix(1,T-1,1);
     }else{
       # Cross-sectional density (i.e. density for the portfolios observed with measurament error)
@@ -1042,7 +1040,7 @@ A0N_MLEdensity_WOE__sepQ_Bootstrap <- function(K1XQ, r0, SSZ, K0Z, K1Z, se, Gy.0
     # Yields can be affine function of Pt's,i.e., Y(t) = AnP +BnP*P(t).
     # Further, we define Z(t) as an affine function of P(t) such that: Z(t) = phi0+ phi1*P(t).
     # As such, we can write P(t) = phi1^(-1)*(Z(t) - phi0).7
-    BnX <- A0N__computeBnAn_sepQ(round(mat/dt),K1XQ, dx= NULL, r0= NULL, SSX= NULL)[[1]]/dt
+    BnX <- A0N__computeBnAn_sepQ(round(mat/dt),K1XQ, dX= NULL, r0= NULL, SSX= NULL)[[1]]/dt
     # NOTE: the function "A0N__computeBnAn" generates outputs for interest rates per unit of time interval.
     # Hence by multiplying by "1/dt" we obtain annualized results.
     BnP <- mrdivide(BnX,Wpca%*%BnX) #  BnP = BnX*(W*BnX)^(-1)
@@ -1053,9 +1051,9 @@ A0N_MLEdensity_WOE__sepQ_Bootstrap <- function(K1XQ, r0, SSZ, K0Z, K1Z, se, Gy.0
     # Covariance matrix of latent states X:
     WBX <- Wpca%*%BnX # WBX = W * BnX
     SSP <- SSZ[idxSpanned , idxSpanned]
-    SSX <- mrdivide(solve(WBX,SSP),t(WBX)) # SSX = (W*BnX)^(-1)*SSP*t((*W*BnX)^(-1))
+    SSX <- mrdivide(solve(WBX,SSP,tol = 1e-50),t(WBX)) # SSX = (W*BnX)^(-1)*SSP*t((*W*BnX)^(-1))
     # Optimal estimate of r0:
-    betan <- A0N__computeBnAn_sepQ(round(mat/dt), K1XQ, dx=NULL , r0=0, SSX)[[3]]
+    betan <- A0N__computeBnAn_sepQ(round(mat/dt), K1XQ, dX=NULL , r0=0, SSX)[[3]]
     betan <- t(t(betan/dt))
 
 
@@ -1272,7 +1270,7 @@ A0N_MLEdensity_WOE__jointQ_Bootstrap <- function(K1XQ, r0, SSZ, K0Z, K1Z, se, Gy
     # Yields can be affine function of Pt's,i.e., Y(t) = AnP +BnP*P(t).
     # Further, we define Z(t) as an affine function of P(t) such that: Z(t) = phi0+ phi1*P(t).
     # As such, we can write P(t) = phi1^(-1)*(Z(t) - phi0).
-    BnX <- A0N__computeBnAn_jointQ(round(mat/dt),K1XQ, dx= NULL, r0= NULL, SSX= NULL, Economies)[[1]]/dt # NOTE: the function "A0N__computeBnAn" generates outputs for interest rates per unit of time interval. Hence by multiplying by "1/dt" we obtain annualized results.
+    BnX <- A0N__computeBnAn_jointQ(round(mat/dt),K1XQ, dX= NULL, r0= NULL, SSX= NULL, Economies)[[1]]/dt # NOTE: the function "A0N__computeBnAn" generates outputs for interest rates per unit of time interval. Hence by multiplying by "1/dt" we obtain annualized results.
 
     BnP <- mrdivide(BnX,Wpca%*%BnX) #  BnP = BnX*(W*BnX)^(-1)
     rownames(BnX) <- rownames(Y)
@@ -1281,11 +1279,11 @@ A0N_MLEdensity_WOE__jointQ_Bootstrap <- function(K1XQ, r0, SSZ, K0Z, K1Z, se, Gy
     WBX <- Wpca%*%BnX # WBX = W * BnX
     b<- IdxSpanned(G,M,N,C)
     SSP <- SSZ[b, b]
-    SSX <- mrdivide(solve(WBX,SSP),t(WBX)) # SSX = (W*BnX)^(-1)*SSP*t((*W*BnX)^(-1))
+    SSX <- mrdivide(solve(WBX,SSP,tol = 1e-50),t(WBX)) # SSX = (W*BnX)^(-1)*SSP*t((*W*BnX)^(-1))
 
 
     # Optimal estimate of r0:
-    betan <- A0N__computeBnAn_jointQ(round(mat/dt), K1XQ, dx=NULL , r0=rep(0, times=C), SSX, Economies)[[3]]
+    betan <- A0N__computeBnAn_jointQ(round(mat/dt), K1XQ, dX=NULL , r0=rep(0, times=C), SSX, Economies)[[3]]
     betan <- t(t(betan/dt))
 
 
@@ -1362,7 +1360,7 @@ A0N_MLEdensity_WOE__jointQ_Bootstrap <- function(K1XQ, r0, SSZ, K0Z, K1Z, se, Gy
 
 
     ## The log-likelihood function:
-    if (is.nan(se)){
+    if (any(is.nan(se) ==1)){
       y <- 1e6*matrix(1,T-1,1)
     }else{
       # Cross-sectional density (i.e. density for the portfolios observed with measurament error)
@@ -1598,7 +1596,7 @@ A0N_MLEdensity_WOE__jointQ_sepSigma_Bootstrap <- function(K1XQ, r0, SSZ, K0Z, K1
     # Yields can be affine function of Pt's,i.e., Y(t) = AnP +BnP*P(t).
     # Further, we define Z(t) as an affine function of P(t) such that: Z(t) = phi0+ phi1*P(t).
     # As such, we can write P(t) = phi1^(-1)*(Z(t) - phi0).
-    BnX <- A0N__computeBnAn_jointQ(round(mat/dt),K1XQ, dx= NULL, r0= NULL, SSX= NULL, Economies)[[1]]/dt
+    BnX <- A0N__computeBnAn_jointQ(round(mat/dt),K1XQ, dX= NULL, r0= NULL, SSX= NULL, Economies)[[1]]/dt
     # NOTE: the function "A0N__computeBnAn" generates outputs for interest rates per unit of time interval.
     # Hence by multiplying by "1/dt" we obtain annualized results.
     BnP <- mrdivide(BnX,Wpca%*%BnX) #  BnP = BnX*(W*BnX)^(-1)
@@ -1610,10 +1608,10 @@ A0N_MLEdensity_WOE__jointQ_sepSigma_Bootstrap <- function(K1XQ, r0, SSZ, K0Z, K1
     WBX <- Wpca%*%BnX # WBX = W * BnX
     b<- IdxSpanned(G,M,N,C)
     SSP <- SSZ[b, b]
-    SSX <- mrdivide(solve(WBX,SSP),t(WBX)) # SSX = (W*BnX)^(-1)*SSP*t((*W*BnX)^(-1))
+    SSX <- mrdivide(solve(WBX,SSP, tol = 1e-50),t(WBX)) # SSX = (W*BnX)^(-1)*SSP*t((*W*BnX)^(-1))
 
     # Optimal estimate of r0:
-    betan <- A0N__computeBnAn_jointQ(round(mat/dt), K1XQ, dx=NULL , r0=rep(0, times=C), SSX, Economies)[[3]]
+    betan <- A0N__computeBnAn_jointQ(round(mat/dt), K1XQ, dX=NULL , r0=rep(0, times=C), SSX, Economies)[[3]]
     betan <- t(t(betan/dt))
 
 
@@ -1689,7 +1687,7 @@ A0N_MLEdensity_WOE__jointQ_sepSigma_Bootstrap <- function(K1XQ, r0, SSZ, K0Z, K1
 
 
     ## The log-likelihood function:
-    if (is.nan(se)){
+    if (any(is.nan(se) ==1)){
       y <- 1e6*matrix(1,T-1,1)
     }else{
       # Cross-sectional density (i.e. density for the portfolios observed with measurament error)

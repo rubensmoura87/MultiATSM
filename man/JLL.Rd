@@ -18,7 +18,7 @@ JLL(NonOrthoFactors, N, JLLinputs)
                 If no dominant unit is assigned, then this variable is defined as "None"
     \item WishSigmas: equal to "1" if one wishes the variance-covariance matrices and the Cholesky factorizations
                 (can take long if they need to be estimated). Set "0", otherwise.
-    \item SigmaNonOrtho: NULL or some K x K matrix from the non-orthogonalized dynamics
+    \item SigmaNonOrtho: NULL or some F x F matrix from the non-orthogonalized dynamics
     \item JLLModelType: available options are "JLL original", "JLL jointSigma"  or "JLL NoDomUnit"
 }}
 }
@@ -34,8 +34,6 @@ For the model 'JLL  NoDomUnit', the name of one dominant economy must be set as 
 }
 \examples{
 \donttest{
-if (requireNamespace('neldermead', quietly = TRUE)) {
-
 data(CM_Factors)
 ZZ <- RiskFactors
 N <- 3
@@ -46,11 +44,9 @@ JLLinputs$DomUnit <- "China"
 JLLinputs$WishSigmas <- 1
 JLLinputs$SigmaNonOrtho <- NULL
 JLLinputs$JLLModelType <- "JLL original"
+
 JLL(ZZ, N, JLLinputs)
 
-#'} else {
- message("skipping functionality due to missing Suggested dependency")
-}
 }
 }
 \references{

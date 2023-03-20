@@ -12,9 +12,12 @@ DataForEstimation(
   FactorLabels,
   ModelType,
   DataFrequency,
+  W_type = NULL,
+  t_First_Wgvar = NULL,
+  t_Last_Wgvar = NULL,
   DataPathMacro = NULL,
   DataPathYields = NULL,
-  Wgvar = NULL
+  DataPathTrade = NULL
 )
 }
 \arguments{
@@ -32,11 +35,22 @@ DataForEstimation(
 
 \item{DataFrequency}{Character-based-vector. Avaialable options are: "Daily All Days", "Daily Business Days", "Weekly", "Monthly", "Quarterly", "Annually"}
 
+\item{W_type}{Three possibilities:
+\itemize{
+     \item "Full Sample": if one wishes ALL weight matrices of each year from which data is available (it may extrapolate the sample period);
+     \item "Sample Mean": if one wishes a SINGLE weight matrix containing the average of weights over of the entire sample period;
+     \item Some year in particular (e.g. "1998", "2005" ...).
+}}
+
+\item{t_First_Wgvar}{Sample starting date (year)}
+
+\item{t_Last_Wgvar}{Sample last date (year)}
+
 \item{DataPathMacro}{Path of the Excel file conating the macroeconomic data (if any). The default is linked to the excel file present in the package.}
 
 \item{DataPathYields}{Path of the Excel file conating the yields data (if any). The default is linked to the excel file present in the package.}
 
-\item{Wgvar}{GVAR transition matrix, if GVAR type model is chosen; default is set to NULL.}
+\item{DataPathTrade}{Path of the Excel file conating the trade data (if any). The default is linked to the excel file present in the package.}
 }
 \value{
 A list containing the

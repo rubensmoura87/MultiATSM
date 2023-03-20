@@ -11,6 +11,7 @@
 #'@param vararginPE    list containg starting values and constraints (see arguments of the "Optimization" function)
 #'@param JLLinputs    list of necessary inputs for the estimation of JLL-based models (see "JLL" function)
 #'@param GVARinputs list of necessary inputs for the estimation of GVAR-based models (see "GVAR" function)
+#'@param BRWinputs  list of necessary inputs for performing the bias-corrected estimation (see "Bias_Correc_VAR" function)
 #'
 #'
 #'@importFrom pracma ceil rand strcmp num2str tril
@@ -35,7 +36,7 @@
 
 
 Bootstrap <- function(ModelType, ModelParaPE, NumOutPE, mat, Economies, InputsForOutputs,
-                      FactorLabels, DataFrequency, vararginPE, JLLinputs = NULL, GVARinputs = NULL){
+                      FactorLabels, DataFrequency, vararginPE, JLLinputs = NULL, GVARinputs = NULL, BRWinputs= NULL){
 
 
   WishBoot<- InputsForOutputs[[ModelType]]$Bootstrap$WishBoot
@@ -260,10 +261,10 @@ Bootstrap <- function(ModelType, ModelParaPE, NumOutPE, mat, Economies, InputsFo
         MaxEigen <-max(abs(eigen(K1Z_artificial)$value))
 
 
-      if (MaxEigen < 0.99999 ) {
+      if (MaxEigen < 1 ) {
       # 3.3) Prepare the inputs used the in the llk
-      InputsMLE_artificial <- InputsForMLEdensity_BS(ModelType, Y_artificial, ZZ_artificial, FactorLabels, mat,
-                                                        Economies, DataFrequency, JLLinputs, GVARinputs)
+      InputsMLE_artificial <- InputsForMLEdensity_BS(ModelType, Y_artificial, ZZ_artificial, FactorLabels, mat, Economies,
+                                                    DataFrequency, JLLinputs, GVARinputs, BRWinputs)
 
       # 3.4) Variables that will be concentrared out of from the log-likelihood function
       K1XQ <- InputsMLE_artificial$K1XQ
@@ -316,7 +317,6 @@ saveRDS(ModelBootstrap, paste(tempdir(),"/Bootstrap_", InputsForOutputs$'Label O
     print('-- Done!')
 
     Jmisc::toc()
-
 
     ###################################### NUMERICAL OUTPUTS ########################################################
     ModelBootstrap$NumOutDraws <- NumOutputs_Bootstrap(ModelType,ModelBootstrap, InputsForOutputs, FactorLabels,

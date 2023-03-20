@@ -11,8 +11,7 @@
 #'  This function is a modified version of the "getx" function by Le and Singleton (2018). \cr
 #'  "A Small Package of Matlab Routines for the Estimation of Some Term Structure Models." \cr
 #'  (Euro Area Business Cycle Network Training School - Term Structure Modelling).
-#'
-#'
+
 
 
 getx <- function(con, varargin, Economies, FactorLabels, JLLinputs = NULL){
@@ -28,8 +27,8 @@ getx <- function(con, varargin, Economies, FactorLabels, JLLinputs = NULL){
 
   countfull <- 0
 
-  for (i in 1:NP){
 
+  for (i in 1:NP){
     si <- strfind(varargin[[i]]$Label, ':')
 
     if (!isempty(si)){
@@ -234,6 +233,23 @@ true2aux <- function(b, ctype, lb, ub, Economies, FactorLabels, JLLinputs =NULL)
 
     N <- length(FactorLabels$Spanned)
     C <- length(Economies)
+
+
+# If the initial guess for the largest eigenvalues of all countries are greater than 1, then the numerical
+# optimization of the models "JLL original" and "JLL NoDomUnit" will crash as the optimization vector will
+# contain only infinities. Therefore, the code forces one of the eigenvalues to be strictly less than 1.
+
+if (!is.null(JLLinputs)){
+    IDXMaxeigen <- seq(1, N*C, by = N) # identify the indexes of the largest eigenvalue of each country
+    MaxeigenCS <- diag(b)[IDXMaxeigen]
+
+    if(all(MaxeigenCS > 0.9999)){
+      BB <- which( min(MaxeigenCS) == MaxeigenCS)
+      b[IDXMaxeigen[BB], IDXMaxeigen[BB]] <- 0.9998 # Replace the eigenvalue whose value is closest to 1 by 0.9998
+    }
+}
+
+##
 
     idx0 <- 0
 

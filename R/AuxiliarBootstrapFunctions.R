@@ -13,6 +13,7 @@
 PdynamicsSet_BS<- function(ModelType, AllFactorsUnderP, FactorLabels, Economies, JLLinputs = NULL, GVARinputs= NULL){
 
    T <- ncol(AllFactorsUnderP)
+   N <- length(FactorLabels$Spanned)
 
   # JPS-related models
   if (ModelType == 'JPS' || ModelType == 'JPS jointP' || ModelType == 'VAR jointQ'){
@@ -26,7 +27,6 @@ PdynamicsSet_BS<- function(ModelType, AllFactorsUnderP, FactorLabels, Economies,
 
   # GVAR-related models
   if (ModelType ==  'GVAR sepQ'|| ModelType == 'GVAR jointQ'){
-    N <- length(FactorLabels$Spanned)
     GVARpara <- GVAR(GVARinputs, N)
     K0Z <- GVARpara$F0
     K1Z <- GVARpara$F1

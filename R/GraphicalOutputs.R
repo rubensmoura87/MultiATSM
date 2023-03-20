@@ -51,7 +51,12 @@ if ( "JPS" %in% ModelType || "JPS jointP" %in% ModelType ||  "GVAR sepQ" %in% Mo
   GFEVDgraphsSep(ModelType, NumOut, InputsForOutputs[[ModelType]]$GFEVD$WishGraphs$RiskFactors,
                  InputsForOutputs[[ModelType]]$GFEVD$WishGraphs$Yields, InputsForOutputs[[ModelType]]$GFEVD$horiz,
                  PathsGraphs, Economies)
-}
+
+  # Term premia decomposition
+  TPDecompGraphSep(ModelType, NumOut, ModelPara, InputsForOutputs[[ModelType]]$RiskPremia$WishGraphs,
+                   InputsForOutputs$UnitMatYields, Economies, PathsGraphs)
+
+  }
 
 # 2) Models for which the estimation is done on jointly for all the countries
 
@@ -75,6 +80,10 @@ GIRFgraphsJoint(ModelType, NumOut, InputsForOutputs[[ModelType]]$GIRF$WishGraphs
 
 GFEVDgraphsJoint(ModelType, NumOut, InputsForOutputs[[ModelType]]$GFEVD$WishGraphs$RiskFactors,
                 InputsForOutputs[[ModelType]]$GFEVD$WishGraphs$Yields, InputsForOutputs[[ModelType]]$GFEVD$horiz, PathsGraphs)
+
+
+TPDecompGraphJoint(ModelType, NumOut, ModelPara, InputsForOutputs[[ModelType]]$RiskPremia$WishGraphs,
+                   InputsForOutputs$UnitMatYields, Economies, PathsGraphs)
 
 # 2.1) JLL-based models
 if ("JLL original" %in% ModelType  || "JLL NoDomUnit" %in% ModelType || "JLL jointSigma" %in% ModelType){
@@ -722,7 +731,127 @@ GFEVDgraphsSep <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsgra
   }
 
 
+#####################################################################################################################
+######################################## 6) TERM PREMIA DECOMPOSITION ##################################################
+#####################################################################################################################
+#' Term Premia decomposition graphs for "joint Q" models
+#'
+#'@param ModelType a string-vector containing the label of the model to be estimated
+#'@param NumOut list of computed outputs containing the model fit, IRFs, FEVDs, GIRFs, GFEVDs and Risk premia
+#'@param ModelPara list of model parameter estimates (See the "Optimization" function)
+#'@param WishRPgraphs binary variable: set 1, if the user wishes graphs to be generated; or set 0, otherwise
+#'@param UnitYields (i) "Month": if maturity of yields are expressed in months or
+#'                  (ii) "Year": if maturity of yields are expressed in years
+#'@param Economies a string-vector containing the names of the economies which are part of the economic system
+#'@param PathsGraphs Path of the folder in which the graphs will be saved
+#'
 
+
+
+
+TPDecompGraphSep <- function(ModelType, NumOut, ModelPara, WishRPgraphs, UnitYields, Economies, PathsGraphs){
+
+
+
+  if (WishRPgraphs ==0){print(paste(ModelType,": No term-premia graphs were generated"))
+  } else {
+
+    print('################################# Generating term premia graphs #################################' )
+
+
+    # Preliminary work
+    dt <- ModelPara[[ModelType]][[Economies[1]]]$inputs$dt
+    mat <- ModelPara[[ModelType]][[Economies[1]]]$inputs$mat
+
+    J <- length(mat)
+    C <- length(Economies)
+    T <- ncol(ModelPara[[ModelType]][[Economies[1]]]$inputs$Y)
+
+    TPdecomp <- NumOut$TermPremiaDecomp
+
+
+    if (UnitYields== "Month"){
+      k <- 12
+      YLab <- "Months"
+    }
+    if (UnitYields== "Year"){
+      k <- 1
+      YLab <- "Years"
+    }
+    matAdjUnit <- mat*k
+
+
+    # Graph title, legends and axes
+    Dates <- 1:T
+
+    matRPLab <- paste(matAdjUnit, YLab)
+    GraphLegend <- c("Data", "Expected Component", "Term Premium")
+
+
+    # Prepare plots
+    subplots_RP <- list()
+    YieldData <- list()
+
+    plot_list_RP <- list()
+    plot_list_no_legend_RP <- list()
+
+    for (i in 1:C){ # per country
+
+      Yields <- ModelPara[[ModelType]][[Economies[i]]]$inputs$Y
+      YieldData[[Economies[i]]] <- t(Yields)*100
+
+      dir.create( paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/Model ", Economies[i], "/TermPremia", sep=""))  # Folder creation
+
+
+      p <- c()
+
+      for (h in 1:length(mat)){  # per maturity
+
+        Data <- YieldData[[Economies[i]]][,h]
+        ExpCom <- TPdecomp$RiskPremia[["Expected Component"]][[Economies[i]]][,h]
+        TP <- TPdecomp$RiskPremia[["Term Premia"]][[Economies[i]]][,h]
+        TimeSpan <- Dates
+
+        DataGraph <- data.frame(Data, ExpCom, TP, TimeSpan)
+
+        # Graph: Fit x Data
+        p <- ggplot(DataGraph) + geom_line(aes(x=TimeSpan, y=Data, color = GraphLegend[1])) +
+          geom_line(aes(x=TimeSpan, y = ExpCom, color = GraphLegend[2])) +
+          geom_line(aes(x=TimeSpan, y = TP, color = GraphLegend[3])) +
+          labs(color = "Legend") + ggtitle( matRPLab[h]) +  theme_classic() +
+          theme(plot.title = element_text(size = 8, face = "bold", hjust = 0.5), axis.title.x=element_blank(),
+                axis.title.y=element_blank(), axis.text.x = element_text(size=6) ) +
+          geom_hline(yintercept=0)
+
+
+        plot_list_RP[[h]] <- p # All plots with legends
+
+        plot_list_no_legend_RP[[h]] <- p + theme(legend.position = "none")  # Hide legends from all plots
+
+      }
+
+      # Common title for each model
+      title <- cowplot::ggdraw() + cowplot::draw_label(Economies[i], fontface='bold', size=14)
+
+      # Generate legend
+      # Legend settings:
+      LegendSubPlot_RP <- cowplot::get_legend(plot_list_RP[[1]] +
+                                                theme(legend.direction = "horizontal", legend.position="bottom", legend.justification="center",
+                                                      legend.title = element_text(size=10, face="bold"),
+                                                      legend.text = element_text( size = 8),
+                                                      legend.box.background = element_rect(colour = "black")) )
+
+
+      # Build the graph subplots:
+      subplots_CS <- cowplot::plot_grid(plotlist= plot_list_no_legend_RP, ncol=3)
+      subplots2save <- cowplot::plot_grid(LegendSubPlot_RP, subplots_CS, ncol=1, rel_heights=c(0.2, 1))
+      ggplot2::ggsave(subplots2save, file=paste0("TermPremia_", Economies[i],"_", ModelType, ".png"),
+                      path = PathsGraphs[[ModelType]]$TermPremia[[Economies[i]]])
+
+    }
+
+  }
+}
 
 
 
@@ -1181,7 +1310,7 @@ GIRFgraphsJoint <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsgr
 ######################################################################################################
 ##################################### 5) GFEVD ########################################################
 #####################################################################################################
-#' GFEVDs graphs for ("joint Q" models)
+#' GFEVDs graphs for "joint Q" models
 #'
 #'@param ModelType a string-vector containing the label of the model to be estimated
 #'@param NumOut list of computed outputs containing the model fit, IRFs, FEVDs, GIRFs, and GFEVDs
@@ -1293,6 +1422,131 @@ GFEVDgraphsJoint <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsg
 
     }
 
+}
+
+#####################################################################################################################
+######################################## 6) TERM PREMIA DECOMPOSITION ##################################################
+#####################################################################################################################
+#' Term Premia decomposition graphs for "joint Q" models
+#'
+#'@param ModelType a string-vector containing the label of the model to be estimated
+#'@param NumOut list of computed outputs containing the model fit, IRFs, FEVDs, GIRFs, GFEVDs and Risk premia
+#'@param ModelPara list of model parameter estimates (See the "Optimization" function)
+#'@param WishRPgraphs binary variable: set 1, if the user wishes graphs to be generated; or set 0, otherwise
+#'@param UnitYields (i) "Month": if maturity of yields are expressed in months or
+#'                  (ii) "Year": if maturity of yields are expressed in years
+#'@param Economies a string-vector containing the names of the economies which are part of the economic system
+#'@param PathsGraphs Path of the folder in which the graphs will be saved
+#'
+
+
+
+
+TPDecompGraphJoint <- function(ModelType, NumOut, ModelPara, WishRPgraphs, UnitYields, Economies, PathsGraphs){
+
+
+
+  if (WishRPgraphs ==0){print(paste(ModelType,": No term-premia graphs were generated"))
+  } else {
+
+    print('################################# Generating term premia graphs #################################' )
+
+
+    dir.create( paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/TermPremia", sep=""))  # Folder creation
+
+
+  # Preliminary work
+  dt <- ModelPara[[ModelType]]$inputs$dt
+  mat <- ModelPara[[ModelType]]$inputs$mat
+  Yields <- ModelPara[[ModelType]]$inputs$Y
+
+  TPdecomp <- NumOut$TermPremiaDecomp
+
+  J <- length(mat)
+  C <- length(Economies)
+  T <- ncol(Yields)
+
+  if (UnitYields== "Month"){
+    k <- 12
+    YLab <- "Months"
+    }
+  if (UnitYields== "Year"){
+    k <- 1
+    YLab <- "Years"
+    }
+  matAdjUnit <- mat*k
+
+
+
+  YieldData <- list()
+  for (i in 1:C){
+    IdxRP <- 1:J + J*(i-1)
+    YieldData[[Economies[i]]] <- t(Yields[IdxRP, ]*100)
+  }
+
+  # Graph title, legends and axes
+  Dates <- 1:T
+
+  matRPLab <- paste(matAdjUnit, YLab)
+  GraphLegend <- c("Data", "Expected Component", "Term Premium")
+
+
+    # Prepare plots
+    subplots_RP <- list()
+
+    for (i in 1:C){ # per country
+
+      p <- c()
+      plot_list_RP <- list()
+      plot_list_no_legend_RP <- list()
+
+      for (h in 1:length(matRPLab)){  # per maturity
+
+        Data <- YieldData[[Economies[i]]][,h]
+        ExpCom <- TPdecomp$RiskPremia[["Expected Component"]][[Economies[i]]][,h]
+        TP <- TPdecomp$RiskPremia[["Term Premia"]][[Economies[i]]][,h]
+        TimeSpan <- Dates
+
+        DataGraph <- data.frame(Data, ExpCom, TP, TimeSpan)
+
+        # Graph: Fit x Data
+        p <- ggplot(DataGraph) + geom_line(aes(x=TimeSpan, y=Data, color = GraphLegend[1])) +
+          geom_line(aes(x=TimeSpan, y = ExpCom, color = GraphLegend[2])) +
+          geom_line(aes(x=TimeSpan, y = TP, color = GraphLegend[3])) +
+          labs(color = "Legend") + ggtitle( matRPLab[h]) +  theme_classic() +
+          theme(plot.title = element_text(size = 8, face = "bold", hjust = 0.5), axis.title.x=element_blank(),
+                axis.title.y=element_blank(), axis.text.x = element_text(size=6) ) +
+          geom_hline(yintercept=0)
+
+
+        plot_list_RP[[h]] <- p # All plots with legends
+
+        plot_list_no_legend_RP[[h]] <- p + theme(legend.position = "none")  # Hide legends from all plots
+
+      }
+
+      # Common title for each model
+      title <- cowplot::ggdraw() + cowplot::draw_label(Economies[i], fontface='bold', size=14)
+
+      # Generate legend
+      # Legend settings:
+      LegendSubPlot_RP <- cowplot::get_legend(plot_list_RP[[1]] +
+                                                theme(legend.direction = "horizontal", legend.position="bottom", legend.justification="center",
+                                                      legend.title = element_text(size=10, face="bold"),
+                                                      legend.text = element_text( size = 8),
+                                                      legend.box.background = element_rect(colour = "black")) )
+
+
+      # Build the graph subplots:
+      subplots_CS <- cowplot::plot_grid(plotlist= plot_list_no_legend_RP, ncol=3)
+      subplots2save <- cowplot::plot_grid(LegendSubPlot_RP, subplots_CS, ncol=1, rel_heights=c(0.2, 1))
+
+      ggplot2::ggsave(subplots2save, file=paste0("TermPremia_", Economies[i],"_", ModelType, ".png"),
+                path = PathsGraphs[[ModelType]]$TermPremia)
+
+        }
+
+}
 }
 
 ##########################################################################################################
