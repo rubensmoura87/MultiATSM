@@ -135,6 +135,52 @@ DataSet_BS <- function(ModelType, RiskFactors, Wgvar, Economies, FactorLabels){
   }
   names(Z) <- FactorLabels$Domestic
 
+
+  # C.1) If star variables are computed with time-varying weigths
+  if (is.list(Wgvar)){
+    # Use only the transition matrices that are included in the sample span
+    t_First <- as.Date(colnames(RiskFactors)[1], format = "%d-%m-%Y")
+    t_Last <- as.Date(colnames(RiskFactors)[T], format = "%d-%m-%Y")
+
+    t_First_Wgvar <- format(t_First, "%Y")
+    t_Last_Wgvar <- format(t_Last, "%Y")
+
+    Wgvar_subset <- Wgvar[names(Wgvar) >= t_First_Wgvar & names(Wgvar) <= t_Last_Wgvar]
+
+    # Add common column label (i.e. the year of the observation) to all variables
+    Dates <- as.Date(colnames(RiskFactors), format = "%d-%m-%Y")
+    YearLabels <- substr(Dates, 1,4)
+    Z <- lapply(Z, function(x) {  colnames(x) <- paste0(YearLabels, seq_along(colnames(x)))
+    return(x)
+    })
+
+
+    # Compute the star variables with time-varying weigths
+    for (i in 1:C){
+      for (j in 1:(M+N)){
+
+        StarTimeVarTemp <- matrix(NA, nrow = T, ncol = 1)
+
+        for (k in 1:length(Wgvar_subset)) {
+          YearRef <- names(Wgvar_subset)[k] # year of reference
+          IdxYear <- grep(YearRef, colnames(Z[[j]]))
+          WgvarYear <- Wgvar_subset[[k]]
+          StarTimeVarTemp[IdxYear]  <- t(WgvarYear[i, ]%*% Z[[j]][, IdxYear])
+        }
+        # If the last year of the transition matrix happens earlier than the year of the last observation from the sample,
+        # then use the last transition matrix for the remaining observations
+        if (anyNA(StarTimeVarTemp)){
+          LenlastYear <- length(IdxYear)
+          IdxLastObs <- IdxYear[LenlastYear] + 1
+          StarTimeVarTemp[IdxLastObs:T]  <- t(WgvarYear[i, ]%*% Z[[j]][, (IdxLastObs):T])
+        }
+
+        ListFactors[[Economies[i]]]$Factors[[idx1+j]] <- StarTimeVarTemp
+      }
+    }
+
+    # c.2) If star variables are computed with time fixed weigths
+  }else{
   if ("GVAR sepQ" %in% ModelType || "GVAR jointQ" %in% ModelType ){
     for (i in 1:C){
       for (j in 1:(M+N)){
@@ -142,7 +188,7 @@ DataSet_BS <- function(ModelType, RiskFactors, Wgvar, Economies, FactorLabels){
       }
     }
   }
-
+}
   # D) Global Factors
   for (i in seqi(1,G)){
     ListFactors[[length(Economies)+1]][[i]] <-as.matrix( RiskFactors[(c(FactorLabels$Global[i])),])

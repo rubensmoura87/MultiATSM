@@ -294,10 +294,10 @@ FitgraphsSep  <- function(ModelType, WishFitgraphs, ModelPara, NumOut, Economies
 
 
     for (j in 1:J){
-      Data <- YieldData[j,]
-      Modfit <- ModelFit[j,]
-      ModImp <- ModelImplied[j,]
-      TimeSpan <- 1:T
+      Data <- YieldData[j,-1]
+      Modfit <- ModelFit[j,-1]
+      ModImp <- ModelImplied[j,-1]
+      TimeSpan <- 1:(T-1)
 
       YieldCompar <- data.frame(Data, Modfit, ModImp, TimeSpan)
 
@@ -925,10 +925,10 @@ FitgraphsJoint  <- function(ModelType, WishFitgraphs, ModelPara, NumOut, Economi
 
 
   for (i in 1:CJ){
-    Data <- YieldData[i,]
-    Modfit <- ModelFit[i,]
-    ModImp <- ModelImplied[i,]
-    TimeSpan <- 1:T
+    Data <- YieldData[i,-1]
+    Modfit <- ModelFit[i,-1]
+    ModImp <- ModelImplied[i,-1]
+    TimeSpan <- 1:(T-1)
 
     YieldCompar <- data.frame(Data, Modfit, ModImp, TimeSpan)
 

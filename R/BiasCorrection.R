@@ -105,12 +105,12 @@ Bias_Correc_VAR  <- function(ModelType, BRWinputs, RiskFactors, N, Economies, Fa
   #print(paste('largest absolute eigenvalue OLS:', round(max(abs(eigen(Phi_hat)$value)), 6)))
 
   # 2) initialization for SA algorithm
-  theta <- matrix(0, nrow = k^2, ncol=N_burn+N)
+  theta <- matrix(0, nrow = k^2, ncol=N_burn+N_iter)
   theta_hat <- Phi_hat[1:(ncol(Phi_hat)*nrow(Phi_hat))]
   theta[ ,1] <- theta_hat # starting value
 
   # 3) SA algorithm
-  for (j in 1:(N_burn+N-1)){
+  for (j in 1:(N_burn+N_iter-1)){
     Phi_new <- m_var(theta[ ,j], B, RiskFactors, N, GVARinputs, JLLinputs, FactorLabels, Economies,
                      ModelType, flag_mean)$Phi_new
     theta_new <- c(Phi_new)

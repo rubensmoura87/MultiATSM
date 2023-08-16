@@ -32,7 +32,7 @@ GaussianDensity <- function(res,SS, invSS, logabsdetSS){
     if (!missing("invSS")){
       SSres <-  invSS%*%res
     }else{
-      SSres <- solve(SS,res)} # SSres <- (SS)^(-1)*res
+      SSres <- solve(SS,res, tol = 1e-50)} # SSres <- (SS)^(-1)*res
 
 
     if (missing("logabsdetSS")){

@@ -49,45 +49,46 @@ Transition_Matrix <- function(t_First, t_Last, Economies, type, DataPath = NULL,
 
   for (i in 1:L){
     Countries <- list_all_Trade[[i]][[1]]
-    list_all_Trade[[i]] <- list_all_Trade[[i]][,-1]
-    row.names(list_all_Trade[[i]]) <- suppressMessages(Countries)
-  }
+    list_all_Trade[[i]] <- as.data.frame(list_all_Trade[[i]][,-1])
+    rownames(list_all_Trade[[i]]) <- Countries
+    }
 
 
   Data <- list_all_Trade
   }
 
-# a) Pre-allocation of variables
-DataAdj <- lapply(Data, function(x) as.data.frame(t(x)))
-C <- length(Economies)
-T <- ncol(Data[[1]])
-WgvarAllYears <- vector(mode='list', length = T)
-names(WgvarAllYears) <- colnames(Data[[1]])
-num <- matrix(NA, nrow = C, ncol= C)
-dem <- c()
-Wyear <- matrix(NA, nrow = C, ncol= C)
+  # a) Pre-allocation of variables
+  DataAdj <- lapply(Data, function(x) as.data.frame(t(x)))
+  C <- length(Economies)
+  T <- ncol(Data[[1]])
+  WgvarAllYears <- vector(mode='list', length = T)
+  names(WgvarAllYears) <- colnames(Data[[1]])
+  num <- matrix(NA, nrow = C, ncol= C)
+  dem <- c()
+  Wyear <- matrix(NA, nrow = C, ncol= C)
 
-# b) Generate the matrix of weights year-by-year
-for(k in 1:T){
-  for (h in 1:C){
-    for (j in 1:C){
-      num[h,j] <- DataAdj[[Economies[h]]][[Economies[j]]][k]
-    }
-    dem[h] <- sum(num[h,])
-    Wyear[h,] <- num[h,]/dem[h]
+
+  # b) Generate the matrix of weights year-by-year
+  for(k in 1:T){
+    for (h in 1:C){
+      for (j in 1:C){
+        num[h,j] <- DataAdj[[Economies[h]]][[Economies[j]]][k]
       }
-  if(any(is.na(Wyear))){ # If there is missing data for any country of the system for that particularly year, then return a matrix of NAs.
-    Wyear <- matrix(NA, nrow = C, ncol= C)
+      dem[h] <- sum(num[h,])
+      Wyear[h,] <- num[h,]/dem[h]
+    }
+    if(any(is.na(Wyear))){ # If there is missing data for any country of the system for that particularly year, then return a matrix of NAs.
+      Wyear <- matrix(NA, nrow = C, ncol= C)
+    }
+    WgvarAllYears[[k]] <- Wyear
   }
-  WgvarAllYears[[k]] <- Wyear
-}
 
 
-# c) desired output
-# c.1) "Full Sample"
-if (type == "Full Sample"){
-  Wgvar <- WgvarAllYears
-}
+  # c) desired output
+  # c.1) "Full Sample"
+  if (type == "Full Sample"){
+    Wgvar <- Filter(function(x) all(stats::complete.cases(x)), WgvarAllYears)
+  }
 
 # c.2) "Sample Mean"
 if (type == "Sample Mean"){
@@ -107,6 +108,7 @@ if (type == "Sample Mean"){
 
 # c.3) Specific Year
 if (type !="Sample Mean" & type !="Full Sample" ){
+
   Wgvar <- WgvarAllYears[[type]]
   colnames(Wgvar) <- Economies
   rownames(Wgvar) <- Economies

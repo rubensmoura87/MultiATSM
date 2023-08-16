@@ -269,7 +269,7 @@ Bootstrap <- function(ModelType, ModelParaPE, NumOutPE, mat, Economies, InputsFo
       # 3.4) Variables that will be concentrared out of from the log-likelihood function
       K1XQ <- InputsMLE_artificial$K1XQ
 
-    if (ModelType == "JLL original" || ModelType == "JLL NoDomUnit" ){ SSZ <- NULL} else{SSZ <- InputsMLE_artificial$SSZ}
+    if (any(ModelType == c ("JLL original", "JLL NoDomUnit"))){ SSZ <- NULL} else{SSZ <- InputsMLE_artificial$SSZ}
 
 
     ## STEP 4: collect the model inpits to build the llk
@@ -293,7 +293,7 @@ Bootstrap <- function(ModelType, ModelParaPE, NumOutPE, mat, Economies, InputsFo
 
     tol <- 1e-1 # To avoid spending unecessary amount of time on flat regions of the llk functions
     ## STEP 6: Run the optimization
-  if (ModelType == 'JPS' || ModelType == 'JPS jointP' || ModelType == "GVAR sepQ"){
+  if (any(ModelType == c('JPS',  'JPS jointP',"GVAR sepQ"))){
   ModelBootstrap$ParaDraws[[ModelType]][[Economies[i]]][[tt]] <- Optimization_Boot(f, tol, varargin, FactorLabels,
                                                                                    Economies, ModelType, JLLinputs,
                                                                                    GVARinputs)
@@ -328,7 +328,7 @@ saveRDS(ModelBootstrap, paste(tempdir(),"/Bootstrap_", InputsForOutputs$'Label O
 
 
     ## To save space, clean the repeated outputs from the JLL outputs
-    if (ModelType == "JLL original" || ModelType == "JLL NoDomUnit"  || ModelType == "JLL jointSigma"){
+    if (any(ModelType == c("JLL original", "JLL NoDomUnit", "JLL jointSigma"))){
         for (tt in 1:ndraws){
           ModelBootstrap$NumOutDraws$IRF[[ModelType]][[tt]]$Yields$Ortho <- NULL
           ModelBootstrap$NumOutDraws$FEVD[[ModelType]][[tt]]$Yields$Ortho <- NULL

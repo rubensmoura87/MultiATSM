@@ -31,7 +31,7 @@ Functionf<- function(MLEinputs, Economies, mat, DataFrequency, FactorLabels, Mod
 
 
 # 1) If one choose models in which the estimation is done country-by-country
-if (ModelType == 'JPS' || ModelType == 'JPS jointP' || ModelType == "GVAR sepQ"){
+if (any(ModelType == c('JPS', 'JPS jointP', "GVAR sepQ"))){
 
   i <- get("i", globalenv())
 
@@ -43,7 +43,7 @@ if (ModelType == 'JPS' || ModelType == 'JPS jointP' || ModelType == "GVAR sepQ")
 
 
 # 2) If one choose models in which the estimation is done jointly for all countries of the system
-if (ModelType == 'GVAR jointQ' || ModelType == 'VAR jointQ' ||  ModelType == "JLL jointSigma") {
+if (any(ModelType == c('GVAR jointQ', 'VAR jointQ', "JLL jointSigma"))) {
 
   if(length(Economies) == 1){stop('The chosen model type has to be estimated for multiple countries at the time.
                                 The input "Economies" should contain several members.')}
@@ -57,7 +57,7 @@ if (ModelType == 'GVAR jointQ' || ModelType == 'VAR jointQ' ||  ModelType == "JL
 
 # 3) If one choose models in which the estimation is done jointly for all countries of the system with
   # the Sigma matrix estimated exclusively under the P-dynamics
-if (ModelType == "JLL original" || ModelType == "JLL NoDomUnit") {
+if (any(ModelType == c("JLL original", "JLL NoDomUnit"))) {
   if(length(Economies) == 1){stop('The chosen model type has to be estimated for multiple countries at the time.
                                 The input "Economies" should contain several members.')}
 
@@ -107,7 +107,7 @@ Functionf_Boot <- function(ModelType, MLEinputsBS, Economies, mat, dt, FactorLab
   Gy.0 <- MLEinputsBS$Gy.0
 
 # 1) If one choose models in which the estimation is done country-by-country
-if (ModelType == 'JPS' || ModelType == 'JPS jointP' || ModelType == "GVAR sepQ"){
+if (any(ModelType == c('JPS', 'JPS jointP', "GVAR sepQ"))){
   i <- get("i", globalenv())
    f <-functional::Curry(A0N_MLEdensity_WOE__sepQ_Bootstrap, r0 = NULL, K0Z, K1Z, se= NULL, Gy.0, mat, Y_artificial,
             ZZ_artificial, PP_artificial, Wpca_artificial, We_artificial, WpcaFull_artificial, dt, Economies[i],
@@ -115,7 +115,7 @@ if (ModelType == 'JPS' || ModelType == 'JPS jointP' || ModelType == "GVAR sepQ")
 }
 
   # 2) If one choose models in which the estimation is done jointly for all countries of the system
-if (ModelType == 'GVAR jointQ' || ModelType == 'VAR jointQ' ||  ModelType == "JLL jointSigma") {
+if (any(ModelType == c('GVAR jointQ', 'VAR jointQ',"JLL jointSigma"))) {
   f <-functional::Curry(A0N_MLEdensity_WOE__jointQ_Bootstrap, r0= NULL, K0Z, K1Z, se= NULL, Gy.0,  mat, Y_artificial,
             ZZ_artificial, PP_artificial, Wpca_artificial, We_artificial, WpcaFull_artificial, dt, Economies,
             FactorLabels, ModelType, residBS, MaxEigen, GVARinputs, JLLinputs)
@@ -123,7 +123,7 @@ if (ModelType == 'GVAR jointQ' || ModelType == 'VAR jointQ' ||  ModelType == "JL
 
 
 # 3) If one choose models in which the estimation is done jointly for all countries of the system
-if (ModelType == "JLL original" || ModelType == "JLL NoDomUnit") {
+if (any(ModelType == c("JLL original","JLL NoDomUnit"))) {
   f <-functional::Curry(A0N_MLEdensity_WOE__jointQ_sepSigma_Bootstrap, r0 = NULL, SSZ, K0Z, K1Z, se= NULL, Gy.0, mat,
             Y_artificial, ZZ_artificial, PP_artificial, Wpca_artificial, We_artificial, WpcaFull_artificial,
             dt, Economies, FactorLabels, ModelType, residBS, MaxEigen, GVARinputs, JLLinputs)

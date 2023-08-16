@@ -142,6 +142,7 @@ DatabasePrep <- function(t_First, t_Last, Economies, N, FactorLabels, ModelType,
   Z <- list()
   for (j in 1:(M+N)){
     X <- matrix(NA, nrow= C, ncol=T)
+
     for (i in 1:C){
       X[i,] <- ListFactors[[Economies[i]]]$Factors[[j]]
       Z[[j]] <- X # Each element of the list contains the same country-specific variable of all countries
@@ -153,10 +154,55 @@ DatabasePrep <- function(t_First, t_Last, Economies, N, FactorLabels, ModelType,
 
     if (isempty(Wgvar)){ stop("The transition matrix needs to be specified!")}
 
+
+    # c.1) If star variables are computed with time-varying weigths
+    if (is.list(Wgvar)){
+  # Use only the transition matrices that are included in the sample span
+      t_First_Wgvar <- format(t_First, "%Y")
+      t_Last_Wgvar <- format(t_Last, "%Y")
+
+      Wgvar_subset <- Wgvar[names(Wgvar) >= t_First_Wgvar & names(Wgvar) <= t_Last_Wgvar]
+
+      # Add common column label (i.e. the year of the observation) to all variables
+      YearLabels <- substr(SampleMacro[[Economies[1]]]$Period, 1,4)
+      Z <- lapply(Z, function(x) {  colnames(x) <- paste0(YearLabels, seq_along(colnames(x)))
+        return(x)
+      })
+
+
+      # Compute the star variables with time-varying weigths
+      for (i in 1:C){
+       for (j in 1:(M+N)){
+
+         StarTimeVarTemp <- matrix(NA, nrow = T, ncol = 1)
+
+         for (k in 1:length(Wgvar_subset)) {
+         YearRef <- names(Wgvar_subset)[k] # year of reference
+        IdxYear <- grep(YearRef, colnames(Z[[j]]))
+        WgvarYear <- Wgvar_subset[[k]]
+        StarTimeVarTemp[IdxYear]  <- t(WgvarYear[i, ]%*% Z[[j]][, IdxYear])
+         }
+         # If the last year of the transition matrix happens earlier than the year of the last observation from the sample,
+         # then use the last transition matrix for the remaining observations
+         if (anyNA(StarTimeVarTemp)){
+           LenlastYear <- length(IdxYear)
+           IdxLastObs <- IdxYear[LenlastYear] + 1
+           StarTimeVarTemp[IdxLastObs:T]  <- t(WgvarYear[i, ]%*% Z[[j]][, (IdxLastObs):T])
+           }
+
+             ListFactors[[Economies[i]]]$Factors[[idx1+j]] <- StarTimeVarTemp
+        }
+      }
+
+      # c.2) If star variables are computed with time fixed weigths
+    }else{
+
+
     for (i in 1:C){
       for (j in 1:(M+N)){
         ListFactors[[Economies[i]]]$Factors[[idx1+j]] <- t(Wgvar[i,]%*%Z[[j]])
       }
+    }
     }
   }
   # D) Global Factors

@@ -49,7 +49,14 @@ ListModelInputs <-function(ModelType, Data= NULL, Economies, VARXtype= NULL, t_F
     GVARinputs$Economies <- Economies
     GVARinputs$GVARFactors <- Data$GVARFactors
     GVARinputs$VARXtype <- VARXtype
-    GVARinputs$Wgvar <- Transition_Matrix(t_First_Wgvar, t_Last_Wgvar, Economies, W_type, DataPathTrade)
+
+    GVARinputs$Wgvar <- Transition_Matrix(t_First_Wgvar, t_Last_Wgvar, Economies, W_type, DataPathTrade, Data$Wgvar)
+    if (is.list(GVARinputs$Wgvar)){
+      if (t_First_Wgvar !=t_Last_Wgvar){stop("For estimating GVAR models with time-varying interdependence,
+                                             the start and ending dates of the transition matrix must coincide!")}
+
+      GVARinputs$Wgvar <- GVARinputs$Wgvar[[t_First_Wgvar]]
+    }
   } else { GVARinputs <- NULL }
 
 

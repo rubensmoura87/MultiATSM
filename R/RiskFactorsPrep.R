@@ -66,7 +66,7 @@ RiskFactorsPrep <- function(FactorSet, Economies, FactorLabels, Initial_Date, Fi
   # (iv) Monthly data
   if (DataFrequency== "Monthly"){
   month <- seq(Initial_Date, Final_Date, by = "1 month")
-  DateLabels <- format(month, "%m-%Y")
+  DateLabels <- format(month, "%d-%m-%Y")
   }
   # (v) Quarterly data
   if (DataFrequency== "Quarterly"){

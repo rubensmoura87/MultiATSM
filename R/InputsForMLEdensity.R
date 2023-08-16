@@ -113,8 +113,7 @@ InputsForMLEdensity <- function(ModelType, Yields, PdynamicsFactors, FactorLabel
 
 # Check whether the model choice is compatible with the number of countries selected
 if (length(Economies) == 1 &
-    ( ModelType == "GVAR jointQ" || ModelType == "VAR jointQ" || ModelType == "JLL original"
-      || ModelType == "JLL NoDomUnit" || ModelType == "JLL jointSigma" )){
+    ( any(ModelType == c("GVAR jointQ", "VAR jointQ", "JLL original", "JLL NoDomUnit", "JLL jointSigma" )))){
 
   stop("The models 'GVAR jointQ', 'VAR jointQ', 'JLL original', 'JLL NoDomUnit', and 'JLL jointSigma'
        require the estimation of several countries")
@@ -122,7 +121,7 @@ if (length(Economies) == 1 &
 
 
   # for the cases in which the estimation is done on a country-by-country basis
-  if (ModelType == 'JPS' || ModelType == 'JPS jointP' || ModelType == "GVAR sepQ"){
+  if (any(ModelType == c('JPS',  'JPS jointP', "GVAR sepQ"))){
     i <- get("i", globalenv())
     Economies <- Economies[i]
   }
@@ -209,7 +208,7 @@ if (DataFrequency == "Annually"){ dt <- 1}
 
 
   # JPS-related models
-  if (ModelType == 'JPS' || ModelType == 'JPS jointP' || ModelType == 'VAR jointQ'){
+  if (any(ModelType == c('JPS', 'JPS jointP', 'VAR jointQ'))){
   VARpara <- VAR(ZZ, VARtype= 'unconstrained', Bcon = NULL)
   K0Z <- VARpara$K0Z
   K1Z <- VARpara$K1Z
@@ -217,7 +216,7 @@ if (DataFrequency == "Annually"){ dt <- 1}
   }
 
   # GVAR-related models
-  if (ModelType == 'GVAR sepQ'|| ModelType == 'GVAR jointQ'){
+  if (any(ModelType == c('GVAR sepQ', 'GVAR jointQ'))){
     GVARpara <- GVAR(GVARinputs, N)
     K0Z <- GVARpara$F0
     K1Z <- GVARpara$F1
@@ -225,7 +224,7 @@ if (DataFrequency == "Annually"){ dt <- 1}
   }
 
   # JLL-related models
-  if (ModelType == "JLL original" || ModelType == "JLL NoDomUnit" || ModelType == "JLL jointSigma"){
+  if (any(ModelType == c("JLL original", "JLL NoDomUnit", "JLL jointSigma"))){
     JLLinputs$WishSigmas <- 1
     JLLPara <- JLL(ZZ, N, JLLinputs)
     K0Z <-JLLPara$k0

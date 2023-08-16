@@ -51,10 +51,11 @@ DataForEstimation <- function(t0, tF, Economies, N, FactorLabels, ModelType, Dat
 
 C <- length(Economies)
 
-if (ModelType == 'GVAR sepQ' || ModelType == 'GVAR jointQ'){
+if(any(ModelType == c('GVAR sepQ','GVAR jointQ'))){
   Wgvar <- Transition_Matrix(t_First_Wgvar, t_Last_Wgvar, Economies, W_type, DataPathTrade)
 }
 FactorSet <- DatabasePrep(t0, tF, Economies, N, FactorLabels, ModelType, Wgvar, DataPathMacro, DataPathYields)
+
 
 # Gather all bond yields of all countries
 Yields <- c()
@@ -72,7 +73,7 @@ for (i in 1:C){
 RiskFactors <- RiskFactorsPrep(FactorSet, Economies, FactorLabels, t0, tF, DataFrequency)
 
 # Gather the factors used in the GVAR estimation
-if (ModelType == 'GVAR sepQ' || ModelType == 'GVAR jointQ'){
+if (any(ModelType == c( 'GVAR sepQ' , 'GVAR jointQ'))){
 GVARFactors <-  DataSet_BS(ModelType, RiskFactors, Wgvar, Economies, FactorLabels)
 } else { GVARFactors <- NULL}
 
