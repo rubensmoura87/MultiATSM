@@ -56,3 +56,4 @@ This function is a modified version of the "aux2true" function by Le and Singlet
 (Euro Area Business Cycle Network Training School - Term Structure Modelling).
 Available at: https://cepr.org/40029
 }
+\keyword{internal}

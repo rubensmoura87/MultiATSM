@@ -12,3 +12,4 @@ LabelsSpanned(N)
 \description{
 Generate the labels of the spanned factors
 }
+\keyword{internal}

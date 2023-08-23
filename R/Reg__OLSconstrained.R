@@ -4,8 +4,9 @@
 #'@param X    regressors (i.e. N-1 variables + the intercept) (N x T)
 #'@param Bcon   constraints matrix (M x N). If Bcon(i,j) = nan --> B(i,j) is a free parameter
 #'@param G      weighting matrix (psd) - (M x M). Default is set to be identity
-#
-#
+#'
+#'@keywords internal
+#'
 #'@return  matrix of coefficient (M x N)
 #'@details
 #'# Estimate of B is obtained by minimizing the objective:\cr
@@ -17,6 +18,8 @@
 #'  "A Small Package of Matlab Routines for the Estimation of Some Term Structure Models." \cr
 #'  (Euro Area Business Cycle Network Training School - Term Structure Modelling).
 #' Available at: https://cepr.org/40029
+#'
+
 
 
 

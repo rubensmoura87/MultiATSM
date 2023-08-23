@@ -32,3 +32,4 @@ Risk factors used in the estimation of the desired ATSM
 \description{
 Builds the complete set of time series of the risk factors (spanned and unspanned)
 }
+\keyword{internal}

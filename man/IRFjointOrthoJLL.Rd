@@ -23,3 +23,4 @@ Orthogonalized IRFs for JLL models
 \details{
 Structural shocks are identified via Cholesky decomposition
 }
+\keyword{internal}

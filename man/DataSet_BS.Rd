@@ -20,3 +20,4 @@ DataSet_BS(ModelType, RiskFactors, Wgvar, Economies, FactorLabels)
 \description{
 Prepare the factor set for GVAR models  (Bootstrap version)
 }
+\keyword{internal}

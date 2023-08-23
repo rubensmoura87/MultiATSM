@@ -29,3 +29,4 @@ FEVDandGFEVDbs_sepQ(
 \description{
 Creates the confidence bounds and the graphs of FEVDs and GFEVDs after bootstrap ("sep Q" models)
 }
+\keyword{internal}

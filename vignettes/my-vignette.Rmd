@@ -11,7 +11,7 @@ output:
     toc_depth: 2
     fig_caption: yes
 vignette: >
-  %\VignetteIndexEntry{Vignette for package MultiATSM}
+  %\VignetteIndexEntry{General Guidelines}
   %\VignetteEngine{knitr::rmarkdown}
   \usepackage[utf8]{inputenc} 
 bibliography: references.bib

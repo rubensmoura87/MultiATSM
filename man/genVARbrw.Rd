@@ -21,3 +21,4 @@ Bauer, Rudebusch and, Wu (2012). "Correcting Estimation Bias in Dynamic Term Str
 This function is similar to the"genVAR" Matlab function available at Cynthia Wu's website
 (https://sites.google.com/view/jingcynthiawu/).
 }
+\keyword{internal}

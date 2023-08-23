@@ -1,7 +1,6 @@
 ## Resubmission
 This is a resubmission. In this version I have:
 
-* slightly changed the *Transition_Matrix* function so that the warning message "Setting row names on a tibble is deprecated" no longer shows up
-* Performed several changes to allow the GVAR to be estimated with time-varying weights 
-* Split the vignette in two parts. In the current version, the newest one includes only the results of the paper replications, including the recently publised paper by Candelon and Moura (2023)
-
+* made changes to the vignette names to make it more intuitive
+* added the command *@keywords internal* to every non-exportable function
+* included the command *@aliases MultiATSM-package* into the *MultiATSM/R/MultiATSM.R* file in order to correct for the breaking change from roxygen2, as requested by CRAN staff

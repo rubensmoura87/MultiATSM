@@ -29,3 +29,4 @@ FitgraphsJoint(
 \description{
 Model fit graphs for ("joint Q" models)
 }
+\keyword{internal}

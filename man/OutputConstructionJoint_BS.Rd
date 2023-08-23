@@ -26,3 +26,4 @@ OutputConstructionJoint_BS(
 \description{
 Gathers all the model numerical ouputs after bootstrap for "joint Q" models
 }
+\keyword{internal}

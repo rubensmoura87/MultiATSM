@@ -87,6 +87,7 @@ return(f)
 #'@param JLLinputs   necessary inputs for the estimation of JLL-based models
 #'@param GVARinputs  necessary inputs for the estimation of GVAR-based models
 #'
+#'@keywords internal
 
 
 Functionf_Boot <- function(ModelType, MLEinputsBS, Economies, mat, dt, FactorLabels, residBS, MaxEigen,

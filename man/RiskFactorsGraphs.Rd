@@ -18,3 +18,4 @@ RiskFactorsGraphs(ModelType, ModelOutputs, Economies, FactorLabels)
 \description{
 Spanned and unspanned factors plot
 }
+\keyword{internal}

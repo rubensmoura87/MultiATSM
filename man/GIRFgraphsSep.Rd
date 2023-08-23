@@ -32,3 +32,4 @@ GIRFgraphsSep(
 \description{
 GIRFs graphs for ("sep Q" models)
 }
+\keyword{internal}

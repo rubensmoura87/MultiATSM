@@ -6,6 +6,7 @@
 #'@param FactorLabels string-list based which contains all the labels of all the variables present in the model
 #'@param Economies  string-vector containing the names of the economies which are part of the economic system
 #'
+#'@keywords internal
 
 
 NumOutputs_Bootstrap <- function(ModelType, ModelParaBoot, InputsForOutputs, FactorLabels, Economies){
@@ -58,7 +59,8 @@ NumOutputs_Bootstrap <- function(ModelType, ModelParaBoot, InputsForOutputs, Fac
 #'@param FactorLabels  string-list based which contains all the labels of all the variables present in the model
 #'@param Economies  string-vector containing the names of the economies which are part of the economic system
 #'
-
+#'
+#'@keywords internal
 
 
 OutputConstructionSep_BS <- function(ModelType, ModelParaBoot, InputsForOutputs, FactorLabels, Economies){
@@ -93,6 +95,7 @@ OutputConstructionSep_BS <- function(ModelType, ModelParaBoot, InputsForOutputs,
 #'@param FactorLabels  string-list based which contains all the labels of all the variables present in the model
 #'@param Economies  string-vector containing the names of the economies which are part of the economic system
 #'
+#'@keywords internal
 
 
 
@@ -202,6 +205,8 @@ IRFsep_BS <- function(ModelType, ModelParaBoot, IRFhoriz, FactorLabels, Economie
 #'@param FactorLabels  string-list based which contains all the labels of all the variables present in the model
 #'@param Economies  string-vector containing the names of the economies which are part of the economic system
 #'
+#'
+#'@keywords internal
 
 
 FEVDsep_BS <- function(ModelType, ModelParaBoot, FEVDhoriz, FactorLabels, Economies){
@@ -350,6 +355,9 @@ FEVDsep_BS <- function(ModelType, ModelParaBoot, FEVDhoriz, FactorLabels, Econom
 #'
 #' \item Pesaran and Shin, 1998. "Generalized impulse response analysis in linear multivariate models" (Economics Letters)
 #' }
+#'
+#'
+#'@keywords internal
 
 
 
@@ -477,6 +485,8 @@ GIRFSep_BS <- function(ModelType, ModelParaBoot, GIRFhoriz, FactorLabels, Econom
 #'
 #' \item Pesaran and Shin, 1998. "Generalized impulse response analysis in linear multivariate models" (Economics Letters)
 #' }
+#'
+#'@keywords internal
 
 
 
@@ -651,6 +661,8 @@ GFEVDsep_BS <- function(ModelType, ModelParaBoot, GFEVDhoriz, FactorLabels, Econ
 #'@param FactorLabels  string-list based which contains all the labels of all the variables present in the model
 #'@param Economies  string-vector containing the names of the economies which are part of the economic system
 #'
+#'
+#'@keywords internal
 
 
 OutputConstructionJoint_BS <- function(ModelType, ModelParaBoot, InputsForOutputs, FactorLabels, Economies){
@@ -739,6 +751,9 @@ OutputConstructionJoint_BS <- function(ModelType, ModelParaBoot, InputsForOutput
 #'@param FactorLabels a string-list based which contains all the labels of all the variables present in the model
 #'@param Economies a string-vector containing the names of the economies which are part of the economic system
 #'
+#'
+#'
+#'@keywords internal
 
 
 
@@ -853,6 +868,8 @@ IRFjoint_BS <- function(ModelType, ModelParaBoot, IRFhoriz, FactorLabels, Econom
 #'@param FactorLabels  string-list based which contains all the labels of all the variables present in the model
 #'@param Economies  string-vector containing the names of the economies which are part of the economic system
 #'
+#'
+#'@keywords internal
 
 
 FEVDjoint_BS <- function(ModelType, ModelParaBoot, FEVDhoriz, FactorLabels, Economies){
@@ -1003,6 +1020,9 @@ FEVDjoint_BS <- function(ModelType, ModelParaBoot, FEVDhoriz, FactorLabels, Econ
 #'
 #' \item Pesaran and Shin, 1998. "Generalized impulse response analysis in linear multivariate models" (Economics Letters)
 #' }
+#'
+#'
+#'@keywords internal
 
 
 
@@ -1134,6 +1154,9 @@ GIRFjoint_BS <- function(ModelType, ModelParaBoot, GIRFhoriz, FactorLabels, Econ
 #'
 #' \item Pesaran and Shin, 1998. "Generalized impulse response analysis in linear multivariate models" (Economics Letters)
 #' }
+#'
+#'
+#'@keywords internal
 
 
 GFEVDjoint_BS <- function(ModelType, ModelParaBoot, GFEVDhoriz, FactorLabels, Economies){
@@ -1303,6 +1326,9 @@ GFEVDjoint_BS <- function(ModelType, ModelParaBoot, GFEVDhoriz, FactorLabels, Ec
 #'@param FactorLabels  string-list based which contains all the labels of all the variables present in the model
 #'@param Economies  string-vector containing the names of the economies which are part of the economic system
 #'
+#'
+#'
+#'@keywords internal
 
 
 IRFjointOrthoJLL_BS <- function(ModelType, ModelParaBoot, IRFhoriz, FactorLabels, Economies){
@@ -1410,6 +1436,8 @@ IRFjointOrthoJLL_BS <- function(ModelType, ModelParaBoot, IRFhoriz, FactorLabels
 #'@param FactorLabels string-list based which contains all the labels of all the variables present in the model
 #'@param Economies string-vector containing the names of the economies which are part of the economic system
 #'
+#'
+#'@keywords internal
 
 
 FEVDjointOrthogoJLL_BS <- function(ModelType, ModelParaBoot, FEVDhoriz, FactorLabels, Economies){
@@ -1557,6 +1585,8 @@ FEVDjointOrthogoJLL_BS <- function(ModelType, ModelParaBoot, FEVDhoriz, FactorLa
 #'
 #' \item Pesaran and Shin, 1998. "Generalized impulse response analysis in linear multivariate models" (Economics Letters)
 #' }
+#'
+#'@keywords internal
 
 
 GIRFjointOrthoJLL_BS <- function(ModelType, ModelParaBoot, GIRFhoriz, FactorLabels, Economies){
@@ -1684,6 +1714,9 @@ GIRFjointOrthoJLL_BS <- function(ModelType, ModelParaBoot, GIRFhoriz, FactorLabe
 #'
 #' \item Pesaran and Shin, 1998. "Generalized impulse response analysis in linear multivariate models" (Economics Letters)
 #' }
+#'
+#'
+#'@keywords internal
 
 
 GFEVDjointOrthoJLL_BS <- function(ModelType, ModelParaBoot, GFEVDhoriz, FactorLabels, Economies){
@@ -1857,6 +1890,9 @@ GFEVDjointOrthoJLL_BS <- function(ModelType, ModelParaBoot, GFEVDhoriz, FactorLa
 #'@param Economy  string-vector containing the names of the economy under study
 #'@param ModelType string-vector containing the label of the model to be estimated
 #'@param tt number of the bootstrap draw
+#'
+#'
+#'@keywords internal
 
 
 BUnspannedAdapSep_BS <- function(G, M, ModelParaBoot, Economies, Economy, ModelType, tt){

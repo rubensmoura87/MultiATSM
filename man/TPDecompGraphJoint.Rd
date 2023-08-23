@@ -33,3 +33,4 @@ TPDecompGraphJoint(
 \description{
 Term Premia decomposition graphs for "joint Q" models
 }
+\keyword{internal}

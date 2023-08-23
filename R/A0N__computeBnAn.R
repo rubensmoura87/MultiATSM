@@ -7,6 +7,9 @@
 #'@param r0        the long run risk neutral mean of the short rate (scalar)
 #'@param SSX       the covariance matrix of the errors (N x N)
 #'
+#'
+#'@keywords internal
+#'
 #'@return
 #' List containing:
 #' \itemize{
@@ -24,6 +27,8 @@
 #'
 #'  \item Dai and Singleton (2000). "Specification Analysis of Affine Term Structure Models" (The Journal of Finance)
 #'  }
+#'
+
 
 
 
@@ -81,6 +86,8 @@ A0N__computeBnAn_sepQ <- function(mat, K1XQ, dX, r0, SSX){
 #'@param r0        the long run risk neutral mean of the short rate (scalar)
 #'@param SSX       the covariance matrix of the errors (N x N)
 #'@param Economies Set of economies that are part of the economic system (vector of text)
+#'
+#'@keywords internal
 #'
 #'@return
 #' List containing:

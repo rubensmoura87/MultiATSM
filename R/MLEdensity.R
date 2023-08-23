@@ -29,6 +29,7 @@
 #'  (Euro Area Business Cycle Network Training School - Term Structure Modelling).
 #'  Available at: https://cepr.org/40029
 #'
+#'@keywords internal
 
 
 
@@ -283,8 +284,8 @@ MLEdensity_sepQ <- function(K1XQ, r0, SSZ, K0Z, K1Z, se, Gy.0, mat, Y, Z, P, Wpc
 #'  "A Small Package of Matlab Routines for the Estimation of Some Term Structure Models." \cr
 #'  (Euro Area Business Cycle Network Training School - Term Structure Modelling).
 #'  Available at: https://cepr.org/40029
-
-
+#'
+#'@keywords internal
 
 
 
@@ -634,6 +635,8 @@ MLEdensity_jointQ <- function(K1XQ, r0, SSZ, K0Z, K1Z, se, Gy.0, mat, Y, Z, P, W
 #'  "A Small Package of Matlab Routines for the Estimation of Some Term Structure Models." \cr
 #'  (Euro Area Business Cycle Network Training School - Term Structure Modelling).
 #'  Available at: https://cepr.org/40029
+#'
+#'@keywords internal
 
 
 
@@ -930,6 +933,8 @@ MLEdensity_jointQ_sepSigma <- function(K1XQ, r0, SSZ, K0Z, K1Z, se, Gy.0, mat, Y
 #'@param M number of domestic unspanned factors per country (scalar)
 #'@param N number of domestic spanned factors per country (scalar)
 #'@param C number of countries of the economic system (scalar)
+#'
+#'@keywords internal
 
 IdxSpanned <- function(G,M,N,C){
 
@@ -992,6 +997,8 @@ IdxSpanned <- function(G,M,N,C){
 #'  "A Small Package of Matlab Routines for the Estimation of Some Term Structure Models." \cr
 #'  (Euro Area Business Cycle Network Training School - Term Structure Modelling).
 #'  Available at: https://cepr.org/40029
+#'
+#'@keywords internal
 
 
 
@@ -1226,6 +1233,7 @@ A0N_MLEdensity_WOE__sepQ_Bootstrap <- function(K1XQ, r0, SSZ, K0Z, K1Z, se, Gy.0
 #'  (Euro Area Business Cycle Network Training School - Term Structure Modelling).
 #'  Available at: https://cepr.org/40029
 #'
+#'@keywords internal
 
 
 
@@ -1547,8 +1555,7 @@ A0N_MLEdensity_WOE__jointQ_Bootstrap <- function(K1XQ, r0, SSZ, K0Z, K1Z, se, Gy
 #'  (Euro Area Business Cycle Network Training School - Term Structure Modelling).
 #'  Available at: https://cepr.org/40029
 #'
-
-
+#'@keywords internal
 
 
 A0N_MLEdensity_WOE__jointQ_sepSigma_Bootstrap <- function(K1XQ, r0, SSZ, K0Z, K1Z, se, Gy.0, mat, Y, Z, P, Wpca, We,

@@ -38,3 +38,4 @@ This function is an extended version of the "A0N__computeBnAn" function by Le an
  (Euro Area Business Cycle Network Training School - Term Structure Modelling).
  Available at: https://cepr.org/40029
 }
+\keyword{internal}

@@ -3,6 +3,9 @@
 #' @param f function which contains vector (J x T) valued function handle
 #' @param x parameter values
 #'
+#'
+#'@keywords internal
+#'
 #' @return
 #' transformed matrix (MN x JT)
 #' @references

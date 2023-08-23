@@ -1,5 +1,5 @@
 ---
-title: "Paper Replication"
+title: "Paper Replications"
 author: Rubens Moura
 date: "`r Sys.Date()`"
 output: 
@@ -11,7 +11,7 @@ output:
     toc_depth: 2
     fig_caption: yes
 vignette: >
-  %\VignetteIndexEntry{Vignette for package MultiATSM_v2}
+  %\VignetteIndexEntry{Paper Replications}
   %\VignetteEngine{knitr::rmarkdown}
   \usepackage[utf8]{inputenc} 
 bibliography: references.bib
@@ -27,8 +27,7 @@ library(MultiATSM)
 
 
 
-# Paper replications
-## Joslin, Priebisch and Singleton (2014)
+# Joslin, Priebisch and Singleton (2014)
 To the best of my knowledge, the original data-set used in @JoslinPriebschSingleton2014 is not publicly available. Nevertheless, there exists an alternative source of data that closely matches JPS (2014) in terms of the construction method and the sample period. This database is constructed by @BauerRudebusch2017 (BR, 2017) and is available at [Bauer's website](https://www.michaeldbauer.com/publication/spanning-puzzle/). In that paper, BR (2017) investigate whether macro-finance term structure models better suit the unspanned macro risk framework by JPS (2014) or the earlier traditional spanned settings as the one by @AngPiazzesi2003JME. Accordingly, BR (2017) intend to replicate some of the empirical results reported in JPS (2014). The R-code used by BR (2017) is also available at [Bauer's website](https://www.michaeldbauer.com/publication/spanning-puzzle/).
 
 Supported by BR (2017)'s data-set, the code below uses the *MultiATSM* package to estimate the key model parameters from the ATSM along the lines of JPS (2014). The model estimation is performed using the *JPS* modeling setup.
@@ -204,7 +203,7 @@ kableExtra::kbl(se, align = "c", caption ="Portfolio of yields with errors") %>%
 It is relevant to highlight that the script above makes use of the principal component weights provided by BR (2017). Such a matrix is simply a scaled-up version of the one provided by the function *pca_weights_one_country* of this package. Accordingly, despite the numerical differences on the weight matrices, both methods generate time series of spanned factors which are perfectly correlated. Another difference between the two approaches relates to the construction form of the log-likelihood function (llk): while in the BR (2017) code the llk is expressed in terms of a portfolio of yields, the *MultiATSM* package generates this same input directly as a function of observed yields (i.e. both procedures lead to equivalent llk up to the Jacobian term).
 
 
-## Candelon and Moura (2021)
+# Candelon and Moura (2021)
 The multi-country framework introduced in @CandelonMoura2021 was meticulously designed to enhance the tractability of large-scale ATSMs, providing a deeper understanding of the intricate global economic mechanisms that underlie yield curve fluctuations. This framework also reinforces the statistical validity of inference and enhances the predictive capabilities of these models. This novel setup, embodied by the *GVAR jointQ* model class, is benchmarked against the findings of @JotikasthiraLeLundblad2015, which are captured by the *JLL original* model class. The paper showcases an empirical illustration involving China, Brazil, Mexico, and Uruguay.
 
 
@@ -360,7 +359,7 @@ Forecasts <- ForecastYields(ModelType, ModelParaList, InputsForOutputs, FactorLa
 ```
 
 
-## Candelon and Moura (2023)
+# Candelon and Moura (2023)
 In this paper, @CandelonMoura2023 delve into an exploration of the underlying factors that shape the sovereign yield curves of Brazil, India, Mexico, and Russia in the midst of the COVID$-19$ pandemic crisis. To comprehensively address the intricate web of global macro-financial and particularly health-related interdependencies, the study employs a modeling approach based on a *GVAR jointQ* type framework. By delving into these aspects, the authors aim to provide a nuanced understanding of the dynamics influencing sovereign yield curves in these countries during the challenging circumstances of the pandemic.
 
 

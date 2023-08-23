@@ -18,3 +18,4 @@ IdxSpanned(G, M, N, C)
 \description{
 Extract the indexes related to the spanned factors in the variance-covariance matrix
 }
+\keyword{internal}

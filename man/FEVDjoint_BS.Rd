@@ -20,3 +20,4 @@ FEVDjoint_BS(ModelType, ModelParaBoot, FEVDhoriz, FactorLabels, Economies)
 \description{
 FEVDs after bootstrap for "joint Q" models
 }
+\keyword{internal}

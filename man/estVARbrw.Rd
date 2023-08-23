@@ -50,3 +50,4 @@ This function is similar to the "estVAR" Matlab function available at Cynthia Wu
 \description{
 Estimate a VAR(1) - suited to Bauer, Rudebusch and Wu (2012) methodology
 }
+\keyword{internal}

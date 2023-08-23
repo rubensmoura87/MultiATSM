@@ -29,3 +29,4 @@ GraphicalOutputs(
 \description{
 Generate the graphical outputs for the selected models (Point estimate)
 }
+\keyword{internal}

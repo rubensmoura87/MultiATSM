@@ -26,3 +26,4 @@ OutputConstructionSep_BS(
 \description{
 Gathers all the model numerical ouputs after bootstrap for "sep Q" models
 }
+\keyword{internal}

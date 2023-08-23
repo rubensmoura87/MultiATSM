@@ -9,6 +9,8 @@
 #'  (Euro Area Business Cycle Network Training School - Term Structure Modelling).
 #'  Available at: https://cepr.org/40029
 #'
+#'@keywords internal
+#'
 
 contain <- function(s1, s2){
   y <- grepl(s1, s2)
@@ -29,6 +31,8 @@ contain <- function(s1, s2){
 #'  "A Small Package of Matlab Routines for the Estimation of Some Term Structure Models." \cr
 #'  (Euro Area Business Cycle Network Training School - Term Structure Modelling).
 #'  Available at: https://cepr.org/40029
+#'
+#'@keywords internal
 
 bound2x <- function(y, lb, ub){
 
@@ -45,6 +49,8 @@ bound2x <- function(y, lb, ub){
 #'  "A Small Package of Matlab Routines for the Estimation of Some Term Structure Models." \cr
 #'  (Euro Area Business Cycle Network Training School - Term Structure Modelling).
 #'  Available at: https://cepr.org/40029
+#'
+#'@keywords internal
 
 pos2x <- function(y){
 
@@ -63,6 +69,8 @@ pos2x <- function(y){
 #'  "A Small Package of Matlab Routines for the Estimation of Some Term Structure Models." \cr
 #'  (Euro Area Business Cycle Network Training School - Term Structure Modelling)
 #'  Available at: https://cepr.org/40029
+#'
+#'@keywords internal
 
 x2pos<- function(x,nargout){
 
@@ -139,6 +147,8 @@ x2pos<- function(x,nargout){
 #'  "A Small Package of Matlab Routines for the Estimation of Some Term Structure Models." \cr
 #'  (Euro Area Business Cycle Network Training School - Term Structure Modelling).
 #'  Available at: https://cepr.org/40029
+#'
+#'@keywords internal
 
 x2bound <-function(x, lb, ub, nargout){
 
@@ -180,6 +190,7 @@ x2bound <-function(x, lb, ub, nargout){
 #'  (Euro Area Business Cycle Network Training School - Term Structure Modelling).
 #'  Available at: https://cepr.org/40029
 #'
+#'@keywords internal
 
 
 

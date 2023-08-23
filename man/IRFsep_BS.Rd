@@ -20,3 +20,4 @@ IRFsep_BS(ModelType, ModelParaBoot, IRFhoriz, FactorLabels, Economies)
 \description{
 IRFs after bootstrap for "sep Q" models
 }
+\keyword{internal}

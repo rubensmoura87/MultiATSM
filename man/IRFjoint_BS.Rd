@@ -20,3 +20,4 @@ IRFjoint_BS(ModelType, ModelParaBoot, IRFhoriz, FactorLabels, Economies)
 \description{
 IRFs after bootstrap for "joint Q" models
 }
+\keyword{internal}

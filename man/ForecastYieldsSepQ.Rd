@@ -38,3 +38,4 @@ ForecastYieldsSepQ(
 \description{
 Bond yields forecasts  ("sep Q" models)
 }
+\keyword{internal}

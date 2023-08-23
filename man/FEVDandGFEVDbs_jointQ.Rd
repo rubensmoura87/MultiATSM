@@ -29,3 +29,4 @@ FEVDandGFEVDbs_jointQ(
 \description{
 Creates the confidence bounds and the graphs of FEVDs and GFEVDs after bootstrap ("joint Q" models)
 }
+\keyword{internal}

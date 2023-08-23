@@ -23,3 +23,4 @@ FEVDs for "joint Q" models
 \details{
 Structural shocks are identified via Cholesky decomposition
 }
+\keyword{internal}

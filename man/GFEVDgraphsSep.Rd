@@ -32,3 +32,4 @@ GFEVDgraphsSep(
 \description{
 GFEVDs graphs for ("sep Q" models)
 }
+\keyword{internal}

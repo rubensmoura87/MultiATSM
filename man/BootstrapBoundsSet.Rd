@@ -26,3 +26,4 @@ BootstrapBoundsSet(
 \description{
 Builds the confidence bounds and graphs (Bootstrap set)
 }
+\keyword{internal}

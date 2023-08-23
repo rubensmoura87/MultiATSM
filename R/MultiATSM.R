@@ -4,6 +4,7 @@
 #' @docType package
 #' @author Rubens Moura \email{rubens.gtmoura@gmail.com}
 #' @name MultiATSM
+#' @aliases MultiATSM-package
 NULL
 
 

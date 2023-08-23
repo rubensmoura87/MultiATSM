@@ -29,3 +29,4 @@ GIRFgraphsJoint(
 \description{
 GIRFs graphs for ("joint Q" models)
 }
+\keyword{internal}

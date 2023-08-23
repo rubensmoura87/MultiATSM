@@ -26,3 +26,4 @@ IRFjointOrthoJLL_BS(
 \description{
 IRFs after bootstrap for JLL-based models
 }
+\keyword{internal}

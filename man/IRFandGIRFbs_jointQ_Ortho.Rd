@@ -29,3 +29,4 @@ IRFandGIRFbs_jointQ_Ortho(
 \description{
 Creates the confidence bounds and the graphs of IRFs and GIRFs after bootstrap (JLL-based models)
 }
+\keyword{internal}

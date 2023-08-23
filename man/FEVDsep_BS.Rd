@@ -20,3 +20,4 @@ FEVDsep_BS(ModelType, ModelParaBoot, FEVDhoriz, FactorLabels, Economies)
 \description{
 FEVDs after bootstrap for "sep Q" models
 }
+\keyword{internal}

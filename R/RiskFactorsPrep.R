@@ -8,6 +8,8 @@
 #' @param DataFrequency  character-based vector: "Daily All Days", "Daily Business Days", "Weekly", "Monthly", "Quarterly", "Annually"
 #'
 #'
+#'@keywords internal
+#'
 #' @return
 #' Risk factors used in the estimation of the desired ATSM
 #'

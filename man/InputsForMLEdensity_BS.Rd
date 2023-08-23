@@ -43,3 +43,4 @@ If the ModelType selected is "JPS", "JPS jointP", "GVAR sepQ", then only one eco
 \description{
 Generates several  inputs that are necessary to build the likelihood function - Bootstrap version
 }
+\keyword{internal}

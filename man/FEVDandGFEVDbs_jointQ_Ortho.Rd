@@ -29,3 +29,4 @@ FEVDandGFEVDbs_jointQ_Ortho(
 \description{
 Creates the confidence bounds and the graphs of FEVDs and GFEVDs after bootstrap (JLL-based models)
 }
+\keyword{internal}

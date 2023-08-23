@@ -25,3 +25,4 @@ Computes two measures of model fit for bond yields
 \references{
 See, for instance, Jotiskhatira, Le and Lundblad (2015). "Why do interest rates in different currencies co-move?" (Journal of Financial Economics)
 }
+\keyword{internal}

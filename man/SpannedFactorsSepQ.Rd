@@ -20,3 +20,4 @@ SpannedFactorsSepQ(ModelType, ModelPara, Economies, t0Sample, tlastObserved)
 \description{
 Gather all spanned factors ("sep Q" models)
 }
+\keyword{internal}

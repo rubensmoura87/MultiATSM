@@ -38,3 +38,4 @@ ForecastYieldsJointQ(
 \description{
 Bond yields forecasts ("joint Q" models)
 }
+\keyword{internal}

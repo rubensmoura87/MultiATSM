@@ -22,3 +22,4 @@ BUnspannedAdapSep(G, M, ModelPara, Economies, Economy, ModelType)
 \description{
 Transform B_spanned into B_unspanned for sepQ models
 }
+\keyword{internal}

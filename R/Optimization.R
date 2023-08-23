@@ -255,8 +255,6 @@ Optimization <- function(f, tol, varargin, FactorLabels, Economies, ModelType, J
 #' If a variable name starts with a '@@', it means that that parameter will be analytically concentrated out in
 #' the specification of f. In this case, no starting value is needed for this particular parameter.An  empty matrix
 #' can be provided as a starting value
-
-
 #'@importFrom pracma fminunc
 #'
 #'@references
@@ -265,6 +263,8 @@ Optimization <- function(f, tol, varargin, FactorLabels, Economies, ModelType, J
 #'  (Euro Area Business Cycle Network Training School - Term Structure Modelling).
 #'  Available at: https://cepr.org/40029
 #'
+#'
+#'@keywords internal
 
 
 

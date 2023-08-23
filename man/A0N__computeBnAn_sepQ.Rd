@@ -40,3 +40,4 @@ Compute the cross-section loadings of yields of a canonical A0_N model ("sep Q" 
  \item Dai and Singleton (2000). "Specification Analysis of Affine Term Structure Models" (The Journal of Finance)
  }
 }
+\keyword{internal}

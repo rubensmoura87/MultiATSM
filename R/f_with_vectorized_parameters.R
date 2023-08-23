@@ -14,6 +14,8 @@
 #'@param nargout if nargout <- 1, returns only the values of the likelihood function.\cr
 #'               If nargout <- 2, generates the entire set of outputs
 #'
+#'@keywords internal
+#'
 #'@references
 #' This function is modified version of the "f_with_vectorized_parameters" function by Le and Singleton (2018).\cr
 #' "A Small Package of Matlab Routines for the Estimation of Some Term Structure Models." \cr
@@ -96,6 +98,8 @@ f_with_vectorized_parameters <- function(x, sizex, f, con, varargin, ModelType, 
 #'@param JLLinputs Set of necessary inputs used in the estimation of the JLL-based models
 #'@param GVARinputs Set of necessary inputs used in the estimation of the GVAR-based models
 #'@param varargin variable inputs used in the optimization (see "Optimization" function)
+#'
+#'@keywords internal
 #'
 #'@return
 #' same form as varargin, except now the parameters are updated with the values provided by the auxiliary x.
@@ -191,7 +195,7 @@ update_para <-function(x, sizex, ii, con, FactorLabels, Economies, JLLinputs=NUL
 #' (Euro Area Business Cycle Network Training School - Term Structure Modelling).
 #' Available at: https://cepr.org/40029
 #'
-
+#'@keywords internal
 
 aux2true <-function(a, ctype, lb, ub, FactorLabels, Economies, JLLinputs= NULL, GVARinputs= NULL, nargout){
 
@@ -607,7 +611,7 @@ if (length(d)==0 ){ btemp <- matrix(, nrow= 0, ncol= 0) } else{
 ######################################################################################################
 #' Extract the parameter values from varargin
 #'
-#' @param varargin All parameter features
+#'@param varargin All parameter features
 #'
 #'@references
 #' This function is modified version of the "getpara" function by Le and Singleton (2018). \cr
@@ -615,6 +619,8 @@ if (length(d)==0 ){ btemp <- matrix(, nrow= 0, ncol= 0) } else{
 #' (Euro Area Business Cycle Network Training School - Term Structure Modelling).
 #' Available at: https://cepr.org/40029
 #'
+#'
+#'@keywords internal
 
 
 getpara <- function(varargin){

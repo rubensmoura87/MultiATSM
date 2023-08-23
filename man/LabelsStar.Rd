@@ -12,3 +12,4 @@ LabelsStar(FactorLabels)
 \description{
 Generate the labels of the star variables
 }
+\keyword{internal}

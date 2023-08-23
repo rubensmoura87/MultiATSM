@@ -90,6 +90,8 @@ NumOutputs <- function(ModelType, ModelPara, InputsForOutputs, FactorLabels, Eco
 #'                        and risk premia decomposition
 #'@param FactorLabels string-list based which contains all the labels of all the variables present in the model
 #'@param Economies string-vector containing the names of the economies which are part of the economic system
+#'
+#'@keywords internal
 
 
 
@@ -128,7 +130,8 @@ OutputConstructionSep <- function(ModelType, ModelPara, InputsForOutputs, Factor
 #'@param ModelPara List of model parameter estimates (see the "Optimization" function)
 #'@param FactorLabels   string-list based which contains all the labels of all the variables present in the model
 #'@param Economies  string-vector containing the names of the economies which are part of the economic system
-
+#'
+#'@keywords internal
 #'
 
 
@@ -179,6 +182,8 @@ VarianceExplainedSep<-function(ModelType, ModelPara, FactorLabels, Economies){
 #'
 #' @references
 #' See, for instance, Jotiskhatira, Le and Lundblad (2015). "Why do interest rates in different currencies co-move?" (Journal of Financial Economics)
+#'
+#'@keywords internal
 
 
 YieldsFitsep <- function(ModelType, ModelPara, FactorLabels, Economies){
@@ -262,6 +267,8 @@ YieldsFitsep <- function(ModelType, ModelPara, FactorLabels, Economies){
 #'
 #'@details
 #' Structural shocks are identified via Cholesky decomposition
+#'
+#'@keywords internal
 
 
 IRFsep <- function(ModelType, ModelPara, IRFhoriz, FactorLabels, Economies){
@@ -363,6 +370,8 @@ IRFsep <- function(ModelType, ModelPara, IRFhoriz, FactorLabels, Economies){
 #'
 #'@details
 #' Structural shocks are identified via Cholesky decomposition
+#'
+#'@keywords internal
 
 
 FEVDsep <- function(ModelType, ModelPara, FEVDhoriz, FactorLabels, Economies){
@@ -503,6 +512,8 @@ FEVDsep <- function(ModelType, ModelPara, FEVDhoriz, FactorLabels, Economies){
 #'
 #' \item Pesaran and Shin, 1998. "Generalized impulse response analysis in linear multivariate models" (Economics Letters)
 #' }
+#'
+#'@keywords internal
 
 
 
@@ -624,6 +635,8 @@ GIRFSep <- function(ModelType, ModelPara, GIRFhoriz, FactorLabels, Economies){
 #'
 #' \item Pesaran and Shin, 1998. "Generalized impulse response analysis in linear multivariate models" (Economics Letters)
 #' }
+#'
+#'@keywords internal
 
 
 
@@ -789,6 +802,9 @@ GFEVDsep <- function(ModelType, ModelPara, GFEVDhoriz, FactorLabels, Economies){
 #'                        and risk premia decomposition
 #'@param Economies  string-vector containing the names of the economies which are part of the economic system
 #'
+#'
+#'
+#'@keywords internal
 
 TermPremiaDecompSep <- function(ModelPara, FactorLabels, ModelType, InputsForOutputs, Economies){
 
@@ -1046,6 +1062,8 @@ TermPremiaDecompSep <- function(ModelPara, FactorLabels, ModelType, InputsForOut
 #'@param FactorLabels  string-list based which contains all the labels of all the variables present in the model
 #'@param Economies  string-vector containing the names of the economies which are part of the economic system
 #'
+#'
+#'@keywords internal
 
 
 OutputConstructionJoint <- function(ModelType, ModelPara, InputsForOutputs, FactorLabels,
@@ -1130,6 +1148,8 @@ idxWishModels <- which(ModelTypeSet == ModelType)
 #'@param FactorLabels  string-list based which contains all the labels of all the variables present in the model
 #'@param Economies  string-vector containing the names of the economies which are part of the economic system
 #'
+#'
+#'@keywords internal
 
 
 
@@ -1187,6 +1207,8 @@ VarianceExplainedJoint<-function(ModelType, ModelPara, FactorLabels, Economies){
 #'
 #' @references
 #' See, for instance, Jotiskhatira, Le and Lundblad (2015). "Why do interest rates in different currencies co-move?" (Journal of Financial Economics)
+#'
+#'@keywords internal
 
 
 YieldsFitJoint <- function(ModelType, ModelPara, FactorLabels, Economies){
@@ -1269,9 +1291,10 @@ YieldsFitJoint <- function(ModelType, ModelPara, FactorLabels, Economies){
 #'
 #'@details
 #' Structural shocks are identified via Cholesky decomposition
+#'
+#' @keywords internal
 
-#'
-#'
+
 IRFjoint <- function(ModelType, ModelPara, IRFhoriz, FactorLabels, Economies){
 
   ModelTypeSet <- c("JPS", "JPS jointP", "GVAR sepQ", "VAR jointQ" , "GVAR jointQ",
@@ -1371,6 +1394,8 @@ IRFjoint <- function(ModelType, ModelPara, IRFhoriz, FactorLabels, Economies){
 #'
 #'@details
 #' Structural shocks are identified via Cholesky decomposition
+#'
+#'@keywords internal
 
 
 FEVDjoint <- function(ModelType, ModelPara, FEVDhoriz, FactorLabels, Economies){
@@ -1515,6 +1540,9 @@ FEVDjoint <- function(ModelType, ModelPara, FEVDhoriz, FactorLabels, Economies){
 #'
 #' \item Pesaran and Shin, 1998. "Generalized impulse response analysis in linear multivariate models" (Economics Letters)
 #' }
+#'
+#'
+#'@keywords internal
 
 
 
@@ -1638,6 +1666,9 @@ GIRFjoint <- function(ModelType, ModelPara, GIRFhoriz, FactorLabels, Economies){
 #'
 #' \item Pesaran and Shin, 1998. "Generalized impulse response analysis in linear multivariate models" (Economics Letters)
 #' }
+#'
+#'
+#'@keywords internal
 
 
 GFEVDjoint <- function(ModelType, ModelPara, GFEVDhoriz, FactorLabels, Economies){
@@ -1801,6 +1832,8 @@ GFEVDjoint <- function(ModelType, ModelPara, GFEVDhoriz, FactorLabels, Economies
 #'@param InputsForOutputs list conataining the desired horizon of analysis for the model fit, IRFs, GIRFs, FEVDs, GFEVDs and risk premia decomposition
 #'@param Economies  string-vector containing the names of the economies which are part of the economic system
 #'
+#'
+#'@keywords internal
 
 TermPremiaDecompJoint <- function(ModelPara, FactorLabels, ModelType, InputsForOutputs, Economies){
 
@@ -2052,8 +2085,8 @@ TermPremiaDecompJoint <- function(ModelPara, FactorLabels, ModelType, InputsForO
 #'
 #'@details
 #' Structural shocks are identified via Cholesky decomposition
-
-
+#'
+#'@keywords internal
 
 
 IRFjointOrthoJLL <- function(ModelType, ModelPara, IRFhoriz, FactorLabels, Economies){
@@ -2152,6 +2185,8 @@ IRFjointOrthoJLL <- function(ModelType, ModelPara, IRFhoriz, FactorLabels, Econo
 #'
 #'@details
 #' Structural shocks are identified via Cholesky decomposition
+#'
+#'@keywords internal
 
 
 FEVDjointOrthogoJLL <- function(ModelType, ModelPara, FEVDhoriz, FactorLabels, Economies){
@@ -2292,6 +2327,9 @@ FEVDjointOrthogoJLL <- function(ModelType, ModelPara, FEVDhoriz, FactorLabels, E
 #'
 #' \item Pesaran and Shin, 1998. "Generalized impulse response analysis in linear multivariate models" (Economics Letters)
 #' }
+#'
+#'
+#'@keywords internal
 
 
 
@@ -2417,6 +2455,9 @@ GIRFjointOrthoJLL <- function(ModelType, ModelPara, GIRFhoriz, FactorLabels, Eco
 #'
 #' \item Pesaran and Shin, 1998. "Generalized impulse response analysis in linear multivariate models" (Economics Letters)
 #' }
+#'
+#'
+#'@keywords internal
 
 
 GFEVDjointOrthoJLL <- function(ModelType, ModelPara, GFEVDhoriz, FactorLabels, Economies){
@@ -2589,6 +2630,9 @@ GFEVDjointOrthoJLL <- function(ModelType, ModelPara, GFEVDhoriz, FactorLabels, E
 #'@param C number of economies of the economic system
 #'@param J number of country-specific observed bond yields
 #'@param BSpanned B that accomodates only the map to the spanned factors only
+#'
+#'
+#'@keywords internal
 
 BUnspannedAdapJoint <- function(G,M,N,C, J, BSpanned){
 
@@ -2624,6 +2668,8 @@ BUnspannedAdapJoint <- function(G,M,N,C, J, BSpanned){
 #' @param Economies complet set of economies of the economic system
 #' @param Economy  specific economy under study
 #' @param ModelType a string-vector containing the label of the model to be estimated
+#'
+#'@keywords internal
 
 BUnspannedAdapSep <- function(G,M, ModelPara, Economies, Economy, ModelType){
 
@@ -2673,7 +2719,7 @@ BUnspannedAdapSep <- function(G,M, ModelPara, Economies, Economy, ModelType){
 #'@param Economies a string-vector containing the names of the economies which are part of the economic system
 #'@param YLab Label of yields ("Months" or "Yields")
 #'
-#'
+#'@keywords internal
 
 YieldsFitAllSep <- function(MatInt, ModelPara, FactorLabels, ModelType, Economies, YLab){
 
@@ -2761,7 +2807,7 @@ if (ModelType == "JPS jointP" || ModelType == 'GVAR sepQ'){ AllLabels <- c(Facto
 #'@param Economies a string-vector containing the names of the economies which are part of the economic system
 #'@param YLab Label of yields ("Months" or "Yields")
 #'
-#'
+#'@keywords internal
 
 YieldsFitAllJoint <- function(MatInt, ModelPara, FactorLabels, ModelType, Economies, YLab){
 

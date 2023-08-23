@@ -29,3 +29,4 @@ FitgraphsSep(
 \description{
 Model fit graphs for ("sep Q" models)
 }
+\keyword{internal}

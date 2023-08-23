@@ -26,3 +26,4 @@ NumOutputs_Bootstrap(
 \description{
 Numerical outputs (IRFs, GIRFs, FEVD, and GFEVD) for bootstrap
 }
+\keyword{internal}

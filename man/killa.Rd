@@ -17,3 +17,4 @@ This function is a modified version of the "killa" function by Le and Singleton 
  "A Small Package of Matlab Routines for the Estimation of Some Term Structure Models." \cr
  (Euro Area Business Cycle Network Training School - Term Structure Modelling).
 }
+\keyword{internal}

@@ -6,6 +6,8 @@
 #'@param InputsForOutputs list conataining the desired inputs for the construction of IRFs, GIRFs, FEVDs, and GFEVDs
 #'@param Economies string-vector containing the names of the economies which are part of the economic system
 #'
+#'
+#'@keywords internal
 
 
 BootstrapBoundsSet <- function(ModelType, ModelBootstrap, NumOutPE, InputsForOutputs, Economies){
@@ -99,7 +101,7 @@ BootstrapBoundsSet <- function(ModelType, ModelBootstrap, NumOutPE, InputsForOut
 #'@param Economies string-vector containing the names of the economies which are part of the economic system
 #'@param PathsGraphs path of the folder in which the graphs will be saved
 #'
-#'
+#'@keywords internal
 
 
 
@@ -331,7 +333,7 @@ print('################################# Generating IRFs/GIRFs graphs (Bootstrap
 #'@param Economies string-vector containing the names of the economies which are part of the economic system
 #'@param PathsGraphs path of the folder in which the graphs will be saved
 #'
-#'
+#'@keywords internal
 
 
 FEVDandGFEVDbs_sepQ <- function(ModelType, ModelBootstrap, NumOutPE, InputsForOutputs, Economies, PathsGraphs){
@@ -568,6 +570,7 @@ FEVDandGFEVDbs_sepQ <- function(ModelType, ModelBootstrap, NumOutPE, InputsForOu
 #'@param PathsGraphs path of the folder in which the graphs will be saved
 #'
 #'
+#'@keywords internal
 
 
 
@@ -810,7 +813,7 @@ IRFandGIRFbs_jointQ <- function(ModelType, ModelBootstrap, NumOutPE, InputsForOu
 #'@param Economies  string-vector containing the names of the economies which are part of the economic system
 #'@param PathsGraphs path of the folder in which the graphs will be saved
 #'
-#'
+#'@keywords internal
 
 
 FEVDandGFEVDbs_jointQ <- function(ModelType, ModelBootstrap, NumOutPE, InputsForOutputs, Economies, PathsGraphs){
@@ -1059,6 +1062,7 @@ FEVDandGFEVDbs_jointQ <- function(ModelType, ModelBootstrap, NumOutPE, InputsFor
 #'@param PathsGraphs path of the folder in which the graphs will be saved
 #'
 #'
+#'@keywords internal
 
 
 IRFandGIRFbs_jointQ_Ortho <- function(ModelType, ModelBootstrap, NumOutPE, InputsForOutputs, Economies, PathsGraphs){
@@ -1287,6 +1291,7 @@ IRFandGIRFbs_jointQ_Ortho <- function(ModelType, ModelBootstrap, NumOutPE, Input
 #'@param PathsGraphs path of the folder in which the graphs will be saved
 #'
 #'
+#'@keywords internal
 
 
 FEVDandGFEVDbs_jointQ_Ortho <- function(ModelType, ModelBootstrap, NumOutPE, InputsForOutputs, Economies, PathsGraphs){

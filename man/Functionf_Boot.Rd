@@ -41,3 +41,4 @@ Functionf_Boot(
 \description{
 Set up the vector-valued objective function (Bootstrap)
 }
+\keyword{internal}

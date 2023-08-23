@@ -19,3 +19,4 @@ return the time series data that were not initially composed by NAs.
 \description{
 Exclude series that contain NAs
 }
+\keyword{internal}

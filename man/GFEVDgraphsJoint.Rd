@@ -29,3 +29,4 @@ GFEVDgraphsJoint(
 \description{
 GFEVDs graphs for "joint Q" models
 }
+\keyword{internal}

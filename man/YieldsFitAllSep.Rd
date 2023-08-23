@@ -22,3 +22,4 @@ YieldsFitAllSep(MatInt, ModelPara, FactorLabels, ModelType, Economies, YLab)
 \description{
 Fit yields for all maturities of interest
 }
+\keyword{internal}

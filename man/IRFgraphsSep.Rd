@@ -32,3 +32,4 @@ IRFgraphsSep(
 \description{
 IRFs graphs for ("sep Q" models)
 }
+\keyword{internal}

@@ -66,6 +66,7 @@ ForecastYields <- function(ModelType, ModelPara, InputsForOutputs, FactorLabels,
 #'@param GVARinputs list of necessary inputs for the estimation of GVAR-based models (see "GVAR" function)
 #'@param BRWinputs  list of necessary inputs for performing the bias-corrected estimation (see "Bias_Correc_VAR" function)
 #'
+#'@keywords internal
 
 
 ForecastYieldsSepQ <- function(ModelType, ModelPara, InputsForOutputs, FactorLabels, Economies, DataFrequency,
@@ -246,6 +247,7 @@ ForecastYieldsSepQ <- function(ModelType, ModelPara, InputsForOutputs, FactorLab
 #'@param GVARinputs list of necessary inputs for the estimation of GVAR-based models (see "GVAR" function)
 #'@param BRWinputs  list of necessary inputs for performing the bias-corrected estimation (see "Bias_Correc_VAR" function)
 #'
+#'@keywords internal
 
 
 ForecastYieldsJointQ <- function(ModelType, ModelPara, InputsForOutputs, FactorLabels, Economies, DataFrequency,
@@ -452,6 +454,8 @@ RMSEsep <- function(ForecastOutputs){
 #'
 #'@param ForecastOutputs  List of country-specific forecasts (see "ForecastYieldsjointQ" function)
 #'
+#'
+#'@keywords internal
 
 
 RMSEjoint <- function(ForecastOutputs){
@@ -482,6 +486,7 @@ RMSEjoint <- function(ForecastOutputs){
 #'@param FactorLabels string-list based which contains the labels of all the variables present in the model
 #'@param Economies  string-vector containing the names of the economies which are part of the economic system
 #'
+#'@keywords internal
 
 IdxAllSpanned <- function(ModelType, FactorLabels, Economies){
 
@@ -518,6 +523,8 @@ IdxAllSpanned <- function(ModelType, FactorLabels, Economies){
 #'@param t0Sample   index for the initial sample date
 #'@param tlastObserved index for the last observation of the information set
 #'
+#'
+#'@keywords internal
 
 SpannedFactorsSepQ <- function(ModelType, ModelPara, Economies, t0Sample, tlastObserved){
 
@@ -554,6 +561,7 @@ SpannedFactorsSepQ <- function(ModelType, ModelPara, Economies, t0Sample, tlastO
 #'@param t0Sample   index for the initial sample date
 #'@param tlastObserved index for the last observation of the information set
 #'
+#'@keywords internal
 
 SpannedFactorsjointQ <- function(ModelType, ModelPara, Economies, t0Sample, tlastObserved){
 

@@ -12,3 +12,4 @@ RMSEjoint(ForecastOutputs)
 \description{
 Compute the root mean square error ("joint Q" models)
 }
+\keyword{internal}

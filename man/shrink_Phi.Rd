@@ -24,3 +24,4 @@ Bauer, Rudebusch and, Wu (2012). "Correcting Estimation Bias in Dynamic Term Str
 This function is an adapted version of the"shrink_Phi" Matlab function available at Cynthia Wu's website
 (https://sites.google.com/view/jingcynthiawu/).
 }
+\keyword{internal}

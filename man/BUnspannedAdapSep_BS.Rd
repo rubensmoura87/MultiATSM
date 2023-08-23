@@ -24,3 +24,4 @@ BUnspannedAdapSep_BS(G, M, ModelParaBoot, Economies, Economy, ModelType, tt)
 \description{
 Obtain the full form of B unspanned for "sep Q" models within the bootstrap setting
 }
+\keyword{internal}

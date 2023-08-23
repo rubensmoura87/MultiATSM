@@ -29,3 +29,4 @@ and risk premia decomposition}
 Numerical outputs (variance explained, model fit, IRFs, GIRFs, FEVDs, GFEVDs and risk premia decomposition)
 for "joint Q" models
 }
+\keyword{internal}

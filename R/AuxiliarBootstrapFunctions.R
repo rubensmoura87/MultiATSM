@@ -7,7 +7,7 @@
 #'@param JLLinputs         List containing the necessary inputs for the estimation of the JLL-based models (see "JLL" function). Default is set to NULL.
 #'@param GVARinputs        List containing the necessary inputs for the estimation of the GVAR-based models (see "GVAR" function). Default is set to NULL.
 #'
-#'
+#'@keywords internal
 
 
 PdynamicsSet_BS<- function(ModelType, AllFactorsUnderP, FactorLabels, Economies, JLLinputs = NULL, GVARinputs= NULL){
@@ -61,6 +61,7 @@ PdynamicsSet_BS<- function(ModelType, AllFactorsUnderP, FactorLabels, Economies,
 #' @param Economies string-vector containing the names of the economies which are part of the economic system
 #' @param FactorLabels string-list based which contains the labels of all the variables present in the model
 #'
+#'@keywords internal
 
 
 DataSet_BS <- function(ModelType, RiskFactors, Wgvar, Economies, FactorLabels){

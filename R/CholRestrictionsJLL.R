@@ -7,8 +7,8 @@
 #'@param Economies string-vector containing the names of the economies which are part of the economic system
 #'@param DomUnit Name of the economy which is assigned as the dominant unit. \cr
 #'               If no dominant unit is assigned, then this variable is defined as "none"
-
-#
+#'
+#'
 #'@keywords internal
 #'@return   restricted version the Cholesky factorization matrix from JLL-based models (K x K)
 #

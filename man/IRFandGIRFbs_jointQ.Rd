@@ -29,3 +29,4 @@ IRFandGIRFbs_jointQ(
 \description{
 Creates the confidence bounds and the graphs of IRFs and GIRFs after bootstrap ("joint Q" models)
 }
+\keyword{internal}

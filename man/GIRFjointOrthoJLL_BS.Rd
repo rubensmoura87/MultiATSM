@@ -34,3 +34,4 @@ Smith, L.V. and A. Galesi (2014). GVAR Toolbox 2.0, available at https://sites.g
 \item Pesaran and Shin, 1998. "Generalized impulse response analysis in linear multivariate models" (Economics Letters)
 }
 }
+\keyword{internal}

@@ -8,6 +8,7 @@
 #'@param Economies string-vector containing the names of the economies which are part of the economic system
 #'@param FactorLabels string-list based which contains the labels of all the variables present in the model
 #'
+#'@keywords internal
 
 
 
@@ -127,7 +128,7 @@ GFEVDgraphsJLLOrtho(ModelType, NumOut, InputsForOutputs[[ModelType]]$GFEVD$WishG
 #'@importFrom wrapr seqi
 #'
 #'
-#'
+#'@keywords internal
 
 
 
@@ -253,6 +254,8 @@ RiskFactorsGraphs <- function(ModelType, ModelOutputs, Economies, FactorLabels){
 #'
 #'@importFrom ggplot2 ggplot theme_classic scale_x_date element_rect
 #'
+#'
+#'@keywords internal
 
 
 FitgraphsSep  <- function(ModelType, WishFitgraphs, ModelPara, NumOut, Economies, PathsGraphs){
@@ -354,6 +357,8 @@ FitgraphsSep  <- function(ModelType, WishFitgraphs, ModelPara, NumOut, Economies
 #'
 #'
 #'@importFrom ggplot2 ggplot geom_line labs geom_hline theme ggtitle theme_classic
+#'
+#'@keywords internal
 
 
 
@@ -453,8 +458,8 @@ IRFgraphsSep <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsgraph
 #'
 #'@importFrom ggplot2 ggplot theme_classic aes element_text theme labs ggtitle element_blank aes_string geom_bar geom_hline
 #'@importFrom zoo index
-
-
+#'
+#'@keywords internal
 
 
 
@@ -554,6 +559,8 @@ FEVDgraphsSep <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsgrap
 #'
 #'
 #'@importFrom ggplot2 ggplot aes element_text theme theme_classic labs ggtitle element_blank aes_string geom_line geom_hline
+#'
+#'@keywords internal
 
 
 GIRFgraphsSep <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsgraphs, GIRFhoriz,
@@ -648,6 +655,8 @@ GIRFgraphsSep <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsgrap
 #'
 #'@importFrom ggplot2 ggplot aes element_text theme theme_classic labs ggtitle element_blank aes_string geom_bar geom_hline
 #'@importFrom zoo index
+#'
+#'@keywords internal
 
 
 GFEVDgraphsSep <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsgraphs, GFEVDhoriz,
@@ -745,6 +754,8 @@ GFEVDgraphsSep <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsgra
 #'@param Economies a string-vector containing the names of the economies which are part of the economic system
 #'@param PathsGraphs Path of the folder in which the graphs will be saved
 #'
+#'
+#'@keywords internal
 
 
 
@@ -879,6 +890,7 @@ TPDecompGraphSep <- function(ModelType, NumOut, ModelPara, WishRPgraphs, UnitYie
 #'
 #'@importFrom ggplot2 ggplot theme_classic scale_x_date element_rect
 #'
+#'@keywords internal
 
 
 FitgraphsJoint  <- function(ModelType, WishFitgraphs, ModelPara, NumOut, Economies, PathsGraphs){
@@ -992,6 +1004,8 @@ FitgraphsJoint  <- function(ModelType, WishFitgraphs, ModelPara, NumOut, Economi
 #'
 #'
 #'@importFrom ggplot2 ggplot geom_line labs geom_hline theme ggtitle theme_classic
+#'
+#'@keywords internal
 
 
 
@@ -1095,6 +1109,8 @@ IRFgraphsJoint <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsgra
 #'
 #'@importFrom ggplot2 ggplot theme_classic aes element_text theme labs ggtitle element_blank aes_string geom_bar geom_hline
 #'@importFrom zoo index
+#'
+#'@keywords internal
 
 
 FEVDgraphsJoint <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsgraphs, FEVDhoriz, PathsGraphs) {
@@ -1218,6 +1234,7 @@ FEVDgraphsJoint <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsgr
 #'
 #'
 #'@importFrom ggplot2 ggplot aes element_text theme theme_classic labs ggtitle element_blank aes_string geom_line geom_hline
+#'@keywords internal
 
 
 
@@ -1322,6 +1339,8 @@ GIRFgraphsJoint <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsgr
 #'
 #'@importFrom ggplot2 ggplot aes element_text theme theme_classic labs ggtitle element_blank aes_string geom_bar geom_hline
 #'@importFrom zoo index
+#'
+#'@keywords internal
 
 
 
@@ -1438,8 +1457,7 @@ GFEVDgraphsJoint <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsg
 #'@param Economies a string-vector containing the names of the economies which are part of the economic system
 #'@param PathsGraphs Path of the folder in which the graphs will be saved
 #'
-
-
+#'@keywords internal
 
 
 TPDecompGraphJoint <- function(ModelType, NumOut, ModelPara, WishRPgraphs, UnitYields, Economies, PathsGraphs){
@@ -1568,8 +1586,8 @@ TPDecompGraphJoint <- function(ModelType, NumOut, ModelPara, WishRPgraphs, UnitY
 #'
 #'
 #'@importFrom ggplot2 ggplot geom_line labs geom_hline theme ggtitle theme_classic
-
-
+#'
+#'@keywords internal
 
 
 
@@ -1655,10 +1673,12 @@ IRFgraphsJLLOrtho <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYields
 #'@param WishYieldsgraphs binary variable: set 1, if the user wishes graphs to be generated; or set 0, otherwise
 #'@param FEVDhoriz  single numerical vector conataining the desired horizon of analysis for the FEVDs
 #'@param PathsGraphs Path of the folder in which the graphs will be saved
-
+#'
 #'
 #'@importFrom ggplot2 ggplot theme_classic aes element_text theme labs ggtitle element_blank aes_string geom_bar geom_hline
 #'@importFrom zoo index
+#'
+#'@keywords internal
 
 FEVDgraphsJLLOrtho <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsgraphs, FEVDhoriz, PathsGraphs) {
 
@@ -1752,6 +1772,8 @@ FEVDgraphsJLLOrtho <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYield
 #'
 #'
 #'@importFrom ggplot2 ggplot aes element_text theme theme_classic labs ggtitle element_blank aes_string geom_line geom_hline
+#'
+#'@keywords internal
 
 
 
@@ -1839,6 +1861,8 @@ GIRFgraphsJLLOrtho <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYield
 #'
 #'@importFrom ggplot2 ggplot aes element_text theme theme_classic labs ggtitle element_blank aes_string geom_bar geom_hline
 #'@importFrom zoo index
+#'
+#'@keywords internal
 
 
 GFEVDgraphsJLLOrtho <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsgraphs, GFEVDhoriz, PathsGraphs) {

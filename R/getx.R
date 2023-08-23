@@ -11,6 +11,8 @@
 #'  This function is a modified version of the "getx" function by Le and Singleton (2018). \cr
 #'  "A Small Package of Matlab Routines for the Estimation of Some Term Structure Models." \cr
 #'  (Euro Area Business Cycle Network Training School - Term Structure Modelling).
+#'
+#'@keywords internal
 
 
 
@@ -111,7 +113,10 @@ getx <- function(con, varargin, Economies, FactorLabels, JLLinputs = NULL){
 #' @importFrom hablar s
 #' @importFrom pracma tril
 #'
-#' @return  unconstrained auxiliary matrix.
+#'
+#'@keywords internal
+#'
+#'@return  unconstrained auxiliary matrix.
 #'
 #' @references
 #'  This function is a modified and extended version of the "true2aux" function by Le and Singleton (2018). \cr
@@ -463,12 +468,15 @@ if (!is.null(JLLinputs)){
 #'
 #' @param s text vector containing the feature of the variable
 #'
+#'
 #' @importFrom pracma strfind isempty
 #'
 #'@references
 #' This function is a modified version of the "killa" function by Le and Singleton (2018). \cr
 #'  "A Small Package of Matlab Routines for the Estimation of Some Term Structure Models." \cr
 #'  (Euro Area Business Cycle Network Training School - Term Structure Modelling).
+#'
+#'@keywords internal
 
 killa <- function(s){
 

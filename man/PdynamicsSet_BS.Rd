@@ -29,3 +29,4 @@ PdynamicsSet_BS(
 \description{
 Compute some key parameters from the P-dynamics (Bootstrap set)
 }
+\keyword{internal}

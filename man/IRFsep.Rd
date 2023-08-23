@@ -23,3 +23,4 @@ IRFs for "sep Q" models
 \details{
 Structural shocks are identified via Cholesky decomposition
 }
+\keyword{internal}

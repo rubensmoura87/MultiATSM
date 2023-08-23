@@ -236,6 +236,8 @@ DatabasePrep <- function(t_First, t_Last, Economies, N, FactorLabels, ModelType,
 #'@param MacroData      List of country-specific and global economic variables
 #'@param Economies      string-vector containing the names of the economies which are part of the economic system
 #'
+#'@keywords internal
+#'
 #'@return return the time series data that were not initially composed by NAs.
 #'
 

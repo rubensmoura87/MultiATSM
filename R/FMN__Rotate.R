@@ -4,6 +4,8 @@
 #' @param U1    matrix (N x N)
 #' @param U0    vector (N x 1). Optional. Default: vector of zeros.
 #'
+#'@keywords internal
+#'
 #'@return      y1 - list of outputs after the transformation, the structure parallels that of y0
 #'
 #'@importFrom pracma mldivide

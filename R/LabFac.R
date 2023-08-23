@@ -75,6 +75,7 @@ LabFac <- function(N, DomVar, GlobalVar, Economies, ModelType){
 #'
 #' @param N number of spanned factors
 #'
+#'@keywords internal
 
 LabelsSpanned <-function(N){
 
@@ -92,6 +93,8 @@ LabelsSpanned <-function(N){
 #' Generate the labels of the star variables
 #'
 #'@param FactorLabels Factor labels
+#'
+#'@keywords internal
 
 
 LabelsStar <-function(FactorLabels){

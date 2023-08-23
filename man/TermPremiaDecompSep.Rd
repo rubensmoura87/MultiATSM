@@ -27,3 +27,4 @@ and risk premia decomposition}
 \description{
 Decomposition of yields into the average of expected future short-term interest rate and risk premia for "joint Q" models
 }
+\keyword{internal}

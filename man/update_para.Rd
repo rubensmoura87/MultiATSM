@@ -51,3 +51,4 @@ This function is a modified version of the "update_para" function by Le and Sing
 (Euro Area Business Cycle Network Training School - Term Structure Modelling).
 Available at: https://cepr.org/40029
 }
+\keyword{internal}

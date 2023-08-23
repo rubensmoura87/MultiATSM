@@ -29,3 +29,4 @@ IRFgraphsJoint(
 \description{
 IRFs graphs for ("joint Q" models)
 }
+\keyword{internal}

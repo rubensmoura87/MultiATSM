@@ -20,3 +20,4 @@ SpannedFactorsjointQ(ModelType, ModelPara, Economies, t0Sample, tlastObserved)
 \description{
 Gather all spanned factors ("joint Q" models)
 }
+\keyword{internal}

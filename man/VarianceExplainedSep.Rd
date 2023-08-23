@@ -18,3 +18,4 @@ VarianceExplainedSep(ModelType, ModelPara, FactorLabels, Economies)
 \description{
 Percentage explained by the spanned factors of the variations in the set of observed yields for "sep Q" models
 }
+\keyword{internal}

@@ -16,3 +16,4 @@ IdxAllSpanned(ModelType, FactorLabels, Economies)
 \description{
 Find the indexes of the spanned factors
 }
+\keyword{internal}

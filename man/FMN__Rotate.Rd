@@ -35,3 +35,4 @@ where SSi <- array(SS, c(N, N, M+1))
 (Euro Area Business Cycle Network Training School - Term Structure Modelling).
 Available at: https://cepr.org/40029
 }
+\keyword{internal}

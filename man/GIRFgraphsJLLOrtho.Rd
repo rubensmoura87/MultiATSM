@@ -29,3 +29,4 @@ GIRFgraphsJLLOrtho(
 \description{
 GIRFs graphs for orthogonalized risk factors of JLL-based models
 }
+\keyword{internal}

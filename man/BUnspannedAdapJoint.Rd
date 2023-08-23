@@ -22,3 +22,4 @@ BUnspannedAdapJoint(G, M, N, C, J, BSpanned)
 \description{
 Transform B_spanned into B_unspanned for jointQ models
 }
+\keyword{internal}

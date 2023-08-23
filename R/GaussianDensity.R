@@ -7,6 +7,9 @@
 #'@param invSS  Inverse of SS (N x N) or (N x N x T) - optional input
 #'@param logabsdetSS   log(abs(|SS|)) (1 x T) - optional input
 #'
+#'
+#'@keywords internal
+#'
 #'@return y   - vector of density (1 x T)
 #'
 #'@references

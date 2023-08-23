@@ -24,3 +24,4 @@ This function is based on the "x2bound" function by Le and Singleton (2018). \cr
  (Euro Area Business Cycle Network Training School - Term Structure Modelling).
  Available at: https://cepr.org/40029
 }
+\keyword{internal}

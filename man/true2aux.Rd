@@ -45,3 +45,4 @@ This function is a modified and extended version of the "true2aux" function by L
  (Euro Area Business Cycle Network Training School - Term Structure Modelling).
  Available at: https://cepr.org/40029
 }
+\keyword{internal}

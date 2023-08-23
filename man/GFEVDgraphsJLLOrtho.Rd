@@ -29,3 +29,4 @@ GFEVDgraphsJLLOrtho(
 \description{
 GFEVDs graphs for orthogonalized risk factors of JLL-based models
 }
+\keyword{internal}

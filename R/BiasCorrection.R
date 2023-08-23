@@ -204,6 +204,7 @@ Bias_Correc_VAR  <- function(ModelType, BRWinputs, RiskFactors, N, Economies, Fa
 #'@param demean demean the data before estimation. Default is set to FALSE
 #'@param intercept Include intercept in the VAR model. Default is set to TRUE
 #'
+#'@keywords internal
 #'
 #'@return list containing VAR(1) parameters
 #'#'\enumerate{
@@ -294,6 +295,8 @@ estVARbrw <- function(RiskFactors, ModelType, N, GVARinputs, JLLinputs, FactorLa
 #'@param M number of Monte Carlo replications
 #'@param RiskFactors time series of the risk factors (T x F)
 #'
+#'@keywords internal
+#'
 #'@references
 #' Bauer, Rudebusch and, Wu (2012). "Correcting Estimation Bias in Dynamic Term Structure Models". \cr
 #' This function is similar to the"genVAR" Matlab function available at Cynthia Wu's website
@@ -344,7 +347,8 @@ genVARbrw <- function(Phi, M, RiskFactors){
 #'@param Economies string-vector containing the names of the economies which are part of the economic system
 #'@param ModelType string-vector containing the label of the model to be estimated
 #'@param flag_mean flag whether mean- (TRUE) or median- (FALSE) unbiased estimation is desired. Default is set to TRUE
-
+#'
+#'@keywords internal
 #'
 #'@references
 #' Bauer, Rudebusch and, Wu (2012). "Correcting Estimation Bias in Dynamic Term Structure Models". \cr
@@ -398,6 +402,8 @@ m_var <- function(theta, M, RiskFactors, N, GVARinputs, JLLinputs, FactorLabels,
 #'@param Phi_tilde VAR (1) bias-corrected feedback matrix from Bauer, Rudebusch and, Wu (2012)
 #'@param Phi_hat  unrestricted VAR(1) feedback matrix
 #'@param ev_restr maximum eigenvalue desired in the feedback matrix after the adjustement
+#'
+#'@keywords internal
 #'
 #'@return
 #'stationary VAR(1)
