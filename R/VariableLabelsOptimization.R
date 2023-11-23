@@ -31,7 +31,7 @@ ParaLabelsList[[ModelType]][["K1Z"]] <- "@K1Z: bounded"
 # K1XQ
 K1XQType <- K1XQStationary(WishStationarityQ)$SepQ
 
-if (ModelType == "JPS" || ModelType == "JPS jointP" || ModelType == 'GVAR sepQ' ){
+if (any(ModelType == c("JPS", "JPS jointP", 'GVAR sepQ'))){
   ParaLabelsList[[ModelType]][["K1XQ"]] <- K1XQStationary(WishStationarityQ)$SepQ
 } else{
   ParaLabelsList[[ModelType]][["K1XQ"]] <- K1XQStationary(WishStationarityQ)$JointQ
@@ -39,10 +39,10 @@ if (ModelType == "JPS" || ModelType == "JPS jointP" || ModelType == 'GVAR sepQ' 
 
 
 # SSZ
-if (ModelType == "JPS" || ModelType == "JPS jointP" || ModelType == 'VAR jointQ' ){ ParaLabelsList[[ModelType]][["SSZ"]] <- "SSZ: psd" }
-if (ModelType == "GVAR sepQ" || ModelType == 'GVAR jointQ'){  ParaLabelsList[[ModelType]][["SSZ"]] <- "SSZ: BlockDiag" }
-if (ModelType == "JLL original" || ModelType == "JLL NoDomUnit"){ ParaLabelsList[[ModelType]][["SSZ"]] <- "@SSZ: bounded" } # Variance-covariance matrix is not estimated under Q
-if (ModelType == "JLL jointSigma"){ ParaLabelsList[[ModelType]][["SSZ"]] <- "SSZ: JLLstructure" }
+if (any(ModelType == c("JPS", "JPS jointP", 'VAR jointQ' ))){ ParaLabelsList[[ModelType]][["SSZ"]] <- "SSZ: psd" }
+else if (any(ModelType == c("GVAR sepQ", 'GVAR jointQ'))){  ParaLabelsList[[ModelType]][["SSZ"]] <- "SSZ: BlockDiag" }
+else if (any(ModelType == c("JLL original", "JLL NoDomUnit"))){ ParaLabelsList[[ModelType]][["SSZ"]] <- "@SSZ: bounded" } # Variance-covariance matrix is not estimated under Q
+else if (ModelType == "JLL jointSigma"){ ParaLabelsList[[ModelType]][["SSZ"]] <- "SSZ: JLLstructure" }
 # Ensures that the structure of the Variance-covariance matrix of the JLL is preserved
 
 return(ParaLabelsList)

@@ -104,7 +104,7 @@ FolderCreationBoot <- function(ModelType, Economies){
   }
 
 
-  if (ModelType == "JPS" || ModelType == "JPS jointP" || ModelType == "GVAR sepQ"){
+  if (any(ModelType == c("JPS", "JPS jointP", "GVAR sepQ"))){
     for (h in 1:length(OutputTypeSet)){
       for (v in 1:length(VarTypeSet)){
         for (i in 1:C){
@@ -139,7 +139,7 @@ FolderCreationBoot <- function(ModelType, Economies){
 
 
 
-        if (ModelType == "JLL original" || ModelType == "JLL NoDomUnit" || ModelType == "JLL jointSigma"){
+        if (any(ModelType == c("JLL original", "JLL NoDomUnit", "JLL jointSigma"))){
             OrthoLabel <- paste(VarTypeSet,"Ortho")
             PathsGraphs[[ModelType]][[OutputTypeSet[h]]][[OrthoLabel[v]]] <- paste(tempdir(),"/Outputs/", ModelType, "/Bootstrap/",
                                                                                    OutputTypeSet[h], "/", VarTypeSet[v],

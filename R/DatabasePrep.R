@@ -150,7 +150,7 @@ DatabasePrep <- function(t_First, t_Last, Economies, N, FactorLabels, ModelType,
   }
   names(Z) <- FactorLabels$Domestic
 
-  if (ModelType == "GVAR sepQ" ||  ModelType == "GVAR jointQ" ){
+  if (any(ModelType == c("GVAR sepQ", "GVAR jointQ"))){
 
     if (isempty(Wgvar)){ stop("The transition matrix needs to be specified!")}
 

@@ -89,13 +89,14 @@ Bootstrap <- function(ModelType, ModelParaPE, NumOutPE, mat, Economies, InputsFo
 
     for (i in 1:C){
 
-      if (( ModelType == "GVAR jointQ" || ModelType == "VAR jointQ" || ModelType == "JLL original"
-            || ModelType == "JLL NoDomUnit" || ModelType == "JLL jointSigma" )   & i >1 ){break} # the break avoids the models with joint estimation under the Q to be estimated C times
+
+      if (any(ModelType == c( "GVAR jointQ" , "VAR jointQ" , "JLL original", "JLL NoDomUnit", "JLL jointSigma")
+                & i >1 )){break} # the break avoids the models with joint estimation under the Q to be estimated C times
 
 
       # Select the original data and labels (preliminary work)
 
-      if (ModelType == 'JPS' || ModelType == 'JPS jointP' || ModelType == "GVAR sepQ"){  # country-by-country estimation
+      if (any(ModelType == c('JPS', 'JPS jointP', "GVAR sepQ"))){  # country-by-country estimation
 
         print('#########################################################################################################')
         print( paste('#################################', 'Bootstrap for model', ModelType, '-', Economies[i], '#################################' ))
@@ -140,7 +141,7 @@ Bootstrap <- function(ModelType, ModelParaPE, NumOutPE, mat, Economies, InputsFo
       residPdyn <- PdynamicsSet_BS(ModelType, ZZ, FactorLabels, Economies, JLLinputs, GVARinputs)$eZ
       # b) observational equation
       # For models estimated on a country-by-country basis
-      if (ModelType == 'JPS' || ModelType == 'JPS jointP' || ModelType == "GVAR sepQ"){
+      if (any(ModelType == c( 'JPS',  'JPS jointP', "GVAR sepQ"))){
         BFull <- matrix(0, nrow = J, ncol= K)
         LabelSpannedCS <- c(FactorLabels$Tables[[Economies[i]]][-(1:M)])
         idxSpanned <- match(LabelSpannedCS, RiskFactorLabels)

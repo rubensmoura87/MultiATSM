@@ -44,7 +44,7 @@ MLEdensity_sepQ <- function(K1XQ, r0, SSZ, K0Z, K1Z, se, Gy.0, mat, Y, Z, P, Wpc
 
 
   if (ModelType == "JPS"){ AllLabels <- c(FactorLabels$Global, FactorLabels$Tables[[Economy]]) }
-  if (ModelType == "JPS jointP" || ModelType == 'GVAR sepQ'){ AllLabels <- c(FactorLabels$Global, FactorLabels$Tables$AllCountries)}
+  else if (any(ModelType == c("JPS jointP", 'GVAR sepQ'))){ AllLabels <- c(FactorLabels$Global, FactorLabels$Tables$AllCountries)}
 
   rownames(SSZ) <- AllLabels
   colnames(SSZ) <- AllLabels
@@ -130,7 +130,7 @@ MLEdensity_sepQ <- function(K1XQ, r0, SSZ, K0Z, K1Z, se, Gy.0, mat, Y, Z, P, Wpc
       y <- GaussianDensity(eQ, se^2*diag(J-N))
 
       # time series density:
-      if ((!exists("K0Z")||sjmisc::is_empty(K0Z)) & (ModelType == 'JPS' || ModelType == 'JPS jointP' )){
+      if ((!exists("K0Z")||sjmisc::is_empty(K0Z)) & (any(ModelType == c('JPS','JPS jointP' )))){
         VARpara <- VAR(Z, VARtype= "unconstrained", Bcon = NULL)
         K0Z <- VARpara$K0Z  # Column vector (Kx1)
         K1Z <-  VARpara$K1Z # matrix (KxK)
@@ -172,7 +172,7 @@ MLEdensity_sepQ <- function(K1XQ, r0, SSZ, K0Z, K1Z, se, Gy.0, mat, Y, Z, P, Wpc
 
     if (nargout>1){
 
-      if (ModelType == 'JPS' || ModelType == 'JPS jointP' ){ inputs <- list(Y, Z, mat, N, dt, Wpca)}
+      if (any(ModelType == c('JPS', 'JPS jointP' ))){ inputs <- list(Y, Z, mat, N, dt, Wpca)}
       if (ModelType == 'GVAR sepQ' ){ inputs <- list(Y, Z, mat, N, dt, Wpca, GVARinputs$Wgvar)}
 
       ests <- list(K1XQ, SSZ, SSP, r0, se, K0Z, K1Z, Gy.0, VarYields)
@@ -189,7 +189,7 @@ MLEdensity_sepQ <- function(K1XQ, r0, SSZ, K0Z, K1Z, se, Gy.0, mat, Y, Z, P, Wpc
 
       names(Out) <- c("inputs", "ests", "llk", "rot")
 
-      if (ModelType == 'JPS' || ModelType == 'JPS jointP' ){ names(Out$inputs)  <-c('Y','AllFactors' , 'mat', 'N', 'dt', 'Wpca')}
+      if (any(ModelType == c('JPS', 'JPS jointP' ))){ names(Out$inputs)  <-c('Y','AllFactors' , 'mat', 'N', 'dt', 'Wpca')}
       if (ModelType == 'GVAR sepQ' ){ names(Out$inputs)  <-c('Y','AllFactors' , 'mat', 'N', 'dt', 'Wpca', 'Wgvar')}
 
       names(Out$ests) <- c('K1XQ', 'SSZ', 'SSP', 'r0', 'se', 'K0Z', 'K1Z', 'Gy.0', 'VarYields')
@@ -451,7 +451,7 @@ MLEdensity_jointQ <- function(K1XQ, r0, SSZ, K0Z, K1Z, se, Gy.0, mat, Y, Z, P, W
         K0Z <- VARpara$K0Z  # Column vector (Kx1)
         K1Z <-  VARpara$K1Z # matrix (KxK)
       }
-      if ( (!exists("K0Z")|| sjmisc::is_empty(K0Z)) & (ModelType == 'GVAR sepQ' || ModelType == 'GVAR jointQ') ){
+      if ( (!exists("K0Z")|| sjmisc::is_empty(K0Z)) & (any(ModelType == c('GVAR sepQ', 'GVAR jointQ')))){
         # Estimate GVAR(1)
           GVARPara <- GVAR(GVARinputs, N)
           K0Z <- GVARPara$F0 # Column vector (Kx1)
@@ -1390,7 +1390,7 @@ A0N_MLEdensity_WOE__jointQ_Bootstrap <- function(K1XQ, r0, SSZ, K0Z, K1Z, se, Gy
         K0Z <- VARpara$K0Z  # Column vector (Kx1)
         K1Z <-  VARpara$K1Z # matrix (KxK)
       }
-      if ( (!exists("K0Z")|| sjmisc::is_empty(K0Z)) & (ModelType == 'GVAR sepQ' || ModelType == 'GVAR jointQ') ){
+      if ( (!exists("K0Z")|| sjmisc::is_empty(K0Z)) & (any(ModelType == c('GVAR sepQ', 'GVAR jointQ'))) ){
         # Estimate GVAR(1)
         GVARPara <- GVAR(GVARinputs, N)
         K0Z <- GVARPara$F0 # Column vector (Kx1)

@@ -38,7 +38,7 @@ VAR <- function(RiskFactors, VARtype, Bcon = NULL){
   }
 
   # Constrained
-  if (VARtype == 'constrained'){
+  else{ # i.e. if VARtype == 'constrained'
 
     intercept <- rep(1, times= T-1)
     RHS <- rbind(intercept, RHS)

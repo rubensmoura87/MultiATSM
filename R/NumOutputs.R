@@ -58,7 +58,7 @@ NumOutputs <- function(ModelType, ModelPara, InputsForOutputs, FactorLabels, Eco
     names(AllNumOutputs) <- names(NumOutSep)
   }
 
-# Save relevant numerical outputs
+  # Save relevant numerical outputs
 
   PEoutputs<- list(ModelPara, AllNumOutputs)
   names(PEoutputs) <- c("Model Parameters", "Numerical Outputs")
@@ -67,7 +67,7 @@ NumOutputs <- function(ModelType, ModelPara, InputsForOutputs, FactorLabels, Eco
   # Generate graphs, if previously selected
   GraphicalOutputs(ModelType, ModelPara, AllNumOutputs, InputsForOutputs, Economies, FactorLabels)
   return(AllNumOutputs)
-  }
+}
 
 
 
@@ -295,7 +295,7 @@ IRFsep <- function(ModelType, ModelPara, IRFhoriz, FactorLabels, Economies){
 
       # Generate factor labels depending on the models to be estimated
       if ( ModelTypeSet[j] == "JPS") {AllFactorsLabels <- c(FactorLabels$Global, FactorLabels$Tables[[Economies[i]]])}
-      if ( ModelTypeSet[j] != "JPS") {AllFactorsLabels <-  c(FactorLabels$Global, FactorLabels$Tables$AllCountries) }
+      else {AllFactorsLabels <-  c(FactorLabels$Global, FactorLabels$Tables$AllCountries) }
 
       # Summarize inputs for the IRFs
       SIGMA <- ModelPara[[ModelTypeSet[[j]]]][[Economies[i]]]$ests$SSZ # KxK (variance-covariance matrix)
@@ -317,8 +317,9 @@ IRFsep <- function(ModelType, ModelPara, IRFhoriz, FactorLabels, Economies){
       tempYields[ , , 1]  <- B %*% S
       # Shock at t=1:
       for (r in 2:IRFhoriz){
-        tempFactors[ , , r] <- powerplus::Matpow(A1,numer=r-1, denom=1)%*%S # IRF (t+h) = A1^h*S
-        tempYields[ , , r]      <- B%*%powerplus::Matpow(A1,numer=r-1, denom=1)%*%S
+        if (r == 2) { A1h <- A1} else { A1h <- A1h %*% A1}
+        tempFactors[ , , r] <- A1h%*%S # IRF (t+h) = A1^h*S
+        tempYields[ , , r]      <- B%*%A1h%*%S
       }
       IRFRiskFactors <- aperm(tempFactors, c(3,1,2))
       IRFYields <- aperm(tempYields, c(3,1,2))
@@ -463,7 +464,7 @@ FEVDsep <- function(ModelType, ModelPara, FEVDhoriz, FactorLabels, Economies){
 
       # 4) Prepare labels
       if ( ModelTypeSet[j] == "JPS") {AllFactorsLabels <- c(FactorLabels$Global, FactorLabels$Tables[[Economies[i]]])}
-      if ( ModelTypeSet[j] != "JPS") {AllFactorsLabels <-  c(FactorLabels$Global, FactorLabels$Tables$AllCountries) }
+      else {AllFactorsLabels <-  c(FactorLabels$Global, FactorLabels$Tables$AllCountries) }
 
       YieldsLabel<- rownames(ModelPara[[ModelTypeSet[[j]]]][[Economies[i]]]$inputs$Y)
 
@@ -740,8 +741,8 @@ GFEVDsep <- function(ModelType, ModelPara, GFEVDhoriz, FactorLabels, Economies){
         den <- den + acc2
         for (q in 1:K){
           GFEVDresYie[ ,q,l] <- scale[q]*(num/den)[,q] # note: unlike the GFEVD of the factors, note that the "scale" variable is now at the acc1
-          }
         }
+      }
 
 
       GFEVDYields <- aperm(GFEVDresYie, c(3,2,1)) # Non-normalized GFEVD (i.e. rows need not sum up to 1)
@@ -838,7 +839,7 @@ TermPremiaDecompSep <- function(ModelPara, FactorLabels, ModelType, InputsForOut
   matMAX <- InputsForOutputs[[ModelType]]$ForwardPremia$Limits[2]
 
 
-#b) Specific Inputs
+  #b) Specific Inputs
   avexp <- list()
 
   rho0_PP <- vector(mode = "list", length = C)
@@ -847,47 +848,47 @@ TermPremiaDecompSep <- function(ModelPara, FactorLabels, ModelType, InputsForOut
   names(rho1_PP) <- Economies
 
   for (i in 1:C){
-  ZZ <- ModelPara[[ModelType]][[Economies[i]]]$inputs$AllFactors
-  BnX <- ModelPara[[ModelType]][[Economies[i]]]$rot$X$B
-  AnX <- ModelPara[[ModelType]][[Economies[i]]]$rot$X$A
-  Wpca <- ModelPara[[ModelType]][[Economies[i]]]$inputs$Wpca
-  K0Z <- ModelPara[[ModelType]][[Economies[i]]]$ests$K0Z
-  K1Z <- ModelPara[[ModelType]][[Economies[i]]]$ests$K1Z
-  r0 <- ModelPara[[ModelType]][[Economies[i]]]$ests$r0
+    ZZ <- ModelPara[[ModelType]][[Economies[i]]]$inputs$AllFactors
+    BnX <- ModelPara[[ModelType]][[Economies[i]]]$rot$X$B
+    AnX <- ModelPara[[ModelType]][[Economies[i]]]$rot$X$A
+    Wpca <- ModelPara[[ModelType]][[Economies[i]]]$inputs$Wpca
+    K0Z <- ModelPara[[ModelType]][[Economies[i]]]$ests$K0Z
+    K1Z <- ModelPara[[ModelType]][[Economies[i]]]$ests$K1Z
+    r0 <- ModelPara[[ModelType]][[Economies[i]]]$ests$r0
 
-  mat <- ModelPara[[ModelType]][[Economies[i]]]$inputs$mat
-  dt <- ModelPara[[ModelType]][[Economies[i]]]$inputs$dt
+    mat <- ModelPara[[ModelType]][[Economies[i]]]$inputs$mat
+    dt <- ModelPara[[ModelType]][[Economies[i]]]$inputs$dt
 
-  K <- nrow(K0Z)
+    K <- nrow(K0Z)
 
-  # 2) Expectations component
-  # a) Extract spanned factors from the list of unspanned factors
+    # 2) Expectations component
+    # a) Extract spanned factors from the list of unspanned factors
 
-  if (ModelType == "JPS"){ AllLabels <- c(FactorLabels$Global, FactorLabels$Tables[[Economies[i]]]) }
-  if (ModelType == "JPS jointP" || ModelType == 'GVAR sepQ'){ AllLabels <- c(FactorLabels$Global, FactorLabels$Tables$AllCountries)}
+    if (ModelType == "JPS"){ AllLabels <- c(FactorLabels$Global, FactorLabels$Tables[[Economies[i]]]) }
+    if (ModelType == "JPS jointP" || ModelType == 'GVAR sepQ'){ AllLabels <- c(FactorLabels$Global, FactorLabels$Tables$AllCountries)}
 
-  rownames(SSZ) <- AllLabels
-  colnames(SSZ) <- AllLabels
-  LabelSpannedCS <- c(FactorLabels$Tables[[Economies[i]]][-(1:M)])
-  IdxSpanned <- match(LabelSpannedCS, AllLabels)
+    rownames(SSZ) <- AllLabels
+    colnames(SSZ) <- AllLabels
+    LabelSpannedCS <- c(FactorLabels$Tables[[Economies[i]]][-(1:M)])
+    IdxSpanned <- match(LabelSpannedCS, AllLabels)
 
-  # b) Compute the intercept and slope coefficients of the short rate expressed as a function of the spanned factors
-  # By definition: r_t = r0 + rho1_X* X_t
-  # But X_t = (W*Bx)^(-1)(P- WAx)
-  # so r_t = rho0_PP + rho1_PP*P_t
-  # where (i) rho0_PP = r0 - rho1_X*(W*BX)^(-1)W*AX and (ii) rho1_PP = rho1_X (W*BX)^(-1)
-  rho1_X <- rep(1,N)
+    # b) Compute the intercept and slope coefficients of the short rate expressed as a function of the spanned factors
+    # By definition: r_t = r0 + rho1_X* X_t
+    # But X_t = (W*Bx)^(-1)(P- WAx)
+    # so r_t = rho0_PP + rho1_PP*P_t
+    # where (i) rho0_PP = r0 - rho1_X*(W*BX)^(-1)W*AX and (ii) rho1_PP = rho1_X (W*BX)^(-1)
+    rho1_X <- rep(1,N)
 
-  rho0_PP[[i]] <- as.numeric((r0 - rho1_X%*%solve(Wpca%*%BnX,tol = 1e-50)%*%Wpca%*%AnX)/dt)
-  rho1_PP[[i]] <- (rho1_X%*%solve(Wpca%*%BnX, tol = 1e-50))/dt
-
-
-  # c) Compute expectations component
-  ExpecCompLength <-  round((matAdjUnit/k)/dt)
+    rho0_PP[[i]] <- as.numeric((r0 - rho1_X%*%solve(Wpca%*%BnX,tol = 1e-50)%*%Wpca%*%AnX)/dt)
+    rho1_PP[[i]] <- (rho1_X%*%solve(Wpca%*%BnX, tol = 1e-50))/dt
 
 
-  # c.1) Pure term Premia expected component
-   # Per country
+    # c) Compute expectations component
+    ExpecCompLength <-  round((matAdjUnit/k)/dt)
+
+
+    # c.1) Pure term Premia expected component
+    # Per country
     avexpCS <- matrix(0, T, length(ExpecCompLength))
     rownames(avexpCS) <- colnames(ZZ)
     colnames(avexpCS) <- paste("RP_",ExpecCompLength, YLab, sep="")
@@ -1069,13 +1070,13 @@ TermPremiaDecompSep <- function(ModelPara, FactorLabels, ModelType, InputsForOut
 OutputConstructionJoint <- function(ModelType, ModelPara, InputsForOutputs, FactorLabels,
                                     Economies){
 
-ModelTypeSet <- c("JPS", "JPS jointP", "GVAR sepQ", "VAR jointQ" , "GVAR jointQ",
+  ModelTypeSet <- c("JPS", "JPS jointP", "GVAR sepQ", "VAR jointQ" , "GVAR jointQ",
                     "JLL original", "JLL NoDomUnit", "JLL jointSigma")
-idxWishModels <- which(ModelTypeSet == ModelType)
+  idxWishModels <- which(ModelTypeSet == ModelType)
 
 
   # Output summary
-    # Total Variance Explained and Model Fit
+  # Total Variance Explained and Model Fit
   Total_Var_exp <- VarianceExplainedJoint(ModelType, ModelPara, FactorLabels, Economies)
   ModFit <- YieldsFitJoint(ModelType, ModelPara, FactorLabels, Economies)
 
@@ -1334,16 +1335,17 @@ IRFjoint <- function(ModelType, ModelPara, IRFhoriz, FactorLabels, Economies){
     tempYields  <- array(0, c(CJ,K,IRFhoriz))
 
     # Compute the IRFs
-   if ( ModelType == "JLL original" || ModelType == "JLL NoDomUnit" || ModelType == "JLL jointSigma" ){
-     S <- ModelPara[[ModelTypeSet[[j]]]]$ests$JLLoutcomes$Sigmas$Sigma_Y
-   }else{ S <- t(chol(SIGMA))} # Choleski term
+    if ( ModelType == "JLL original" || ModelType == "JLL NoDomUnit" || ModelType == "JLL jointSigma" ){
+      S <- ModelPara[[ModelTypeSet[[j]]]]$ests$JLLoutcomes$Sigmas$Sigma_Y
+    }else{ S <- t(chol(SIGMA))} # Choleski term
     # Shock at t=0:
     tempFactors[ ,  , 1] <- S
     tempYields[ , , 1]  <- B %*% S
     # Shock at t=1:
     for (r in 2:IRFhoriz){
-      tempFactors[ , , r] <- powerplus::Matpow(A1,numer=r-1, denom=1)%*%S # IRF (t+h) = A1^h*S
-      tempYields[ , , r]      <- B%*%powerplus::Matpow(A1,numer=r-1, denom=1)%*%S
+      if (r == 2) { A1h <- A1} else { A1h <- A1h %*% A1}
+      tempFactors[ , , r] <- A1h%*%S # IRF (t+h) = A1^h*S
+      tempYields[ , , r]      <- B%*%A1h%*%S
     }
     IRFRiskFactors <- aperm(tempFactors, c(3,1,2))
     IRFYields <- aperm(tempYields, c(3,1,2))
@@ -1773,9 +1775,9 @@ GFEVDjoint <- function(ModelType, ModelPara, GFEVDhoriz, FactorLabels, Economies
       acc2 <- diag(eslctYie%*%B%*%Ry.h[,,l]%*%invGSigmau%*%t(invG)%*%t(Ry.h[,,l])%*%t(B)%*%eslctYie)
       den <- den + acc2
       for (q in 1:K){
-      GFEVDresYie[ ,q,l] <- scale[q]*(num/den)[,q] # note: unlike the GFEVD of the factors, note that the "scale" variable is now at the acc1
-    }
+        GFEVDresYie[ ,q,l] <- scale[q]*(num/den)[,q] # note: unlike the GFEVD of the factors, note that the "scale" variable is now at the acc1
       }
+    }
 
 
     GFEVDYields <- aperm(GFEVDresYie, c(3,2,1))
@@ -1865,11 +1867,11 @@ TermPremiaDecompJoint <- function(ModelPara, FactorLabels, ModelType, InputsForO
   if (UnitYields== "Month"){
     k <- 12
     YLab <- "M"
-    }
+  }
   if (UnitYields== "Year"){
     k <- 1
     YLab <- "Y"
-    }
+  }
   matAdjUnit <- mat*k
 
   WishFP <- InputsForOutputs$ForwardPremia
@@ -1917,35 +1919,35 @@ TermPremiaDecompJoint <- function(ModelPara, FactorLabels, ModelType, InputsForO
 
   avexp <- list()
   # c.1) Pure term Premia expected component
-    for(i in 1:C){ # Per country
-      avexpCS <- matrix(0, T, length(ExpecCompLength))
-      rownames(avexpCS) <- colnames(ZZ)
-      colnames(avexpCS) <- paste("RP_",ExpecCompLength, YLab, sep="")
+  for(i in 1:C){ # Per country
+    avexpCS <- matrix(0, T, length(ExpecCompLength))
+    rownames(avexpCS) <- colnames(ZZ)
+    colnames(avexpCS) <- paste("RP_",ExpecCompLength, YLab, sep="")
 
-      for (h in 1:length(ExpecCompLength)){ # per bond maturity
+    for (h in 1:length(ExpecCompLength)){ # per bond maturity
 
-        for (t in 1:T){ # Per point in time
+      for (t in 1:T){ # Per point in time
 
-          g <- matrix(NA, K, ExpecCompLength[h])
-          rownames(g) <- rownames(ZZ)
+        g <- matrix(NA, K, ExpecCompLength[h])
+        rownames(g) <- rownames(ZZ)
 
-          g[ ,1] <- ZZ[, t]
-          for (j in 2:ExpecCompLength[h]){g[ ,j] <- K0Z + K1Z%*%g[ ,j-1]} # Fitted P-dynamics
+        g[ ,1] <- ZZ[, t]
+        for (j in 2:ExpecCompLength[h]){g[ ,j] <- K0Z + K1Z%*%g[ ,j-1]} # Fitted P-dynamics
 
-          g <- g[IdxSpanned, ] # extract relevant variables
+        g <- g[IdxSpanned, ] # extract relevant variables
 
-          MaxExpec <- pmax(rho0_PP[i] + (rho1_PP[i, ]%*%g),0)
-          avexpCS[t,h] <- mean(MaxExpec)
-        }
+        MaxExpec <- pmax(rho0_PP[i] + (rho1_PP[i, ]%*%g),0)
+        avexpCS[t,h] <- mean(MaxExpec)
       }
-
-      avexp[[Economies[i]]] <- avexpCS*100
     }
 
-############################################## FORWARD PREMIA ####################################
-    if( WishFP == 1){
+    avexp[[Economies[i]]] <- avexpCS*100
+  }
 
-      avexpFP <- list()
+  ############################################## FORWARD PREMIA ####################################
+  if( WishFP == 1){
+
+    avexpFP <- list()
     # c.1) Forward Premia expected component
     for(i in 1:C){ # Per country
       avexpCS <- matrix(0, T, 1)
@@ -1971,25 +1973,25 @@ TermPremiaDecompJoint <- function(ModelPara, FactorLabels, ModelType, InputsForO
       avexpFP[[Economies[i]]] <- avexpCS*100
     }
   }
-##########################################################################################################
+  ##########################################################################################################
 
-    # 3) Compute Term Premium
+  # 3) Compute Term Premium
   YieldData <- list()
   TermPremium <- list()
 
   # a) Pure term Premia expected component
 
-    for (i in 1:C){
-      IdxRP <- (1:J) +J*(i-1)
-      YieldData[[Economies[i]]] <- t(Y[IdxRP, ]*100)
-      TermPremium[[Economies[i]]] <- YieldData[[Economies[i]]] - avexp[[Economies[i]]]
-    }
+  for (i in 1:C){
+    IdxRP <- (1:J) +J*(i-1)
+    YieldData[[Economies[i]]] <- t(Y[IdxRP, ]*100)
+    TermPremium[[Economies[i]]] <- YieldData[[Economies[i]]] - avexp[[Economies[i]]]
+  }
 
-    Output <- list(TermPremium, avexp)
-    names(Output) <- c("Term Premia","Expected Component")
+  Output <- list(TermPremium, avexp)
+  names(Output) <- c("Term Premia","Expected Component")
 
-################################################## FORWARD PREMIA ####################################
-    if( WishFP == 1){
+  ################################################## FORWARD PREMIA ####################################
+  if( WishFP == 1){
     # d) Forward Premia
 
     IDXMatMIN <- match(matMIN,matAdjUnit)
@@ -2059,14 +2061,14 @@ TermPremiaDecompJoint <- function(ModelPara, FactorLabels, ModelType, InputsForO
     Output <- list(Output,OutputFP)
     names(Output) <- c("RiskPremia", "ForwardPremia")
 
-  ###############################################################################################################
-    }else {
-      OutputFP <- NA
-      Output <- list(Output,OutputFP)
-      names(Output) <- c("RiskPremia", "ForwardPremia")
-    }
+    ###############################################################################################################
+  }else {
+    OutputFP <- NA
+    Output <- list(Output,OutputFP)
+    names(Output) <- c("RiskPremia", "ForwardPremia")
+  }
 
-    return(Output)
+  return(Output)
 }
 
 
@@ -2136,8 +2138,9 @@ IRFjointOrthoJLL <- function(ModelType, ModelPara, IRFhoriz, FactorLabels, Econo
     tempYields[ , , 1]  <- B%*%PI%*% Se
     # Shock at t=1:
     for (r in 2:IRFhoriz){
-      tempFactors[ , , r] <- powerplus::Matpow(A1e,numer=r-1, denom=1)%*%Se # IRF (t+h) = A1^h*S
-      tempYields[ , , r]      <- B%*%PI%*%powerplus::Matpow(A1e,numer=r-1, denom=1)%*%Se
+      if (r == 2) { A1h <- A1e} else { A1h <- A1h %*% A1e}
+      tempFactors[ , , r] <- A1h%*%Se # IRF (t+h) = A1^h*S
+      tempYields[ , , r]      <- B%*%PI%*%A1h%*%Se
     }
     IRFRiskFactors <- aperm(tempFactors, c(3,1,2))
     IRFYields <- aperm(tempYields, c(3,1,2))
@@ -2688,7 +2691,7 @@ BUnspannedAdapSep <- function(G,M, ModelPara, Economies, Economy, ModelType){
 
 
 
-  if( ModelType == "JPS jointP" || ModelType == "GVAR sepQ" ){
+  if( any(ModelType == c("JPS jointP","GVAR sepQ" ))){
     K <- C*(N+M) + G
     BUnspanned <- matrix(0, nrow=J, ncol= K)
     BSpanned <- ModelPara[[ModelType]][[Economies[i]]]$rot$P$B
@@ -2753,7 +2756,7 @@ YieldsFitAllSep <- function(MatInt, ModelPara, FactorLabels, ModelType, Economie
 
 
 if (ModelType == "JPS"){ AllLabels <- c(FactorLabels$Global, FactorLabels$Tables[[Economies[i]]]) }
-if (ModelType == "JPS jointP" || ModelType == 'GVAR sepQ'){ AllLabels <- c(FactorLabels$Global, FactorLabels$Tables$AllCountries)}
+if (any(ModelType == c("JPS jointP", 'GVAR sepQ'))){ AllLabels <- c(FactorLabels$Global, FactorLabels$Tables$AllCountries)}
 
   LabelSpannedCS <- c(FactorLabels$Tables[[Economies[i]]][-(1:M)])
   b <- match(LabelSpannedCS, AllLabels)

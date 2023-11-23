@@ -32,7 +32,6 @@
 
 Reg_K1Q <- function(Y, mat, Z, dt,type){
 
-
   # Step 1: Define the boundaries of the maturities that will be interpolated
   M <- round(max(mat)/dt) # longest maturity adjusted for the time units of the model
   m <- round(min(mat)/dt) # shortest maturity adjusted for the time units of the model
@@ -72,8 +71,18 @@ Reg_K1Q <- function(Y, mat, Z, dt,type){
 
   K1Qh <- mldivide(RHS,LHS)
 
-  K1Q <- suppressWarnings(Re(powerplus::Matpow(K1Qh, numer=1, denom = h)))
+  # Get K^(1/h)
+  eigendecomp <- eigen(K1Qh)
 
+  # Calculate the matrix power using eigen decomposition
+  eigenvalues <- eigendecomp$values
+  eigenvectors <- eigendecomp$vectors
+
+  # Take the power of the absolute values of the eigenvalues
+  powered_eigenvalues <- Mod(eigenvalues)^(1/h) * exp(1i * Arg(eigenvalues)/h)
+
+  # Construct K^(1/h)
+  K1Q <- Re(eigenvectors %*% diag(powered_eigenvalues) %*% solve(eigendecomp$vectors))
 
   #Step 7: Convert  K1Q into Jordan form
   if (type == "Jordan"){

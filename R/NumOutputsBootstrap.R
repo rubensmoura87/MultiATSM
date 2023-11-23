@@ -16,16 +16,13 @@ NumOutputs_Bootstrap <- function(ModelType, ModelParaBoot, InputsForOutputs, Fac
 
 
   # If one chooseS models in which the estimation is done country-by-country
-  if ( "JPS" %in% ModelType || "JPS jointP" %in% ModelType ||  "GVAR sepQ" %in% ModelType){
+  if ( any(ModelType == c("JPS" , "JPS jointP" ,"GVAR sepQ" ))){
     NumOutSep <- OutputConstructionSep_BS(ModelType, ModelParaBoot, InputsForOutputs, FactorLabels, Economies)
   }
 
   # If one chooseS models in which the estimation is done jointly for all countries
-  if ( "GVAR jointQ" %in% ModelType || "VAR jointQ" %in% ModelType || "JLL original" %in% ModelType
-       || "JLL NoDomUnit" %in% ModelType || "JLL jointSigma" %in% ModelType){
-
+  if (any(ModelType == c("GVAR jointQ", "VAR jointQ", "JLL original", "JLL NoDomUnit", "JLL jointSigma"))){
     NumOutJoint <- OutputConstructionJoint_BS(ModelType, ModelParaBoot, InputsForOutputs, FactorLabels, Economies)
-
   }
 
 
@@ -150,8 +147,10 @@ IRFsep_BS <- function(ModelType, ModelParaBoot, IRFhoriz, FactorLabels, Economie
         tempYields[ , , 1]  <- B %*% S
         # Shock at t=1:
         for (r in 2:IRFhoriz){
-          tempFactors[ , , r] <- powerplus::Matpow(A1,numer=r-1, denom=1)%*%S # IRF (t+h) = A1^h*S
-          tempYields[ , , r]      <- B%*%powerplus::Matpow(A1,numer=r-1, denom=1)%*%S
+          if (r == 2) { A1h <- A1} else { A1h <- A1h %*% A1}
+
+          tempFactors[ , , r] <- A1h%*%S # IRF (t+h) = A1^h*S
+          tempYields[ , , r]      <- B%*%A1h%*%S
         }
         IRFRiskFactors <- aperm(tempFactors, c(3,1,2))
         IRFYields <- aperm(tempYields, c(3,1,2))
@@ -672,12 +671,12 @@ OutputConstructionJoint_BS <- function(ModelType, ModelParaBoot, InputsForOutput
   idxWishModels <- which(ModelTypeSet == ModelType)
   ndraws <- length(ModelParaBoot$ParaDraws[[ModelType]])
 
-    # Output summary
+  # Output summary
   # IRF and FEVD
   IRFoutputs <- IRFjoint_BS(ModelType, ModelParaBoot, InputsForOutputs[[ModelType]]$IRF$horiz,
                             FactorLabels, Economies)
-    FEVDoutputs <- FEVDjoint_BS(ModelType, ModelParaBoot, InputsForOutputs[[ModelType]]$FEVD$horiz,
-                                FactorLabels, Economies)
+  FEVDoutputs <- FEVDjoint_BS(ModelType, ModelParaBoot, InputsForOutputs[[ModelType]]$FEVD$horiz,
+                              FactorLabels, Economies)
 
   # GIRFS and GFEVD
   GIRFoutputs <- GIRFjoint_BS(ModelType, ModelParaBoot, InputsForOutputs[[ModelType]]$GIRF$horiz,
@@ -686,7 +685,7 @@ OutputConstructionJoint_BS <- function(ModelType, ModelParaBoot, InputsForOutput
                                 FactorLabels, Economies)
 
   # FOR JLL models: Non-orthogonalized IRFs
-  if ("JLL original" %in% ModelType || "JLL NoDomUnit" %in% ModelType ||"JLL jointSigma" %in% ModelType){
+  if (any(ModelType == c("JLL original", "JLL NoDomUnit", "JLL jointSigma"))){
 
     # Generate the outputs with orthogonalized factros:
     IRFOrtho<- IRFjointOrthoJLL_BS(ModelType, ModelParaBoot, InputsForOutputs[[ModelType]]$IRF$horiz,
@@ -740,9 +739,9 @@ OutputConstructionJoint_BS <- function(ModelType, ModelParaBoot, InputsForOutput
 
 
 
-  ######################################################################################################
-  ########################################### 2) IRFs ##################################################
-  ######################################################################################################
+######################################################################################################
+########################################### 2) IRFs ##################################################
+######################################################################################################
 #' IRFs after bootstrap for "joint Q" models
 
 #'@param ModelType string-vector containing the label of the model to be estimated
@@ -763,103 +762,105 @@ IRFjoint_BS <- function(ModelType, ModelParaBoot, IRFhoriz, FactorLabels, Econom
                     "JLL original", "JLL NoDomUnit", "JLL jointSigma")
   idxWishModels <- which(ModelTypeSet == ModelType)
 
-    # Pre-allocation
+  # Pre-allocation
   C <- length(Economies)
-    G <- length(FactorLabels$Global)
-    N <- length(FactorLabels$Spanned)
-    M <- length(FactorLabels$Domestic) - N
-    J <- length(ModelParaBoot$GeneralInputs$mat)
-    CJ <- C*J
-    K <- (M+N)*C + G
+  G <- length(FactorLabels$Global)
+  N <- length(FactorLabels$Spanned)
+  M <- length(FactorLabels$Domestic) - N
+  J <- length(ModelParaBoot$GeneralInputs$mat)
+  CJ <- C*J
+  K <- (M+N)*C + G
 
-    ndraws <- length(ModelParaBoot$ParaDraws[[ModelType]])
+  ndraws <- length(ModelParaBoot$ParaDraws[[ModelType]])
 
-    IRFoutputs <- list()
-    IRFoutputsAllDraws <- list()
+  IRFoutputs <- list()
+  IRFoutputsAllDraws <- list()
 
-    jointModelIdx <- idxWishModels[idxWishModels > which(ModelTypeSet == "GVAR sepQ") ]
-    L <- which(ModelTypeSet == "GVAR sepQ") # index of the model right before the first desired joint model.
+  jointModelIdx <- idxWishModels[idxWishModels > which(ModelTypeSet == "GVAR sepQ") ]
+  L <- which(ModelTypeSet == "GVAR sepQ") # index of the model right before the first desired joint model.
 
-    for(j in jointModelIdx){
-      for (tt in 1:ndraws){
+  for(j in jointModelIdx){
+    for (tt in 1:ndraws){
 
-        # Generate factor labels depending on the models to be estimated
-        AllCountryLabels <- c()
-        AllFactorsLabels <-  c(FactorLabels$Global, FactorLabels$Tables$AllCountries)
+      # Generate factor labels depending on the models to be estimated
+      AllCountryLabels <- c()
+      AllFactorsLabels <-  c(FactorLabels$Global, FactorLabels$Tables$AllCountries)
 
-        # Summarize inputs for the IRFs
-        SIGMA <- ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[tt]]$ests$SSZ # KxK (variance-covariance matrix)
-        A0 <- ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[tt]]$ests$K0Z # Kx1 (matrix of intercepts)
-        A1 <- ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[tt]]$ests$K1Z # KxK (feedback matrix)
+      # Summarize inputs for the IRFs
+      SIGMA <- ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[tt]]$ests$SSZ # KxK (variance-covariance matrix)
+      A0 <- ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[tt]]$ests$K0Z # Kx1 (matrix of intercepts)
+      A1 <- ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[tt]]$ests$K1Z # KxK (feedback matrix)
 
-        BSpanned <- ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[tt]]$rot$P$B
-        B <- BUnspannedAdapJoint(G,M,N,C, J, BSpanned)
+      BSpanned <- ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[tt]]$rot$P$B
+      B <- BUnspannedAdapJoint(G,M,N,C, J, BSpanned)
 
-        # Initialization of IRFs of interest
-        tempFactors <- array(0, c(K, K, IRFhoriz))
-        tempYields  <- array(0, c(CJ,K,IRFhoriz))
+      # Initialization of IRFs of interest
+      tempFactors <- array(0, c(K, K, IRFhoriz))
+      tempYields  <- array(0, c(CJ,K,IRFhoriz))
 
-        # Compute the IRFs
-      if (ModelType== "JLL original" || ModelType== "JLL NoDomUnit" || ModelType== "JLL jointSigma"){  # Choleski term
+      # Compute the IRFs
+      if (any(ModelType == c("JLL original", "JLL NoDomUnit", "JLL jointSigma"))){  # Choleski term
         S <- ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[tt]]$ests$JLLoutcomes$Sigmas$Sigma_Y }
-        else{   S <- t(chol(SIGMA)) }
-        # Shock at t=0:
-        tempFactors[ ,  , 1] <- S
-        tempYields[ , , 1]  <- B %*% S
-        # Shock at t=1:
-        for (r in 2:IRFhoriz){
-          tempFactors[ , , r] <- powerplus::Matpow(A1,numer=r-1, denom=1)%*%S # IRF (t+h) = A1^h*S
-          tempYields[ , , r]      <- B%*%powerplus::Matpow(A1,numer=r-1, denom=1)%*%S
-        }
-        IRFRiskFactors <- aperm(tempFactors, c(3,1,2))
-        IRFYields <- aperm(tempYields, c(3,1,2))
+      else{   S <- t(chol(SIGMA)) }
+      # Shock at t=0:
+      tempFactors[ ,  , 1] <- S
+      tempYields[ , , 1]  <- B %*% S
+      # Shock at t=1:
+      for (r in 2:IRFhoriz){
+        if (r == 2) { A1h <- A1} else { A1h <- A1h %*% A1}
 
-        Horiz <- t(t(0:(IRFhoriz-1))) #Add a column for horizon of interest
-
-
-        # Adjust the variable labels
-        dimnames(IRFRiskFactors)[[1]] <- Horiz
-        dimnames(IRFRiskFactors)[[2]] <- AllFactorsLabels
-        dimnames(IRFRiskFactors)[[3]] <- AllFactorsLabels
-
-
-        YieldsLabel<- rownames(ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[tt]]$rot$P$A)
-        dimnames(IRFYields)[[1]] <- Horiz
-        dimnames(IRFYields)[[2]] <-  YieldsLabel
-        dimnames(IRFYields)[[3]] <- AllFactorsLabels
-
-
-        IRFoutputsAllCountries <- list(IRFRiskFactors,IRFYields)
-        names(IRFoutputsAllCountries) <- c("Factors","Yields")
-
-        # Prepare output per country
-        IRFoutputsAllDraws[[tt]]  <- IRFoutputsAllCountries
-        #
-
-
+        tempFactors[ , , r] <- A1h%*%S # IRF (t+h) = A1^h*S
+        tempYields[ , , r]      <- B%*%A1h%*%S
       }
+      IRFRiskFactors <- aperm(tempFactors, c(3,1,2))
+      IRFYields <- aperm(tempYields, c(3,1,2))
 
-      # All draws of all counntries for ALL models
-      IRFoutputs[[j-L]] <- IRFoutputsAllDraws
+      Horiz <- t(t(0:(IRFhoriz-1))) #Add a column for horizon of interest
+
+
+      # Adjust the variable labels
+      dimnames(IRFRiskFactors)[[1]] <- Horiz
+      dimnames(IRFRiskFactors)[[2]] <- AllFactorsLabels
+      dimnames(IRFRiskFactors)[[3]] <- AllFactorsLabels
+
+
+      YieldsLabel<- rownames(ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[tt]]$rot$P$A)
+      dimnames(IRFYields)[[1]] <- Horiz
+      dimnames(IRFYields)[[2]] <-  YieldsLabel
+      dimnames(IRFYields)[[3]] <- AllFactorsLabels
+
+
+      IRFoutputsAllCountries <- list(IRFRiskFactors,IRFYields)
+      names(IRFoutputsAllCountries) <- c("Factors","Yields")
+
+      # Prepare output per country
+      IRFoutputsAllDraws[[tt]]  <- IRFoutputsAllCountries
+      #
+
 
     }
 
-
-
-    # Clean empty lists
-    IRFoutputs  <- IRFoutputs[unlist(lapply(IRFoutputs, length) != 0)]
-
-    names(IRFoutputs) <- ModelTypeSet[jointModelIdx]
-
-
-    return(IRFoutputs)
+    # All draws of all counntries for ALL models
+    IRFoutputs[[j-L]] <- IRFoutputsAllDraws
 
   }
 
 
-  #########################################################################################################
-  ################################### 3) FEVD #############################################################
-  #########################################################################################################
+
+  # Clean empty lists
+  IRFoutputs  <- IRFoutputs[unlist(lapply(IRFoutputs, length) != 0)]
+
+  names(IRFoutputs) <- ModelTypeSet[jointModelIdx]
+
+
+  return(IRFoutputs)
+
+}
+
+
+#########################################################################################################
+################################### 3) FEVD #############################################################
+#########################################################################################################
 #' FEVDs after bootstrap for "joint Q" models
 
 #'@param ModelType string-vector containing the label of the model to be estimated
@@ -880,130 +881,130 @@ FEVDjoint_BS <- function(ModelType, ModelParaBoot, FEVDhoriz, FactorLabels, Econ
 
   ndraws <- length(ModelParaBoot$ParaDraws[[ModelType]])
 
-    N <- length(FactorLabels$Spanned)
-    C <- length(Economies)
-    M <- length(FactorLabels$Domestic) - N
-    G <- length(FactorLabels$Global)
-    K <- C*(M+N) + G
-    J <- length(ModelParaBoot$GeneralInputs$mat)
+  N <- length(FactorLabels$Spanned)
+  C <- length(Economies)
+  M <- length(FactorLabels$Domestic) - N
+  G <- length(FactorLabels$Global)
+  K <- C*(M+N) + G
+  J <- length(ModelParaBoot$GeneralInputs$mat)
 
-    jointModelIdx <- idxWishModels[idxWishModels > which(ModelTypeSet == "GVAR sepQ") ]
-    L <- which(ModelTypeSet == "GVAR sepQ") # index of the model right before the first desired joint model.
+  jointModelIdx <- idxWishModels[idxWishModels > which(ModelTypeSet == "GVAR sepQ") ]
+  L <- which(ModelTypeSet == "GVAR sepQ") # index of the model right before the first desired joint model.
 
-    FEVDoutputs <- list()
-    FEVDoutputsAllDraws <- list()
+  FEVDoutputs <- list()
+  FEVDoutputsAllDraws <- list()
 
-    for (j in  jointModelIdx){
-      for (tt in 1: ndraws){
+  for (j in  jointModelIdx){
+    for (tt in 1: ndraws){
 
-        G0 <- ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[tt]]$ests$Gy.0
-        Sigma_y <-  ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[tt]]$ests$SSZ
-        F1 <- ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[tt]]$ests$K1Z
+      G0 <- ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[tt]]$ests$Gy.0
+      Sigma_y <-  ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[tt]]$ests$SSZ
+      F1 <- ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[tt]]$ests$K1Z
 
-        # 1) Dynamic multipliers
-        Ry.h <- array(NA, c(K,K,FEVDhoriz))
-        Ry.h[, ,1] <- diag(K) # dynamic multiplier at t=0
+      # 1) Dynamic multipliers
+      Ry.h <- array(NA, c(K,K,FEVDhoriz))
+      Ry.h[, ,1] <- diag(K) # dynamic multiplier at t=0
 
-        for (i in 2:FEVDhoriz) {
-          Ry.h[, ,i] <- F1%*%Ry.h[, ,i-1]
-        }
-
-        # 2) Initialization
-        vslct <- diag(K)
-        eslct <- diag(K)
-
-        # 2.1) Minor preliminary work
-        invG <- diag(nrow(G0))/G0
-        invG[!is.finite(invG)] <- 0
-        invGSigmau <- solve(G0)%*%Sigma_y
-
-        # Choleski term
-        if ( ModelType == "JLL original" || ModelType == "JLL NoDomUnit" || ModelType == "JLL jointSigma" ){
-          P <- ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[tt]]$ests$JLLoutcomes$Sigmas$Sigma_Y
-        }else{ P <- t(chol(invGSigmau)) }
-
-        scale <- 1
-
-        # 2.2) Factor loadings preparation
-        BSpanned <- ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[tt]]$rot$P$B
-        B <- BUnspannedAdapJoint(G,M,N,C, J, BSpanned)
-
-        # 3) FEVD
-        # 3.1) Factors
-        FEVDresFactors <- array(NA, c(nrow = K, ncol=K, FEVDhoriz))
-        num <- matrix(0, nrow =K, ncol=K)
-        den <- rep(0, times = K)
-
-        for (l in 1:FEVDhoriz){
-          acc1 <- (eslct%*%Ry.h[,,l]%*%P%*%vslct)^2
-          num <- num + acc1
-          acc2 <- diag(eslct%*%Ry.h[,,l]%*%invGSigmau%*%t(invG)%*%t(Ry.h[,,l])%*%eslct)
-          den<- den + acc2
-          FEVDresFactors[ ,,l] <- scale*num/den
-        }
-
-        FEVDFactors <- aperm(FEVDresFactors, c(3,2,1))
-
-        # 3.2) Yields
-        eslctCJ <- diag(C*J)
-        vslctCJ <- diag(K)
-
-
-
-        FEVDresYields <- array(NA, c(nrow = C*J, ncol=K, FEVDhoriz))
-        num <- matrix(0, nrow =C*J, ncol=K)
-        den <- matrix(0, nrow =C*J, ncol=K)
-
-        for (l in 1:FEVDhoriz){
-          acc1 <- (eslctCJ%*%B%*%Ry.h[,,l]%*%P%*%vslctCJ)^2
-          num <- num + acc1
-          acc2 <- diag(eslctCJ%*%B%*%Ry.h[,,l]%*%invGSigmau%*%t(invG)%*%t(Ry.h[,,l])%*%t(B)%*%eslctCJ)
-          den<- den + acc2
-          FEVDresYields[ ,,l] <- scale*num/den
-        }
-
-
-        FEVDYields <- aperm(FEVDresYields, c(3, 2, 1))
-
-        # 4) Prepare labels
-        labelsFEVDFactors <- c(FactorLabels$Global,FactorLabels$Tables$AllCountries)
-        YieldsLabel<- rownames(ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[tt]]$rot$P$A)
-
-        dimnames(FEVDFactors)[[1]] <- 1:(FEVDhoriz)
-        dimnames(FEVDFactors)[[2]] <- labelsFEVDFactors
-        dimnames(FEVDFactors)[[3]] <- labelsFEVDFactors
-
-
-        dimnames(FEVDYields)[[1]] <- 1:(FEVDhoriz)
-        dimnames(FEVDYields)[[2]] <- labelsFEVDFactors
-        dimnames(FEVDYields)[[3]] <- YieldsLabel
-
-
-        FEVDoutputsAllCountries <- list(FEVDFactors,FEVDYields)
-        names(FEVDoutputsAllCountries) <- c("Factors","Yields")
-
-        FEVDoutputsAllDraws[[tt]] <- FEVDoutputsAllCountries
-
-
+      for (i in 2:FEVDhoriz) {
+        Ry.h[, ,i] <- F1%*%Ry.h[, ,i-1]
       }
 
-      FEVDoutputs[[j-L]] <- FEVDoutputsAllDraws
+      # 2) Initialization
+      vslct <- diag(K)
+      eslct <- diag(K)
+
+      # 2.1) Minor preliminary work
+      invG <- diag(nrow(G0))/G0
+      invG[!is.finite(invG)] <- 0
+      invGSigmau <- solve(G0)%*%Sigma_y
+
+      # Choleski term
+      if ( any(ModelType == c("JLL original", "JLL NoDomUnit", "JLL jointSigma" ))){
+        P <- ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[tt]]$ests$JLLoutcomes$Sigmas$Sigma_Y
+      }else{ P <- t(chol(invGSigmau)) }
+
+      scale <- 1
+
+      # 2.2) Factor loadings preparation
+      BSpanned <- ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[tt]]$rot$P$B
+      B <- BUnspannedAdapJoint(G,M,N,C, J, BSpanned)
+
+      # 3) FEVD
+      # 3.1) Factors
+      FEVDresFactors <- array(NA, c(nrow = K, ncol=K, FEVDhoriz))
+      num <- matrix(0, nrow =K, ncol=K)
+      den <- rep(0, times = K)
+
+      for (l in 1:FEVDhoriz){
+        acc1 <- (eslct%*%Ry.h[,,l]%*%P%*%vslct)^2
+        num <- num + acc1
+        acc2 <- diag(eslct%*%Ry.h[,,l]%*%invGSigmau%*%t(invG)%*%t(Ry.h[,,l])%*%eslct)
+        den<- den + acc2
+        FEVDresFactors[ ,,l] <- scale*num/den
+      }
+
+      FEVDFactors <- aperm(FEVDresFactors, c(3,2,1))
+
+      # 3.2) Yields
+      eslctCJ <- diag(C*J)
+      vslctCJ <- diag(K)
+
+
+
+      FEVDresYields <- array(NA, c(nrow = C*J, ncol=K, FEVDhoriz))
+      num <- matrix(0, nrow =C*J, ncol=K)
+      den <- matrix(0, nrow =C*J, ncol=K)
+
+      for (l in 1:FEVDhoriz){
+        acc1 <- (eslctCJ%*%B%*%Ry.h[,,l]%*%P%*%vslctCJ)^2
+        num <- num + acc1
+        acc2 <- diag(eslctCJ%*%B%*%Ry.h[,,l]%*%invGSigmau%*%t(invG)%*%t(Ry.h[,,l])%*%t(B)%*%eslctCJ)
+        den<- den + acc2
+        FEVDresYields[ ,,l] <- scale*num/den
+      }
+
+
+      FEVDYields <- aperm(FEVDresYields, c(3, 2, 1))
+
+      # 4) Prepare labels
+      labelsFEVDFactors <- c(FactorLabels$Global,FactorLabels$Tables$AllCountries)
+      YieldsLabel<- rownames(ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[tt]]$rot$P$A)
+
+      dimnames(FEVDFactors)[[1]] <- 1:(FEVDhoriz)
+      dimnames(FEVDFactors)[[2]] <- labelsFEVDFactors
+      dimnames(FEVDFactors)[[3]] <- labelsFEVDFactors
+
+
+      dimnames(FEVDYields)[[1]] <- 1:(FEVDhoriz)
+      dimnames(FEVDYields)[[2]] <- labelsFEVDFactors
+      dimnames(FEVDYields)[[3]] <- YieldsLabel
+
+
+      FEVDoutputsAllCountries <- list(FEVDFactors,FEVDYields)
+      names(FEVDoutputsAllCountries) <- c("Factors","Yields")
+
+      FEVDoutputsAllDraws[[tt]] <- FEVDoutputsAllCountries
+
 
     }
-    # Clean empty lists
-    FEVDoutputs  <- FEVDoutputs[unlist(lapply(FEVDoutputs, length) != 0)]
 
-    names(FEVDoutputs) <- ModelTypeSet[jointModelIdx]
-
-
-    return(FEVDoutputs)
+    FEVDoutputs[[j-L]] <- FEVDoutputsAllDraws
 
   }
+  # Clean empty lists
+  FEVDoutputs  <- FEVDoutputs[unlist(lapply(FEVDoutputs, length) != 0)]
+
+  names(FEVDoutputs) <- ModelTypeSet[jointModelIdx]
 
 
-  #########################################################################################################
-  ################################### 4) GIRF #############################################################
-  #########################################################################################################
+  return(FEVDoutputs)
+
+}
+
+
+#########################################################################################################
+################################### 4) GIRF #############################################################
+#########################################################################################################
 #' GIRFs after bootstrap for "joint Q" models
 
 #'@param ModelType string-vector containing the label of the model to be estimated
@@ -1035,109 +1036,109 @@ GIRFjoint_BS <- function(ModelType, ModelParaBoot, GIRFhoriz, FactorLabels, Econ
 
   ndraws <- length(ModelParaBoot$ParaDraws[[ModelType]])
 
-    N <- length(FactorLabels$Spanned)
-    C <- length(Economies) # Number of economies in the system
-    M <- length(FactorLabels$Domestic) - N # Number of country-specific domestic variables
-    G <- length(FactorLabels$Global) # Number of global variables
-    K <- C*(M+N)+G # All factors of the system
-    J <- length(ModelParaBoot$GeneralInputs$mat)
-    CJ <- C*J
+  N <- length(FactorLabels$Spanned)
+  C <- length(Economies) # Number of economies in the system
+  M <- length(FactorLabels$Domestic) - N # Number of country-specific domestic variables
+  G <- length(FactorLabels$Global) # Number of global variables
+  K <- C*(M+N)+G # All factors of the system
+  J <- length(ModelParaBoot$GeneralInputs$mat)
+  CJ <- C*J
 
-    jointModelIdx <- idxWishModels[idxWishModels > which(ModelTypeSet == "GVAR sepQ") ]
-    L <- which(ModelTypeSet == "GVAR sepQ") # index of the model right before the first desired joint model.
+  jointModelIdx <- idxWishModels[idxWishModels > which(ModelTypeSet == "GVAR sepQ") ]
+  L <- which(ModelTypeSet == "GVAR sepQ") # index of the model right before the first desired joint model.
 
-    GIRFoutputs <- list()
-    GIRFoutputsAllDraws <- list()
+  GIRFoutputs <- list()
+  GIRFoutputsAllDraws <- list()
 
-    for (j in  jointModelIdx){
-      for (tt in 1: ndraws){
-
-
-        Gy.0 <- ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[tt]]$ests$Gy.0
-        Sigma.y <- ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[tt]]$ests$SSZ
-        F1 <- ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[tt]]$ests$K1Z
-
-        BSpanned <- ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[tt]]$rot$P$B
-        B <- BUnspannedAdapJoint(G,M,N,C, J, BSpanned)
-
-        # 1) Dynamic multiplier:
-        Ry.h <- array(NA, c(K,K,GIRFhoriz))
-        Ry.h[, ,1] <- diag(K) # dynamic multiplier at t=0
-
-        for (i in 2:GIRFhoriz) {
-          Ry.h[, ,i] <- F1%*%Ry.h[, ,i-1]
-        }
-
-        # 2) Build the vector containing the one unit-shock for each variable of the system
-        ey.j <- diag(K)
-
-        # 3) GIRFs:
-        # 3.1) Factors
-        AllResponsesToAllShocksFactors <- array(NA, c(K,GIRFhoriz,K))
-        AllResponsesToShockOfOneVariableFactors <- matrix(NA, ncol= GIRFhoriz , nrow = K)
-        for (g in 1:K){
-          for (i in 1:GIRFhoriz){
-            numFactors <- (Ry.h[,,i]%*% solve(Gy.0)%*%Sigma.y%*%ey.j[,g]) # numerator from equation at the bottom of the page 22 (PS, 1998)
-            demFactors <- 1/sqrt((t(ey.j[,g])%*%Sigma.y%*%ey.j[,g])) # denominator from equation at the bottom of the page 22 (PS, 1998)
-            AllResponsesToShockOfOneVariableFactors[,i] <- numFactors*drop(demFactors)
-          }
-          AllResponsesToAllShocksFactors[,,g] <- AllResponsesToShockOfOneVariableFactors
-        }
-
-        GIRFFactors <- aperm(AllResponsesToAllShocksFactors, c(2,1,3))
-
-        #3.2) Yields
-        AllResponsesToAllShocksYields <- array(NA, c(CJ,GIRFhoriz,K))
-        AllResponsesToShockOfOneVariableYields <- matrix(NA, ncol= GIRFhoriz , nrow = CJ)
-        for (g in 1:K){
-          for (i in 1:GIRFhoriz){
-            numYields <- B%*%(Ry.h[,,i]%*% solve(Gy.0)%*%Sigma.y%*%ey.j[,g]) # numerator from equation at the bottom of the page 22 (PS, 1998)
-            demYields <- 1/sqrt((t(ey.j[,g])%*%Sigma.y%*%ey.j[,g])) # denominator from equation at the bottom of the page 22 (PS, 1998)
-            AllResponsesToShockOfOneVariableYields[,i] <- numYields*drop(demYields)
-          }
-          AllResponsesToAllShocksYields[,,g] <- AllResponsesToShockOfOneVariableYields
-        }
-
-        GIRFYields <- aperm(AllResponsesToAllShocksYields, c(2,1,3))
+  for (j in  jointModelIdx){
+    for (tt in 1: ndraws){
 
 
-        # 4) Prepare labels for the output
-        # 4.1) Add columns containig the horizons
-        Horiz <- t(t(0:(GIRFhoriz-1))) #Add a column for horizon of interest
+      Gy.0 <- ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[tt]]$ests$Gy.0
+      Sigma.y <- ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[tt]]$ests$SSZ
+      F1 <- ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[tt]]$ests$K1Z
 
-        # 4.2) Labels
-        labelsGIRF <- c(FactorLabels$Global,FactorLabels$Tables$AllCountries)
+      BSpanned <- ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[tt]]$rot$P$B
+      B <- BUnspannedAdapJoint(G,M,N,C, J, BSpanned)
 
-        dimnames(GIRFFactors)[[1]] <- Horiz # We subtract 1, because the first element is the contemporaneous one
-        dimnames(GIRFFactors)[[2]] <- labelsGIRF
-        dimnames(GIRFFactors)[[3]] <- labelsGIRF
+      # 1) Dynamic multiplier:
+      Ry.h <- array(NA, c(K,K,GIRFhoriz))
+      Ry.h[, ,1] <- diag(K) # dynamic multiplier at t=0
 
-        YieldsLabel<- rownames(ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[tt]]$rot$P$A)
-        dimnames(GIRFYields)[[1]] <- Horiz # We subtract 1, because the first element is the contemporaneous one
-        dimnames(GIRFYields)[[2]] <- YieldsLabel
-        dimnames(GIRFYields)[[3]] <- labelsGIRF
-
-
-        GIRFoutputsAllCountries <- list(GIRFFactors,GIRFYields)
-        names(GIRFoutputsAllCountries) <- c("Factors","Yields")
-
-        GIRFoutputsAllDraws[[tt]] <- GIRFoutputsAllCountries
-
+      for (i in 2:GIRFhoriz) {
+        Ry.h[, ,i] <- F1%*%Ry.h[, ,i-1]
       }
 
-      GIRFoutputs[[j-L]] <- GIRFoutputsAllDraws
+      # 2) Build the vector containing the one unit-shock for each variable of the system
+      ey.j <- diag(K)
+
+      # 3) GIRFs:
+      # 3.1) Factors
+      AllResponsesToAllShocksFactors <- array(NA, c(K,GIRFhoriz,K))
+      AllResponsesToShockOfOneVariableFactors <- matrix(NA, ncol= GIRFhoriz , nrow = K)
+      for (g in 1:K){
+        for (i in 1:GIRFhoriz){
+          numFactors <- (Ry.h[,,i]%*% solve(Gy.0)%*%Sigma.y%*%ey.j[,g]) # numerator from equation at the bottom of the page 22 (PS, 1998)
+          demFactors <- 1/sqrt((t(ey.j[,g])%*%Sigma.y%*%ey.j[,g])) # denominator from equation at the bottom of the page 22 (PS, 1998)
+          AllResponsesToShockOfOneVariableFactors[,i] <- numFactors*drop(demFactors)
+        }
+        AllResponsesToAllShocksFactors[,,g] <- AllResponsesToShockOfOneVariableFactors
+      }
+
+      GIRFFactors <- aperm(AllResponsesToAllShocksFactors, c(2,1,3))
+
+      #3.2) Yields
+      AllResponsesToAllShocksYields <- array(NA, c(CJ,GIRFhoriz,K))
+      AllResponsesToShockOfOneVariableYields <- matrix(NA, ncol= GIRFhoriz , nrow = CJ)
+      for (g in 1:K){
+        for (i in 1:GIRFhoriz){
+          numYields <- B%*%(Ry.h[,,i]%*% solve(Gy.0)%*%Sigma.y%*%ey.j[,g]) # numerator from equation at the bottom of the page 22 (PS, 1998)
+          demYields <- 1/sqrt((t(ey.j[,g])%*%Sigma.y%*%ey.j[,g])) # denominator from equation at the bottom of the page 22 (PS, 1998)
+          AllResponsesToShockOfOneVariableYields[,i] <- numYields*drop(demYields)
+        }
+        AllResponsesToAllShocksYields[,,g] <- AllResponsesToShockOfOneVariableYields
+      }
+
+      GIRFYields <- aperm(AllResponsesToAllShocksYields, c(2,1,3))
+
+
+      # 4) Prepare labels for the output
+      # 4.1) Add columns containig the horizons
+      Horiz <- t(t(0:(GIRFhoriz-1))) #Add a column for horizon of interest
+
+      # 4.2) Labels
+      labelsGIRF <- c(FactorLabels$Global,FactorLabels$Tables$AllCountries)
+
+      dimnames(GIRFFactors)[[1]] <- Horiz # We subtract 1, because the first element is the contemporaneous one
+      dimnames(GIRFFactors)[[2]] <- labelsGIRF
+      dimnames(GIRFFactors)[[3]] <- labelsGIRF
+
+      YieldsLabel<- rownames(ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[tt]]$rot$P$A)
+      dimnames(GIRFYields)[[1]] <- Horiz # We subtract 1, because the first element is the contemporaneous one
+      dimnames(GIRFYields)[[2]] <- YieldsLabel
+      dimnames(GIRFYields)[[3]] <- labelsGIRF
+
+
+      GIRFoutputsAllCountries <- list(GIRFFactors,GIRFYields)
+      names(GIRFoutputsAllCountries) <- c("Factors","Yields")
+
+      GIRFoutputsAllDraws[[tt]] <- GIRFoutputsAllCountries
+
     }
-    # Clean empty lists
-    GIRFoutputs  <- GIRFoutputs[unlist(lapply(GIRFoutputs, length) != 0)]
 
-    names(GIRFoutputs) <- ModelTypeSet[jointModelIdx]
-
-    return(GIRFoutputs)
+    GIRFoutputs[[j-L]] <- GIRFoutputsAllDraws
   }
+  # Clean empty lists
+  GIRFoutputs  <- GIRFoutputs[unlist(lapply(GIRFoutputs, length) != 0)]
 
-  #########################################################################################################
-  ################################### 5) GFEVD #############################################################
-  #########################################################################################################
+  names(GIRFoutputs) <- ModelTypeSet[jointModelIdx]
+
+  return(GIRFoutputs)
+}
+
+#########################################################################################################
+################################### 5) GFEVD #############################################################
+#########################################################################################################
 #' GFEVDs after bootstrap for "joint Q" models
 
 #'@param ModelType string-vector containing the label of the model to be estimated
@@ -1167,152 +1168,152 @@ GFEVDjoint_BS <- function(ModelType, ModelParaBoot, GFEVDhoriz, FactorLabels, Ec
 
   ndraws <- length(ModelParaBoot$ParaDraws[[ModelType]])
 
-    N <- length(FactorLabels$Spanned)
-    C <- length(Economies)
-    M <- length(FactorLabels$Domestic) - N
-    G <- length(FactorLabels$Global)
-    K <- C*(M+N) + G
-    J <- length(ModelParaBoot$GeneralInputs$mat)
+  N <- length(FactorLabels$Spanned)
+  C <- length(Economies)
+  M <- length(FactorLabels$Domestic) - N
+  G <- length(FactorLabels$Global)
+  K <- C*(M+N) + G
+  J <- length(ModelParaBoot$GeneralInputs$mat)
 
-    jointModelIdx <- idxWishModels[idxWishModels > which(ModelTypeSet == "GVAR sepQ") ]
-    L <- which(ModelTypeSet == "GVAR sepQ") # index of the model right before the first desired joint model.
+  jointModelIdx <- idxWishModels[idxWishModels > which(ModelTypeSet == "GVAR sepQ") ]
+  L <- which(ModelTypeSet == "GVAR sepQ") # index of the model right before the first desired joint model.
 
-    GFEVDoutputs <- list()
-    GFEVDoutputsAllDraws <- list()
+  GFEVDoutputs <- list()
+  GFEVDoutputsAllDraws <- list()
 
-    for (j in  jointModelIdx){
-      for (tt in 1: ndraws){
+  for (j in  jointModelIdx){
+    for (tt in 1: ndraws){
 
-        G0 <- ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[tt]]$ests$Gy.0
-        Sigma_y <- ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[tt]]$ests$SSZ
-        F1 <- ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[tt]]$ests$K1Z
+      G0 <- ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[tt]]$ests$Gy.0
+      Sigma_y <- ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[tt]]$ests$SSZ
+      F1 <- ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[tt]]$ests$K1Z
 
-        # 1) Dynamic multipliers
-        Ry.h <- array(NA, c(K,K,GFEVDhoriz))
-        Ry.h[, ,1] <- diag(K) # dynamic multiplier at t=0
+      # 1) Dynamic multipliers
+      Ry.h <- array(NA, c(K,K,GFEVDhoriz))
+      Ry.h[, ,1] <- diag(K) # dynamic multiplier at t=0
 
-        for (i in 2:GFEVDhoriz) {
-          Ry.h[, ,i] <- F1%*%Ry.h[, ,i-1]
-        }
-
-        # 2) Initialization/ Minor preliminary work
-        GFEVDresFac <- array(NA, c(nrow = K, ncol=GFEVDhoriz,K))
-        vslct <- diag(K)
-        eslct <- diag(K)
-
-        invG <- diag(nrow(G0))/G0
-        invG[!is.finite(invG)] <- 0
-        invGSigmau <- solve(G0)%*%Sigma_y
-
-        scale <- 1/diag(Sigma_y)
-
-        # 3) GFEVD
-        # 3.1) Factors
-        for(i in 1:K){
-          n<-1
-          num <- matrix(0, nrow =K, ncol=GFEVDhoriz)
-          den <- matrix(0, nrow =K, ncol=GFEVDhoriz)
-          while (n <= GFEVDhoriz){
-            for (l in 1:n){
-              acc1 <- t((eslct[,i]%*%Ry.h[,,l]%*%invGSigmau%*%vslct)^2)
-              num[,n] <- num[ ,n] + acc1
-              acc2 <- eslct[,i]%*%Ry.h[,,l]%*%invGSigmau%*%t(invG)%*%t(Ry.h[,,l])%*%eslct[,i]
-              den[,n]<- den[,n] + matrix(1, nrow=K)%*%acc2
-            }
-            GFEVDresFac[ ,n,i] <- t(t(scale*num[,n]))/den[,n]
-            n <- n+1
-          }
-        }
-
-
-        GFEVDFactors <- aperm(GFEVDresFac, c(2,1,3)) # Non-normalized GFEVD (i.e. rows need not sum up to 1)
-
-        #  Normalization of the GFEVD for the factors
-        # (Make sure that the sum of the errors equal to one in each period)
-        DEM <- array(NA, c(nrow = GFEVDhoriz, ncol=1, K))
-        GFEVDFactorsNormalized <- array(NA, c(nrow = GFEVDhoriz, ncol=K, K))
-
-        for (h in 1:K){
-          for (n in 1:GFEVDhoriz){
-            DEM[n, 1, h] <- sum(GFEVDFactors[n,,h])
-            GFEVDFactorsNormalized[n,,h] <- GFEVDFactors[n,,h]/DEM[n,,h]
-          }
-        }
-
-        # 3.2) Yields
-        # Get the full B
-        BSpanned <- ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[tt]]$rot$P$B
-        B <- BUnspannedAdapJoint(G,M,N,C, J, BSpanned)
-
-
-        # Initialization
-        GFEVDresYie <- array(NA, c(nrow = C*J, ncol=K, GFEVDhoriz))
-        vslctYie <- diag(K)
-        eslctYie <- diag(C*J)
-
-
-        num <- matrix(0, nrow =C*J, ncol=K)
-        den <- matrix(0, nrow =C*J, ncol=K)
-
-        for (l in 1:GFEVDhoriz){
-          acc1 <- (eslctYie%*%B%*%Ry.h[,,l]%*%invGSigmau%*%vslctYie)^2
-          num <- num + acc1
-          acc2 <- diag(eslctYie%*%B%*%Ry.h[,,l]%*%invGSigmau%*%t(invG)%*%t(Ry.h[,,l])%*%t(B)%*%eslctYie)
-          den <- den + acc2
-          for (q in 1:K){
-            GFEVDresYie[ ,q,l] <- scale[q]*(num/den)[,q] # note: unlike the GFEVD of the factors, note that the "scale" variable is now at the acc1
-          }
-        }
-
-
-        GFEVDYields <- aperm(GFEVDresYie, c(3,2,1))
-
-        #  Normalization of the GFEVD for the factors
-        # (Make sure that the sum of the errors equal to one in each period)
-        DEM <- array(NA, c(nrow = GFEVDhoriz, ncol=1, C*J))
-        GFEVDYieldsNormalized <- array(NA, c(nrow = GFEVDhoriz, ncol=K, C*J))
-
-        for (h in 1:(C*J)){
-          for (n in 1:GFEVDhoriz){
-            DEM[n, 1, h] <- sum(GFEVDYields[n,,h])
-            GFEVDYieldsNormalized[n,,h] <- GFEVDYields[n,,h]/DEM[n,,h]
-          }
-        }
-
-
-        # 4) Adjust labels:
-        labelsGFEVDFactors <- c(FactorLabels$Global,FactorLabels$Tables$AllCountries)
-        YieldsLabel <- rownames(ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[tt]]$rot$P$A)
-
-
-        dimnames(GFEVDFactorsNormalized)[[1]] <- 1:(GFEVDhoriz)
-        dimnames(GFEVDFactorsNormalized)[[2]] <- labelsGFEVDFactors
-        dimnames(GFEVDFactorsNormalized)[[3]] <- labelsGFEVDFactors
-
-        dimnames(GFEVDYieldsNormalized)[[1]] <- 1:(GFEVDhoriz)
-        dimnames(GFEVDYieldsNormalized)[[2]] <- labelsGFEVDFactors
-        dimnames(GFEVDYieldsNormalized)[[3]] <- YieldsLabel
-
-        GFEVDoutputsAllCountries <- list(GFEVDFactorsNormalized,GFEVDYieldsNormalized)
-        names(GFEVDoutputsAllCountries) <- c("Factors","Yields")
-
-        GFEVDoutputsAllDraws[[tt]] <- GFEVDoutputsAllCountries
-
+      for (i in 2:GFEVDhoriz) {
+        Ry.h[, ,i] <- F1%*%Ry.h[, ,i-1]
       }
 
-      GFEVDoutputs[[j-L]] <- GFEVDoutputsAllDraws
+      # 2) Initialization/ Minor preliminary work
+      GFEVDresFac <- array(NA, c(nrow = K, ncol=GFEVDhoriz,K))
+      vslct <- diag(K)
+      eslct <- diag(K)
+
+      invG <- diag(nrow(G0))/G0
+      invG[!is.finite(invG)] <- 0
+      invGSigmau <- solve(G0)%*%Sigma_y
+
+      scale <- 1/diag(Sigma_y)
+
+      # 3) GFEVD
+      # 3.1) Factors
+      for(i in 1:K){
+        n<-1
+        num <- matrix(0, nrow =K, ncol=GFEVDhoriz)
+        den <- matrix(0, nrow =K, ncol=GFEVDhoriz)
+        while (n <= GFEVDhoriz){
+          for (l in 1:n){
+            acc1 <- t((eslct[,i]%*%Ry.h[,,l]%*%invGSigmau%*%vslct)^2)
+            num[,n] <- num[ ,n] + acc1
+            acc2 <- eslct[,i]%*%Ry.h[,,l]%*%invGSigmau%*%t(invG)%*%t(Ry.h[,,l])%*%eslct[,i]
+            den[,n]<- den[,n] + matrix(1, nrow=K)%*%acc2
+          }
+          GFEVDresFac[ ,n,i] <- t(t(scale*num[,n]))/den[,n]
+          n <- n+1
+        }
+      }
+
+
+      GFEVDFactors <- aperm(GFEVDresFac, c(2,1,3)) # Non-normalized GFEVD (i.e. rows need not sum up to 1)
+
+      #  Normalization of the GFEVD for the factors
+      # (Make sure that the sum of the errors equal to one in each period)
+      DEM <- array(NA, c(nrow = GFEVDhoriz, ncol=1, K))
+      GFEVDFactorsNormalized <- array(NA, c(nrow = GFEVDhoriz, ncol=K, K))
+
+      for (h in 1:K){
+        for (n in 1:GFEVDhoriz){
+          DEM[n, 1, h] <- sum(GFEVDFactors[n,,h])
+          GFEVDFactorsNormalized[n,,h] <- GFEVDFactors[n,,h]/DEM[n,,h]
+        }
+      }
+
+      # 3.2) Yields
+      # Get the full B
+      BSpanned <- ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[tt]]$rot$P$B
+      B <- BUnspannedAdapJoint(G,M,N,C, J, BSpanned)
+
+
+      # Initialization
+      GFEVDresYie <- array(NA, c(nrow = C*J, ncol=K, GFEVDhoriz))
+      vslctYie <- diag(K)
+      eslctYie <- diag(C*J)
+
+
+      num <- matrix(0, nrow =C*J, ncol=K)
+      den <- matrix(0, nrow =C*J, ncol=K)
+
+      for (l in 1:GFEVDhoriz){
+        acc1 <- (eslctYie%*%B%*%Ry.h[,,l]%*%invGSigmau%*%vslctYie)^2
+        num <- num + acc1
+        acc2 <- diag(eslctYie%*%B%*%Ry.h[,,l]%*%invGSigmau%*%t(invG)%*%t(Ry.h[,,l])%*%t(B)%*%eslctYie)
+        den <- den + acc2
+        for (q in 1:K){
+          GFEVDresYie[ ,q,l] <- scale[q]*(num/den)[,q] # note: unlike the GFEVD of the factors, note that the "scale" variable is now at the acc1
+        }
+      }
+
+
+      GFEVDYields <- aperm(GFEVDresYie, c(3,2,1))
+
+      #  Normalization of the GFEVD for the factors
+      # (Make sure that the sum of the errors equal to one in each period)
+      DEM <- array(NA, c(nrow = GFEVDhoriz, ncol=1, C*J))
+      GFEVDYieldsNormalized <- array(NA, c(nrow = GFEVDhoriz, ncol=K, C*J))
+
+      for (h in 1:(C*J)){
+        for (n in 1:GFEVDhoriz){
+          DEM[n, 1, h] <- sum(GFEVDYields[n,,h])
+          GFEVDYieldsNormalized[n,,h] <- GFEVDYields[n,,h]/DEM[n,,h]
+        }
+      }
+
+
+      # 4) Adjust labels:
+      labelsGFEVDFactors <- c(FactorLabels$Global,FactorLabels$Tables$AllCountries)
+      YieldsLabel <- rownames(ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[tt]]$rot$P$A)
+
+
+      dimnames(GFEVDFactorsNormalized)[[1]] <- 1:(GFEVDhoriz)
+      dimnames(GFEVDFactorsNormalized)[[2]] <- labelsGFEVDFactors
+      dimnames(GFEVDFactorsNormalized)[[3]] <- labelsGFEVDFactors
+
+      dimnames(GFEVDYieldsNormalized)[[1]] <- 1:(GFEVDhoriz)
+      dimnames(GFEVDYieldsNormalized)[[2]] <- labelsGFEVDFactors
+      dimnames(GFEVDYieldsNormalized)[[3]] <- YieldsLabel
+
+      GFEVDoutputsAllCountries <- list(GFEVDFactorsNormalized,GFEVDYieldsNormalized)
+      names(GFEVDoutputsAllCountries) <- c("Factors","Yields")
+
+      GFEVDoutputsAllDraws[[tt]] <- GFEVDoutputsAllCountries
+
     }
 
-
-    # Clean empty lists
-    GFEVDoutputs  <- GFEVDoutputs[unlist(lapply(GFEVDoutputs, length) != 0)]
-
-    names(GFEVDoutputs) <- ModelTypeSet[jointModelIdx]
-
-
-    return(GFEVDoutputs)
-
+    GFEVDoutputs[[j-L]] <- GFEVDoutputsAllDraws
   }
+
+
+  # Clean empty lists
+  GFEVDoutputs  <- GFEVDoutputs[unlist(lapply(GFEVDoutputs, length) != 0)]
+
+  names(GFEVDoutputs) <- ModelTypeSet[jointModelIdx]
+
+
+  return(GFEVDoutputs)
+
+}
 
 
 ######################################################################################################
@@ -1383,8 +1384,10 @@ IRFjointOrthoJLL_BS <- function(ModelType, ModelParaBoot, IRFhoriz, FactorLabels
       tempYields[ , , 1]  <- B%*%PI%*% Se
       # Shock at t=1:
       for (r in 2:IRFhoriz){
-        tempFactors[ , , r] <- powerplus::Matpow(A1e,numer=r-1, denom=1)%*%Se # IRF (t+h) = A1^h*S
-        tempYields[ , , r]      <- B%*%PI%*%powerplus::Matpow(A1e,numer=r-1, denom=1)%*%Se
+        if (r == 2) { A1h <- A1e} else { A1h <- A1h %*% A1e}
+
+        tempFactors[ , , r] <- A1h%*%Se # IRF (t+h) = A1^h*S
+        tempYields[ , , r]      <- B%*%PI%*%A1h%*%Se
       }
       IRFRiskFactors <- aperm(tempFactors, c(3,1,2))
       IRFYields <- aperm(tempYields, c(3,1,2))
@@ -1911,7 +1914,7 @@ BUnspannedAdapSep_BS <- function(G, M, ModelParaBoot, Economies, Economy, ModelT
   }
 
 
-  if( ModelType == "JPS jointP" || ModelType== "GVAR sepQ" ){
+  else if( any(ModelType == c("JPS jointP", "GVAR sepQ"))){
     K <- nrow(ModelParaBoot$ParaDraws[[ModelType]][[Economies[i]]][[tt]]$ests$K1Z)
     BUnspanned <- matrix(0, nrow=J, ncol= K)
     BSpanned <- ModelParaBoot$ParaDraws[[ModelType]][[Economies[i]]][[tt]]$rot$P$B

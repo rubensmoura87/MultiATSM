@@ -279,7 +279,7 @@ InputsForMLEdensity_BS <- function(ModelType, Y_artificial, Z_artificial, Factor
                                    DataFrequency, JLLinputs = NULL, GVARinputs= NULL, BRWinputs= NULL){
 
   # for the cases in which the estimation is done on a country-by-country basis
-  if (ModelType == 'JPS' || ModelType == 'JPS jointP' || ModelType == "GVAR sepQ"){
+  if (any(ModelType == c('JPS', 'JPS jointP', "GVAR sepQ"))){
     i <- get("i", globalenv())
     Economies <- Economies[i]
   }
@@ -365,28 +365,28 @@ InputsForMLEdensity_BS <- function(ModelType, Y_artificial, Z_artificial, Factor
   } else{
 
 
-  if (ModelType == 'JPS' || ModelType == 'JPS jointP' || ModelType == 'VAR jointQ'){
+  if (any(ModelType == c('JPS', 'JPS jointP', 'VAR jointQ'))){
     VARpara <- VAR(ZZ_artificial, VARtype= 'unconstrained', Bcon = NULL)
     K0Z_artificial <- VARpara$K0Z
     K1Z_artificial <- VARpara$K1Z
     SSZ_artificial <- VARpara$SSZ
   }
 
-  if (ModelType == 'GVAR sepQ'|| ModelType == 'GVAR jointQ'){
+else  if (any(ModelType == c('GVAR sepQ', 'GVAR jointQ'))){
     GVARpara <- GVAR(GVARinputs, N)
     K0Z_artificial <- GVARpara$F0
     K1Z_artificial <- GVARpara$F1
     SSZ_artificial <- GVARpara$Sigma_y
   }
 
-  if (ModelType == "JLL original" || ModelType == "JLL NoDomUnit" || ModelType == "JLL jointSigma"){
+else  if (any(ModelType == c("JLL original",  "JLL NoDomUnit", "JLL jointSigma"))){
     JLLinputs$WishSigmas <- 1
     JLLPara <- JLL(ZZ_artificial, N, JLLinputs)
     K0Z_artificial <-JLLPara$k0
     K1Z_artificial <-JLLPara$k1
     JLLinputs$WishSigmas <- 0 # Ensures that the variance-covariance matrix will no longer be estimated within the JLL function
 
-    if (ModelType == "JLL original" || ModelType == "JLL NoDomUnit"){  SSZ_artificial <- JLLPara$Sigmas$VarCov_NonOrtho }
+    if (any(ModelType == c("JLL original", "JLL NoDomUnit"))){  SSZ_artificial <- JLLPara$Sigmas$VarCov_NonOrtho }
     if (ModelType == "JLL jointSigma"){ SSZ_artificial <- JLLPara$Sigmas$VarCov_Ortho
     # NOTE: the required vectorization that preceeds the numerical optimization of the variance-covariance matrix
     # is done on the orthogonalized variance-covariance matrix because we want to preserve the restrictions imposed in this matrix.

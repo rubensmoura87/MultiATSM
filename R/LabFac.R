@@ -42,7 +42,7 @@ LabFac <- function(N, DomVar, GlobalVar, Economies, ModelType){
     for (j in 1:(N+M)){
       count1 <- count0 + j
       labelsDomVar[count1] <- paste(FactorLabels$Domestic[j], Economies[i])
-      if ("JLL original" %in% ModelType || "JLL NoDomUnit" %in% ModelType || "JLL jointSigma" %in% ModelType){
+      if (any(ModelType == c("JLL original","JLL NoDomUnit", "JLL jointSigma"))){
         labelsDomVarJLL[count1] <- paste(FactorLabels$Domestic[j], Economies[i], "JLL")
       }
     }
@@ -55,7 +55,7 @@ LabFac <- function(N, DomVar, GlobalVar, Economies, ModelType){
   for (a in 1:C){
     idx1 <- idx0 + N + M
     FactorLabels$Tables$AllCountries[(idx0+1):idx1] <- do.call(cbind,lapply(FactorLabels$Tables[[Economies[a]]],matrix,nrow=1))
-    if ("JLL original" %in% ModelType || "JLL NoDomUnit" %in% ModelType || "JLL jointSigma" %in% ModelType){
+    if (any(ModelType == c("JLL original", "JLL NoDomUnit", "JLL jointSigma"))){
       FactorLabels$Tables$AllCountriesJLL[(idx0+1):idx1] <- do.call(cbind,lapply(FactorLabels$TablesJLL[[Economies[a]]],matrix,nrow=1))
     }
     idx0 <- idx1

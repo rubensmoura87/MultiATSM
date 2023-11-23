@@ -28,7 +28,7 @@ GraphicalOutputs <- function(ModelType, ModelPara, NumOut, InputsForOutputs, Eco
 
 
 # 1) Models for which the estimation is done on a country-by-country basis
-if ( "JPS" %in% ModelType || "JPS jointP" %in% ModelType ||  "GVAR sepQ" %in% ModelType){
+if (any(ModelType == c("JPS", "JPS jointP",  "GVAR sepQ"))){
 
     for (i in 1:length(Economies)){dir.create(paste(tempdir(),"/Outputs/", ModelType, "/Point Estimate/Model ", Economies[i], sep=""))}
 
@@ -61,8 +61,7 @@ if ( "JPS" %in% ModelType || "JPS jointP" %in% ModelType ||  "GVAR sepQ" %in% Mo
 
 # 2) Models for which the estimation is done on jointly for all the countries
 
-if ( "GVAR jointQ" %in% ModelType || "VAR jointQ" %in% ModelType || "JLL original" %in% ModelType ||
-      "JLL NoDomUnit" %in% ModelType || "JLL jointSigma" %in% ModelType){
+if ( any(ModelType == c("GVAR jointQ", "VAR jointQ", "JLL original", "JLL NoDomUnit", "JLL jointSigma"))){
 
 # Model fit
 FitgraphsJoint(ModelType, InputsForOutputs[[ModelType]]$Fit$WishGraphs, ModelPara, NumOut, Economies, PathsGraphs)
@@ -87,7 +86,7 @@ TPDecompGraphJoint(ModelType, NumOut, ModelPara, InputsForOutputs[[ModelType]]$R
                    InputsForOutputs$UnitMatYields, Economies, PathsGraphs)
 
 # 2.1) JLL-based models
-if ("JLL original" %in% ModelType  || "JLL NoDomUnit" %in% ModelType || "JLL jointSigma" %in% ModelType){
+if (any(ModelType == c("JLL original",  "JLL NoDomUnit",  "JLL jointSigma"))){
 # IRF and FEVD
 IRFgraphsJLLOrtho(ModelType, NumOut, InputsForOutputs[[ModelType]]$IRF$WishGraphsOrtho$RiskFactors,
                   InputsForOutputs[[ModelType]]$IRF$WishGraphsOrtho$Yields, InputsForOutputs[[ModelType]]$IRF$horiz,
@@ -141,7 +140,7 @@ RiskFactorsGraphs <- function(ModelType, ModelOutputs, Economies, FactorLabels){
   C <- length(Economies)
 
 
-  if (ModelType == "JPS" || ModelType == "JPS jointP" || ModelType == "GVAR sepQ"  ){
+  if (any(ModelType == c("JPS", "JPS jointP", "GVAR sepQ"))){
     X <- c()
     for (i in 1:C){
       if (i ==1){
@@ -1027,7 +1026,7 @@ IRFgraphsJoint <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsgra
       Horiz <- 0:(IRFhoriz-1)
 
 
-        if ( ModelType == "JLL original"  || ModelType== "JLL NoDomUnit" || ModelType =="JLL jointSigma"){
+        if ( any(ModelType == c("JLL original", "JLL NoDomUnit", "JLL jointSigma"))){
           K <- dim(NumOut$IRF[[ModelType]]$Factors$NonOrtho)[2]  # Total number of risk factors
           CJ <- dim(NumOut$IRF[[ModelType]]$Yields$NonOrtho)[2]  # Total number of yields
           for (i in 1:K){ # Outputs in data-frame format
@@ -1133,7 +1132,7 @@ FEVDgraphsJoint <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsgr
           FEVDFactors <- list()
 
 
-          if ( ModelType == "JLL original"  || ModelType== "JLL NoDomUnit" || ModelType =="JLL jointSigma"){
+          if ( any(ModelType == c("JLL original", "JLL NoDomUnit", "JLL jointSigma"))){
             K <- dim(NumOut$FEVD[[ModelType]]$Factors$NonOrtho)[2] # Total number of risk factors
             for (i in 1:K){
               FEVDFactors[[i]] <- data.frame(NumOut$FEVD[[ModelType]]$Factors$NonOrtho[,,i])
@@ -1176,7 +1175,7 @@ FEVDgraphsJoint <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsgr
 
           FEVDYields <- list()
 
-          if (ModelType == "JLL original"  || ModelType == "JLL NoDomUnit" || ModelType =="JLL jointSigma"){
+          if (any(ModelType == c("JLL original", "JLL NoDomUnit", "JLL jointSigma"))){
 
             CJ <- dim(NumOut$FEVD[[ModelType]]$Yields$NonOrtho)[3] # Total number of yields of the system
 
@@ -1256,7 +1255,7 @@ GIRFgraphsJoint <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsgr
       Horiz <- 0:(GIRFhoriz-1)
 
 
-        if ( ModelType == "JLL original"  || ModelType == "JLL NoDomUnit" || ModelType =="JLL jointSigma"){
+        if ( any(ModelType == c("JLL original", "JLL NoDomUnit", "JLL jointSigma"))){
           K <- dim(NumOut$GIRF[[ModelType]]$Factors$NonOrtho)[2]  # Total number of risk factors
           CJ <- dim(NumOut$GIRF[[ModelType]]$Yields$NonOrtho)[2]  # Total number of yields
           for (i in 1:K){
@@ -1362,7 +1361,7 @@ GFEVDgraphsJoint <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsg
           GFEVDFactors <- list()
 
 
-          if ( ModelType == "JLL original"  || ModelType == "JLL NoDomUnit" || ModelType =="JLL jointSigma"){
+          if ( any(ModelType == c("JLL original", "JLL NoDomUnit", "JLL jointSigma"))){
             K <- dim(NumOut$GFEVD[[ModelType]]$Factors$NonOrtho)[2] # Total number of risk factors
             for (i in 1:K){ # Outputs in data-frame
               GFEVDFactors[[i]] <- data.frame(NumOut$GFEVD[[ModelType]]$Factors$NonOrtho[,,i])

@@ -173,9 +173,8 @@ C <- length(GVARinputs$Economies) # Number of economies in the system
       rownames(Coeff[[i]]) <- DomLabels
     }
   }
-
   # b) constrained system: zero restrictions for the spanned factors in the feedback matrix
-  if (GVARinputs$VARXtype == 'constrained: Spanned Factors'){
+else  if (GVARinputs$VARXtype == 'constrained: Spanned Factors'){
     idxIntercept<- 1
     idxM <- idxIntercept + M
     idxP <- idxM + N

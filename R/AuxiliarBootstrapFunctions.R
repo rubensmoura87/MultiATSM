@@ -15,28 +15,25 @@ PdynamicsSet_BS<- function(ModelType, AllFactorsUnderP, FactorLabels, Economies,
    T <- ncol(AllFactorsUnderP)
    N <- length(FactorLabels$Spanned)
 
-  # JPS-related models
-  if (ModelType == 'JPS' || ModelType == 'JPS jointP' || ModelType == 'VAR jointQ'){
+
+   # JPS-related models
+  if (any(ModelType == c("JPS", "JPS jointP", "VAR jointQ"))){
     K <- nrow(AllFactorsUnderP)
     VAR <-stats::lm( t(AllFactorsUnderP[,2:T])~ t(AllFactorsUnderP[,1:(T-1)])) # VAR(1) under the P.
     K0Z <- t(t(VAR$coefficients[1,]))
     K1Z <- t(VAR$coefficients[2:(K+1),])
     eZ<- VAR$residuals # (T-1) x K
-  }
-
-
-  # GVAR-related models
-  if (ModelType ==  'GVAR sepQ'|| ModelType == 'GVAR jointQ'){
+    # GVAR-related models
+  }  else if (any(ModelType == c("GVAR sepQ", "GVAR jointQ"))){
     GVARpara <- GVAR(GVARinputs, N)
     K0Z <- GVARpara$F0
     K1Z <- GVARpara$F1
 
     eZ <- AllFactorsUnderP[,2:T] - matrix(K0Z, nrow= nrow(K0Z),  ncol= T-1) - K1Z%*%AllFactorsUnderP[,1:(T-1)] # T x K
     eZ <- t(eZ)
-  }
 
-  # JLL-related models
-  if (ModelType == "JLL original" || ModelType == "JLL NoDomUnit" || ModelType == "JLL jointSigma"){
+   # JLL-related models
+  } else if (any(ModelType == c("JLL original", "JLL NoDomUnit", "JLL jointSigma"))) {
     JLLinputs$WishSigmas <- 0
     JLLPara <- JLL(AllFactorsUnderP, N, JLLinputs)
     K0Z <-JLLPara$k0
@@ -67,7 +64,7 @@ PdynamicsSet_BS<- function(ModelType, AllFactorsUnderP, FactorLabels, Economies,
 DataSet_BS <- function(ModelType, RiskFactors, Wgvar, Economies, FactorLabels){
 
 
-  if (ModelType == "GVAR sepQ" || ModelType == "GVAR jointQ"){
+  if (any(ModelType == c("GVAR sepQ", "GVAR jointQ"))){
 
   # 1) Pre-allocate list of factors
   T <- ncol(RiskFactors) # length of model's time dimension
@@ -202,3 +199,4 @@ DataSet_BS <- function(ModelType, RiskFactors, Wgvar, Economies, FactorLabels){
 
   return(ListFactors)
 }
+

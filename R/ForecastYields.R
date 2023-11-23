@@ -25,31 +25,31 @@
 #'@export
 
 ForecastYields <- function(ModelType, ModelPara, InputsForOutputs, FactorLabels, Economies, DataFrequency,
-                               JLLinputs, GVARinputs, BRWinputs){
+                           JLLinputs, GVARinputs, BRWinputs){
 
 
   WishForecast <- InputsForOutputs[[ModelType]]$Forecasting$WishForecast
 
   if (WishForecast ==0){ print( "No bond yields forecasts were generated")
-    }else{
-      Jmisc::tic()
-  # If one chooseS models in which the estimation is done country-by-country
-  if ( "JPS" %in% ModelType || "JPS jointP" %in% ModelType ||  "GVAR sepQ" %in% ModelType){
-    ForeYie <- ForecastYieldsSepQ(ModelType, ModelPara, InputsForOutputs, FactorLabels, Economies, DataFrequency,
-                                  JLLinputs, GVARinputs, BRWinputs)
+  }else{
+    Jmisc::tic()
+    # If one chooseS models in which the estimation is done country-by-country
+    if ( "JPS" %in% ModelType || "JPS jointP" %in% ModelType ||  "GVAR sepQ" %in% ModelType){
+      ForeYie <- ForecastYieldsSepQ(ModelType, ModelPara, InputsForOutputs, FactorLabels, Economies, DataFrequency,
+                                    JLLinputs, GVARinputs, BRWinputs)
 
-  }
-  # If one chooseS models in which the estimation is done jointly for all countries
-  if ( "GVAR jointQ" %in% ModelType || "VAR jointQ" %in% ModelType || "JLL original" %in% ModelType
-       || "JLL NoDomUnit" %in% ModelType || "JLL jointSigma" %in% ModelType){
-
-    ForeYie <- ForecastYieldsJointQ(ModelType, ModelPara, InputsForOutputs, FactorLabels, Economies, DataFrequency,
-                                  JLLinputs, GVARinputs, BRWinputs)
-
-  }
-      Jmisc::toc()
-      return(ForeYie)
     }
+    # If one chooseS models in which the estimation is done jointly for all countries
+    if ( "GVAR jointQ" %in% ModelType || "VAR jointQ" %in% ModelType || "JLL original" %in% ModelType
+         || "JLL NoDomUnit" %in% ModelType || "JLL jointSigma" %in% ModelType){
+
+      ForeYie <- ForecastYieldsJointQ(ModelType, ModelPara, InputsForOutputs, FactorLabels, Economies, DataFrequency,
+                                      JLLinputs, GVARinputs, BRWinputs)
+
+    }
+    Jmisc::toc()
+    return(ForeYie)
+  }
 
 }
 
@@ -129,31 +129,31 @@ ForecastYieldsSepQ <- function(ModelType, ModelPara, InputsForOutputs, FactorLab
       YieldsFull <- ModelPara[[ModelType]][[Economies[i]]]$inputs$Y
 
       i <<- i # Re-define i in the global envirnonment
-    # Yields
-    YYtemp <- YieldsFull[, t0Sample:tlastObserved]
-    # Spanned factors
-    PPall <- SpannedFactorsSepQ(ModelType, ModelPara, Economies, t0Sample, tlastObserved)
-    # All risk factors
-    IdxSpa <- IdxAllSpanned(ModelType, FactorLabels, Economies)
-    ZZtemp <- ZZfull[ , t0Sample:tlastObserved]
-    ZZtemp[IdxSpa, ] <- PPall
+      # Yields
+      YYtemp <- YieldsFull[, t0Sample:tlastObserved]
+      # Spanned factors
+      PPall <- SpannedFactorsSepQ(ModelType, ModelPara, Economies, t0Sample, tlastObserved)
+      # All risk factors
+      IdxSpa <- IdxAllSpanned(ModelType, FactorLabels, Economies)
+      ZZtemp <- ZZfull[ , t0Sample:tlastObserved]
+      ZZtemp[IdxSpa, ] <- PPall
 
-    # For the GVAR-based models
-    if (ModelType == 'GVAR sepQ'){
-      GVARinputs$GVARFactors <- DataSet_BS(ModelType, ZZtemp, GVARinputs$Wgvar, Economies, FactorLabels)
-      #) NOTE:  To avoid over complicating the code, we keep the transition matrix as the one
-      #  estimated conditionally on the full information set
-    }
-    # Compute the inputs that go directly into the log-likelihood function
-    invisible(utils::capture.output(ATSMInputs <- InputsForMLEdensity(ModelType, YYtemp, ZZtemp, FactorLabels, mat, Economies, DataFrequency,
-                                        JLLinputs, GVARinputs, BRWinputs)))
+      # For the GVAR-based models
+      if (ModelType == 'GVAR sepQ'){
+        GVARinputs$GVARFactors <- DataSet_BS(ModelType, ZZtemp, GVARinputs$Wgvar, Economies, FactorLabels)
+        #) NOTE:  To avoid over complicating the code, we keep the transition matrix as the one
+        #  estimated conditionally on the full information set
+      }
+      # Compute the inputs that go directly into the log-likelihood function
+      invisible(utils::capture.output(ATSMInputs <- InputsForMLEdensity(ModelType, YYtemp, ZZtemp, FactorLabels, mat, Economies, DataFrequency,
+                                                                        JLLinputs, GVARinputs, BRWinputs)))
 
-  # Initial guesses for Variables that will be concentrared out of from the log-likelihood function
+      # Initial guesses for Variables that will be concentrared out of from the log-likelihood function
       K1XQ <- ATSMInputs$K1XQ
       SSZ <- ATSMInputs$SSZ
 
-  # Build the objective function
-  f <- Functionf(ATSMInputs, Economies, mat, DataFrequency, FactorLabels, ModelType)
+      # Build the objective function
+      f <- Functionf(ATSMInputs, Economies, mat, DataFrequency, FactorLabels, ModelType)
 
       # Choose the optimization settings
       VarLab <- ParaLabels(ModelType, StationarityUnderQ)
@@ -173,8 +173,8 @@ ForecastYieldsSepQ <- function(ModelType, ModelPara, InputsForOutputs, FactorLab
       tol <- 1e-4
 
       invisible(utils::capture.output(FullModelParaList[[ModelType]][[Economies[i]]] <- Optimization(f, tol, varargin,
-                                                                                   FactorLabels, Economies, ModelType,
-                                                                                   JLLinputs, GVARinputs)$Summary))
+                                                                                                     FactorLabels, Economies, ModelType,
+                                                                                                     JLLinputs, GVARinputs)$Summary))
 
 
       # 3) Forecasting
@@ -195,8 +195,15 @@ ForecastYieldsSepQ <- function(ModelType, ModelPara, InputsForOutputs, FactorLab
       K1ZsumOld <- 0
 
       for (hh in 1:H){
-        K1Znew <- powerplus::Matpow(K1Z, numer = hh -1 )
-        VARforecast <- (K1ZsumOld + K1Znew)%*%K0Z + powerplus::Matpow(K1Z, numer = hh)%*%ZZtt
+        if(hh==1){
+        K1Znew <- diag(nrow(K1Z))
+        K1Zhh <- K1Z
+        }else{
+          K1Znew <- K1Znew%*%K1Z
+          K1Zhh <- K1Zhh%*%K1Z
+          }
+
+        VARforecast <- (K1ZsumOld + K1Znew)%*%K0Z + K1Zhh%*%ZZtt
         ForecastYields[,hh] <- A + Bfull%*%(VARforecast)
 
         K1ZsumOld <- K1ZsumOld + K1Znew
@@ -232,7 +239,7 @@ ForecastYieldsSepQ <- function(ModelType, ModelPara, InputsForOutputs, FactorLab
 
   return(OutofSampleForecast)
 
-  }
+}
 
 ###############################################################################################################
 #' Bond yields forecasts ("joint Q" models)
@@ -251,11 +258,13 @@ ForecastYieldsSepQ <- function(ModelType, ModelPara, InputsForOutputs, FactorLab
 
 
 ForecastYieldsJointQ <- function(ModelType, ModelPara, InputsForOutputs, FactorLabels, Economies, DataFrequency,
-                               JLLinputs, GVARinputs, BRWinputs){
+                                 JLLinputs, GVARinputs, BRWinputs){
 
   print('#########################################################################################################')
   print( paste('#################################', 'Forecasting', ModelType, '#################################' ))
   print('#########################################################################################################')
+
+
 
   # 1) Redefine some general model outputs
   StationarityUnderQ <- InputsForOutputs$StationaryQ
@@ -299,100 +308,107 @@ ForecastYieldsJointQ <- function(ModelType, ModelPara, InputsForOutputs, FactorL
 
     # 2) Model Estimation
 
-      # Redefine the dataset used in the estimation
-      ZZfull <- ModelPara[[ModelType]]$inputs$AllFactors
-      YieldsFull <- ModelPara[[ModelType]]$inputs$Y
+    # Redefine the dataset used in the estimation
+    ZZfull <- ModelPara[[ModelType]]$inputs$AllFactors
+    YieldsFull <- ModelPara[[ModelType]]$inputs$Y
 
-      # Yields
-      YYtemp <- YieldsFull[, t0Sample:tlastObserved]
-      # Spanned factors
-      PPall <- SpannedFactorsjointQ(ModelType, ModelPara, Economies, t0Sample, tlastObserved)
-      # All risk factors
-      IdxSpa <- IdxAllSpanned(ModelType, FactorLabels, Economies)
-      ZZtemp <- ZZfull[ , t0Sample:tlastObserved]
-      ZZtemp[IdxSpa, ] <- PPall
+    # Yields
+    YYtemp <- YieldsFull[, t0Sample:tlastObserved]
+    # Spanned factors
+    PPall <- SpannedFactorsjointQ(ModelType, ModelPara, Economies, t0Sample, tlastObserved)
+    # All risk factors
+    IdxSpa <- IdxAllSpanned(ModelType, FactorLabels, Economies)
+    ZZtemp <- ZZfull[ , t0Sample:tlastObserved]
+    ZZtemp[IdxSpa, ] <- PPall
 
-      # For the GVAR-based models
-      if (ModelType == 'GVAR jointQ'){
-        GVARinputs$GVARFactors <- DataSet_BS(ModelType, ZZtemp, GVARinputs$Wgvar, Economies, FactorLabels)
-        #) NOTE:  To avoid over complicating the code, we keep the transition matrix as the one
-        #  estimated conditionally on the full information set
+    # For the GVAR-based models
+    if (ModelType == 'GVAR jointQ'){
+      GVARinputs$GVARFactors <- DataSet_BS(ModelType, ZZtemp, GVARinputs$Wgvar, Economies, FactorLabels)
+      #) NOTE:  To avoid over complicating the code, we keep the transition matrix as the one
+      #  estimated conditionally on the full information set
+    }
+    # Compute the inputs that go directly into the log-likelihood function
+    invisible(utils::capture.output(ATSMInputs <- InputsForMLEdensity(ModelType, YYtemp, ZZtemp, FactorLabels, mat, Economies, DataFrequency,
+                                                                      JLLinputs, GVARinputs, BRWinputs)))
+
+    # Initial guesses for Variables that will be concentrared out of from the log-likelihood function
+    K1XQ <- ATSMInputs$K1XQ
+    if (ModelType == "JLL original" || ModelType == "JLL NoDomUnit" ){ SSZ <- NULL} else{SSZ <- ATSMInputs$SSZ}
+
+    # Build the objective function
+    f <- Functionf(ATSMInputs, Economies, mat, DataFrequency, FactorLabels, ModelType)
+
+    # Choose the optimization settings
+    VarLab <- ParaLabels(ModelType, StationarityUnderQ)
+
+    varargin <- list()
+    varargin$K1XQ <-list(K1XQ, VarLab[[ModelType]][["K1XQ"]] , NULL , NULL)
+    varargin$SSZ <- list(SSZ, VarLab[[ModelType]][["SSZ"]], NULL, NULL)
+    varargin$r0 <- list(NULL, VarLab[[ModelType]][["r0"]], NULL, NULL)
+    varargin$se <- list(NULL, VarLab[[ModelType]][["se"]], 1e-6, NULL)
+    varargin$K0Z <- list(NULL, VarLab[[ModelType]][["K0Z"]], NULL, NULL)
+    varargin$K1Z <- list(NULL, VarLab[[ModelType]][["K1Z"]], NULL, NULL)
+    varargin$OptRun <-  c("iter off")
+
+    LabelVar<- c('Value', 'Label', 'LB', 'UB') # Elements of each parameter
+    for (d in 1:(length(varargin)-1)){ names(varargin[[d]]) <-  LabelVar}
+
+    tol <- 1e-4
+
+
+    invisible(utils::capture.output(FullModelParaList[[ModelType]] <- Optimization(f, tol, varargin, FactorLabels,
+                                                                                   Economies, ModelType, JLLinputs, GVARinputs)$Summary))
+
+
+    # 3) Forecasting
+
+    # Define general inputs
+    A <- FullModelParaList[[ModelType]]$rot$P$A
+    K0Z <- FullModelParaList[[ModelType]]$ests$K0Z
+    K1Z <- FullModelParaList[[ModelType]]$ests$K1Z
+
+    Bspanned <- FullModelParaList[[ModelType]]$rot$P$B
+    Bfull <- BUnspannedAdapJoint(G,M, N, C, J, Bspanned)
+
+    # Forecast of yields
+    ForecastYields <- matrix(NA, nrow = C*J, ncol = H)
+    LabelForecastPeriod <- colnames(YieldsFull[,(Ttemp+1):(Ttemp+H)])
+    rownames(ForecastYields) <- rownames(YieldsFull)
+    colnames(ForecastYields) <- LabelForecastPeriod
+
+    ZZtt <- ZZtemp[,Ttemp]
+    K1ZsumOld <- 0
+
+    for (hh in 1:H){
+      if(hh==1){
+        K1Znew <- diag(nrow(K1Z))
+        K1Zhh <- K1Z
+      }else{
+        K1Znew <- K1Znew%*%K1Z
+        K1Zhh <- K1Zhh%*%K1Z
       }
-      # Compute the inputs that go directly into the log-likelihood function
-      invisible(utils::capture.output(ATSMInputs <- InputsForMLEdensity(ModelType, YYtemp, ZZtemp, FactorLabels, mat, Economies, DataFrequency,
-                                        JLLinputs, GVARinputs, BRWinputs)))
 
-      # Initial guesses for Variables that will be concentrared out of from the log-likelihood function
-      K1XQ <- ATSMInputs$K1XQ
-      if (ModelType == "JLL original" || ModelType == "JLL NoDomUnit" ){ SSZ <- NULL} else{SSZ <- ATSMInputs$SSZ}
+      VARforecast <- (K1ZsumOld + K1Znew)%*%K0Z + K1Zhh%*%ZZtt
+      ForecastYields[,hh] <- A + Bfull%*%(VARforecast)
 
-      # Build the objective function
-      f <- Functionf(ATSMInputs, Economies, mat, DataFrequency, FactorLabels, ModelType)
+      K1ZsumOld <- K1ZsumOld + K1Znew
+    }
 
-      # Choose the optimization settings
-      VarLab <- ParaLabels(ModelType, StationarityUnderQ)
+    # Actual yields for the period of the forecasting
+    YieldsObsForPer <- YieldsFull[,(Ttemp+1):(Ttemp+H)]
 
-      varargin <- list()
-      varargin$K1XQ <-list(K1XQ, VarLab[[ModelType]][["K1XQ"]] , NULL , NULL)
-      varargin$SSZ <- list(SSZ, VarLab[[ModelType]][["SSZ"]], NULL, NULL)
-      varargin$r0 <- list(NULL, VarLab[[ModelType]][["r0"]], NULL, NULL)
-      varargin$se <- list(NULL, VarLab[[ModelType]][["se"]], 1e-6, NULL)
-      varargin$K0Z <- list(NULL, VarLab[[ModelType]][["K0Z"]], NULL, NULL)
-      varargin$K1Z <- list(NULL, VarLab[[ModelType]][["K1Z"]], NULL, NULL)
-      varargin$OptRun <-  c("iter off")
+    # 4) Forecast error
+    ForecastError <- YieldsObsForPer - ForecastYields
 
-      LabelVar<- c('Value', 'Label', 'LB', 'UB') # Elements of each parameter
-      for (d in 1:(length(varargin)-1)){ names(varargin[[d]]) <-  LabelVar}
-
-      tol <- 1e-4
-
-
-      invisible(utils::capture.output(FullModelParaList[[ModelType]] <- Optimization(f, tol, varargin, FactorLabels,
-                                                     Economies, ModelType, JLLinputs, GVARinputs)$Summary))
-
-
-      # 3) Forecasting
-
-      # Define general inputs
-      A <- FullModelParaList[[ModelType]]$rot$P$A
-      K0Z <- FullModelParaList[[ModelType]]$ests$K0Z
-      K1Z <- FullModelParaList[[ModelType]]$ests$K1Z
-
-      Bspanned <- FullModelParaList[[ModelType]]$rot$P$B
-      Bfull <- BUnspannedAdapJoint(G,M, N, C, J, Bspanned)
-
-      # Forecast of yields
-      ForecastYields <- matrix(NA, nrow = C*J, ncol = H)
-      LabelForecastPeriod <- colnames(YieldsFull[,(Ttemp+1):(Ttemp+H)])
-      rownames(ForecastYields) <- rownames(YieldsFull)
-      colnames(ForecastYields) <- LabelForecastPeriod
-
-      ZZtt <- ZZtemp[,Ttemp]
-      K1ZsumOld <- 0
-
-      for (hh in 1:H){
-        K1Znew <- powerplus::Matpow(K1Z, numer = hh -1 )
-        VARforecast <- (K1ZsumOld + K1Znew)%*%K0Z + powerplus::Matpow(K1Z, numer = hh)%*%ZZtt
-        ForecastYields[,hh] <- A + Bfull%*%(VARforecast)
-
-        K1ZsumOld <- K1ZsumOld + K1Znew
-      }
-
-      # Actual yields for the period of the forecasting
-      YieldsObsForPer <- YieldsFull[,(Ttemp+1):(Ttemp+H)]
-
-      # 4) Forecast error
-      ForecastError <- YieldsObsForPer - ForecastYields
-
-      ForecastDate <- colnames(ZZfull)[Ttemp]
-      OutofSampleForecast[[ModelType]][[ForecastDate]]$Forcast <- ForecastYields
-      OutofSampleForecast[[ModelType]][[ForecastDate]]$Error <- ForecastError
+    ForecastDate <- colnames(ZZfull)[Ttemp]
+    OutofSampleForecast[[ModelType]][[ForecastDate]]$Forcast <- ForecastYields
+    OutofSampleForecast[[ModelType]][[ForecastDate]]$Error <- ForecastError
 
 
 
-      print(paste(ModelType, ": Out-of-sample forecast for information set available until", ForecastDate))
+    print(paste(ModelType, ": Out-of-sample forecast for information set available until", ForecastDate))
 
-      saveRDS(OutofSampleForecast, paste(tempdir(),"/Forecast_", InputsForOutputs$'Label Outputs','.rds',sep=""))
+    saveRDS(OutofSampleForecast, paste(tempdir(),"/Forecast_", InputsForOutputs$'Label Outputs','.rds',sep=""))
   }
 
 
@@ -428,20 +444,20 @@ RMSEsep <- function(ForecastOutputs){
 
 
   FElist <- list()
-    for (i in 1:C){
-      for (h in 1:nfor){
-        FElist[[Economies[i]]][[h]] <- ForecastOutputs[[ModelType]][[Economies[i]]][[h]]$Error
-      }
+  for (i in 1:C){
+    for (h in 1:nfor){
+      FElist[[Economies[i]]][[h]] <- ForecastOutputs[[ModelType]][[Economies[i]]][[h]]$Error
     }
+  }
 
 
 
   rmse <- list()
-    for (i in 1:C){
-      rmse[[Economies[i]]] <- sqrt(Reduce("+", lapply(FElist[[Economies[i]]],
-                                                                     function(x, N= nfor) x^2/N)))
-      colnames(rmse[[Economies[i]]]) <- 1:H
-    }
+  for (i in 1:C){
+    rmse[[Economies[i]]] <- sqrt(Reduce("+", lapply(FElist[[Economies[i]]],
+                                                    function(x, N= nfor) x^2/N)))
+    colnames(rmse[[Economies[i]]]) <- 1:H
+  }
 
 
 
@@ -466,13 +482,13 @@ RMSEjoint <- function(ForecastOutputs){
   H <- ncol(ForecastOutputs[[1]][[1]][[1]])
 
   FElist <- list()
-    for (h in 1:nfor){
-      FElist[[Modeljoint]][[h]] <- ForecastOutputs[[Modeljoint]][[h]]$Error
-    }
+  for (h in 1:nfor){
+    FElist[[Modeljoint]][[h]] <- ForecastOutputs[[Modeljoint]][[h]]$Error
+  }
 
-    rmse <- list()
-    rmse[[Modeljoint]] <- sqrt(Reduce("+", lapply(FElist[[Modeljoint]], function(x, N= nfor) x^2/N)))
-    colnames(rmse[[Modeljoint]]) <- 1:H
+  rmse <- list()
+  rmse[[Modeljoint]] <- sqrt(Reduce("+", lapply(FElist[[Modeljoint]], function(x, N= nfor) x^2/N)))
+  colnames(rmse[[Modeljoint]]) <- 1:H
 
 
   return(rmse)
@@ -578,15 +594,15 @@ SpannedFactorsjointQ <- function(ModelType, ModelPara, Economies, t0Sample, tlas
 
     YCS <- ModelPara[[ModelType]]$inputs$Y[(idxJ0+1):idxJ1, t0Sample:tlastObserved][,]
 
-  if (i==1 ){PPALL <- Spanned_Factors(YCS, Economies = Economies[i], N)
+    if (i==1 ){PPALL <- Spanned_Factors(YCS, Economies = Economies[i], N)
     }else{
-        PPtemp <- Spanned_Factors(YCS, Economies = Economies[i], N)
-        PPALL <- rbind(PPALL, PPtemp)
-      }
+      PPtemp <- Spanned_Factors(YCS, Economies = Economies[i], N)
+      PPALL <- rbind(PPALL, PPtemp)
+    }
 
     idxJ0<- idxJ1
 
-    }
+  }
 
 
   return(PPALL)

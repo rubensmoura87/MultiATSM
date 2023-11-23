@@ -91,7 +91,7 @@ Transition_Matrix <- function(t_First, t_Last, Economies, type, DataPath = NULL,
   }
 
 # c.2) "Sample Mean"
-if (type == "Sample Mean"){
+else if (type == "Sample Mean"){
 
   Y_First <- substring(t_First, 1,4)
   Y_Last <- substring(t_Last, 1,4)
@@ -107,7 +107,7 @@ if (type == "Sample Mean"){
   }
 
 # c.3) Specific Year
-if (type !="Sample Mean" & type !="Full Sample" ){
+else if (type !="Sample Mean" & type !="Full Sample" ){
 
   Wgvar <- WgvarAllYears[[type]]
   colnames(Wgvar) <- Economies
