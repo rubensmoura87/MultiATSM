@@ -17,7 +17,8 @@ Inverse the (m,m,T) array of matrices for m<=4
 }
 \details{
 equivalent to the following for loop:
-for (i in 1:T){ y[,,i] = inv(A[,,i]) }
+
+\code{ for (i in 1:T){ y[ , ,i] = inv(A[,,i]) } }
 }
 \references{
 This function is based on the "mult_inv_small" function by Le and Singleton (2018).\cr

@@ -9,8 +9,8 @@
 #'@importFrom pracma numel size
 #'
 #'@keywords internal
-#'@return "nargout == 1" returns inva -> matrix array: a^{-1} (N x N x T) \cr
-#'        "nargout == 2" returns inva -> matrix array: a^{-1} (N x N x T) and  logabsdet ->  vector of log(abs(det(a)))  (1 x T)
+#'@return "nargout == 1" returns inva -> matrix array: a^(-1) (N x N x T) \cr
+#'        "nargout == 2" returns inva -> matrix array: a^(-1) (N x N x T) and  logabsdet ->  vector of log(abs(det(a)))  (1 x T)
 
 #'@references
 #' This function is modified version of the "mult__inv" function by Le and Singleton (2018).\cr
@@ -212,10 +212,9 @@ mult_inv_large <- function(M){
 #'
 #'@details
 #' equivalent to the following for loop:
-#' for (i in 1:T){ y[,,i] = inv(A[,,i]) }
 #'
-
-
+#' \code{ for (i in 1:T){ y[ , ,i] = inv(A[,,i]) } }
+#'
 #'@references
 #' This function is based on the "mult_inv_small" function by Le and Singleton (2018).\cr
 #'  "A Small Package of Matlab Routines for the Estimation of Some Term Structure Models." \cr

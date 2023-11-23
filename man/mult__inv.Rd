@@ -14,8 +14,8 @@ mult__inv(a, whichoutput, nargout)
 \item{nargout}{"nargout == 1" or "nargout == 2"(scalar)}
 }
 \value{
-"nargout == 1" returns inva -> matrix array: a^{-1} (N x N x T) \cr
-       "nargout == 2" returns inva -> matrix array: a^{-1} (N x N x T) and  logabsdet ->  vector of log(abs(det(a)))  (1 x T)
+"nargout == 1" returns inva -> matrix array: a^(-1) (N x N x T) \cr
+       "nargout == 2" returns inva -> matrix array: a^(-1) (N x N x T) and  logabsdet ->  vector of log(abs(det(a)))  (1 x T)
 }
 \description{
 Inverts an array of matrices so that:  inva[,,i] = inv(a[,,i])

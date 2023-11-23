@@ -23,7 +23,7 @@ Restricted OLS regression
 }
 \details{
 # Estimate of B is obtained by minimizing the objective:\cr
-  sum_t (Y_t-B X_t)' G^{-1} (Y_t-B*X_t) \cr
+  sum_t (Y_t-B X_t)' G^(-1) (Y_t-B*X_t) \cr
 subject to the constraint that B = Bcon for all non-nan entries of Bcon
 }
 \references{
