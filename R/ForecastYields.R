@@ -34,14 +34,13 @@ ForecastYields <- function(ModelType, ModelPara, InputsForOutputs, FactorLabels,
   }else{
     Jmisc::tic()
     # If one chooseS models in which the estimation is done country-by-country
-    if ( "JPS" %in% ModelType || "JPS jointP" %in% ModelType ||  "GVAR sepQ" %in% ModelType){
+    if ( any(ModelType ==c("JPS", "JPS jointP", "GVAR sepQ"))){
       ForeYie <- ForecastYieldsSepQ(ModelType, ModelPara, InputsForOutputs, FactorLabels, Economies, DataFrequency,
                                     JLLinputs, GVARinputs, BRWinputs)
 
     }
     # If one chooseS models in which the estimation is done jointly for all countries
-    if ( "GVAR jointQ" %in% ModelType || "VAR jointQ" %in% ModelType || "JLL original" %in% ModelType
-         || "JLL NoDomUnit" %in% ModelType || "JLL jointSigma" %in% ModelType){
+    if ( any(ModelType ==c("GVAR jointQ", "VAR jointQ", "JLL original", "JLL NoDomUnit", "JLL jointSigma"))){
 
       ForeYie <- ForecastYieldsJointQ(ModelType, ModelPara, InputsForOutputs, FactorLabels, Economies, DataFrequency,
                                       JLLinputs, GVARinputs, BRWinputs)
@@ -80,12 +79,14 @@ ForecastYieldsSepQ <- function(ModelType, ModelPara, InputsForOutputs, FactorLab
 
   # 1) Redefine some general model outputs
   StationarityUnderQ <- InputsForOutputs$StationaryQ
+  ForecastType <- InputsForOutputs[[ModelType]]$Forecasting$ForType
   t0Sample <- InputsForOutputs[[ModelType]]$Forecasting$t0Sample
   t0Forecast <- InputsForOutputs[[ModelType]]$Forecasting$t0Forecast
   H <- InputsForOutputs[[ModelType]]$Forecasting$ForHoriz
 
 
   if (t0Forecast < t0Sample ){stop("The first forecast cut-off date is earlier than the start of the sample.")}
+  if(ForecastType != "Rolling"){print("Forecasts being generated with expanding windows")}
 
   FullModelParaList <- list()
   OutofSampleForecast <- list()
@@ -111,11 +112,8 @@ ForecastYieldsSepQ <- function(ModelType, ModelPara, InputsForOutputs, FactorLab
 
     if (nloops <= 0){stop("Impossible to generate forecast errors: sample period is extrapolated!")}
 
-    if (tt ==1){
-      tlastObserved <- t0Forecast
-    }else{
-      tlastObserved <- tlastObserved + 1
-    }
+    if(ForecastType == "Rolling" & tt >= 2 ){t0Sample <- t0Sample + 1}
+    if (tt ==1){tlastObserved <- t0Forecast}else{  tlastObserved <- tlastObserved + 1}
 
     Ttemp <- tlastObserved  # Time dimension of the model (updated after each iteration)
 
@@ -268,11 +266,13 @@ ForecastYieldsJointQ <- function(ModelType, ModelPara, InputsForOutputs, FactorL
 
   # 1) Redefine some general model outputs
   StationarityUnderQ <- InputsForOutputs$StationaryQ
+  ForecastType <- InputsForOutputs[[ModelType]]$Forecasting$ForType
   t0Sample <- InputsForOutputs[[ModelType]]$Forecasting$t0Sample
   t0Forecast <- InputsForOutputs[[ModelType]]$Forecasting$t0Forecast
   H <- InputsForOutputs[[ModelType]]$Forecasting$ForHoriz
 
   if (t0Forecast < t0Sample ){stop("The first forecast cut-off date is earlier than the start of the sample.")}
+  if(ForecastType != "Rolling"){print("Forecasts being generated with expanding windows")}
 
   FullModelParaList <- list()
   OutofSampleForecast <- list()
@@ -297,11 +297,12 @@ ForecastYieldsJointQ <- function(ModelType, ModelPara, InputsForOutputs, FactorL
 
     if (nloops <= 0){stop("Impossible to generate forecast errors: sample period is extrapolated!")}
 
-    if (tt ==1){
-      tlastObserved <- t0Forecast
-    }else{
-      tlastObserved <- tlastObserved + 1
-    }
+
+    if(ForecastType == "Rolling" & tt >= 2 ){t0Sample <- t0Sample + 1}
+
+    if (tt ==1){tlastObserved <- t0Forecast }else{tlastObserved <- tlastObserved + 1}
+
+    ForSampleIdx <- t0Sample:tlastObserved
 
     Ttemp <- tlastObserved  # Time dimension of the model (updated after each iteration)
 
@@ -313,12 +314,12 @@ ForecastYieldsJointQ <- function(ModelType, ModelPara, InputsForOutputs, FactorL
     YieldsFull <- ModelPara[[ModelType]]$inputs$Y
 
     # Yields
-    YYtemp <- YieldsFull[, t0Sample:tlastObserved]
+    YYtemp <- YieldsFull[, ForSampleIdx]
     # Spanned factors
     PPall <- SpannedFactorsjointQ(ModelType, ModelPara, Economies, t0Sample, tlastObserved)
     # All risk factors
     IdxSpa <- IdxAllSpanned(ModelType, FactorLabels, Economies)
-    ZZtemp <- ZZfull[ , t0Sample:tlastObserved]
+    ZZtemp <- ZZfull[ , ForSampleIdx]
     ZZtemp[IdxSpa, ] <- PPall
 
     # For the GVAR-based models
@@ -333,7 +334,7 @@ ForecastYieldsJointQ <- function(ModelType, ModelPara, InputsForOutputs, FactorL
 
     # Initial guesses for Variables that will be concentrared out of from the log-likelihood function
     K1XQ <- ATSMInputs$K1XQ
-    if (ModelType == "JLL original" || ModelType == "JLL NoDomUnit" ){ SSZ <- NULL} else{SSZ <- ATSMInputs$SSZ}
+    if (any(ModelType ==c("JLL original", "JLL NoDomUnit"))){ SSZ <- NULL} else{SSZ <- ATSMInputs$SSZ}
 
     # Build the objective function
     f <- Functionf(ATSMInputs, Economies, mat, DataFrequency, FactorLabels, ModelType)
@@ -376,7 +377,7 @@ ForecastYieldsJointQ <- function(ModelType, ModelPara, InputsForOutputs, FactorL
     rownames(ForecastYields) <- rownames(YieldsFull)
     colnames(ForecastYields) <- LabelForecastPeriod
 
-    ZZtt <- ZZtemp[,Ttemp]
+    ZZtt <- ZZtemp[ , ncol(ZZtemp)]
     K1ZsumOld <- 0
 
     for (hh in 1:H){

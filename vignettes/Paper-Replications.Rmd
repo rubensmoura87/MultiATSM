@@ -218,12 +218,12 @@ data('CM_Trade')
 data('CM_Yields')
 
 # B) Decide on general model inputs
-ModelType <- "GVAR jointQ" # Options: "GVAR jointQ", "JLL original" 
+ModelType <- "GVAR jointQ"  # Options: "GVAR jointQ", "JLL original" 
 
 StationarityUnderQ <- 0  
-BiasCorrection <- 0 
+BiasCorrection <- 1
 WishForwardPremia <- 0 
-FPmatLim <- c(47,48) 
+FPmatLim <- c(24,36) 
 
 Economies <- c("China","Brazil","Mexico", "Uruguay") 
 GlobalVar <- c("GBC", "CPI_OECD") 
@@ -231,7 +231,7 @@ DomVar <- c("Eco_Act", "Inflation")
 
 N <- 3 # Number of spanned factors per country
 
-OutputLabel <- "CM_2021"
+OutputLabel <- "CM_2024"
 DataFrequency <- "Monthly"
 UnitMatYields <- "Month"
 
@@ -248,8 +248,8 @@ SigmaNonOrtho <- NULL
 JLLModelType <- ModelType
 ###################################### BRW inputs  ######################################################
 flag_mean <- TRUE
-gamma <- 0.1
-N_iter <- 500
+gamma <- 0.001
+N_iter <- 200
 N_burn <- N_iter*0.15
 B <- 50
 checkBRW <- 1
@@ -274,9 +274,10 @@ Bootlist$pctg   <-  95
 # E) Out-of-sample forecast
 WishForecast <- 1 
 ForecastList <- list()
+ForecastList$ForType <- "Rolling"
 ForecastList$ForHoriz <- 12 
 ForecastList$t0Sample <- 1 
-ForecastList$t0Forecast <- 90 
+ForecastList$t0Forecast <- 100 
 
 #########################################################################################################
 ############################### NO NEED TO MAKE CHANGES FROM HERE #######################################
@@ -303,37 +304,37 @@ BRWinputs <- ModInputs$BRWinputs
 # 3) Prepare the inputs of the likelihood function
 ModelParaList <- list()
 
-  # 3.1) Compute the inputs that go directly into the log-likelihood function
-  ATSMInputs <- InputsForMLEdensity(ModelType, Yields, ZZ, FactorLabels, mat, Economies, DataFrequency, 
-                                    JLLinputs, GVARinputs, BRWinputs)
-  
-  
-  # 3.2) Initial guesses for Variables that will be concentrared out of from the log-likelihood function
-  K1XQ <- ATSMInputs$K1XQ
-  if (ModelType == "JLL original"){ SSZ <- NULL}else{SSZ <- ATSMInputs$SSZ}
-  
-  # 4) Build the objective function
-  f <- Functionf(ATSMInputs, Economies, mat, DataFrequency, FactorLabels, ModelType)
-  
-  # 5) Set the optimization settings
-  VarLab <- ParaLabels(ModelType, StationarityUnderQ)
-  
-  varargin <- list()
-  varargin$K1XQ <-list(K1XQ, VarLab[[ModelType]][["K1XQ"]] , NULL , NULL)
-  varargin$SSZ <- list(SSZ, VarLab[[ModelType]][["SSZ"]], NULL, NULL)
-  varargin$r0 <- list(NULL, VarLab[[ModelType]][["r0"]], NULL, NULL)
-  varargin$se <- list(NULL, VarLab[[ModelType]][["se"]], 1e-6, NULL)
-  varargin$K0Z <- list(NULL, VarLab[[ModelType]][["K0Z"]], NULL, NULL)
-  varargin$K1Z <- list(NULL, VarLab[[ModelType]][["K1Z"]], NULL, NULL)
-  varargin$OptRun <-  c("iter off")
-  
-  LabelVar<- c('Value', 'Label', 'LB', 'UB') 
-  for (d in 1:(length(varargin)-1)){ names(varargin[[d]]) <-  LabelVar}
-  
-  tol <- 1e-4
-  # 6) Optimization of the model
-  ModelParaList[[ModelType]] <- Optimization(f, tol, varargin, FactorLabels, Economies, ModelType,
-                                             JLLinputs, GVARinputs)$Summary
+# 3.1) Compute the inputs that go directly into the log-likelihood function
+ATSMInputs <- InputsForMLEdensity(ModelType, Yields, ZZ, FactorLabels, mat, Economies, DataFrequency, 
+                                  JLLinputs, GVARinputs, BRWinputs)
+
+
+# 3.2) Initial guesses for Variables that will be concentrared out of from the log-likelihood function
+K1XQ <- ATSMInputs$K1XQ
+if (ModelType == "JLL original"){ SSZ <- NULL}else{SSZ <- ATSMInputs$SSZ}
+
+# 4) Build the objective function
+f <- Functionf(ATSMInputs, Economies, mat, DataFrequency, FactorLabels, ModelType)
+
+# 5) Set the optimization settings
+VarLab <- ParaLabels(ModelType, StationarityUnderQ)
+
+varargin <- list()
+varargin$K1XQ <-list(K1XQ, VarLab[[ModelType]][["K1XQ"]] , NULL , NULL)
+varargin$SSZ <- list(SSZ, VarLab[[ModelType]][["SSZ"]], NULL, NULL)
+varargin$r0 <- list(NULL, VarLab[[ModelType]][["r0"]], NULL, NULL)
+varargin$se <- list(NULL, VarLab[[ModelType]][["se"]], 1e-6, NULL)
+varargin$K0Z <- list(NULL, VarLab[[ModelType]][["K0Z"]], NULL, NULL)
+varargin$K1Z <- list(NULL, VarLab[[ModelType]][["K1Z"]], NULL, NULL)
+varargin$OptRun <-  c("iter off")
+
+LabelVar<- c('Value', 'Label', 'LB', 'UB') 
+for (d in 1:(length(varargin)-1)){ names(varargin[[d]]) <-  LabelVar}
+
+tol <- 1e-4
+# 6) Optimization of the model
+ModelParaList[[ModelType]] <- Optimization(f, tol, varargin, FactorLabels, Economies, ModelType,
+                                           JLLinputs, GVARinputs)$Summary
 
 # 7) Numerical Outputs
 InputsForOutputs <- InputsForOutputs(ModelType, Horiz, DesiredGraphs, OutputLabel, StationarityUnderQ,
@@ -415,6 +416,7 @@ ForecastList <- list()
 ForecastList$ForHoriz <- 12 # forecast horizon
 ForecastList$t0Sample <- 1 # initial sample date
 ForecastList$t0Forecast <- 50 # last sample date for the first forecast
+ForecastList$ForType <- c()
 
 ##########################################################################################################
 ############################### NO NEED TO MAKE CHANGES FROM HERE ########################################

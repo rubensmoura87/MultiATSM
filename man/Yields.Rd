@@ -3,7 +3,7 @@
 \docType{data}
 \name{Yields}
 \alias{Yields}
-\title{Data: Yields - Candelon and Moura (2021)}
+\title{Data: Yields - Candelon and Moura (forthcoming, JFEC)}
 \format{
 matrix containing the Yields of the models
 
@@ -15,12 +15,12 @@ data("CM_Yields")
 data("CM_Yields_2023")
 }
 \description{
-Yields data used in Candelon and Moura (2021)
+Yields data used in Candelon and Moura (forthcoming, JFEC)
 
 Bond yield data used in Candelon and Moura (2023)
 }
 \references{
-Candelon, B. and Moura, R. "A Multi-Country Model of the Term Structures of Interest Rates with a GVAR".
+Candelon, B. and Moura, R. "A Multicountry Model of the Term Structures of Interest Rates with a GVAR".
 
 Candelon, B. and Moura, R. "Sovereign yield curves and the COVID-19 in emerging markets".
 }

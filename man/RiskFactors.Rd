@@ -3,7 +3,7 @@
 \docType{data}
 \name{RiskFactors}
 \alias{RiskFactors}
-\title{Data: Risk Factors - Candelon and Moura (2021)}
+\title{Data: Risk Factors - Candelon and Moura (forthcoming, JFEC)}
 \format{
 matrix containing the  risk factors of the models
 
@@ -15,12 +15,12 @@ data("CM_Factors")
 data("CM_Factors_2023")
 }
 \description{
-Risk factors data used in Candelon and Moura (2021)
+Risk factors data used in Candelon and Moura (forthcoming, JFEC)
 
 Risk factors data used in Candelon and Moura (2023)
 }
 \references{
-Candelon, B. and Moura, R. "A Multi-Country Model of the Term Structures of Interest Rates with a GVAR".
+Candelon, B. and Moura, R. "A Multicountry Model of the Term Structures of Interest Rates with a GVAR".
 
 Candelon, B. and Moura, R. "Sovereign yield curves and the COVID-19 in emerging markets".
 }

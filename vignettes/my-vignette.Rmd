@@ -286,13 +286,15 @@ To perform out-of-sample forecasts of bond yields, the following list-based feat
 
 - **ForHoriz**: number of periods-ahead that the forecasts are to be generated;
 - **t0Sample**: time-dimension index of the first observations belonging to the information set;
-- **t0Forecast**: time-dimension index of the last observation of the information set used to perform the first forecast set.
+- **t0Forecast**: time-dimension index of the last observation of the information set used to perform the first forecast set;
+- **ForType**:  rolling window forecasting to be done by setting this parameter as *Rolling*. In such a case, the forecast length used in the forecasts is the one specified as in *t0Sample*. Should the user wishes the forecasts to be performed on a expanding window basis, then this input should be left empty.
 
 ```{r}
 ForecastList <- list()
 ForecastList$ForHoriz <- 12 # forecast horizon
 ForecastList$t0Sample <- 1 # initial sample date
 ForecastList$t0Forecast <- 70 # last sample date for the first forecast
+ForecastList$ForType <- "Rolling" # forecasting will be performed using rolling windows 
 ```
 
 
@@ -555,6 +557,7 @@ ForecastList <- list()
 ForecastList$ForHoriz <- 12 # forecast horizon
 ForecastList$t0Sample <- 1 # initial sample date
 ForecastList$t0Forecast <- 145 # last sample date for the first forecast
+ForecastList$ForType <- c()
 
 #########################################################################################################
 ############################### NO NEED TO MAKE CHANGES FROM HERE #######################################

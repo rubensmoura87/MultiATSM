@@ -1,7 +1,6 @@
 ## Resubmission
-This is a resubmission. In this version I have:
+This is a re-submission. In this version I have:
 
-* rewritten several parts of the package to eliminante its dependence on the 'powerplus' package 
-* corrected a mistake in the vignette section that refers to the paper replication Candelon Moura (2021)
+* rewritten the *ForecastYields* function to accommodate bond yield forecasts with rolling windows and have updated the vignette accordingly
+* Updated the dataset used in Candelon and Moura (forthcoming), since this paper has now been accepted for publication
   
- 
