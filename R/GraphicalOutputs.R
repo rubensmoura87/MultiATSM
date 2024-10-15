@@ -1,12 +1,12 @@
 #' Generate the graphical outputs for the selected models (Point estimate)
 
 
-#'@param ModelType a string-vector containing the label of the model to be estimated
+#'@param ModelType A character vector indicating the model type to be estimated.
 #'@param ModelPara List of model parameter estimates (See the "Optimization" function)
-#'@param NumOut list of computed outputs containing the model fit, IRFs, FEVDs, GIRFs, and GFEVDs
+#'@param NumOut list of computed outputs containing the model fit, IRFs, FEVDs, GIRFs, GFEVDs and Term Premia
 #'@param InputsForOutputs list containing the desired inputs for the construction of the desired output
-#'@param Economies string-vector containing the names of the economies which are part of the economic system
-#'@param FactorLabels string-list based which contains the labels of all the variables present in the model
+#'@param Economies A character vector containing the names of the economies included in the system.
+#'@param FactorLabels A list of character vectors with labels for all variables in the model.
 #'
 #'@keywords internal
 
@@ -28,10 +28,11 @@ GraphicalOutputs <- function(ModelType, ModelPara, NumOut, InputsForOutputs, Eco
 
 
 # 1) Models for which the estimation is done on a country-by-country basis
-if (any(ModelType == c("JPS", "JPS jointP",  "GVAR sepQ"))){
+if (any(ModelType == c("JPS original", "JPS global",  "GVAR single"))){
 
     for (i in 1:length(Economies)){dir.create(paste(tempdir(),"/Outputs/", ModelType, "/Point Estimate/Model ", Economies[i], sep=""))}
 
+  cat(" 2.3) Generating the graphs of interest \n")
   # Model fit
   FitgraphsSep(ModelType, InputsForOutputs[[ModelType]]$Fit$WishGraphs, ModelPara, NumOut, Economies, PathsGraphs)
 
@@ -61,7 +62,7 @@ if (any(ModelType == c("JPS", "JPS jointP",  "GVAR sepQ"))){
 
 # 2) Models for which the estimation is done on jointly for all the countries
 
-if ( any(ModelType == c("GVAR jointQ", "VAR jointQ", "JLL original", "JLL NoDomUnit", "JLL jointSigma"))){
+if ( any(ModelType == c("GVAR multi", "JPS multi", "JLL original", "JLL No DomUnit", "JLL joint Sigma"))){
 
 # Model fit
 FitgraphsJoint(ModelType, InputsForOutputs[[ModelType]]$Fit$WishGraphs, ModelPara, NumOut, Economies, PathsGraphs)
@@ -86,7 +87,7 @@ TPDecompGraphJoint(ModelType, NumOut, ModelPara, InputsForOutputs[[ModelType]]$R
                    InputsForOutputs$UnitMatYields, Economies, PathsGraphs)
 
 # 2.1) JLL-based models
-if (any(ModelType == c("JLL original",  "JLL NoDomUnit",  "JLL jointSigma"))){
+if (any(ModelType == c("JLL original",  "JLL No DomUnit",  "JLL joint Sigma"))){
 # IRF and FEVD
 IRFgraphsJLLOrtho(ModelType, NumOut, InputsForOutputs[[ModelType]]$IRF$WishGraphsOrtho$RiskFactors,
                   InputsForOutputs[[ModelType]]$IRF$WishGraphsOrtho$Yields, InputsForOutputs[[ModelType]]$IRF$horiz,
@@ -110,6 +111,7 @@ GFEVDgraphsJLLOrtho(ModelType, NumOut, InputsForOutputs[[ModelType]]$GFEVD$WishG
 
 }
 
+  cat(paste("Desired graphs are saved in your temporary directory. Please, check:",tempdir(), "\n\n"))
 }
 
 
@@ -140,7 +142,7 @@ RiskFactorsGraphs <- function(ModelType, ModelOutputs, Economies, FactorLabels){
   C <- length(Economies)
 
 
-  if (any(ModelType == c("JPS", "JPS jointP", "GVAR sepQ"))){
+  if (any(ModelType == c("JPS original", "JPS global", "GVAR single"))){
     X <- c()
     for (i in 1:C){
       if (i ==1){
@@ -226,7 +228,7 @@ RiskFactorsGraphs <- function(ModelType, ModelOutputs, Economies, FactorLabels){
   FactorsGraph <- cowplot::plot_grid(LegendSubPlot, subplots , ncol=1,  rel_heights = c(.1, 1))
 
   # Save final graph at the overleaf folder:
-  ggplot2::ggsave(FactorsGraph, filename =paste0("RiskFactors", ".png"), path =Folder2save)
+  suppressMessages(ggplot2::ggsave(FactorsGraph, filename =paste0("RiskFactors", ".png"), path =Folder2save))
 
 }
 
@@ -260,10 +262,10 @@ RiskFactorsGraphs <- function(ModelType, ModelOutputs, Economies, FactorLabels){
 FitgraphsSep  <- function(ModelType, WishFitgraphs, ModelPara, NumOut, Economies, PathsGraphs){
 
 
-  if (WishFitgraphs== 0){print(paste(ModelType,": No fit graphs were generated"))
+  if (WishFitgraphs== 0){cat("No graphs for bond yields fit were generated \n")
   }else{
 
-    print('################################# Generating Fit graphs #################################' )
+    cat(' ** Bond yields Fit \n' )
 
 
     C <- length(Economies)
@@ -333,8 +335,8 @@ FitgraphsSep  <- function(ModelType, WishFitgraphs, ModelPara, NumOut, Economies
     # Build the graph subplots:
       subplots_FIT <- cowplot::plot_grid(plotlist= plot_list_no_legend_FIT, ncol=3)
       subplots2save_FIT <- cowplot::plot_grid(LegendSubPlot_FIT, subplots_FIT , ncol=1,  rel_heights = c(.1, 1))
-      ggplot2::ggsave(subplots2save_FIT, file=paste0("Yields_Fit_", Economies[i], ".png"),
-                      path = PathsGraphs[[ModelType]]$Fit[[Economies[i]]])
+      suppressMessages(ggplot2::ggsave(subplots2save_FIT, file=paste0("Yields_Fit_", Economies[i], ".png"),
+                      path = PathsGraphs[[ModelType]]$Fit[[Economies[i]]]))
 
 }
 
@@ -365,11 +367,11 @@ IRFgraphsSep <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsgraph
                          PathsGraphs, Economies) {
 
 
-  if (WishPdynamicsgraphs==0 & WishYieldsgraphs ==0){print(paste(ModelType,": No IRFs graphs were generated"))
+  if (WishPdynamicsgraphs==0 & WishYieldsgraphs ==0){cat( "No graphs for IRFs were generated \n")
   }else {
 
 
-    print('################################# Generating IRFs graphs #################################' )
+    cat(' ** IRFs \n')
 
   C <- length(Economies)
 
@@ -410,12 +412,13 @@ IRFgraphsSep <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsgraph
               plot_list[[x]] <- p
             }
             subplots <- cowplot::plot_grid(plotlist= plot_list, ncol=3) # Gather the graphs in sub-plots
-            ggplot2::ggsave(subplots, file=paste0("IRFFactors_shock_to_", nmFactors[[h]],"_Model_", Economies[i],".png"),
-                            path= PathsGraphs[[ModelType]]$IRF[[Economies[i]]][["Factors"]] ) # Save sub-plots
+            suppressMessages(ggplot2::ggsave(subplots, file=paste0("IRFFactors_shock_to_", nmFactors[[h]],"_Model_", Economies[i],".png"),
+                            path= PathsGraphs[[ModelType]]$IRF[[Economies[i]]][["Factors"]])) # Save sub-plots
           }
         }
         ############################ IRF Yields ########################################################
         if (WishYieldsgraphs == 1){
+
           dir.create( paste(tempdir(),"/Outputs/", ModelType, "/Point Estimate/Model ",
                             Economies[i], "/IRF/Yields", sep=""))
 
@@ -432,8 +435,8 @@ IRFgraphsSep <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsgraph
               plot_list[[x]] <- p
             }
             subplots <- cowplot::plot_grid(plotlist= plot_list, ncol=3) # Gather the graphs in sub-plots
-            ggplot2::ggsave(subplots, file=paste0("IRFYields_shock_to_", nmFactors[[l]],"_Model_", Economies[i], ".png"),
-                            path= PathsGraphs[[ModelType]]$IRF[[Economies[i]]][["Yields"]]) # Save sub-plots
+            suppressMessages(ggplot2::ggsave(subplots, file=paste0("IRFYields_shock_to_", nmFactors[[l]],"_Model_", Economies[i], ".png"),
+                            path= PathsGraphs[[ModelType]]$IRF[[Economies[i]]][["Yields"]])) # Save sub-plots
           }
         }
       }
@@ -466,10 +469,10 @@ FEVDgraphsSep <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsgrap
                           PathsGraphs, Economies) {
 
 
-  if (WishPdynamicsgraphs == 0 & WishYieldsgraphs ==0){print(paste(ModelType,": No FEVDs graphs were generated"))
+  if (WishPdynamicsgraphs == 0 & WishYieldsgraphs ==0){cat("No graphs for FEVDs were generated \n")
   } else {
 
-    print('################################# Generating FEVD graphs #################################' )
+    cat(' ** FEVD \n' )
 
     C <- length(Economies)
 
@@ -502,8 +505,8 @@ FEVDgraphsSep <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsgrap
               labs(title= paste0("FEVD_",nmFactors[i])) + theme_classic() +
             theme(axis.title.x=element_blank(), axis.title.y=element_blank(), axis.text.x = element_text(size=8),
                   plot.title = element_text(size = 10, face = "bold", hjust = 0.5) )
-            ggplot2::ggsave(p, file=paste0("FEVDFactors_", nmFactors[[i]],".png"),
-                            path= PathsGraphs[[ModelType]]$FEVD[[Economies[h]]][["Factors"]], width= 11, height= 7.98)
+            suppressMessages(ggplot2::ggsave(p, file=paste0("FEVDFactors_", nmFactors[[i]],".png"),
+                            path= PathsGraphs[[ModelType]]$FEVD[[Economies[h]]][["Factors"]], width= 11, height= 7.98))
           }
 
 }
@@ -534,8 +537,8 @@ FEVDgraphsSep <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsgrap
                 labs(title= paste0("FEVD_", nmYields[i])) + theme_classic() +
                 theme(axis.title.x=element_blank(), axis.title.y=element_blank(), axis.text.x = element_text(size=8),
                       plot.title = element_text(size = 10, face = "bold", hjust = 0.5))
-              ggplot2::ggsave(p, file=paste0("FEVDYields_", nmYields[i],".png"),
-                              path= PathsGraphs[[ModelType]]$FEVD[[Economies[h]]][["Yields"]], width= 11, height= 7.98)
+              suppressMessages(ggplot2::ggsave(p, file=paste0("FEVDYields_", nmYields[i],".png"),
+                              path= PathsGraphs[[ModelType]]$FEVD[[Economies[h]]][["Yields"]], width= 11, height= 7.98))
             }
           }
         }
@@ -566,10 +569,10 @@ GIRFgraphsSep <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsgrap
                           PathsGraphs, Economies) {
 
 
-  if (WishPdynamicsgraphs == 0 & WishYieldsgraphs == 0){print(paste(ModelType,": No GIRFs graphs were generated"))
+  if (WishPdynamicsgraphs == 0 & WishYieldsgraphs == 0){cat("No graphs for GIRFs were generated \n")
     } else {
 
-      print('################################# Generating GIRFs graphs #################################' )
+      cat(' ** GIRFs \n' )
 
   C <- length(Economies)
 
@@ -610,8 +613,8 @@ GIRFgraphsSep <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsgrap
               plot_list[[x]] <- p
             }
             subplots <- cowplot::plot_grid(plotlist= plot_list, ncol=3) # subplots
-            ggplot2::ggsave(subplots, file=paste0("GIRFFactors_shock_to_", nmFactors[[h]], "_Model_", Economies[i], ".png"),
-                            path= PathsGraphs[[ModelType]]$GIRF[[Economies[i]]][["Factors"]])
+            suppressMessages(ggplot2::ggsave(subplots, file=paste0("GIRFFactors_shock_to_", nmFactors[[h]], "_Model_", Economies[i], ".png"),
+                            path= PathsGraphs[[ModelType]]$GIRF[[Economies[i]]][["Factors"]]))
           }
         }
         ############################ GIRF Yields ########################################################
@@ -630,8 +633,8 @@ GIRFgraphsSep <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsgrap
               plot_list[[x]] <- p
             }
             subplots <- cowplot::plot_grid(plotlist= plot_list, ncol=3) # subplots
-            ggplot2::ggsave(subplots, file=paste0("GIRFYields_shock_to_", nmFactors[[l]],"_Model_", Economies[i], ".png"),
-                            path= PathsGraphs[[ModelType]]$GIRF[[Economies[i]]][["Yields"]])
+            suppressMessages(ggplot2::ggsave(subplots, file=paste0("GIRFYields_shock_to_", nmFactors[[l]],"_Model_", Economies[i], ".png"),
+                            path= PathsGraphs[[ModelType]]$GIRF[[Economies[i]]][["Yields"]]))
           }
         }
       }
@@ -661,10 +664,10 @@ GIRFgraphsSep <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsgrap
 GFEVDgraphsSep <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsgraphs, GFEVDhoriz,
                            PathsGraphs, Economies) {
 
-  if (WishPdynamicsgraphs==0 & WishYieldsgraphs==0){print(paste(ModelType,": No GFEVDs graphs were generated"))
+  if (WishPdynamicsgraphs==0 & WishYieldsgraphs==0){cat("No graphs for GFEVDs were generated \n")
     } else{
 
-      print('################################# Generating GFEVDs graphs #################################' )
+      cat(' ** GFEVDs \n' )
 
       C <- length(Economies)
       for (h in 1:C){
@@ -697,8 +700,8 @@ GFEVDgraphsSep <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsgra
               labs(title= paste0("GFEVD_",nmFactors[i])) + theme_classic() +
               theme(axis.title.x=element_blank(), axis.title.y=element_blank(), axis.text.x = element_text(size=8),
                     plot.title = element_text(size = 10, face = "bold", hjust = 0.5))
-            ggplot2::ggsave(p, file=paste0("GFEVDFactors_", nmFactors[[i]],".png"),
-                            path= PathsGraphs[[ModelType]]$GFEVD[[Economies[h]]][["Factors"]], width= 11, height= 7.98)
+            suppressMessages(ggplot2::ggsave(p, file=paste0("GFEVDFactors_", nmFactors[[i]],".png"),
+                            path= PathsGraphs[[ModelType]]$GFEVD[[Economies[h]]][["Factors"]], width= 11, height= 7.98))
           }
 
 }
@@ -729,8 +732,8 @@ GFEVDgraphsSep <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsgra
                 labs(title= paste0("GFEVD_", nmYields[i])) + theme_classic() +
                 theme(axis.title.x=element_blank(), axis.title.y=element_blank(), axis.text.x = element_text(size=8),
                       plot.title = element_text(size = 10, face = "bold", hjust = 0.5))
-              ggplot2::ggsave(p, file=paste0("GFEVDYields_", nmYields[i],".png"),
-                              path= PathsGraphs[[ModelType]]$GFEVD[[Economies[h]]][["Yields"]], width= 11, height= 7.98)
+              suppressMessages(ggplot2::ggsave(p, file=paste0("GFEVDYields_", nmYields[i],".png"),
+                              path= PathsGraphs[[ModelType]]$GFEVD[[Economies[h]]][["Yields"]], width= 11, height= 7.98))
             }
           }
         }
@@ -763,10 +766,10 @@ TPDecompGraphSep <- function(ModelType, NumOut, ModelPara, WishRPgraphs, UnitYie
 
 
 
-  if (WishRPgraphs ==0){print(paste(ModelType,": No term-premia graphs were generated"))
+  if (WishRPgraphs ==0){cat("No graphs for term-premia were generated \n")
   } else {
 
-    print('################################# Generating term premia graphs #################################' )
+    cat(' ** Term premia \n')
 
 
     # Preliminary work
@@ -855,8 +858,8 @@ TPDecompGraphSep <- function(ModelType, NumOut, ModelPara, WishRPgraphs, UnitYie
       # Build the graph subplots:
       subplots_CS <- cowplot::plot_grid(plotlist= plot_list_no_legend_RP, ncol=3)
       subplots2save <- cowplot::plot_grid(LegendSubPlot_RP, subplots_CS, ncol=1, rel_heights=c(0.2, 1))
-      ggplot2::ggsave(subplots2save, file=paste0("TermPremia_", Economies[i],"_", ModelType, ".png"),
-                      path = PathsGraphs[[ModelType]]$TermPremia[[Economies[i]]])
+      suppressMessages(ggplot2::ggsave(subplots2save, file=paste0("TermPremia_", Economies[i],"_", ModelType, ".png"),
+                      path = PathsGraphs[[ModelType]]$TermPremia[[Economies[i]]]))
 
     }
 
@@ -895,10 +898,10 @@ TPDecompGraphSep <- function(ModelType, NumOut, ModelPara, WishRPgraphs, UnitYie
 FitgraphsJoint  <- function(ModelType, WishFitgraphs, ModelPara, NumOut, Economies, PathsGraphs){
 
 
-  if (WishFitgraphs== 0){print(paste(ModelType,": No fit graphs were generated"))
+  if (WishFitgraphs== 0){cat("No graphs for bond yields fit were generated \n")
   }else{
 
-    print('################################# Generating Fit graphs #################################' )
+    cat(' ** Bond yields fit \n' )
 
 
     dir.create( paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/Fit", sep=""))  # Folder creation
@@ -979,8 +982,8 @@ FitgraphsJoint  <- function(ModelType, WishFitgraphs, ModelPara, NumOut, Economi
 
     subplots_FIT <- cowplot::plot_grid(plotlist= plot_list_no_legend_FIT[IdxGrpahs], ncol=3)
     subplots2save_FIT <- cowplot::plot_grid(LegendSubPlot_FIT, subplots_FIT , ncol=1,  rel_heights = c(.1, 1))
-    ggplot2::ggsave(subplots2save_FIT, file=paste0("Yields_Fit_", Economies[j], ".png"),
-                    path = PathsGraphs[[ModelType]]$Fit)
+    suppressMessages(ggplot2::ggsave(subplots2save_FIT, file=paste0("Yields_Fit_", Economies[j], ".png"),
+                    path = PathsGraphs[[ModelType]]$Fit))
 
     Idx0 <- (Idx+J)
   }
@@ -1012,11 +1015,11 @@ IRFgraphsJoint <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsgra
 
 
 
-    if (WishPdynamicsgraphs== 0 & WishYieldsgraphs==0){print(paste(ModelType,": No IRFs graphs were generated"))
+    if (WishPdynamicsgraphs== 0 & WishYieldsgraphs==0){cat("No graphs for IRFs were generated \n")
       }else{
 
 
-        print('################################# Generating IRFs graphs #################################' )
+        cat(' ** IRFs \n' )
 
       dir.create( paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/IRF", sep="")) # Folder Creation
 
@@ -1026,7 +1029,7 @@ IRFgraphsJoint <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsgra
       Horiz <- 0:(IRFhoriz-1)
 
 
-        if ( any(ModelType == c("JLL original", "JLL NoDomUnit", "JLL jointSigma"))){
+        if ( any(ModelType == c("JLL original", "JLL No DomUnit", "JLL joint Sigma"))){
           K <- dim(NumOut$IRF[[ModelType]]$Factors$NonOrtho)[2]  # Total number of risk factors
           CJ <- dim(NumOut$IRF[[ModelType]]$Yields$NonOrtho)[2]  # Total number of yields
           for (i in 1:K){ # Outputs in data-frame format
@@ -1063,8 +1066,8 @@ IRFgraphsJoint <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsgra
               plot_list[[i]] <- p
             }
             subplots <- cowplot::plot_grid(plotlist= plot_list, ncol=3) # store in subplots
-            ggplot2::ggsave(subplots, file=paste0("IRFFactors_shock_to_", nmFactors[[h]],".png"),
-                            path= PathsGraphs[[ModelType]]$IRF[["Factors"]])
+            suppressMessages(ggplot2::ggsave(subplots, file=paste0("IRFFactors_shock_to_", nmFactors[[h]],".png"),
+                            path= PathsGraphs[[ModelType]]$IRF[["Factors"]]))
           }
         }
         ############################ IRF Yields ########################################################
@@ -1084,8 +1087,8 @@ IRFgraphsJoint <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsgra
               plot_list[[i]] <- p
             }
             subplots <- cowplot::plot_grid(plotlist= plot_list, ncol=3) # store in subplots
-            ggplot2::ggsave(subplots, file=paste0("IRFYields_shock_to_", nmFactors[[l]],".png"),
-                            path= PathsGraphs[[ModelType]]$IRF[["Yields"]])
+            suppressMessages(ggplot2::ggsave(subplots, file=paste0("IRFYields_shock_to_", nmFactors[[l]],".png"),
+                            path= PathsGraphs[[ModelType]]$IRF[["Yields"]]))
           }
 
         }
@@ -1116,11 +1119,11 @@ FEVDgraphsJoint <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsgr
 
 
 
-    if (WishPdynamicsgraphs ==0 & WishYieldsgraphs==0){print(paste(ModelType,": No FEVDs graphs were generated"))
+    if (WishPdynamicsgraphs ==0 & WishYieldsgraphs==0){cat("No graphs for FEVDs were generated \n")
       }else {
 
 
-        print('################################# Generating FEVDs graph #################################' )
+        cat(' ** FEVDs  \n' )
 
         dir.create( paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/FEVD", sep="")) # Folder Creation
 
@@ -1132,7 +1135,7 @@ FEVDgraphsJoint <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsgr
           FEVDFactors <- list()
 
 
-          if ( any(ModelType == c("JLL original", "JLL NoDomUnit", "JLL jointSigma"))){
+          if ( any(ModelType == c("JLL original", "JLL No DomUnit", "JLL joint Sigma"))){
             K <- dim(NumOut$FEVD[[ModelType]]$Factors$NonOrtho)[2] # Total number of risk factors
             for (i in 1:K){
               FEVDFactors[[i]] <- data.frame(NumOut$FEVD[[ModelType]]$Factors$NonOrtho[,,i])
@@ -1163,8 +1166,8 @@ FEVDgraphsJoint <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsgr
               labs(title= paste0("FEVD_",nmFactors[i])) + theme_classic() +
               theme(axis.title.x=element_blank(), axis.title.y=element_blank(), axis.text.x = element_text(size=8),
                     plot.title = element_text(size = 10, face = "bold", hjust = 0.5))
-            ggplot2::ggsave(p, file=paste0("FEVDFactors_", nmFactors[[i]],".png"),
-                            path= PathsGraphs[[ModelType]]$FEVD[["Factors"]], width= 11, height= 7.98)
+            suppressMessages(ggplot2::ggsave(p, file=paste0("FEVDFactors_", nmFactors[[i]],".png"),
+                            path= PathsGraphs[[ModelType]]$FEVD[["Factors"]], width= 11, height= 7.98))
           }
 
         }
@@ -1175,7 +1178,7 @@ FEVDgraphsJoint <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsgr
 
           FEVDYields <- list()
 
-          if (any(ModelType == c("JLL original", "JLL NoDomUnit", "JLL jointSigma"))){
+          if (any(ModelType == c("JLL original", "JLL No DomUnit", "JLL joint Sigma"))){
 
             CJ <- dim(NumOut$FEVD[[ModelType]]$Yields$NonOrtho)[3] # Total number of yields of the system
 
@@ -1210,8 +1213,8 @@ FEVDgraphsJoint <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsgr
               labs(title= paste0("FEVD_", nmYields[i])) + theme_classic() +
               theme(axis.title.x=element_blank(), axis.title.y=element_blank(), axis.text.x = element_text(size=8),
                     plot.title = element_text(size = 10, face = "bold", hjust = 0.5))
-            ggplot2::ggsave(p, file=paste0("FEVDYields_", nmYields[i],".png"),
-                            path= PathsGraphs[[ModelType]]$FEVD[["Yields"]], width= 11, height= 7.98)
+            suppressMessages(ggplot2::ggsave(p, file=paste0("FEVDYields_", nmYields[i],".png"),
+                            path= PathsGraphs[[ModelType]]$FEVD[["Yields"]], width= 11, height= 7.98))
           }
         }
 
@@ -1242,10 +1245,10 @@ FEVDgraphsJoint <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsgr
 GIRFgraphsJoint <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsgraphs, GIRFhoriz, PathsGraphs){
 
 
-    if (WishPdynamicsgraphs ==0 & WishYieldsgraphs==0){print(paste(ModelType,": No GIRFs graphs were generated"))
+    if (WishPdynamicsgraphs ==0 & WishYieldsgraphs==0){cat("No graphs for GIRFs were generated \n")
       } else{
 
-        print('################################# Generating GIRFs graphs #################################' )
+        cat(' ** GIRFs \n' )
 
         dir.create(paste(tempdir(),"/Outputs/", ModelType, "/Point Estimate/GIRF", sep="")) # Folder Creation
 
@@ -1255,7 +1258,7 @@ GIRFgraphsJoint <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsgr
       Horiz <- 0:(GIRFhoriz-1)
 
 
-        if ( any(ModelType == c("JLL original", "JLL NoDomUnit", "JLL jointSigma"))){
+        if ( any(ModelType == c("JLL original", "JLL No DomUnit", "JLL joint Sigma"))){
           K <- dim(NumOut$GIRF[[ModelType]]$Factors$NonOrtho)[2]  # Total number of risk factors
           CJ <- dim(NumOut$GIRF[[ModelType]]$Yields$NonOrtho)[2]  # Total number of yields
           for (i in 1:K){
@@ -1292,8 +1295,8 @@ GIRFgraphsJoint <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsgr
               plot_list[[i]] <- p
             }
             subplots <- cowplot::plot_grid(plotlist= plot_list, ncol=3) # sub-plots
-            ggplot2::ggsave(subplots, file=paste0("GIRFFactors_shock_to_", nmFactors[[h]],".png"),
-                            path= PathsGraphs[[ModelType]]$GIRF[["Factors"]])
+            suppressMessages(ggplot2::ggsave(subplots, file=paste0("GIRFFactors_shock_to_", nmFactors[[h]],".png"),
+                            path= PathsGraphs[[ModelType]]$GIRF[["Factors"]]))
           }
         }
         ############################ IRF Yields ########################################################
@@ -1313,8 +1316,8 @@ GIRFgraphsJoint <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsgr
               plot_list[[i]] <- p
             }
             subplots <- cowplot::plot_grid(plotlist= plot_list, ncol=3) # sub-plots
-            ggplot2::ggsave(subplots, file=paste0("GIRFYields_shock_to_", nmFactors[[l]],".png"),
-                            path= PathsGraphs[[ModelType]]$GIRF[["Yields"]])
+            suppressMessages(ggplot2::ggsave(subplots, file=paste0("GIRFYields_shock_to_", nmFactors[[l]],".png"),
+                            path= PathsGraphs[[ModelType]]$GIRF[["Yields"]]))
           }
 
         }
@@ -1346,11 +1349,11 @@ GIRFgraphsJoint <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsgr
 GFEVDgraphsJoint <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsgraphs, GFEVDhoriz, PathsGraphs){
 
 
-    if (WishPdynamicsgraphs ==0 & WishYieldsgraphs ==0){print(paste(ModelType,": No GFEVDs graphs were generated"))
+    if (WishPdynamicsgraphs ==0 & WishYieldsgraphs ==0){cat("No graphs for GFEVDs were generated \n")
       } else {
 
 
-        print('################################# Generating GFEVD graphs #################################' )
+        cat(' ** GFEVD \n' )
 
 
         dir.create( paste(tempdir(),"/Outputs/", ModelType, "/Point Estimate/GFEVD", sep="")) # Folder Creation
@@ -1361,7 +1364,7 @@ GFEVDgraphsJoint <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsg
           GFEVDFactors <- list()
 
 
-          if ( any(ModelType == c("JLL original", "JLL NoDomUnit", "JLL jointSigma"))){
+          if ( any(ModelType == c("JLL original", "JLL No DomUnit", "JLL joint Sigma"))){
             K <- dim(NumOut$GFEVD[[ModelType]]$Factors$NonOrtho)[2] # Total number of risk factors
             for (i in 1:K){ # Outputs in data-frame
               GFEVDFactors[[i]] <- data.frame(NumOut$GFEVD[[ModelType]]$Factors$NonOrtho[,,i])
@@ -1391,8 +1394,8 @@ GFEVDgraphsJoint <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsg
               labs(title= paste0("GFEVD_",nmFactors[i])) + theme_classic() +
               theme(axis.title.x=element_blank(), axis.title.y=element_blank(), axis.text.x = element_text(size=8),
                     plot.title = element_text(size = 10, face = "bold", hjust = 0.5))
-            ggplot2::ggsave(p, file=paste0("GFEVDFactors_", nmFactors[[i]],".png"),
-                            path= PathsGraphs[[ModelType]]$GFEVD[["Factors"]], width= 11, height= 7.98)
+            suppressMessages(ggplot2::ggsave(p, file=paste0("GFEVDFactors_", nmFactors[[i]],".png"),
+                            path= PathsGraphs[[ModelType]]$GFEVD[["Factors"]], width= 11, height= 7.98))
           }
 
         }
@@ -1403,7 +1406,7 @@ GFEVDgraphsJoint <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsg
 
           GFEVDYields <- list()
 
-          if (ModelType == "JLL original"  || ModelType== "JLL NoDomUnit" || ModelType =="JLL jointSigma"){
+          if (ModelType == "JLL original"  || ModelType== "JLL No DomUnit" || ModelType =="JLL joint Sigma"){
             CJ <- dim(NumOut$GFEVD[[ModelType]]$Yields$NonOrtho)[3] # Total number of yields of the system
             for (i in 1:CJ){ # Outputs in data-frame
               GFEVDYields[[i]] <- data.frame(NumOut$GFEVD[[ModelType]]$Yields$NonOrtho[,,i])
@@ -1433,8 +1436,8 @@ GFEVDgraphsJoint <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsg
               labs(title= paste0("GFEVD_", nmYields[i])) + theme_classic() +
                theme(axis.title.x=element_blank(), axis.title.y=element_blank(), axis.text.x = element_text(size=8),
                      plot.title = element_text(size = 10, face = "bold", hjust = 0.5))
-            ggplot2::ggsave(p, file=paste0("GFEVDYields_", nmYields[i],".png"),
-                            path= PathsGraphs[[ModelType]]$GFEVD[["Yields"]], width= 11, height= 7.98)
+             suppressMessages(ggplot2::ggsave(p, file=paste0("GFEVDYields_", nmYields[i],".png"),
+                            path= PathsGraphs[[ModelType]]$GFEVD[["Yields"]], width= 11, height= 7.98))
           }
         }
 
@@ -1463,10 +1466,10 @@ TPDecompGraphJoint <- function(ModelType, NumOut, ModelPara, WishRPgraphs, UnitY
 
 
 
-  if (WishRPgraphs ==0){print(paste(ModelType,": No term-premia graphs were generated"))
+  if (WishRPgraphs ==0){cat("No graphs for term-premia were generated \n")
   } else {
 
-    print('################################# Generating term premia graphs #################################' )
+    cat(' ** Term premia \n' )
 
 
     dir.create( paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/TermPremia", sep=""))  # Folder creation
@@ -1558,8 +1561,8 @@ TPDecompGraphJoint <- function(ModelType, NumOut, ModelPara, WishRPgraphs, UnitY
       subplots_CS <- cowplot::plot_grid(plotlist= plot_list_no_legend_RP, ncol=3)
       subplots2save <- cowplot::plot_grid(LegendSubPlot_RP, subplots_CS, ncol=1, rel_heights=c(0.2, 1))
 
-      ggplot2::ggsave(subplots2save, file=paste0("TermPremia_", Economies[i],"_", ModelType, ".png"),
-                path = PathsGraphs[[ModelType]]$TermPremia)
+      suppressMessages(ggplot2::ggsave(subplots2save, file=paste0("TermPremia_", Economies[i],"_", ModelType, ".png"),
+                path = PathsGraphs[[ModelType]]$TermPremia))
 
         }
 
@@ -1596,10 +1599,10 @@ IRFgraphsJLLOrtho <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYields
   Horiz <- 0:(IRFhoriz-1)
 
   if (WishPdynamicsgraphs== 0 & WishYieldsgraphs==0){
-    print(paste(ModelType,": No IRFs graphs were generated (orthogonolized version)"))
+    cat("No graphs for IRFs were generated (orthogonolized version) \n")
   }else{
 
-    print('################################# Generating IRFs-Ortho graphs #################################' )
+    cat(' ** IRFs-Ortho \n')
 
       K <- dim(NumOut$IRF[[ModelType]]$Factors$Ortho)[2]  # Total number of risk factors
       CJ <- dim(NumOut$IRF[[ModelType]]$Yields$Ortho)[2]  # Total number of yields
@@ -1631,8 +1634,8 @@ IRFgraphsJLLOrtho <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYields
               plot_list[[i]] <- p
             }
             subplots <- cowplot::plot_grid(plotlist= plot_list, ncol=3) # sub-plots
-            ggplot2::ggsave(subplots, file=paste0("IRFFactors_shock_to_", nmFactors[[h]],"ORTHO",".png"),
-                            path= PathsGraphs[[ModelType]]$IRF[["Factors Ortho"]])
+            suppressMessages(ggplot2::ggsave(subplots, file=paste0("IRFFactors_shock_to_", nmFactors[[h]],"ORTHO",".png"),
+                            path= PathsGraphs[[ModelType]]$IRF[["Factors Ortho"]]))
           }
         }
         ############################ IRF Yields ########################################################
@@ -1652,8 +1655,8 @@ IRFgraphsJLLOrtho <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYields
               plot_list[[i]] <- p
             }
             subplots <- cowplot::plot_grid(plotlist= plot_list, ncol=3) # sub-plots
-            ggplot2::ggsave(subplots, file=paste0("IRFYields_shock_to_", nmFactors[[l]], "ORTHO",".png"),
-                            path= PathsGraphs[[ModelType]]$IRF[["Yields Ortho"]])
+            suppressMessages(ggplot2::ggsave(subplots, file=paste0("IRFYields_shock_to_", nmFactors[[l]], "ORTHO",".png"),
+                            path= PathsGraphs[[ModelType]]$IRF[["Yields Ortho"]]))
           }
 
         }
@@ -1683,10 +1686,10 @@ FEVDgraphsJLLOrtho <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYield
 
 
   if (WishPdynamicsgraphs== 0 & WishYieldsgraphs==0){
-    print(paste(ModelType,": No FEVDs graphs were generated (orthogonolized version)"))
+    cat("No graphs for FEVDs were generated (orthogonolized version) \n")
   }else{
 
-    print('################################# Generating FEVDs-Ortho graphs #################################' )
+    cat(' ** FEVDs-Ortho \n')
 
         ######################################### Factors #########################################################
         if (WishPdynamicsgraphs == 1){
@@ -1715,8 +1718,8 @@ FEVDgraphsJLLOrtho <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYield
               labs(title= paste0("FEVD_",nmFactors[i])) + theme_classic() +
               theme(axis.title.x=element_blank(), axis.title.y=element_blank(), axis.text.x = element_text(size=8),
                     plot.title = element_text(size = 10, face = "bold", hjust = 0.5))
-            ggplot2::ggsave(p, file=paste0("FEVDFactors_", nmFactors[[i]], "ORTHO",".png"),
-                            path= PathsGraphs[[ModelType]]$FEVD[["Factors Ortho"]], width= 11, height= 7.98)
+            suppressMessages(ggplot2::ggsave(p, file=paste0("FEVDFactors_", nmFactors[[i]], "ORTHO",".png"),
+                            path= PathsGraphs[[ModelType]]$FEVD[["Factors Ortho"]], width= 11, height= 7.98))
           }
 
         }
@@ -1748,8 +1751,8 @@ FEVDgraphsJLLOrtho <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYield
               labs(title= paste0("FEVD_", nmYields[i])) + theme_classic() +
               theme(axis.title.x=element_blank(), axis.title.y=element_blank(), axis.text.x = element_text(size=8),
                     plot.title = element_text(size = 10, face = "bold", hjust = 0.5))
-            ggplot2::ggsave(p, file=paste0("FEVDYields_", nmYields[i], "ORTHO",".png"),
-                            path= PathsGraphs[[ModelType]]$FEVD[["Yields Ortho"]], width= 11, height= 7.98)
+            suppressMessages(ggplot2::ggsave(p, file=paste0("FEVDYields_", nmYields[i], "ORTHO",".png"),
+                            path= PathsGraphs[[ModelType]]$FEVD[["Yields Ortho"]], width= 11, height= 7.98))
           }
         }
 
@@ -1782,10 +1785,10 @@ GIRFgraphsJLLOrtho <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYield
   Horiz <- 0:(GIRFhoriz-1)
 
   if (WishPdynamicsgraphs== 0 & WishYieldsgraphs==0){
-    print(paste(ModelType,": No GIRFs graphs were generated (orthogonolized version)"))
+    cat("No graphs for GIRFs  were generated (orthogonolized version) \n")
   }else{
 
-    print('################################# Generating GIRFs-Ortho graphs #################################' )
+    cat(' ** GIRFs-Ortho \n' )
 
         K <- dim(NumOut$GIRF[[ModelType]]$Factors$Ortho)[2]  # Total number of risk factors
         CJ <- dim(NumOut$GIRF[[ModelType]]$Yields$Ortho)[2]  # Total number of yields
@@ -1816,8 +1819,8 @@ GIRFgraphsJLLOrtho <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYield
               plot_list[[i]] <- p
             }
             subplots <- cowplot::plot_grid(plotlist= plot_list, ncol=3) # sub-plots
-            ggplot2::ggsave(subplots, file=paste0("GIRFFactors_shock_to_", nmFactors[[h]],"ORTHO",".png"),
-                            path= PathsGraphs[[ModelType]]$GIRF[["Factors Ortho"]])
+            suppressMessages(ggplot2::ggsave(subplots, file=paste0("GIRFFactors_shock_to_", nmFactors[[h]],"ORTHO",".png"),
+                            path= PathsGraphs[[ModelType]]$GIRF[["Factors Ortho"]]))
           }
         }
         ############################ IRF Yields ########################################################
@@ -1837,8 +1840,8 @@ GIRFgraphsJLLOrtho <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYield
               plot_list[[i]] <- p
             }
             subplots <- cowplot::plot_grid(plotlist= plot_list, ncol=3) # sub-plots
-            ggplot2::ggsave(subplots, file=paste0("GIRFYields_shock_to_", nmFactors[[l]], "ORTHO",".png"),
-                            path= PathsGraphs[[ModelType]]$GIRF[["Yields Ortho"]])
+            suppressMessages(ggplot2::ggsave(subplots, file=paste0("GIRFYields_shock_to_", nmFactors[[l]], "ORTHO",".png"),
+                            path= PathsGraphs[[ModelType]]$GIRF[["Yields Ortho"]]))
           }
 
         }
@@ -1868,10 +1871,10 @@ GFEVDgraphsJLLOrtho <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYiel
 
 
   if (WishPdynamicsgraphs== 0 & WishYieldsgraphs==0){
-    print(paste(ModelType,": No GFEVDs graphs were generated (orthogonolized version)"))
+    cat("No graphs for GFEVDs  were generated (orthogonolized version) \n")
   }else{
 
-    print('################################# Generating GEFVDs-Ortho graph #################################' )
+    cat(' ** GEFVDs-Ortho \n\n' )
 
   ######################################### Factors #########################################################
   if (WishPdynamicsgraphs == 1){
@@ -1898,8 +1901,8 @@ GFEVDgraphsJLLOrtho <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYiel
               geom_bar(stat="identity", width = 0.25) +
               labs(title= paste0("GFEVD_",nmFactors[i])) + theme_classic() +
               theme(axis.title.x=element_blank(), axis.title.y=element_blank(), axis.text.x = element_text(size=8) )
-            ggplot2::ggsave(p, file=paste0("GFEVDFactors_", nmFactors[[i]], "ORTHO",".png"),
-                            path= PathsGraphs[[ModelType]]$GFEVD[["Factors Ortho"]], width= 11, height= 7.98)
+            suppressMessages(ggplot2::ggsave(p, file=paste0("GFEVDFactors_", nmFactors[[i]], "ORTHO",".png"),
+                            path= PathsGraphs[[ModelType]]$GFEVD[["Factors Ortho"]], width= 11, height= 7.98))
           }
 
         }
@@ -1929,8 +1932,8 @@ GFEVDgraphsJLLOrtho <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYiel
               geom_bar(stat="identity", width = 0.25) +
               labs(title= paste0("GFEVD_", nmYields[i])) + theme_classic() +
               theme(axis.title.x=element_blank(), axis.title.y=element_blank(), axis.text.x = element_text(size=8) )
-            ggplot2::ggsave(p, file=paste0("GFEVDYields_", nmYields[i], "ORTHO",".png"),
-                            path= PathsGraphs[[ModelType]]$GFEVD[["Yields Ortho"]], width= 11, height= 7.98)
+            suppressMessages(ggplot2::ggsave(p, file=paste0("GFEVDYields_", nmYields[i], "ORTHO",".png"),
+                            path= PathsGraphs[[ModelType]]$GFEVD[["Yields Ortho"]], width= 11, height= 7.98))
           }
         }
 

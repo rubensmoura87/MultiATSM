@@ -16,15 +16,16 @@ RiskFactorsPrep(
 \arguments{
 \item{FactorSet}{Factor set list (see e.g. "CM_Factors_GVAR" data file)}
 
-\item{Economies}{string-vector containing the names of the economies which are part of the economic system}
+\item{Economies}{A character vector containing the names of the economies included in the system.}
 
-\item{FactorLabels}{string-list based which contains the labels of all the variables present in the model}
+\item{FactorLabels}{A list of character vectors with labels for all variables in the model.}
 
-\item{Initial_Date}{Sample starting date (yyyy-mm-dd)}
+\item{Initial_Date}{Start date of the sample period in the format yyyy-mm-dd}
 
-\item{Final_Date}{Sample last date (yyyy-mm-dd)}
+\item{Final_Date}{End date of the sample period in the format yyyy-mm-dd}
 
-\item{DataFrequency}{character-based vector: "Daily All Days", "Daily Business Days", "Weekly", "Monthly", "Quarterly", "Annually"}
+\item{DataFrequency}{A character vector specifying the data frequency. Available options: "Daily All Days", "Daily Business Days",
+"Weekly", "Monthly", "Quarterly", "Annually".}
 }
 \value{
 Risk factors used in the estimation of the desired ATSM

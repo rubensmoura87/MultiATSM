@@ -5,6 +5,6 @@
 #' @docType data
 #' @usage data("CM_Factors_GVAR")
 #' @format list containing the variables used in the GVAR models
-#' @references Candelon, B. and Moura, R. "A Multicountry Model of the Term Structures of Interest Rates with a GVAR".
+#' @references Candelon, B. and Moura, R. (Forthcoming) "A Multicountry Model of the Term Structures of Interest Rates with a GVAR". (Journal of Financial Econometrics)
 #' @keywords Risk Factors GVAR
 NULL

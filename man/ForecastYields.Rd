@@ -2,7 +2,7 @@
 % Please edit documentation in R/ForecastYields.R
 \name{ForecastYields}
 \alias{ForecastYields}
-\title{Gather bond yields forecasts for all the model types}
+\title{Generates forecasts of bond yields for all model types}
 \usage{
 ForecastYields(
   ModelType,
@@ -10,33 +10,33 @@ ForecastYields(
   InputsForOutputs,
   FactorLabels,
   Economies,
-  DataFrequency,
-  JLLinputs,
-  GVARinputs,
-  BRWinputs
+  JLLlist = NULL,
+  GVARlist = NULL,
+  WishBRW,
+  BRWlist = NULL
 )
 }
 \arguments{
-\item{ModelType}{a string-vector containing the label of the model to be estimated}
+\item{ModelType}{A character vector indicating the model type to be estimated.}
 
-\item{ModelPara}{List of model parameter estimates (See the "Optimization" function)}
+\item{ModelPara}{A list containing the point estimates of the model parameters. For details, refer to the outputs from the \code{\link{Optimization}} function.}
 
-\item{InputsForOutputs}{list conataining the desired horizon of analysis for the IRFs, GIRFs, FEVDs, and GFEVDs}
+\item{InputsForOutputs}{A list containing the necessary inputs for generating IRFs, GIRFs, FEVDs, GFEVDs and Term Premia.}
 
-\item{FactorLabels}{a string-list based which contains all the labels of all the variables present in the model}
+\item{FactorLabels}{A list of character vectors with labels for all variables in the model.}
 
-\item{Economies}{string-vector containing the names of the economies which are part of the economic system}
+\item{Economies}{A character vector containing the names of the economies included in the system.}
 
-\item{DataFrequency}{text: "Daily All Days", "Daily Business Days", "Weekly", "Monthly", "Quarterly", "Annually"}
+\item{JLLlist}{A list of necessary inputs for the estimation of JLL-based models (see the \code{\link{JLL}} function).}
 
-\item{JLLinputs}{list of necessary inputs for the estimation of JLL-based models (see "JLL" function)}
+\item{GVARlist}{A list containing the necessary inputs for the estimation of GVAR-based models (see the \code{\link{GVAR}} function).}
 
-\item{GVARinputs}{list of necessary inputs for the estimation of GVAR-based models (see "GVAR" function)}
+\item{WishBRW}{Whether to estimate the physical parameter model with bias correction, based on the method by Bauer, Rudebusch and Wu (2012) (see \code{\link{Bias_Correc_VAR}} function). Default is set to 0.}
 
-\item{BRWinputs}{list of necessary inputs for performing the bias-corrected estimation (see "Bias_Correc_VAR" function)}
+\item{BRWlist}{List of necessary inputs for performing the bias-corrected estimation (see \code{\link{Bias_Correc_VAR}} function).}
 }
 \value{
-List containg the following elements
+List containing the following elements
 \enumerate{
 \item Out-of-sample forecasts of bond yields per forecast horizon
 \item Out-of-sample forecast errors of bond yields per forecast horizon
@@ -44,10 +44,10 @@ List containg the following elements
 }
 }
 \description{
-Gather bond yields forecasts for all the model types
+Generates forecasts of bond yields for all model types
 }
 \examples{
-# See examples in the vignette file of this package (Section 4).
+# See an example of implementation in the vignette file of this package (Section 4).
 
 
 }

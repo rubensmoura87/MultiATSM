@@ -14,17 +14,17 @@ GraphicalOutputs(
 )
 }
 \arguments{
-\item{ModelType}{a string-vector containing the label of the model to be estimated}
+\item{ModelType}{A character vector indicating the model type to be estimated.}
 
 \item{ModelPara}{List of model parameter estimates (See the "Optimization" function)}
 
-\item{NumOut}{list of computed outputs containing the model fit, IRFs, FEVDs, GIRFs, and GFEVDs}
+\item{NumOut}{list of computed outputs containing the model fit, IRFs, FEVDs, GIRFs, GFEVDs and Term Premia}
 
 \item{InputsForOutputs}{list containing the desired inputs for the construction of the desired output}
 
-\item{Economies}{string-vector containing the names of the economies which are part of the economic system}
+\item{Economies}{A character vector containing the names of the economies included in the system.}
 
-\item{FactorLabels}{string-list based which contains the labels of all the variables present in the model}
+\item{FactorLabels}{A list of character vectors with labels for all variables in the model.}
 }
 \description{
 Generate the graphical outputs for the selected models (Point estimate)

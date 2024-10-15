@@ -2,32 +2,32 @@
 % Please edit documentation in R/VAR.R
 \name{VAR}
 \alias{VAR}
-\title{Estimates a VAR(1)}
+\title{Estimates a standard VAR(1)}
 \usage{
 VAR(RiskFactors, VARtype, Bcon = NULL)
 }
 \arguments{
-\item{RiskFactors}{matrix containing all the risk factors (K x T)}
+\item{RiskFactors}{A numeric matrix (FTx T) representing the time series of risk factors.}
 
-\item{VARtype}{string-vector which accommodates two possibilities: 'unconstrained' or 'constrained'}
+\item{VARtype}{String vector with two possible values: 'unconstrained' or 'constrained'.}
 
-\item{Bcon}{constraints matrix (K+1 x N) - should contain an intercept. IfBcon(i,j) = nan --> B(i,j) is a free parameter. \cr
+\item{Bcon}{Constraints matrix (F+1 x N), which includes an intercept. If Bcon(i,j) = NA, then B(i,j) is treated as a free parameter. \cr
 Default is set to NULL.}
 }
 \value{
 intercept, feedback matrix and the variance-covariance matrix of a VAR(1)
 }
 \description{
-Estimates a VAR(1)
+Estimates a standard VAR(1)
 }
 \examples{
 data("CM_Factors")
-#Example 1
+#Example 1: unconstrained case
 VAR(RiskFactors, VARtype= 'unconstrained')
-#Example 2
+#Example 2: constrainted case
 K <- nrow(RiskFactors)
 Bcon <-matrix(0, nrow = K, ncol = K+1)
-Bcon[,1:3] <- NaN
+Bcon[ , 1:3] <- NaN
 VAR(RiskFactors, VARtype= 'constrained', Bcon)
 
 

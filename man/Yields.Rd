@@ -20,8 +20,8 @@ Yields data used in Candelon and Moura (forthcoming, JFEC)
 Bond yield data used in Candelon and Moura (2023)
 }
 \references{
-Candelon, B. and Moura, R. "A Multicountry Model of the Term Structures of Interest Rates with a GVAR".
+Candelon, B. and Moura, R. (Forthcoming) "A Multicountry Model of the Term Structures of Interest Rates with a GVAR". (Journal of Financial Econometrics)
 
-Candelon, B. and Moura, R. "Sovereign yield curves and the COVID-19 in emerging markets".
+Candelon, B. and Moura, R. (2023) "Sovereign yield curves and the COVID-19 in emerging markets". (Economic Modelling)
 }
 \keyword{Yields}

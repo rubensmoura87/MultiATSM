@@ -18,7 +18,7 @@ BootstrapBoundsSet <- function(ModelType, ModelBootstrap, NumOutPE, InputsForOut
 
 
   # If one chooseS models in which the estimation is done country-by-country
-  if ( "JPS" %in% ModelType || "JPS jointP" %in% ModelType ||  "GVAR sepQ" %in% ModelType){
+  if ( any(ModelType ==c("JPS original", "JPS global", "GVAR single"))){
 
     for (i in 1:length(Economies)){dir.create( paste(tempdir(), "/Outputs/", ModelType, "/Bootstrap/Model ", Economies[i], sep=""))}
 
@@ -31,8 +31,7 @@ BootstrapBoundsSet <- function(ModelType, ModelBootstrap, NumOutPE, InputsForOut
   }
 
   # If one chooseS models in which the estimation is done jointly for all countries
-  if ( "GVAR jointQ" %in% ModelType || "VAR jointQ" %in% ModelType || "JLL original" %in% ModelType
-       || "JLL NoDomUnit" %in% ModelType || "JLL jointSigma" %in% ModelType){
+  if ( any(ModelType ==c("GVAR multi", "JPS multi", "JLL original", "JLL No DomUnit", "JLL joint Sigma"))){
 
 
     IRFandGIRFjoint <- IRFandGIRFbs_jointQ(ModelType, ModelBootstrap, NumOutPE, InputsForOutputs,
@@ -41,7 +40,7 @@ BootstrapBoundsSet <- function(ModelType, ModelBootstrap, NumOutPE, InputsForOut
                                                Economies, PathsGraphs)
 
     # Orthogonalized Outputs for JLL
-    if ("JLL original" %in% ModelType || "JLL NoDomUnit" %in% ModelType || "JLL jointSigma" %in% ModelType){
+    if ( any(ModelType ==c("JLL original", "JLL No DomUnit", "JLL joint Sigma"))){
 
       IRFandGIRFjoint_Ortho <- IRFandGIRFbs_jointQ_Ortho(ModelType, ModelBootstrap, NumOutPE, InputsForOutputs,
                                                          Economies, PathsGraphs)
@@ -82,6 +81,7 @@ BootstrapBoundsSet <- function(ModelType, ModelBootstrap, NumOutPE, InputsForOut
     names(AllNumOutputs) <- names(NumOutSep)
  }
 
+  cat(paste("Desired graphs are saved in your temporary directory. Please, check:",tempdir(), "\n\n"))
   return(AllNumOutputs)
 
 }
@@ -102,9 +102,6 @@ BootstrapBoundsSet <- function(ModelType, ModelBootstrap, NumOutPE, InputsForOut
 #'@param PathsGraphs path of the folder in which the graphs will be saved
 #'
 #'@keywords internal
-
-
-
 
 
 IRFandGIRFbs_sepQ <- function(ModelType, ModelBootstrap, NumOutPE, InputsForOutputs, Economies, PathsGraphs){
@@ -158,9 +155,9 @@ IRFandGIRFbs_sepQ <- function(ModelType, ModelBootstrap, NumOutPE, InputsForOutp
 
             AllShocksOnePeriodFacs[,,h]  <- apply(Facs,2, sort) # Ensures that each column is in ascending order
 
-            INFfacs[thor, ,h] <- apply(AllShocksOnePeriodFacs[,,h], 2, stats::quantile, probs = quants[1])
-            MEDfacs[thor, ,h] <- apply(AllShocksOnePeriodFacs[,,h], 2, stats::quantile, probs = quants[2])
-            SUPfacs[thor, ,h] <- apply(AllShocksOnePeriodFacs[,,h], 2, stats::quantile, probs = quants[3])
+            INFfacs[thor, ,h] <- apply(AllShocksOnePeriodFacs[ , ,h], 2, stats::quantile, probs = quants[1])
+            MEDfacs[thor, ,h] <- apply(AllShocksOnePeriodFacs[ , ,h], 2, stats::quantile, probs = quants[2])
+            SUPfacs[thor, ,h] <- apply(AllShocksOnePeriodFacs[ , ,h], 2, stats::quantile, probs = quants[3])
           }
         }
 
@@ -227,7 +224,7 @@ IRFandGIRFbs_sepQ <- function(ModelType, ModelBootstrap, NumOutPE, InputsForOutp
 
    if (any(GraphsBinaryFactors==1)){
 
-print('################################# Generating IRFs/GIRFs graphs (Bootstrap) #################################' )
+cat(' ** IRFs/GIRFs (Bootstrap) \n' )
 
     plot_list <- list()
 
@@ -260,8 +257,8 @@ print('################################# Generating IRFs/GIRFs graphs (Bootstrap
               plot_list[[i]] <- p
             }
             subplots <- cowplot::plot_grid(plotlist= plot_list, ncol=3)
-            ggplot2::ggsave(subplots, file=paste0(LabIRF[d],"Factors_shock_to_", nmShock[b], ".png"),
-                            path= PathsGraphs[[ModelType]][[LabIRF[d]]][[Economies[f]]][["Factors"]])
+            suppressMessages(ggplot2::ggsave(subplots, file=paste0(LabIRF[d],"Factors_shock_to_", nmShock[b], ".png"),
+                            path= PathsGraphs[[ModelType]][[LabIRF[d]]][[Economies[f]]][["Factors"]]))
           }
         }
       }
@@ -311,8 +308,8 @@ print('################################# Generating IRFs/GIRFs graphs (Bootstrap
               plot_list[[i]] <- p
             }
             subplots <- cowplot::plot_grid(plotlist= plot_list, ncol=3)
-            ggplot2::ggsave(subplots, file=paste0(LabIRF[d],"Yields_shock_to_", nmShock[b], ".png"),
-                            path=  PathsGraphs[[ModelType]][[LabIRF[d]]][[Economies[f]]][["Yields"]])
+            suppressMessages(ggplot2::ggsave(subplots, file=paste0(LabIRF[d],"Yields_shock_to_", nmShock[b], ".png"),
+                            path=  PathsGraphs[[ModelType]][[LabIRF[d]]][[Economies[f]]][["Yields"]]))
           }
         }
       }
@@ -457,7 +454,7 @@ FEVDandGFEVDbs_sepQ <- function(ModelType, ModelBootstrap, NumOutPE, InputsForOu
 
   if (any(GraphsBinaryFactors==1)){
 
-    print('################################# Generating FEVDs/GFEVDs graphs (Bootstrap) #################################' )
+    cat(' ** FEVDs/GFEVDs (Bootstrap) \n' )
 
     plot_list <- list()
     for (f in 1:C){
@@ -489,8 +486,8 @@ FEVDandGFEVDbs_sepQ <- function(ModelType, ModelBootstrap, NumOutPE, InputsForOu
             plot_list[[i]] <- p
           }
           subplots <- cowplot::plot_grid(plotlist= plot_list, ncol=3)
-          ggplot2::ggsave(subplots, file=paste0(LabFEVD[d],"Factors_", nmShock[b], ".png"),
-                          path=  PathsGraphs[[ModelType]][[LabFEVD[d]]][[Economies[f]]][["Factors"]])
+          suppressMessages(ggplot2::ggsave(subplots, file=paste0(LabFEVD[d],"Factors_", nmShock[b], ".png"),
+                          path=  PathsGraphs[[ModelType]][[LabFEVD[d]]][[Economies[f]]][["Factors"]]))
         }
       }
     }
@@ -540,8 +537,8 @@ FEVDandGFEVDbs_sepQ <- function(ModelType, ModelBootstrap, NumOutPE, InputsForOu
             plot_list[[i]] <- p
           }
           subplots <- cowplot::plot_grid(plotlist= plot_list, ncol=3)
-          ggplot2::ggsave(subplots, file=paste0(LabFEVD[d],"Yields_", nmShock[b], ".png"),
-                          path=  PathsGraphs[[ModelType]][[LabFEVD[d]]][[Economies[f]]][["Yields"]])
+          suppressMessages(ggplot2::ggsave(subplots, file=paste0(LabFEVD[d],"Yields_", nmShock[b], ".png"),
+                          path=  PathsGraphs[[ModelType]][[LabFEVD[d]]][[Economies[f]]][["Yields"]]))
         }
       }
     }
@@ -607,7 +604,7 @@ IRFandGIRFbs_jointQ <- function(ModelType, ModelBootstrap, NumOutPE, InputsForOu
       MEDfacs <- array(NA, c(HorizNumOut[[nn]], K,K)) # Median
       SUPfacs <- array(NA, c(HorizNumOut[[nn]], K,K)) # upper bound
 
-      if (ModelType == "JLL original" || ModelType == "JLL NoDomUnit" || ModelType == "JLL jointSigma"){
+      if (any(ModelType ==c("JLL original", "JLL No DomUnit", "JLL joint Sigma"))){
         DimLabelsFac <- dimnames(ModelBootstrap$NumOutDraws[[OutNames[nn]]][[ModelType]][[1]]$Factors$NonOrtho)
       }else{
         DimLabelsFac <- dimnames(ModelBootstrap$NumOutDraws[[OutNames[nn]]][[ModelType]][[1]]$Factors)
@@ -625,7 +622,7 @@ IRFandGIRFbs_jointQ <- function(ModelType, ModelBootstrap, NumOutPE, InputsForOu
       for (thor in 1:HorizNumOut[[nn]]){
         for (h in 1:K){ # loop through the shocks
           for (g in 1:ndraws){ # # loop through the draws
-            if (ModelType == "JLL original" || ModelType == "JLL NoDomUnit" || ModelType == "JLL jointSigma"){
+            if (any(ModelType ==c("JLL original", "JLL No DomUnit", "JLL joint Sigma"))){
               Facs[g,] <- ModelBootstrap$NumOutDraws[[OutNames[nn]]][[ModelType]][[g]]$Factors$NonOrtho[thor,,h]
             } else{
               Facs[g,] <- ModelBootstrap$NumOutDraws[[OutNames[nn]]][[ModelType]][[g]]$Factors[thor,,h] # All responses to one shock in one horizon
@@ -650,11 +647,12 @@ IRFandGIRFbs_jointQ <- function(ModelType, ModelBootstrap, NumOutPE, InputsForOu
       MEDyies <- array(NA, c(HorizNumOut[[nn]], CJ, K)) # Median
       SUPyies <- array(NA, c(HorizNumOut[[nn]], CJ, K)) # upper bound
 
-      if (ModelType == "JLL original" || ModelType == "JLL NoDomUnit" || ModelType == "JLL jointSigma"){
+      if (any(ModelType ==c("JLL original", "JLL No DomUnit", "JLL joint Sigma"))){
         DimLabelsYies <- dimnames(ModelBootstrap$NumOutDraws[[OutNames[nn]]][[ModelType]][[1]]$Yields$NonOrtho)
       } else{
         DimLabelsYies <- dimnames(ModelBootstrap$NumOutDraws[[OutNames[nn]]][[ModelType]][[1]]$Yields)
       }
+
       dimnames(INFyies) <- DimLabelsYies
       dimnames(MEDyies) <- DimLabelsYies
       dimnames(SUPyies) <- DimLabelsYies
@@ -667,7 +665,7 @@ IRFandGIRFbs_jointQ <- function(ModelType, ModelBootstrap, NumOutPE, InputsForOu
       for (thor in 1:HorizNumOut[[nn]]){
         for (h in 1:K){
           for (g in 1:ndraws){
-            if (ModelType == "JLL original" || ModelType == "JLL NoDomUnit" || ModelType == "JLL jointSigma"){
+            if (any(ModelType ==c("JLL original", "JLL No DomUnit", "JLL joint Sigma"))){
               yies[g,] <- ModelBootstrap$NumOutDraws[[OutNames[nn]]][[ModelType]][[g]]$Yields$NonOrtho[thor, ,h]
             }else{
               yies[g,] <- ModelBootstrap$NumOutDraws[[OutNames[nn]]][[ModelType]][[g]]$Yields[thor, ,h] # All responses to one shock in one horizon
@@ -706,7 +704,7 @@ IRFandGIRFbs_jointQ <- function(ModelType, ModelBootstrap, NumOutPE, InputsForOu
 
   if (any(GraphsBinaryFactors==1)){
 
-    print('################################# Generating IRFs/GIRFs graphs (Bootstrap) #################################' )
+    cat(' ** IRFs/GIRFs (Bootstrap) \n' )
 
     plot_list <- list()
 
@@ -721,7 +719,7 @@ IRFandGIRFbs_jointQ <- function(ModelType, ModelBootstrap, NumOutPE, InputsForOu
             LL <- NumOutBounds[[d]][[ModelType]]$Factors$INF[,i,b]
             UU <- NumOutBounds[[d]][[ModelType]]$Factors$SUP[,i,b]
             MM <- NumOutBounds[[d]][[ModelType]]$Factors$MED[,i,b]
-            if (ModelType == "JLL original" || ModelType == "JLL NoDomUnit" || ModelType == "JLL jointSigma"){
+            if (any(ModelType ==c("JLL original", "JLL No DomUnit", "JLL joint Sigma"))){
               PP <- NumOutPE[[LabIRF[d]]][[ModelType]]$Factors$NonOrtho[,i,b ]
             }else{ PP <- NumOutPE[[LabIRF[d]]][[ModelType]]$Factors[,i,b ]} # Point estimate
 
@@ -741,8 +739,8 @@ IRFandGIRFbs_jointQ <- function(ModelType, ModelBootstrap, NumOutPE, InputsForOu
             plot_list[[i]] <- p
           }
           subplots <- cowplot::plot_grid(plotlist= plot_list, ncol=3)
-          ggplot2::ggsave(subplots, file=paste0(LabIRF[d],"Factors_shock_to_", nmShock[b], ".png"),
-                          path= PathsGraphs[[ModelType]][[LabIRF[d]]][["Factors"]])
+          suppressMessages(ggplot2::ggsave(subplots, file=paste0(LabIRF[d],"Factors_shock_to_", nmShock[b], ".png"),
+                          path= PathsGraphs[[ModelType]][[LabIRF[d]]][["Factors"]]))
         }
       }
 
@@ -771,7 +769,7 @@ IRFandGIRFbs_jointQ <- function(ModelType, ModelBootstrap, NumOutPE, InputsForOu
             LL <- NumOutBounds[[d]][[ModelType]]$Yields$INF[,i,b]
             UU <- NumOutBounds[[d]][[ModelType]]$Yields$SUP[,i,b]
             MM <- NumOutBounds[[d]][[ModelType]]$Yields$MED[,i,b]
-            if (ModelType == "JLL original" || ModelType == "JLL NoDomUnit" || ModelType == "JLL jointSigma"){
+            if (any(ModelType ==c("JLL original", "JLL No DomUnit", "JLL joint Sigma"))){
               PP <- NumOutPE[[LabIRF[d]]][[ModelType]]$Yields$NonOrtho[,i,b ]
             }else{ PP <- NumOutPE[[LabIRF[d]]][[ModelType]]$Yields[,i,b ] } # Point estimate
 
@@ -791,8 +789,8 @@ IRFandGIRFbs_jointQ <- function(ModelType, ModelBootstrap, NumOutPE, InputsForOu
             plot_list[[i]] <- p
           }
           subplots <- cowplot::plot_grid(plotlist= plot_list, ncol=3)
-          ggplot2::ggsave(subplots, file=paste0(LabIRF[d],"Yields_shock_to_", nmShock[b], ".png"),
-                          path= PathsGraphs[[ModelType]][[LabIRF[d]]][["Yields"]])
+          suppressMessages(ggplot2::ggsave(subplots, file=paste0(LabIRF[d],"Yields_shock_to_", nmShock[b], ".png"),
+                          path= PathsGraphs[[ModelType]][[LabIRF[d]]][["Yields"]]))
         }
         }
 
@@ -851,7 +849,7 @@ FEVDandGFEVDbs_jointQ <- function(ModelType, ModelBootstrap, NumOutPE, InputsFor
       INFfacs <- array(NA, c( HorizNumOut[[nn]], K,K)) # lower bound
       MEDfacs <- array(NA, c( HorizNumOut[[nn]], K,K)) # Median
       SUPfacs <- array(NA, c( HorizNumOut[[nn]], K,K)) # upper bound
-      if (ModelType == "JLL original" || ModelType == "JLL NoDomUnit" || ModelType == "JLL jointSigma"){
+      if (any(ModelType ==c("JLL original", "JLL No DomUnit", "JLL joint Sigma"))){
         DimLabelsFac <- dimnames(ModelBootstrap$NumOutDraws[[OutNames[nn]]][[ModelType]][[1]]$Factors$NonOrtho)
       }else{
         DimLabelsFac <- dimnames(ModelBootstrap$NumOutDraws[[OutNames[nn]]][[ModelType]][[1]]$Factors)
@@ -869,7 +867,7 @@ FEVDandGFEVDbs_jointQ <- function(ModelType, ModelBootstrap, NumOutPE, InputsFor
       for (thor in 1: HorizNumOut[[nn]]){
         for (h in 1:K){ # loop through the shocks
           for (g in 1:ndraws){ # # loop through the draws
-            if (ModelType == "JLL original" || ModelType == "JLL NoDomUnit" || ModelType == "JLL jointSigma"){
+            if (any(ModelType ==c("JLL original",  "JLL No DomUnit",  "JLL joint Sigma"))){
               Facs[g,] <- ModelBootstrap$NumOutDraws[[OutNames[nn]]][[ModelType]][[g]]$Factors$NonOrtho[thor,,h] # All responses to one shock in one horizon
             }else{
               Facs[g,] <- ModelBootstrap$NumOutDraws[[OutNames[nn]]][[ModelType]][[g]]$Factors[thor,,h]
@@ -895,7 +893,7 @@ FEVDandGFEVDbs_jointQ <- function(ModelType, ModelBootstrap, NumOutPE, InputsFor
       MEDyies <- array(NA, c(HorizNumOut[[nn]], K, CJ)) # Median
       SUPyies <- array(NA, c(HorizNumOut[[nn]], K, CJ)) # upper bound
 
-      if (ModelType == "JLL original" || ModelType == "JLL NoDomUnit" || ModelType == "JLL jointSigma"){
+      if (any(ModelType ==c("JLL original", "JLL No DomUnit", "JLL joint Sigma"))){
         DimLabelsYies <- dimnames(ModelBootstrap$NumOutDraws[[OutNames[nn]]][[ModelType]][[1]]$Yields$NonOrtho)
       } else{
         DimLabelsYies <- dimnames(ModelBootstrap$NumOutDraws[[OutNames[nn]]][[ModelType]][[1]]$Yields)
@@ -912,7 +910,7 @@ FEVDandGFEVDbs_jointQ <- function(ModelType, ModelBootstrap, NumOutPE, InputsFor
         for (h in 1:CJ){
           for (g in 1:ndraws){
 
-            if (ModelType == "JLL original" || ModelType == "JLL NoDomUnit" || ModelType == "JLL jointSigma"){
+            if (any(ModelType ==c("JLL original", "JLL No DomUnit", "JLL joint Sigma"))){
               yies[g,] <- ModelBootstrap$NumOutDraws[[OutNames[nn]]][[ModelType]][[g]]$Yields$NonOrtho[thor, ,h]
             }else{
               yies[g,] <- ModelBootstrap$NumOutDraws[[OutNames[nn]]][[ModelType]][[g]]$Yields[thor, ,h] # All responses to one shock in one horizon
@@ -949,7 +947,7 @@ FEVDandGFEVDbs_jointQ <- function(ModelType, ModelBootstrap, NumOutPE, InputsFor
 
   if (any(GraphsBinaryFactors==1)){
 
-    print('################################# Generating FEVDs/GFEVDs graphs (Bootstrap) #################################' )
+    cat(' ** FEVDs/GFEVDs (Bootstrap) \n\n' )
 
     plot_list <- list()
 
@@ -965,7 +963,7 @@ FEVDandGFEVDbs_jointQ <- function(ModelType, ModelBootstrap, NumOutPE, InputsFor
             LL <- NumOutBounds[[d]][[ModelType]]$Factors$INF[,i,b]
             UU <- NumOutBounds[[d]][[ModelType]]$Factors$SUP[,i,b]
             MM <- NumOutBounds[[d]][[ModelType]]$Factors$MED[,i,b]
-            if (ModelType == "JLL original" || ModelType == "JLL NoDomUnit" || ModelType == "JLL jointSigma"){
+            if (any(ModelType ==c("JLL original", "JLL No DomUnit", "JLL joint Sigma"))){
               PP <- NumOutPE[[LabFEVD[d]]][[ModelType]]$Factors$NonOrtho[,i,b ]
             }else{  PP <- NumOutPE[[LabFEVD[d]]][[ModelType]]$Factors[,i,b ]} # Point estimate}
 
@@ -986,8 +984,8 @@ FEVDandGFEVDbs_jointQ <- function(ModelType, ModelBootstrap, NumOutPE, InputsFor
             plot_list[[i]] <- p
           }
           subplots <- cowplot::plot_grid(plotlist= plot_list, ncol=3)
-          ggplot2::ggsave(subplots, file=paste0(LabFEVD[d],"Factors_", nmShock[b], ".png"),
-                          path= PathsGraphs[[ModelType]][[LabFEVD[d]]][["Factors"]])
+          suppressMessages(ggplot2::ggsave(subplots, file=paste0(LabFEVD[d],"Factors_", nmShock[b], ".png"),
+                          path= PathsGraphs[[ModelType]][[LabFEVD[d]]][["Factors"]]))
         }
       }
 
@@ -1016,7 +1014,7 @@ FEVDandGFEVDbs_jointQ <- function(ModelType, ModelBootstrap, NumOutPE, InputsFor
             LL <- NumOutBounds[[d]][[ModelType]]$Yields$INF[,i,b]
             UU <- NumOutBounds[[d]][[ModelType]]$Yields$SUP[,i,b]
             MM <- NumOutBounds[[d]][[ModelType]]$Yields$MED[,i,b]
-            if (ModelType == "JLL original" || ModelType == "JLL NoDomUnit" || ModelType == "JLL jointSigma"){
+            if (any(ModelType ==c("JLL original", "JLL No DomUnit", "JLL joint Sigma"))){
               PP <- NumOutPE[[LabFEVD[d]]][[ModelType]]$Yields$NonOrtho[,i,b ]
             }else{  PP <- NumOutPE[[LabFEVD[d]]][[ModelType]]$Yields[,i,b ] } # Point estimate
 
@@ -1036,8 +1034,8 @@ FEVDandGFEVDbs_jointQ <- function(ModelType, ModelBootstrap, NumOutPE, InputsFor
             plot_list[[i]] <- p
           }
           subplots <- cowplot::plot_grid(plotlist= plot_list, ncol=3)
-          ggplot2::ggsave(subplots, file=paste0(LabFEVD[d],"Yields_", nmShock[b], ".png"),
-                          path= PathsGraphs[[ModelType]][[LabFEVD[d]]][["Yields"]])
+          suppressMessages(ggplot2::ggsave(subplots, file=paste0(LabFEVD[d],"Yields_", nmShock[b], ".png"),
+                          path= PathsGraphs[[ModelType]][[LabFEVD[d]]][["Yields"]]))
         }
       }
 
@@ -1180,7 +1178,7 @@ IRFandGIRFbs_jointQ_Ortho <- function(ModelType, ModelBootstrap, NumOutPE, Input
 
   if (any(GraphsBinarFactors==1)){
 
-    print('################################# Generating IRFs/GIRFs-Ortho graphs (Bootstrap) #################################' )
+    cat(' ** IRFs/GIRFs-Ortho (Bootstrap) \n' )
 
     plot_list <- list()
 
@@ -1214,8 +1212,8 @@ IRFandGIRFbs_jointQ_Ortho <- function(ModelType, ModelBootstrap, NumOutPE, Input
             plot_list[[i]] <- p
           }
           subplots <- cowplot::plot_grid(plotlist= plot_list, ncol=3)
-          ggplot2::ggsave(subplots, file=paste0(LabIRF[d],"Factors_shock_to_", nmShock[b],"ORTHO", ".png"),
-                          path= PathsGraphs[[ModelType]][[LabIRF[d]]][["Factors Ortho"]])
+          suppressMessages(ggplot2::ggsave(subplots, file=paste0(LabIRF[d],"Factors_shock_to_", nmShock[b],"ORTHO", ".png"),
+                          path= PathsGraphs[[ModelType]][[LabIRF[d]]][["Factors Ortho"]]))
         }
       }
 
@@ -1266,8 +1264,8 @@ IRFandGIRFbs_jointQ_Ortho <- function(ModelType, ModelBootstrap, NumOutPE, Input
             plot_list[[i]] <- p
           }
           subplots <- cowplot::plot_grid(plotlist= plot_list, ncol=3)
-          ggplot2::ggsave(subplots, file=paste0(LabIRF[d],"Yields_shock_to_", nmShock[b], "ORTHO", ".png"),
-                          path= PathsGraphs[[ModelType]][[LabIRF[d]]][["Yields Ortho"]])
+          suppressMessages(ggplot2::ggsave(subplots, file=paste0(LabIRF[d],"Yields_shock_to_", nmShock[b], "ORTHO", ".png"),
+                          path= PathsGraphs[[ModelType]][[LabIRF[d]]][["Yields Ortho"]]))
         }
       }
 
@@ -1408,7 +1406,7 @@ FEVDandGFEVDbs_jointQ_Ortho <- function(ModelType, ModelBootstrap, NumOutPE, Inp
 
   if (any(GraphsBinarFactors==1)){
 
-    print('################################# Generating FEVDs/GFEVDs-Ortho graphs (Bootstrap) #################################' )
+    cat(' ** FEVDs/GFEVDs-Ortho (Bootstrap) \n' )
 
     plot_list <- list()
 
@@ -1442,8 +1440,8 @@ FEVDandGFEVDbs_jointQ_Ortho <- function(ModelType, ModelBootstrap, NumOutPE, Inp
             plot_list[[i]] <- p
           }
           subplots <- cowplot::plot_grid(plotlist= plot_list, ncol=3)
-          ggplot2::ggsave(subplots, file=paste0(LabFEVD[d],"Factors_", nmShock[b], "ORTHO", ".png"),
-                          path= PathsGraphs[[ModelType]][[LabFEVD[d]]][["Factors Ortho"]])
+          suppressMessages(ggplot2::ggsave(subplots, file=paste0(LabFEVD[d],"Factors_", nmShock[b], "ORTHO", ".png"),
+                          path= PathsGraphs[[ModelType]][[LabFEVD[d]]][["Factors Ortho"]]))
         }
       }
 
@@ -1493,8 +1491,8 @@ FEVDandGFEVDbs_jointQ_Ortho <- function(ModelType, ModelBootstrap, NumOutPE, Inp
             plot_list[[i]] <- p
           }
           subplots <- cowplot::plot_grid(plotlist= plot_list, ncol=3)
-          ggplot2::ggsave(subplots, file=paste0(LabFEVD[d],"Yields_", nmShock[b], "ORTHO", ".png"),
-                          path= PathsGraphs[[ModelType]][[LabFEVD[d]]][["Yields Ortho"]])
+          suppressMessages(ggplot2::ggsave(subplots, file=paste0(LabFEVD[d],"Yields_", nmShock[b], "ORTHO", ".png"),
+                          path= PathsGraphs[[ModelType]][[LabFEVD[d]]][["Yields Ortho"]]))
         }
       }
 

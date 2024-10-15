@@ -1,23 +1,23 @@
-#' Compute the transition matrix required in the estimation of the GVAR model
+#' Computes the transition matrix required in the estimation of the GVAR model
 #'
-#'@param t_First      Sample starting date (year)
-#'@param t_Last       Sample last date (year)
-#'@param Economies    Vector containing the names of all the economies of the system.
-#'@param type         Three possibilities:
+#'@param t_First Sample starting date (in the format: yyyy).
+#'@param t_Last  Sample ending date (in the format: yyyy).
+#'@param Economies    A character vector containing the names of the economies included in the system.
+#'@param type   A character string indicating the method for computing interdependence. Possible options include:
 #'\itemize{
-#'      \item "Full Sample": if one wishes ALL weight matrices of each year from which data is available (it may extrapolate the sample period);
-#'      \item "Sample Mean": if one wishes a SINGLE weight matrix containing the average of weights over of the entire sample period;
-#'      \item Some year in particular (e.g. "1998", "2005" ...).
+#'      \item \code{Time-varying}: Computes time-varying interdependence and returns the weight matrices for each year based on available data (may extrapolate the sample period).
+#'      \item \code{Sample Mean}: Returns a single weight matrix containing the average weights over the entire sample period, suitable for time-invariant interdependence.
+#'      \item A specific year (e.g., "1998", "2005"): Used to compute time-invariant interdependence for the specified year.
 #'}
 #'
-#'@param DataPath     path of the Excel file containing the data (if any). The default is linked to the Excel file available in the package.
-#'@param Data         Data for computing the transition matrix. Default is set to NULL.
+#'@param DataConnectedness    Data used to compute the transition matrix. Default is set to NULL.
+#'@param DataPath Path to the Excel file containing the data (if applicable). The default is linked to the Excel file available in the package.
 #'
 #
 #'@return matrix or list of matrices
 #'
 #'@details
-#' NOTE: if there is missing data for any country of the system for that particularly year,
+#' If there is missing data for any country of the system for that particularly year,
 #' then the transition matrix will include only NAs.
 #'
 #'@examples
@@ -27,16 +27,15 @@
 #' t_Last <-  "2019"
 #' Economies <- c("China", "Brazil", "Mexico", "Uruguay")
 #' type <- "Sample Mean"
-#' Transition_Matrix(t_First, t_Last, Economies, type, DataPath = NULL, Data = TradeFlows)
+#' W_mat <- Transition_Matrix(t_First, t_Last, Economies, type, DataConnectedness = TradeFlows)
 #'
 #'
 #'@export
 
+Transition_Matrix <- function(t_First, t_Last, Economies, type, DataConnectedness = NULL, DataPath = NULL){
 
-Transition_Matrix <- function(t_First, t_Last, Economies, type, DataPath = NULL, Data = NULL){
 
-
-  if (sjmisc::is_empty(Data)){
+  if (sjmisc::is_empty(DataConnectedness)){
 
   if (sjmisc::is_empty(DataPath)){ DataPath <- system.file("extdata", "TradeData.xlsx", package = "MultiATSM") }
 
@@ -53,16 +52,15 @@ Transition_Matrix <- function(t_First, t_Last, Economies, type, DataPath = NULL,
     rownames(list_all_Trade[[i]]) <- Countries
     }
 
-
-  Data <- list_all_Trade
+  DataConnectedness <- list_all_Trade
   }
 
   # a) Pre-allocation of variables
-  DataAdj <- lapply(Data, function(x) as.data.frame(t(x)))
+  DataAdj <- lapply(DataConnectedness, function(x) as.data.frame(t(x)))
   C <- length(Economies)
-  T <- ncol(Data[[1]])
+  T <- ncol(DataConnectedness[[1]])
   WgvarAllYears <- vector(mode='list', length = T)
-  names(WgvarAllYears) <- colnames(Data[[1]])
+  names(WgvarAllYears) <- colnames(DataConnectedness[[1]])
   num <- matrix(NA, nrow = C, ncol= C)
   dem <- c()
   Wyear <- matrix(NA, nrow = C, ncol= C)
@@ -85,8 +83,8 @@ Transition_Matrix <- function(t_First, t_Last, Economies, type, DataPath = NULL,
 
 
   # c) desired output
-  # c.1) "Full Sample"
-  if (type == "Full Sample"){
+  # c.1) Time-varying. Gathers the interdependence matrices from the full Sample
+  if (type == "Time-varying"){
     Wgvar <- Filter(function(x) all(stats::complete.cases(x)), WgvarAllYears)
   }
 
@@ -95,7 +93,7 @@ else if (type == "Sample Mean"){
 
   Y_First <- substring(t_First, 1,4)
   Y_Last <- substring(t_Last, 1,4)
-  TimeLable <- colnames(Data[[1]])
+  TimeLable <- colnames(DataConnectedness[[1]])
   idx0 <- which(TimeLable == Y_First)
   idx1 <- which(TimeLable == Y_Last)
 
@@ -107,7 +105,7 @@ else if (type == "Sample Mean"){
   }
 
 # c.3) Specific Year
-else if (type !="Sample Mean" & type !="Full Sample" ){
+else {
 
   Wgvar <- WgvarAllYears[[type]]
   colnames(Wgvar) <- Economies

@@ -2,7 +2,7 @@
 % Please edit documentation in R/DataForEstimation.R
 \name{DataForEstimation}
 \alias{DataForEstimation}
-\title{Retrieve data from Excel and build the database used in the model estimation}
+\title{Retrieves data from Excel and build the database used in the model estimation}
 \usage{
 DataForEstimation(
   t0,
@@ -21,13 +21,13 @@ DataForEstimation(
 )
 }
 \arguments{
-\item{t0}{Sample starting date (yyyy-mm-dd)}
+\item{t0}{Start date of the sample period in the format yyyy-mm-dd.}
 
-\item{tF}{Sample last date (yyyy-mm-dd)}
+\item{tF}{End date of the sample period in the format yyyy-mm-dd.}
 
-\item{Economies}{string-vector containing the names of the economies which are part of the economic system}
+\item{Economies}{A character vector containing the names of the economies included in the system.}
 
-\item{N}{Number of country-specific spanned factor (scalar)}
+\item{N}{Integer. Number of country-specific spanned factors.}
 
 \item{FactorLabels}{String-list based which contains the labels of all the variables present in the model}
 
@@ -37,8 +37,8 @@ DataForEstimation(
 
 \item{W_type}{Three possibilities:
 \itemize{
-     \item "Full Sample": if one wishes ALL weight matrices of each year from which data is available (it may extrapolate the sample period);
-     \item "Sample Mean": if one wishes a SINGLE weight matrix containing the average of weights over of the entire sample period;
+     \item \code{Full Sample}: if one wishes ALL weight matrices of each year from which data is available (it may extrapolate the sample period);
+     \item \code{Sample Mean}: if one wishes a SINGLE weight matrix containing the average of weights over of the entire sample period;
      \item Some year in particular (e.g. "1998", "2005" ...).
 }}
 
@@ -46,23 +46,23 @@ DataForEstimation(
 
 \item{t_Last_Wgvar}{Sample last date (year)}
 
-\item{DataPathMacro}{Path of the Excel file conating the macroeconomic data (if any). The default is linked to the excel file present in the package.}
+\item{DataPathMacro}{Path of the Excel file containing the macroeconomic data (if any). The default is linked to the excel file present in the package.}
 
-\item{DataPathYields}{Path of the Excel file conating the yields data (if any). The default is linked to the excel file present in the package.}
+\item{DataPathYields}{Path of the Excel file containing the yields data (if any). The default is linked to the excel file present in the package.}
 
-\item{DataPathTrade}{Path of the Excel file conating the trade data (if any). The default is linked to the excel file present in the package.}
+\item{DataPathTrade}{Path of the Excel file containing the trade data (if any). The default is linked to the excel file present in the package.}
 }
 \value{
 A list containing the
 \enumerate{
-\item time series of the complete set of bond yields (matrix, JxT or CJxT);
-\item time series of the complete set risk factors (matrix, KxT);
+\item time series of the complete set of bond yields (matrix, J x T or CJ x T);
+\item time series of the complete set risk factors (matrix, K x T);
 \item 'GVARFactors': list of all variables that are used in the estimation of the VARX \cr
-               (see e.g. 'CM_Factors_GVAR' file). If the estimated model type is not GVAR-based, then returns NULL.
+               (see e.g. \code{CM_Factors_GVAR} file). If the estimated model type is not GVAR-based, then returns NULL.
 }
 }
 \description{
-Retrieve data from Excel and build the database used in the model estimation
+Retrieves data from Excel and build the database used in the model estimation
 }
 \examples{
 DomVar <- c("Eco_Act", "Inflation")
@@ -71,11 +71,14 @@ t0 <- "2006-09-01"
 tF <-  "2019-01-01"
 Economies <- c("China", "Brazil", "Mexico", "Uruguay", "Russia")
 N <- 2
-ModelType <- "JPS"
+ModelType <- "JPS original"
 FactorLabels <-  LabFac(N, DomVar, GlobalVar, Economies, ModelType)
 DataFrequency <- "Monthly"
 
 
 DataModel <- DataForEstimation(t0, tF, Economies, N, FactorLabels, ModelType, DataFrequency)
 
+}
+\seealso{
+\code{\link{InputsForOpt}}
 }

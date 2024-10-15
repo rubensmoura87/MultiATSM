@@ -7,28 +7,28 @@
 LabFac(N, DomVar, GlobalVar, Economies, ModelType)
 }
 \arguments{
-\item{N}{number of spanned factors per country (scalar)}
+\item{N}{Integer. Number of country-specific spanned factors.}
 
-\item{DomVar}{character-vector containing the names of the domestic variables}
+\item{DomVar}{A character vector containing the names of the domestic variables.}
 
-\item{GlobalVar}{character-vector containing the names of the global variables}
+\item{GlobalVar}{A character vector containing the names of the global variables.}
 
-\item{Economies}{string-vector containing the names of the economies which are part of the economic system}
+\item{Economies}{A character vector containing the names of the economies included in the system.}
 
-\item{ModelType}{string-vector containing the label of the model to be estimated}
+\item{ModelType}{A character vector indicating the model type to be estimated.}
 }
 \value{
-List containing the country-specific risk factor labels
+List containing the risk factor labels
 }
 \description{
 Generates the labels factors
 }
 \examples{
 N <- 2
-DomVar <- c("inflation", "Economic growth")
+DomVar <- c("inflation", "Output gap")
 GlobalVar <- "Commodity Prices"
 Economies <- c("U.S.", "Canada", "Germany", "Japan")
-ModelType <- "JPS"
+ModelType <- "JPS original"
 
 VarLabels <- LabFac(N, DomVar, GlobalVar, Economies, ModelType)
 

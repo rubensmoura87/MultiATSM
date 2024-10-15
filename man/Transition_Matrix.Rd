@@ -2,43 +2,43 @@
 % Please edit documentation in R/Transition_Matrix.R
 \name{Transition_Matrix}
 \alias{Transition_Matrix}
-\title{Compute the transition matrix required in the estimation of the GVAR model}
+\title{Computes the transition matrix required in the estimation of the GVAR model}
 \usage{
 Transition_Matrix(
   t_First,
   t_Last,
   Economies,
   type,
-  DataPath = NULL,
-  Data = NULL
+  DataConnectedness = NULL,
+  DataPath = NULL
 )
 }
 \arguments{
-\item{t_First}{Sample starting date (year)}
+\item{t_First}{Sample starting date (in the format: yyyy).}
 
-\item{t_Last}{Sample last date (year)}
+\item{t_Last}{Sample ending date (in the format: yyyy).}
 
-\item{Economies}{Vector containing the names of all the economies of the system.}
+\item{Economies}{A character vector containing the names of the economies included in the system.}
 
-\item{type}{Three possibilities:
+\item{type}{A character string indicating the method for computing interdependence. Possible options include:
 \itemize{
-     \item "Full Sample": if one wishes ALL weight matrices of each year from which data is available (it may extrapolate the sample period);
-     \item "Sample Mean": if one wishes a SINGLE weight matrix containing the average of weights over of the entire sample period;
-     \item Some year in particular (e.g. "1998", "2005" ...).
+     \item \code{Time-varying}: Computes time-varying interdependence and returns the weight matrices for each year based on available data (may extrapolate the sample period).
+     \item \code{Sample Mean}: Returns a single weight matrix containing the average weights over the entire sample period, suitable for time-invariant interdependence.
+     \item A specific year (e.g., "1998", "2005"): Used to compute time-invariant interdependence for the specified year.
 }}
 
-\item{DataPath}{path of the Excel file containing the data (if any). The default is linked to the Excel file available in the package.}
+\item{DataConnectedness}{Data used to compute the transition matrix. Default is set to NULL.}
 
-\item{Data}{Data for computing the transition matrix. Default is set to NULL.}
+\item{DataPath}{Path to the Excel file containing the data (if applicable). The default is linked to the Excel file available in the package.}
 }
 \value{
 matrix or list of matrices
 }
 \description{
-Compute the transition matrix required in the estimation of the GVAR model
+Computes the transition matrix required in the estimation of the GVAR model
 }
 \details{
-NOTE: if there is missing data for any country of the system for that particularly year,
+If there is missing data for any country of the system for that particularly year,
 then the transition matrix will include only NAs.
 }
 \examples{
@@ -48,7 +48,7 @@ t_First <- "2006"
 t_Last <-  "2019"
 Economies <- c("China", "Brazil", "Mexico", "Uruguay")
 type <- "Sample Mean"
-Transition_Matrix(t_First, t_Last, Economies, type, DataPath = NULL, Data = TradeFlows)
+W_mat <- Transition_Matrix(t_First, t_Last, Economies, type, DataConnectedness = TradeFlows)
 
 
 }

@@ -32,15 +32,15 @@ f_with_vectorized_parameters <- function(x, sizex, f, con, varargin, ModelType, 
 
   if ( any(is.na(x)==0) & any(is.infinite(x) ==0) & any(Im(x)==0) ) {
     to_continue <- update_para(x, sizex, ii = NULL, con, FactorLabels, Economies, JLLinputs, GVARinputs, varargin)
-  para <- getpara(to_continue) # extract only the numerical parameters of each variable that will not be concetrated out of the likelihood function.
-  }
+  para <- getpara(to_continue) # extract only the numerical parameters of each variable that will not be concentrated out of the likelihood function.
+
 
 
   if (nargout>1){
 
         out <- NULL
     tryCatch({
-      if (ModelType == "JLL original" || ModelType == "JLL NoDomUnit"){
+      if (any(ModelType == c( "JLL original", "JLL No DomUnit"))){
         FF <- unlist(f(K1XQ= para[[1]],nargout = 2)$llk)
         out <- f(K1XQ= para[[1]], nargout = 2)
       }else{
@@ -48,7 +48,7 @@ f_with_vectorized_parameters <- function(x, sizex, f, con, varargin, ModelType, 
         out <- f(K1XQ= para[[1]], SSZ=para[[2]], nargout = 2)
       }
     }, error = function(err) {
-      if (ModelType == "JLL original" || ModelType == "JLL NoDomUnit"){
+      if (any(ModelType == c( "JLL original", "JLL No DomUnit"))){
         FF <- unlist(f(K1XQ= para[[1]], nargout = 1))
       }else{
         FF <- unlist(f(K1XQ= para[[1]], SSZ=para[[2]], nargout = 1))
@@ -56,13 +56,13 @@ f_with_vectorized_parameters <- function(x, sizex, f, con, varargin, ModelType, 
     })
   }else{
 
-    if (ModelType == "JLL original" || ModelType == "JLL NoDomUnit"){
-      FF <- f(K1XQ= para[[1]], nargout = 1)
-    }else{
-      FF <- f(K1XQ= para[[1]], SSZ=para[[2]], nargout = 1)
 
-      }
-  }
+    tryCatch({
+    if (any(ModelType == c( "JLL original", "JLL No DomUnit"))){FF <- f(K1XQ= para[[1]], nargout = 1)
+    }else{  FF <- f(K1XQ= para[[1]], SSZ=para[[2]], nargout = 1) }
+
+    }, error = function(err) {
+      stop("Optimization process failed to converge due to ill-defined matrices. Halting the optimization.")})
 
 
   if (is.numeric(FF) & (any(is.nan(FF)) || any(is.infinite(FF)) || any(Im(FF) ==1) ) ){
@@ -70,8 +70,11 @@ f_with_vectorized_parameters <- function(x, sizex, f, con, varargin, ModelType, 
     FF[1:d] <- 1e9
   }
 
-  ListOut <- list(FF, out, to_continue)
-  names(ListOut) <- c("y", "out", "to_continue")
+  }
+  }
+
+  ListOut <- list(y = FF, out = out, to_continue = to_continue)
+
 
   if(nargout==1){
     return(FF)
@@ -251,16 +254,19 @@ aux2true <-function(a, ctype, lb, ub, FactorLabels, Economies, JLLinputs= NULL, 
 
     lQ <- a
     N <- numel(lQ)
-    K1Q <- rbind(zeros(1,N), eye(N-1,N) )
+
+    if (N==1){ K1Q <- 0}else{ K1Q <- rbind(rep(0, N), diag(1, N - 1, N))}
+
     i0 <- 0
     if (mod(N,2)!=0){ K1Q[1] = lQ[1]; lQ <- t(t(lQ[2:length(lQ)])); i0<-1 }
 
+    if (N > 1){
     for (i in seqi(1,numel(lQ)/2)){
       K1Q[i0+2*i-1,i0+2*i-1] <- lQ[2*i-1]
       K1Q[i0+2*i,i0+2*i] <- lQ[2*i-1]
       K1Q[i0+2*i-1,i0+2*i] <- lQ[2*i]
     }
-
+}
 
     if (contain('stationary', ctype)){
       dd <- eig(K1Q)
@@ -305,14 +311,17 @@ aux2true <-function(a, ctype, lb, ub, FactorLabels, Economies, JLLinputs= NULL, 
 
       lQ <- a[(idx0+1):idx1]
       N <- numel(lQ)
-      K1Q <- rbind(zeros(1,N), eye(N-1,N) )
+      if (N==1){ K1Q <- 0}else{ K1Q <- rbind(rep(0, N), diag(1, N - 1, N)) }
       i0 <- 0
       if (mod(N,2)!=0){ K1Q[1] = lQ[1]; lQ <- t(t(lQ[2:length(lQ)])); i0<-1 }
 
+
+      if (N > 1){
       for (i in seqi(1,numel(lQ)/2)){
         K1Q[i0+2*i-1,i0+2*i-1] <- lQ[2*i-1]
         K1Q[i0+2*i,i0+2*i] <- lQ[2*i-1]
         K1Q[i0+2*i-1,i0+2*i] <- lQ[2*i]
+      }
       }
 
       if (contain('stationary', ctype)){
@@ -361,9 +370,9 @@ aux2true <-function(a, ctype, lb, ub, FactorLabels, Economies, JLLinputs= NULL, 
     index1 <- t(t(idx[which(tril(MatOnes)==1)]))
     idx <- t(idx)
     index2 <- t(t(idx[which(tril(MatOnes)==1)]))
-    convt <- zeros(N*N, N*(N+1)/2)
-    convt[index1,] <- eye(N*(N+1)/2)
-    convt[index2,] <- eye(N*(N+1)/2) # creates indexes to ensure that variance-covariance matrix is symmetric.
+    convt <- matrix(0, nrow = N*N, ncol = N*(N+1)/2)
+    convt[index1,] <- diag(N*(N+1)/2)
+    convt[index2,] <- diag(N*(N+1)/2) # creates indexes to ensure that variance-covariance matrix is symmetric.
 
     b <- NULL
     db <- NULL
@@ -442,9 +451,9 @@ if (length(d)==0 ){ btemp <- matrix(, nrow= 0, ncol= 0) } else{
       index1 <- t(t(idx[which(tril(MatrOne)==1)]))
       idx <- t(idx)
       index2 <- t(t(idx[which(tril(MatrOne)==1)]))
-      convt <- zeros(N*N, N*(N+1)/2)
-      convt[index1,] <- eye(N*(N+1)/2)
-      convt[index2,] <- eye(N*(N+1)/2) # creates indexes to ensure that variance-covariance matrix is symmetric.
+      convt <- matrix(0, nrow = N*N, ncol = N*(N+1)/2)
+      convt[index1,] <- diag(N*(N+1)/2)
+      convt[index2,] <- diag(N*(N+1)/2) # creates indexes to ensure that variance-covariance matrix is symmetric.
 
       btemp <- NULL
       for (i in 1:M){
@@ -493,9 +502,9 @@ if (length(d)==0 ){ btemp <- matrix(, nrow= 0, ncol= 0) } else{
     index1 <- t(t(idx[which(tril(Mat1s)==1)]))
     idx <- t(idx)
     index2 <- t(t(idx[which(tril( Mat1s )==1)]))
-    convt <- zeros(N*N, N*(N+1)/2)
-    convt[index1,] <- eye(N*(N+1)/2)
-    convt[index2,] <- eye(N*(N+1)/2)
+    convt <- matrix(0, nrow = N*N, ncol = N*(N+1)/2)
+    convt[index1,] <- diag(N*(N+1)/2)
+    convt[index2,] <- diag(N*(N+1)/2)
 
 
     b <- NULL

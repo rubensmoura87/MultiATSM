@@ -1,20 +1,20 @@
-#' Estimates a VAR(1)
+#' Estimates a standard VAR(1)
 
-#' @param RiskFactors matrix containing all the risk factors (K x T)
-#' @param VARtype string-vector which accommodates two possibilities: 'unconstrained' or 'constrained'
-#' @param Bcon constraints matrix (K+1 x N) - should contain an intercept. IfBcon(i,j) = nan --> B(i,j) is a free parameter. \cr
-#'              Default is set to NULL.
-
+#' @param RiskFactors A numeric matrix (FTx T) representing the time series of risk factors.
+#' @param VARtype String vector with two possible values: 'unconstrained' or 'constrained'.
+#' @param Bcon Constraints matrix (F+1 x N), which includes an intercept. If Bcon(i,j) = NA, then B(i,j) is treated as a free parameter. \cr
+#'             Default is set to NULL.
+#'
 #'@return  intercept, feedback matrix and the variance-covariance matrix of a VAR(1)
 #'@examples
 #' data("CM_Factors")
-#' #Example 1
+#' #Example 1: unconstrained case
 #' VAR(RiskFactors, VARtype= 'unconstrained')
 
-#' #Example 2
+#' #Example 2: constrainted case
 #' K <- nrow(RiskFactors)
 #' Bcon <-matrix(0, nrow = K, ncol = K+1)
-#' Bcon[,1:3] <- NaN
+#' Bcon[ , 1:3] <- NaN
 #' VAR(RiskFactors, VARtype= 'constrained', Bcon)
 #'
 #'
@@ -53,8 +53,63 @@ VAR <- function(RiskFactors, VARtype, Bcon = NULL){
     SSZ <- eZ%*%t(eZ)/dim(eZ)[2]
   }
 
-  out <- list(K0Z, K1Z, SSZ)
-  names(out) <- c("K0Z", "K1Z", "SSZ")
+  out <- list(K0Z = K0Z, K1Z= K1Z, SSZ = SSZ)
 
   return(out)
+}
+
+#########################################################################################################
+#' Restricted OLS regression
+#"
+#'@param Y    left hand side variables (M x T)
+#'@param X    regressors (i.e. N-1 variables + the intercept) (N x T)
+#'@param Bcon   constraints matrix (M x N). If Bcon(i,j) = nan --> B(i,j) is a free parameter
+#'@param G      weighting matrix (psd) - (M x M). Default is set to be identity
+#'
+#'@keywords internal
+#'
+#'@return  matrix of coefficient (M x N)
+#'@details
+#'# Estimate of B is obtained by minimizing the objective:\cr
+#'   sum_t (Y_t-B X_t)' G^(-1) (Y_t-B*X_t) \cr
+#' subject to the constraint that B = Bcon for all non-nan entries of Bcon
+#'
+#'@references
+#' This function is based on the "Reg__OLSconstrained" function by Le and Singleton (2018). \cr
+#'  "A Small Package of Matlab Routines for the Estimation of Some Term Structure Models." \cr
+#'  (Euro Area Business Cycle Network Training School - Term Structure Modelling).
+#' Available at: https://cepr.org/40029
+#'
+
+
+
+
+Reg__OLSconstrained <-function(Y, X, Bcon, G){
+
+
+  M <- dim(Y)[1]
+  T <- dim(Y)[2]
+
+  if (!exists('G')||is.null(G)){
+    G <- diag(M)
+  }
+
+  N <- dim(X)[1]
+
+  id <- is.nan(Bcon) # id= TRUE -> free parameter; id= FALSE -> constrained
+
+  B <- matrix(0, nrow=M, ncol=N)
+  B[!id] <- Bcon[!id]
+
+  if (any(B!=0)){
+    Y <- Y - B%*%X
+  }
+
+  bigX <- kronecker((X%*%t(X))/T, solve(G))
+  bigY <- solve(G,Y%*%t(X)) /T
+
+
+  B[id] <- solve(bigX[id, id], bigY[id])
+
+  return(B)
 }

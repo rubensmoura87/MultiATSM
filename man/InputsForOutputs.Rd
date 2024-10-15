@@ -2,7 +2,7 @@
 % Please edit documentation in R/InputsForOutputs.R
 \name{InputsForOutputs}
 \alias{InputsForOutputs}
-\title{Collect the inputs that are used to construct the numerical and the graphical outputs}
+\title{Collects the inputs that are used to construct the numerical and the graphical outputs}
 \usage{
 InputsForOutputs(
   ModelType,
@@ -10,7 +10,7 @@ InputsForOutputs(
   ListOutputWished,
   OutputLabel,
   WishStationarityQ,
-  UnitYields,
+  DataFrequency,
   WishGraphYields = 0,
   WishGraphRiskFactors = 0,
   WishOrthoJLLgraphs = 0,
@@ -19,64 +19,68 @@ InputsForOutputs(
   WishBootstrap = 0,
   ListBoot = NULL,
   WishForecast = 0,
-  ListForecast = NULL
+  ListForecast = NULL,
+  UnitYields = "Month"
 )
 }
 \arguments{
-\item{ModelType}{String-vector containing the label of the model to be estimated}
+\item{ModelType}{A character vector indicating the model type to be estimated.}
 
-\item{Horiz}{Single numerical vector conataining the desired horizon of analysis for the outputs}
+\item{Horiz}{A numeric scalar specifying the desired analysis horizon for the outputs.}
 
-\item{ListOutputWished}{List of desired graphical outputs. Available options are: "Fit","IRF", "FEVD", "GIRF", "GFEVD".}
+\item{ListOutputWished}{A list of desired graphical outputs. Available options are: "Fit", "IRF", "FEVD", "GIRF", "GFEVD", "TermPremia".}
 
-\item{OutputLabel}{Name of the output label to be stored}
+\item{OutputLabel}{A string for the name of the output label to be stored.}
 
-\item{WishStationarityQ}{User must set 1 is she whises to impose the largest eigenvalue under the Q to be strictly
-smaller than 1, otherwise set 0.}
+\item{WishStationarityQ}{A binary variable (1 or 0) indicating whether to impose that the largest eigenvalue under Q is strictly
+smaller than 1. Set to 1 to impose the restriction, or 0 otherwise.}
 
-\item{UnitYields}{(i) "Month": if maturity of yields are expressed in months or
-(ii) "Year": if maturity of yields are expressed in years}
+\item{DataFrequency}{A character vector specifying the data frequency. Available options: "Daily All Days", "Daily Business Days",
+"Weekly", "Monthly", "Quarterly", "Annually".}
 
-\item{WishGraphYields}{Binary variable: set 1, if the user wishes graphs to be generated; or set 0, otherwise. Default is set as "0".}
+\item{WishGraphYields}{A binary variable (1 or 0) indicating whether the user wishes to generate graphs for yields. Default is 0.}
 
-\item{WishGraphRiskFactors}{Binary variable: set 1, if the user wishes graphs to be generated; or set 0, otherwise. Default is set as "0".}
+\item{WishGraphRiskFactors}{A binary variable (1 or 0) indicating whether the user wishes to generate graphs for risk factors. Default is 0.}
 
-\item{WishOrthoJLLgraphs}{Binary variable: set 1, if the user wishes orthogonalized JLL-based graphs to be generated; or set 0, otherwise.
-Default is set as "0"}
+\item{WishOrthoJLLgraphs}{A binary variable (1 or 0) indicating whether the user wishes to generate orthogonalized JLL-based graphs.
+Default is 0.}
 
-\item{WishForwardPremia}{Binary variable: set 1, if the user wishes graphs to be generated; or set 0, otherwise. Default is set as "0".}
+\item{WishForwardPremia}{A binary variable (1 or 0) indicating whether the user wishes to generate forward premia graphs. Default is 0.}
 
-\item{LimFP}{Numerical vector containing the maturties associated with the starting and the ending date of the loan}
+\item{LimFP}{A numeric vector containing the maturities associated with the start and end dates of the loan.}
 
-\item{WishBootstrap}{Binary variable: set 1, if the user wishes graphs to be generated; or set 0, otherwise. Default is set as "0".}
+\item{WishBootstrap}{A binary variable (1 or 0) indicating whether the user wishes to perform bootstrap-based estimation. Default is 0.}
 
-\item{ListBoot}{List containing the four following elements:
+\item{ListBoot}{A List containing the following four elements:
 \enumerate{
- \item "methodBS": Desired bootstrap method among (a) 'bs' (standard residual bootstrap), (b) 'wild' (wild bootstrap),
-                  (c) 'block' (block  bootstrap);
- \item "BlockLength": if block bootstrap is chosen, then the user has to specify the lenght of the block (single numerical vector);
- \item "ndraws": number of draws;
- \item "pctg": level of confidence (single numerical vector expressed in basis points)
+ \item \code{methodBS}: Desired bootstrap method: (a) 'bs' for standard residual bootstrap, (b) 'wild' for wild bootstrap,
+                   or (c) 'block' for block bootstrap.
+ \item \code{BlockLength}: If block bootstrap is chosen, specify the block length (numeric scalar).
+ \item \code{ndraws}: Number of bootstrap draws.
+ \item \code{pctg}: Confidence level expressed in basis points (numeric vector).
 }}
 
-\item{WishForecast}{Binary variable: set 1, if the user wishes graphs to be generated; or set 0, otherwise. Default is set as "0".}
+\item{WishForecast}{A binary variable (1 or 0) indicating whether the user wishes to generate forecasts. Default is 0.}
 
-\item{ListForecast}{list containing the three following elements:
+\item{ListForecast}{A list containing the following three elements:
 \enumerate{
- \item "ForHoriz": forecast horizon;
- \item "t0Sample": index of the first variable of the information set;
- \item "t0Forecast": index of the first forecast cut-off date.
+ \item \code{ForHoriz}: forecast horizon;
+ \item \code{t0Sample}: Index of the first variable in the information set.
+ \item \code{t0Forecast}: Index of the first forecast cut-off date.
+ \item \code{ForType}: A string specifying the desired forecast type. Available options are: "Rolling" or "Expanding".
 }}
+
+\item{UnitYields}{A character string indicating the maturity unit of yields. Options are: (i) "Month" for yields expressed in months, or (ii) "Year" for yields expressed in years. Default is "Month".}
 }
 \value{
 List of necessary inputs to generate the graphs of the outputs of the desired model
 }
 \description{
-Collect the inputs that are used to construct the numerical and the graphical outputs
+Collects the inputs that are used to construct the numerical and the graphical outputs
 }
 \examples{
 
-ModelType <- "JPS"
+ModelType <- "JPS original"
 Horiz <- 100
 DesiredOutputGraphs <- c("Fit", "GIRF", "GFEVD")
 OutputLabel <- "Test"

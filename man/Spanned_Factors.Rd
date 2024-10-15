@@ -2,27 +2,27 @@
 % Please edit documentation in R/Spanned_Factors.R
 \name{Spanned_Factors}
 \alias{Spanned_Factors}
-\title{Compute the country-specific spanned factors}
+\title{Computes the country-specific spanned factors}
 \usage{
 Spanned_Factors(Yields, Economies, N)
 }
 \arguments{
-\item{Yields}{matrix  (J x T), where  J - the number of maturities and  T - time series length}
+\item{Yields}{matrix  (J x T), where J is the number of maturities and T is the length of the time series.}
 
-\item{Economies}{C-dimensional string-vector containing the names of the economies which are part of the economic system}
+\item{Economies}{A character vector containing the names of the economies included in the system.}
 
-\item{N}{scalar:  desired number of spanned factors (maximum number allowed is N= J)}
+\item{N}{Scalar representing the desired number of country-specific spanned factors (maximum allowed is N = J).}
 }
 \value{
 Matrix containing the N spanned for all the countries of the system  (CJ xT)
 }
 \description{
-Compute the country-specific spanned factors
+Computes the country-specific spanned factors
 }
 \examples{
 data(CM_Yields)
 Economies <- c("China", "Brazil", "Mexico", "Uruguay")
 N <- 3
-Spanned_Factors(Yields, Economies, N)
+SpaFact_TS <- Spanned_Factors(Yields, Economies, N)
 
 }

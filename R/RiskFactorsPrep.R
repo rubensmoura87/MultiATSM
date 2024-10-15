@@ -1,11 +1,12 @@
 #' Builds the complete set of time series of the risk factors (spanned and unspanned)
 #'
 #' @param FactorSet Factor set list (see e.g. "CM_Factors_GVAR" data file)
-#' @param Economies string-vector containing the names of the economies which are part of the economic system
-#' @param FactorLabels string-list based which contains the labels of all the variables present in the model
-#' @param Initial_Date Sample starting date (yyyy-mm-dd)
-#' @param Final_Date   Sample last date (yyyy-mm-dd)
-#' @param DataFrequency  character-based vector: "Daily All Days", "Daily Business Days", "Weekly", "Monthly", "Quarterly", "Annually"
+#' @param Economies A character vector containing the names of the economies included in the system.
+#' @param FactorLabels A list of character vectors with labels for all variables in the model.
+#' @param Initial_Date Start date of the sample period in the format yyyy-mm-dd
+#' @param Final_Date   End date of the sample period in the format yyyy-mm-dd
+#' @param DataFrequency A character vector specifying the data frequency. Available options: "Daily All Days", "Daily Business Days",
+#'                      "Weekly", "Monthly", "Quarterly", "Annually".
 #'
 #'
 #'@keywords internal

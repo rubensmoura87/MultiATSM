@@ -1,348 +1,784 @@
 #' Generates the bootstrap-related outputs
 #'
-#'@param ModelType   string-vector containing the label of the model to be estimated
-#'@param ModelParaPE point estimate from the model parameters (see the outputs of the "Optimization" function)
-#'@param NumOutPE    point estimate from the numerical outputs (see the outputs of the "NumOutputs" function)
-#'@param mat         vector of maturities (in years) used in the estimation
-#'@param Economies   string-vector containing the names of the economies which are part of the economic system
-#'@param InputsForOutputs list containing the desired inputs for the construction of IRFs, GIRFs, FEVDs, and GFEVDs.
-#'@param FactorLabels   string-list based which contains the labels of all the variables present in the model
-#'@param DataFrequency    character-based vector: "Daily All Days", "Daily Business Days", "Weekly", "Monthly", "Quarterly", "Annually"
-#'@param vararginPE    list containg starting values and constraints (see arguments of the "Optimization" function)
-#'@param JLLinputs    list of necessary inputs for the estimation of JLL-based models (see "JLL" function)
-#'@param GVARinputs list of necessary inputs for the estimation of GVAR-based models (see "GVAR" function)
-#'@param BRWinputs  list of necessary inputs for performing the bias-corrected estimation (see "Bias_Correc_VAR" function)
+#'@param ModelType   A character vector indicating the model type to be estimated.
+#'@param ModelParaPE A list containing the point estimates of the model parameters. For details, refer to the outputs from the \code{\link{Optimization}} function.
+#'@param NumOutPE    The point estimate derived from numerical outputs. See the outputs from the \code{\link{NumOutputs}} function for further information.
+#'@param Economies   A character vector containing the names of the economies included in the system.
+#'@param InputsForOutputs A list containing the necessary inputs for generating IRFs, GIRFs, FEVDs, GFEVDs and Term Premia.
+#'@param FactorLabels A list of character vectors with labels for all variables in the model.
+#'@param JLLlist List. Inputs for JLL model estimation (see \code{\link{JLL}} function). Default is NULL.
+#'@param GVARlist List. Inputs for GVAR model estimation (see \code{\link{GVAR}} function). Default is NULL.
+#'@param WishBC  Whether to estimate the physical parameter model with bias correction, based on the method by Bauer, Rudebusch and Wu (2012) (see \code{\link{Bias_Correc_VAR}} function). Default is set to 0.
+#'@param BRWlist  List of necessary inputs for performing the bias-corrected estimation (see \code{\link{Bias_Correc_VAR}} function).
 #'
 #'
 #'@importFrom pracma ceil rand strcmp num2str tril
 #'
 #'
-#'
 #'@examples
-#' # See examples in the vignette file of this package (Section 4).
+#' # See an example of implementation in the vignette file of this package (Section 4).
 #'
 #'@returns
 #'list containing the following elements:
 #'\itemize{
 #' \item list of model parameters for one each one the draws;
-#' \item list of numerical outputs (IRFs, GIRFs, FEVDs, GFEVDs) for each one of the draws;
-#' \item Confidence bands for the chosen level of significance.
+#' \item list of numerical outputs (IRFs, GIRFs, FEVDs, GFEVDs and Term Premia) for each one of the draws;
+#' \item Confidence bounds for the chosen level of significance.
 #' }
 
 #'@references
-#' This function is a modified and extended version of the "VARirbound" function from "A toolbox for VAR analysis"
+#' This function is a modified and extended version of the \code{VARirbound} function from "A toolbox for VAR analysis"
 #' by Ambrogio Cesa-Bianchi (https://github.com/ambropo/VAR-Toolbox)
 #' @export
 
 
-Bootstrap <- function(ModelType, ModelParaPE, NumOutPE, mat, Economies, InputsForOutputs,
-                      FactorLabels, DataFrequency, vararginPE, JLLinputs = NULL, GVARinputs = NULL, BRWinputs= NULL){
+Bootstrap <- function(ModelType, ModelParaPE, NumOutPE, Economies, InputsForOutputs, FactorLabels,
+                      JLLlist = NULL, GVARlist = NULL, WishBC = 0, BRWlist = NULL){
 
-
+  cat("3) BOOTSTRAP ANALYSIS \n")
   WishBoot<- InputsForOutputs[[ModelType]]$Bootstrap$WishBoot
 
-  if (WishBoot ==0){ print("No Bootstrap analysis was generated")
+  if (WishBoot ==0){ cat("No Bootstrap analysis was generated \n\n")
     }
   else{
+    cat("3.1) Estimating bootstrap setup. This may take several hours. \n")
 
+    StatQ <- InputsForOutputs$StationaryQ
+    UMatY <- InputsForOutputs$UnitMatYields
 
-    methodBS <- InputsForOutputs[[ModelType]]$Bootstrap$methodBS
-    BlockLength <- InputsForOutputs[[ModelType]]$Bootstrap$BlockLength
+    # 1) Pre-allocation of list of outputs
     ndraws <- InputsForOutputs[[ModelType]]$Bootstrap$ndraws
-    pctg <- InputsForOutputs[[ModelType]]$Bootstrap$pctg
-
+    DataFreq <- InputsForOutputs$DataFreq
     N <- length(FactorLabels$Spanned)
-    M <- length(FactorLabels$Domestic) - N
-    G <- length(FactorLabels$Global)
 
-    if (DataFrequency == "Daily All Days"){ dt <- 1/365}
-    if (DataFrequency == "Daily Business Days"){ dt <- 1/252}
-    if (DataFrequency == "Weekly"){ dt <- 1/52}
-    if (DataFrequency == "Monthly"){ dt <- 1/12}
-    if (DataFrequency == "Quarterly"){ dt <- 1/4}
-    if (DataFrequency == "Annually"){ dt <- 1}
-
-    ###################################### PRE-ALLOCATION ###########################################################
-    #################################################################################################################
-    # Pre-allocation of list of outputs
     ModelBootstrap <- list()
-    ModelParaPE_artificial <- list()
-    NumericalOutputs_artificial <- list()
-    Bounds <- list()
+    dt <- Getdt(DataFreq)
+    if (any(ModelType == c("JPS original", "JPS global", "GVAR single"))){
+      mat <- ModelParaPE[[ModelType]][[Economies[1]]]$inputs$mat }else{mat <- ModelParaPE[[ModelType]]$inputs$mat}
 
-    GeneralInputs <- list(mat, dt, N)
-    names(GeneralInputs) <- c("mat", "dt", "N")
+    ModelBootstrap <- list(GeneralInputs = list(mat= mat, dt = dt , N= N))
 
-    ModelBootstrap <- list(GeneralInputs, ModelParaPE_artificial, NumericalOutputs_artificial, Bounds)
-    names(ModelBootstrap) <- c("GeneralInputs","ParaDraws", "NumOutDraws", "ConfBounds")
+    # 2) Obtain the residuals from the original model
+    # a) P-dynamics residuals
+    residPdynOriginal <- PdynResid_BS(ModelType, Economies, ModelParaPE)
 
-    C <- length(Economies)
+    # b) Yield residuals
+      BFull_Original <- Get_BFull(ModelParaPE, FactorLabels, mat, Economies, ModelType)
+      residYieOriginal <- residY_original(ModelParaPE, BFull_Original, ModelType, Economies)
 
-    ## Loop over the number of draws
-    tt <- 1 # numbers of accepted draws
-    ww <- 1 # index for printing on screen
-
-    # P-dynamics settings
-    nlag  <- 1
-    const <- 1
-
-
-    for (i in 1:C){
-
-
-      if (any(ModelType == c( "GVAR jointQ" , "VAR jointQ" , "JLL original", "JLL NoDomUnit", "JLL jointSigma")
-                & i >1 )){break} # the break avoids the models with joint estimation under the Q to be estimated C times
-
-
-      # Select the original data and labels (preliminary work)
-
-      if (any(ModelType == c('JPS', 'JPS jointP', "GVAR sepQ"))){  # country-by-country estimation
-
-        print('#########################################################################################################')
-        print( paste('#################################', 'Bootstrap for model', ModelType, '-', Economies[i], '#################################' ))
-        print('#########################################################################################################')
-
-        RiskFactorLabels <- rownames(ModelParaPE[[ModelType]][[Economies[i]]]$inputs$AllFactors)
-        YieldsLabels  <- rownames(ModelParaPE[[ModelType]][[Economies[i]]]$inputs$Y)
-
-        YY <- ModelParaPE[[ModelType]][[Economies[i]]]$inputs$Y
-        ZZ <- ModelParaPE[[ModelType]][[Economies[i]]]$inputs$AllFactors # K x T
-
-        A <- ModelParaPE[[ModelType]][[Economies[i]]]$rot$P$A
-        B <- ModelParaPE[[ModelType]][[Economies[i]]]$rot$P$B
-        D0Z <-  ModelParaPE[[ModelType]][[Economies[i]]]$ests$K0Z
-        D1Z <-  ModelParaPE[[ModelType]][[Economies[i]]]$ests$K1Z
-
-      }else{ # Jointly estimation of countries
-
-        print('#########################################################################################################')
-        print( paste('#################################', 'Bootstrap for model', ModelType,  '#################################' ))
-        print('#########################################################################################################')
-
-        YieldsLabels  <- rownames(ModelParaPE[[ModelType]]$inputs$Y)
-
-        YY <- ModelParaPE[[ModelType]]$inputs$Y
-        ZZ <- ModelParaPE[[ModelType]]$inputs$AllFactors # K x T
-
-        A <- ModelParaPE[[ModelType]]$rot$P$A
-        B <- ModelParaPE[[ModelType]]$rot$P$B
-        D0Z <-  ModelParaPE[[ModelType]]$ests$K0Z
-        D1Z <-  ModelParaPE[[ModelType]]$ests$K1Z
-      }
-
-      T <- ncol(ZZ)
-      K  <- nrow(ZZ) # NUmber of risk factors
-      ZZ_row  <- t(ZZ) # T x K
-      Y_row <- t(YY) # TxJ or TxCJ
-      J <- length(mat)
-
-      # Residuals from the original model
-      # a) P-dynamics
-      residPdyn <- PdynamicsSet_BS(ModelType, ZZ, FactorLabels, Economies, JLLinputs, GVARinputs)$eZ
-      # b) observational equation
-      # For models estimated on a country-by-country basis
-      if (any(ModelType == c( 'JPS',  'JPS jointP', "GVAR sepQ"))){
-        BFull <- matrix(0, nrow = J, ncol= K)
-        LabelSpannedCS <- c(FactorLabels$Tables[[Economies[i]]][-(1:M)])
-        idxSpanned <- match(LabelSpannedCS, RiskFactorLabels)
-        BFull[,idxSpanned] <- B
-      } else{
-        # For models estimated jointly
-        BFull <- BUnspannedAdapJoint(G,M,N,C, J, B)
-      }
-
-      YYhat <- matrix(A, nrow= nrow(YY), ncol=ncol(YY)) + BFull%*%ZZ # Model-implied yields
-      residYie <- t(YY - YYhat)
-
-
-      ###################################### OPTIMIZATION #############################################################
-      #################################################################################################################
+      # 3) Bootstrap samples
+     ## Loop over the number of draws
+      tt <- 1 # numbers of accepted draws
+      ww <- 1 # index for printing on screen
       Jmisc::tic()
-      while (tt<=ndraws){
-
-        ## Create the matrices for the loop
-        ZZ_artificial <- matrix(0, nrow= T -1 +nlag, ncol = K)
-        rownames(ZZ_artificial) <- rownames(ZZ_row)
-        colnames(ZZ_artificial) <- colnames(ZZ_row)
-
-        Y_artificial <- matrix(0, nrow= T  , ncol = nrow(YY))
-        rownames(Y_artificial) <- rownames(Y_row)
-        colnames(Y_artificial) <- colnames(Y_row)
-
-        # Display number of loops
-
-        if (tt==10*ww){
-          print(paste('Loop ', num2str(tt, fmt=0) , ' / ', num2str(ndraws, fmt=0), ' draws'))
+      while (tt<=ndraws){ # Display number of loops
+          if (tt==10*ww){
+          cat(paste('Loop ', num2str(tt, fmt=0) , ' / ', num2str(ndraws, fmt=0), ' draws \n'))
           ww <- ww +1
-
         }
 
+        # a) generate the artificial data
+    invisible(utils::capture.output(Series_artificial <- Gen_Artificial_Series(ModelParaPE, residPdynOriginal,
+                                                        residYieOriginal, ModelType, BFull_Original,
+                                                        InputsForOutputs, Economies, FactorLabels,
+                                                        GVARlist, JLLlist, WishBC, BRWlist)))
 
-        ## STEP 1: Choose the method and generate the residuals
-        if (strcmp(methodBS,'bs')){
-          # Use the residuals to bootstrap: generate a random number bounded
-          # between 0 and the number of residuals, then use the ceil function to select
-          # that row of the residuals (this is equivalent to sampling with replacement)
-          rr <- ceil((T-nlag)*rand(T,1)) # T x 1
-          uPdyn <- residPdyn[rr[1:(T-nlag)], ] # (T-1) x K
-          uYiel <- residYie[rr, ] # TxJ  or T x CJ
-        } else if (strcmp(methodBS,'wild')){
+      # b) Prepare the inputs the model estimation
+      Y_BS <- t(Series_artificial$Y_BS)
+      Global_BS <- t(Series_artificial$GlobalMacro_BS)
+      Dom_BS <- t(Series_artificial$DomesticMacro_BS)
+      t0_BS <- colnames(Global_BS)[1]
+      tF_BS <- utils::tail(colnames(Global_BS), 1)
 
-          # Wild bootstrap based on simple distribution (~Rademacher)
-          rr <- 1-2*(rand(T,1)>0.5)
-          uPdyn<- residPdyn*(rr[1:(T-nlag)]%*%matrix(1,nrow=1, ncol=K))
-          uYiel <- residYie*(rr%*%matrix(1,nrow=1, ncol= ncol(residYie)) )
+      invisible(utils::capture.output(ATSMInputs_BS <- InputsForOpt(t0_BS, tF_BS, ModelType, Y_BS, Global_BS, Dom_BS, FactorLabels,
+                                           Economies, DataFreq, GVARlist, JLLlist, WishBC,
+                                           BRWlist, UMatY, CheckInputs= FALSE, BS_Adj= TRUE)))
 
-        } else if (strcmp(methodBS,'block')){
+      # c) Run the optimization
+      invisible(utils::capture.output(Draw_Opt <- Optimization(ATSMInputs_BS, StatQ, DataFreq, FactorLabels,
+                                                         Economies, ModelType, tol = 1e-1, TimeCount=F,
+                                                         BS_outputs = TRUE)))
 
-          # Blocks overlap and are drawn with replacement
-          FullBlocksSet <- dim(residPdyn)[1] - BlockLength +1 # all possible blocks that can be drawn
-          SampleBlock <- ceil((T-nlag)/BlockLength) #
+      ModelBootstrap <- AdjustOptm_BS(ModelType, ModelBootstrap, Draw_Opt, Economies, tt)
 
-          bb <- ceil(SampleBlock*rand(SampleBlock,1))
-          IdxBlocks <- matrix(NA, nrow= BlockLength, ncol= FullBlocksSet)
-          for (mm in 1:FullBlocksSet){
-            IdxBlocks[,mm] <- mm:(mm + BlockLength-1)
-          }
-          rr <- as.vector(IdxBlocks[,bb])[1:T]
-          uPdyn <- residPdyn[rr[1:(T-nlag)],]
-          uYiel <- residYie[rr, ]
-        }else{
-          stop(paste('The method ', methodBS, ' is not available'))
-        }
-
-        ## STEP 2: generate the artificial data
-        # 2.1) initial values for the artificial data
-        # Intialize the first nlag observations with real data
-        LAG <- c()
-        for (jj in 1:nlag){
-          ZZ_artificial[jj,] <- ZZ_row[jj,]
-          LAG <- rbind(ZZ_artificial[jj,], LAG)
-        }
-        # Initialize the artificial series and the LAGplus vector
-        if (const==0){
-          LAGplus <- LAG
-        }else if (const==1){
-          LAGplus <- cbind(1, LAG)
-        }
-
-
-        # 2.2) generate artificial series
-        Ft <- rbind(t(D0Z), t(D1Z))
-        # From observation nlag+1 to nobs, compute the artificial data
-        for (jj in (nlag+1):(T-1+nlag)){
-          for (mm in 1:K){
-            # Compute the value for time=jj
-            ZZ_artificial[jj,mm] = LAGplus %*% as.matrix(Ft[,mm]) + uPdyn[jj-nlag,mm]
-          }
-          # now update the LAG matrix
-          if (jj<T-1+nlag){
-            LAG <- rbind(ZZ_artificial[jj, ], LAG[1,seqi(1,((nlag-1)*K)) ] )
-            if (const==0){LAGplus <- LAG} else if (const==1){
-              LAGplus <- cbind(1, LAG)
-            }
-          }
-        }
-
-
-        # Yields
-        Y_artificial <-  uYiel + matrix(A, nrow= T, ncol=nrow(YY), byrow=T) + ZZ_artificial%*%t(BFull)
-
-        ## STEP 3: generate the artificial parameters of the ATSM
-
-        i <<- i # Re-define i in the global envirnonment
-
-        # 3.1) BUild the "Factor Set" list, which is necessary for the estimation of the GVAR
-        FactorSet_BS <- DataSet_BS(ModelType, t(ZZ_artificial), GVARinputs$Wgvar, Economies, FactorLabels)
-        GVARinputs$GVARFactors <- FactorSet_BS
-
-        # 3.2) Test whether the VAR is stationary (if not, drop the draw)
-        K1Z_artificial <- PdynamicsSet_BS(ModelType, t(ZZ_artificial), FactorLabels, Economies,
-                                          JLLinputs, GVARinputs)$K1Z
-        MaxEigen <-max(abs(eigen(K1Z_artificial)$value))
-
-
-      if (MaxEigen < 1 ) {
-      # 3.3) Prepare the inputs used the in the llk
-      InputsMLE_artificial <- InputsForMLEdensity_BS(ModelType, Y_artificial, ZZ_artificial, FactorLabels, mat, Economies,
-                                                    DataFrequency, JLLinputs, GVARinputs, BRWinputs)
-
-      # 3.4) Variables that will be concentrared out of from the log-likelihood function
-      K1XQ <- InputsMLE_artificial$K1XQ
-
-    if (any(ModelType == c ("JLL original", "JLL NoDomUnit"))){ SSZ <- NULL} else{SSZ <- InputsMLE_artificial$SSZ}
-
-
-    ## STEP 4: collect the model inpits to build the llk
-      f <- Functionf_Boot(ModelType, InputsMLE_artificial, Economies, mat, dt, FactorLabels, rr,
-                               MaxEigen, JLLinputs, GVARinputs)
-
-    ## STEP 5: prepare the optimization settings
-    varargin <- list()
-
-    varargin$K1XQ <- list(K1XQ, vararginPE$K1XQ$Label, vararginPE$K1XQ$LB, vararginPE$K1XQ$UB)
-    varargin$SSZ <- list(SSZ, vararginPE$SSZ$Label, vararginPE$SSZ$LB, vararginPE$SSZ$UB)
-    varargin$r0 <- list(NULL, vararginPE$r0$Label, vararginPE$r0$LB, vararginPE$r0$UB)
-    varargin$se <- list(NULL, vararginPE$se$Label, vararginPE$se$LB, vararginPE$se$UB)
-    varargin$K0Z <- list(NULL, vararginPE$K0Z$Label, vararginPE$K0Z$LB, vararginPE$K0Z$UB)
-    varargin$K1Z <- list(NULL, vararginPE$K1Z$Label, vararginPE$K1Z$LB, vararginPE$K1Z$UB)
-    varargin$OptRun <- c("iter off", "fminsearch only") # makes the estimation faster
-
-    LabelVar <- c('Value', 'Label', 'LB', 'UB') # Elements of each parameter
-
-    for (d in 1:(length(varargin)-1)){ names(varargin[[d]]) <-  LabelVar}
-
-    tol <- 1e-1 # To avoid spending unecessary amount of time on flat regions of the llk functions
-    ## STEP 6: Run the optimization
-  if (any(ModelType == c('JPS',  'JPS jointP',"GVAR sepQ"))){
-  ModelBootstrap$ParaDraws[[ModelType]][[Economies[i]]][[tt]] <- Optimization_Boot(f, tol, varargin, FactorLabels,
-                                                                                   Economies, ModelType, JLLinputs,
-                                                                                   GVARinputs)
-  }else{
-  ModelBootstrap$ParaDraws[[ModelType]][[tt]] <- Optimization_Boot(f, tol, varargin, FactorLabels,
-                                                                  Economies, ModelType, JLLinputs, GVARinputs)
-  }
-
-saveRDS(ModelBootstrap, paste(tempdir(),"/Bootstrap_", InputsForOutputs$'Label Outputs','.rds',sep="")) # if the optmization crashs after some draws,
-          # we can keep the ouputs of draws before
+      # if the optimization crashes after some draws, we can keep the outputs of draws before
+      saveRDS(ModelBootstrap, paste(tempdir(),"/Bootstrap_", InputsForOutputs$'Label Outputs','.rds',sep=""))
       tt<-tt+1
-
-        }
       }
 
-      tt <- 1
-      ww <- 1
-
-    }
-
-    print('-- Done!')
-
+    cat('-- Done! \n')
     Jmisc::toc()
 
-    ###################################### NUMERICAL OUTPUTS ########################################################
-    ModelBootstrap$NumOutDraws <- NumOutputs_Bootstrap(ModelType,ModelBootstrap, InputsForOutputs, FactorLabels,
+    # 4) Compute the numerical outputs from the bootstrap samples
+    cat("3.2) Computing numerical outputs. \n")
+    ModelBootstrap$NumOutDraws <- NumOutputs_Bootstrap(ModelType, ModelBootstrap, InputsForOutputs, FactorLabels,
                                                        Economies)
 
-
-    ###################################### CONFIDENCE BOUNDS ########################################################
+    # 5) Compute confidence bounds
+    cat("3.3) Computing confidence bounds and producing graphical outputs. \n")
     ModelBootstrap$ConfBounds <- BootstrapBoundsSet(ModelType, ModelBootstrap, NumOutPE, InputsForOutputs, Economies)
-
-
     ## To save space, clean the repeated outputs from the JLL outputs
-    if (any(ModelType == c("JLL original", "JLL NoDomUnit", "JLL jointSigma"))){
-        for (tt in 1:ndraws){
-          ModelBootstrap$NumOutDraws$IRF[[ModelType]][[tt]]$Yields$Ortho <- NULL
-          ModelBootstrap$NumOutDraws$FEVD[[ModelType]][[tt]]$Yields$Ortho <- NULL
-        }
-        ModelBootstrap$ConfBounds$IRF[[ModelType]]$Yields$Ortho <- NULL
-        ModelBootstrap$ConfBounds$FEVD[[ModelType]]$Yields$Ortho <- NULL
-
-    }
+    if (any(ModelType == c("JLL original", "JLL No DomUnit", "JLL joint Sigma"))){ModelBootstrap <- CleanOrthoJLL_Boot(ModelBootstrap, ndraws, ModelType)}
 
     saveRDS(ModelBootstrap, paste(tempdir(),"/Bootstrap_", InputsForOutputs$'Label Outputs','.rds',sep=""))
 
     return(ModelBootstrap)
-
   }
 }
+################################################################################################################
+#' Compute some key parameters from the P-dynamics (Bootstrap set)
+#'
+#'@param ModelType    string-vector containing the label of the model to be estimated
+#'@param Economies    A character vector containing the names of the economies included in the system.
+#'@param ModelPara_PE point estimate from the model parameters
+#'
+#'@keywords internal
 
+PdynResid_BS <- function(ModelType, Economies, ModelPara_PE){
+
+  # SepQ models
+  if (any(ModelType == c("JPS original", "JPS global", "GVAR single"))){
+
+    eZ <- list()
+
+    for (i in 1:length(Economies)){
+      ZZ <- ModelPara_PE[[ModelType]][[Economies[i]]]$inputs$AllFactors # K x T
+      K0Z <- ModelPara_PE[[ModelType]][[Economies[i]]]$ests$K0Z
+      K1Z <- ModelPara_PE[[ModelType]][[Economies[i]]]$ests$K1Z
+      T <- ncol(ZZ)
+      eZ_row <- ZZ[ ,2:T] - matrix(K0Z, nrow= nrow(K0Z),  ncol= T-1) - K1Z%*%ZZ[ , 1:(T-1)] # T x K
+      eZ[[Economies[i]]] <- t(eZ_row)
+    }
+    # JointQ models
+  }else{
+    ZZ <- ModelPara_PE[[ModelType]]$inputs$AllFactors
+    K0Z <- ModelPara_PE[[ModelType]]$ests$K0Z
+    K1Z <- ModelPara_PE[[ModelType]]$ests$K1Z
+    T <- ncol(ZZ)
+    eZ <- ZZ[ ,2:T] - matrix(K0Z, nrow= nrow(K0Z),  ncol= T-1) - K1Z%*%ZZ[ , 1:(T-1)] # T x K
+    eZ <- t(eZ)
+  }
+
+  return(eZ)
+}
+
+
+#################################################################################################################
+#' Compute the residuals from the original model
+#'
+#'@param residPdynOriginal Time-series of the residuals from the P-dynamics equation (T x F)
+#'@param residYieOriginal Time-series of the residuals from the observational equation (T x J or T x CJ)
+#'@param InputsForOutputs list containing the desired inputs for the construction of the numerical outputs.
+#'@param ModelType A character vector indicating the model type to be estimated
+#'@param nlag Number of lags in the P-dynamics. Default is set to 1.
+#'
+#'@keywords internal
+
+ResampleResiduals_BS <- function(residPdynOriginal, residYieOriginal, InputsForOutputs, ModelType, nlag= 1){
+
+  methodBS <- InputsForOutputs[[ModelType]]$Bootstrap$methodBS
+  BlockLength <- InputsForOutputs[[ModelType]]$Bootstrap$BlockLength
+
+  T <- nrow(residYieOriginal)
+  K <- ncol(residPdynOriginal)
+
+
+  if (strcmp(methodBS,'bs')){
+    # Use the residuals to bootstrap: generate a random number bounded
+    # between 0 and the number of residuals, then use the ceil function to select
+    # that row of the residuals (this is equivalent to sampling with replacement)
+    rr <- ceil((T-nlag)*rand(T,1)) # T x 1
+    uPdyn <- residPdynOriginal[rr[1:(T-nlag)], ] # (T-1) x K
+    uYiel <- residYieOriginal[rr, ] # TxJ  or T x CJ
+  } else if (strcmp(methodBS,'wild')){
+
+    # Wild bootstrap based on simple distribution (~Rademacher)
+    rr <- 1-2*(rand(T,1)>0.5)
+    uPdyn<- residPdynOriginal*(rr[1:(T-nlag)]%*%matrix(1,nrow=1, ncol=K))
+    uYiel <- residYieOriginal*(rr%*%matrix(1,nrow=1, ncol= ncol(residYieOriginal)) )
+
+  } else if (strcmp(methodBS,'block')){
+
+    # Blocks overlap and are drawn with replacement
+    FullBlocksSet <- dim(residPdynOriginal)[1] - BlockLength + 1 # all possible blocks that can be drawn
+    SampleBlock <- ceil((T-nlag)/BlockLength) #
+
+    bb <- ceil(SampleBlock*rand(SampleBlock,1))
+    IdxBlocks <- matrix(NA, nrow= BlockLength, ncol= FullBlocksSet)
+    for (mm in 1:FullBlocksSet){
+      IdxBlocks[ , mm] <- mm:(mm + BlockLength-1)
+    }
+    rr <- as.vector(IdxBlocks[,bb])[1:T]
+    uPdyn <- residPdynOriginal[rr[1:(T-nlag)],]
+    uYiel <- residYieOriginal[rr, ]
+  }else{
+    stop(paste('The method ', methodBS, ' is not available'))
+  }
+
+  return(list(residFact = uPdyn, residYields = uYiel))
+}
+
+##############################################################################################################
+#' Compute the residuals from the observational equation
+#'
+#'@param ModelParaPE list of point estimates of the model parameter
+#'@param BFull matrix B of loadings (CJ x F or J x F)
+#'@param ModelType A character vector indicating the model type to be estimated
+#'@param Economies string-vector containing the names of the economies which are part of the economic system
+#'
+#'@keywords internal
+
+residY_original <- function(ModelParaPE, BFull, ModelType, Economies){
+
+
+  # For models estimated on a country-by-country basis
+  if (any(ModelType == c("JPS original", "JPS global", "GVAR single"))){
+
+    residYie <- list()
+
+    for (i in 1:length(Economies)){
+    RiskFactorLabels <- rownames(ModelParaPE[[ModelType]][[Economies[i]]]$inputs$AllFactors)
+    YY <- ModelParaPE[[ModelType]][[Economies[i]]]$inputs$Y
+    ZZ <- ModelParaPE[[ModelType]][[Economies[i]]]$inputs$AllFactors
+    A <- ModelParaPE[[ModelType]][[Economies[i]]]$rot$P$A
+    B__Full <- BFull[[Economies[i]]]
+    YYhat <- matrix(A, nrow= nrow(YY), ncol=ncol(YY)) + B__Full%*%ZZ # Model-implied yields
+
+    residYie[[Economies[i]]] <- t(YY - YYhat)
+    }
+    } else{
+    # For models estimated jointly
+    YY <- ModelParaPE[[ModelType]]$inputs$Y
+    ZZ <- ModelParaPE[[ModelType]]$inputs$AllFactors # K x T
+    A <- ModelParaPE[[ModelType]]$rot$P$A
+    YYhat <- matrix(A, nrow= nrow(YY), ncol=ncol(YY)) + BFull%*%ZZ # Model-implied yields
+    residYie <- t(YY - YYhat)
+  }
+
+
+  return(residYie)
+}
+#########################################################################################################""
+#'Compute the B matrix of loadings
+#'
+#'@param ModelParaPE list of point estimates of the model parameter
+#'@param FactorLabels string-list based which contains the labels of all the variables present in the model
+#'@param mat vector of bond yield maturities
+#'@param Economies string-vector containing the names of the economies which are part of the economic system
+#'@param ModelType A character vector indicating the model type to be estimated
+#'
+#'
+#'@keywords internal
+
+Get_BFull <- function(ModelParaPE, FactorLabels, mat, Economies, ModelType){
+
+  J <- length(mat)
+  G <- length(FactorLabels$Global)
+  N <- length(FactorLabels$Spanned)
+  M <- length(FactorLabels$Domestic) - N
+  C <- length(Economies)
+
+  # For models estimated separately
+if(any(ModelType == c("JPS original", "JPS global", "GVAR single"))){
+  K <- nrow(ModelParaPE[[ModelType]][[Economies[1]]]$inputs$AllFactors)
+
+  BFull <- list()
+  for (i in 1:length(Economies)){
+  B_CS <- matrix(0, nrow = J, ncol= K)
+  LabelSpannedCS <- c(FactorLabels$Tables[[Economies[i]]][-(1:M)])
+  RiskFactorLabels <- rownames(ModelParaPE[[ModelType]][[Economies[i]]]$inputs$AllFactors)
+  idxSpanned <- match(LabelSpannedCS, RiskFactorLabels)
+  B <- ModelParaPE[[ModelType]][[Economies[i]]]$rot$P$B
+  B_CS[ , idxSpanned] <- B
+  BFull[[Economies[i]]] <- B_CS
+  }
+  # For models estimated jointly
+}else{
+  K <- nrow(ModelParaPE[[ModelType]]$inputs$AllFactors)
+  B <- ModelParaPE[[ModelType]]$rot$P$B
+BFull <- BUnspannedAdapJoint(G,M,N,C, J, B)
+}
+
+return(BFull)
+}
+###################################################################################################################
+#' Build the time-series of the risk factors in each bootstrap draw
+#'
+#'@param ModelParaPE list of point estimates of the model parameter
+#'@param residPdynOriginal Time-series of the residuals from the P-dynamics equation (T x F)
+#'@param residYieOriginal Time-series of the residuals from the observational equation (T x J or T x CJ)
+#'@param InputsForOutputs list containing the desired inputs for the construction
+#'@param Economies string-vector containing the names of the economies which are part of the economic system
+#'@param ModelType Desired model to be estimated
+#'@param FactorLabels string-list based which contains the labels of all the variables present in the model
+#'@param GVARlist list of necessary inputs for the estimation of GVAR-based models
+#'@param JLLlist list of necessary inputs for the estimation of JLL-based models
+#'@param WishBRW Whether the user wishes to estimate the physical parameter model with the Bias correction model from BRW (2012) (see "Bias_Correc_VAR" function).\cr
+#'              Default is set to 0.
+#'@param BRWlist list of necessary inputs for performing the bias-corrected estimation (see "Bias_Correc_VAR" function)
+#'@param nlag Number of lags in the P-dynamics. Default is set to 1.
+#'
+#'@keywords internal
+
+BuildRiskFactors_BS <- function(ModelParaPE, residPdynOriginal, residYieOriginal, InputsForOutputs, Economies,
+                                ModelType, FactorLabels, GVARlist, JLLlist, WishBRW, BRWlist, nlag = 1){
+
+  # 1) Initialization
+  if(any(ModelType == c("JPS original", "JPS global", "GVAR single"))){
+    RiskFact_Temp <- list()
+    ZZ_list <- list()
+    resid_list <- list()
+    }
+
+
+  for (i in 1:length(Economies)){
+    if ((any(ModelType ==c("GVAR jointQ", "VAR jointQ","JLL original", "JLL NoDomUnit","JLL jointSigma")))
+        & i >1 ){break}
+
+    MaxEigen <- 1.1 # Initialization
+    while (MaxEigen > 1){ #Test whether the VAR is stationary (if not, drop the draw)
+
+      # Separately estimated models
+    if(any(ModelType == c("JPS original", "JPS global", "GVAR single"))){
+      RiskFactors <- ModelParaPE[[ModelType]][[Economies[i]]]$inputs$AllFactors
+      T <- ncol(RiskFactors)
+      K <- nrow(RiskFactors)
+      ZZ_row <- t(RiskFactors) # T x K
+      D0Z <- ModelParaPE[[ModelType]][[Economies[i]]]$ests$K0Z
+      D1Z <- ModelParaPE[[ModelType]][[Economies[i]]]$ests$K1Z
+      resids_BS <- ResampleResiduals_BS(residPdynOriginal[[Economies[i]]], residYieOriginal[[Economies[i]]],
+                                        InputsForOutputs, ModelType)
+    # Jointly estimated models
+    }else{
+      RiskFactors <- ModelParaPE[[ModelType]]$inputs$AllFactors
+      T <- ncol(RiskFactors)
+      K <- nrow(RiskFactors)
+      ZZ_row <- t(RiskFactors) # T x K
+      D0Z <- ModelParaPE[[ModelType]]$ests$K0Z
+      D1Z <- ModelParaPE[[ModelType]]$ests$K1Z
+      resids_BS <- ResampleResiduals_BS(residPdynOriginal, residYieOriginal, InputsForOutputs, ModelType)
+    }
+
+    ZZ_Boot <- matrix(NA, nrow= T - 1 + nlag, ncol = K)
+    dimnames(ZZ_Boot) <- list(rownames(ZZ_row), colnames(ZZ_row))
+
+    # 2)  Compute artificial time-series
+    # 2.1) initial values for the artificial data
+    LAG <- c()
+    for (jj in 1:nlag){
+      ZZ_Boot[jj,] <- ZZ_row[jj,]
+      LAG <- rbind(ZZ_Boot[jj,], LAG)
+    }
+    # Initialize the artificial series and the LAGplus vector
+    LAGplus <- LAG
+    LAGplus <- cbind(1, LAG)
+
+    # 2.2) generate artificial series
+    Ft <- rbind(t(D0Z), t(D1Z))
+    # From observation nlag+1 to nobs, compute the artificial data
+    for (jj in (nlag+1):(T-1+nlag)){
+      for (mm in 1:K){
+        # Compute the value for time=jj
+        ZZ_Boot[jj,mm] = LAGplus %*% as.matrix(Ft[,mm]) + resids_BS$residFact[jj-nlag,mm]
+      }
+      # now update the LAG matrix
+      if (jj<T-1+nlag){
+        LAG <- rbind(ZZ_Boot[jj, ], LAG[1,seqi(1,((nlag-1)*K)) ] )
+        LAGplus <- cbind(1, LAG)
+      }
+    }
+
+    # 3) Test whether the VAR is stationary (if not, drop the draw)
+    if (any(ModelType ==c("JPS multi", "GVAR multi", "JLL original", "JLL No DomUnit", "JLL joint Sigma"))){
+      K1Z_BS <- FeedbackMat_BS(ModelType, t(ZZ_Boot), FactorLabels, Economies, GVARlist, JLLlist, WishBRW, BRWlist)
+    }else{
+      RiskFact_Temp[[Economies[i]]] <- t(ZZ_Boot)
+      if (any(ModelType ==c("JPS original", "JPS global"))){Economies_temp <- Economies[i]
+      } else{ Economies_temp  <- Economies}
+      K1Z_BS <- FeedbackMat_BS(ModelType, RiskFact_Temp, FactorLabels, Economies_temp, GVARlist, JLLlist,
+                               WishBRW, BRWlist)
+    }
+
+    MaxEigen <- max(abs(eigen(K1Z_BS)$value))
+
+    }
+
+    # 4) Store outputs to export for sepQ models
+    if(any(ModelType == c("JPS original", "JPS global", "GVAR single"))){
+    ZZ_list[[Economies[i]]] <- ZZ_Boot
+    resid_list[[Economies[i]]] <- resids_BS
+    }
+
+  }
+
+  if(any(ModelType == c("JPS original", "JPS global", "GVAR single"))){
+    Out <- list(ZZ_BS= ZZ_list, resids_BS = resid_list)
+  }else{
+  Out <- list(ZZ_BS= ZZ_Boot, resids_BS = resids_BS)}
+
+  return(Out)
+}
+
+###################################################################################################################
+#'Generate artificial time-series in the bootstrap setup
+#'
+#'@param ModelParaPE list of point estimates of the model parameter
+#'@param residPdynOriginal Time-series of the residuals from the P-dynamics equation (T x F)
+#'@param residYieOriginal Time-series of the residuals from the observational equation (T x J or T x CJ)
+#'@param ModelType Desired model to be estimated
+#'@param BFull matrix B of loadings (CJ x F or J x F)
+#'@param InputsForOutputs list containing the desired inputs for the construction
+#'@param Economies string-vector containing the names of the economies which are part of the economic system
+#'@param FactorLabels string-list based which contains the labels of all the variables present in the model
+#'@param GVARlist list of necessary inputs for the estimation of GVAR-based models
+#'@param JLLlist list of necessary inputs for the estimation of JLL-based models
+#'@param WishBRW Whether the user wishes to estimate the physical parameter model with the Bias correction model from BRW (2012) (see "Bias_Correc_VAR" function).\cr
+#'              Default is set to 0.
+#'@param BRWlist list of necessary inputs for performing the bias-corrected estimation (see "Bias_Correc_VAR" function)
+#'@param nlag Number of lags in the P-dynamics. Default is set to 1.
+#'
+#'
+#'@keywords internal
+
+Gen_Artificial_Series <- function(ModelParaPE, residPdynOriginal, residYieOriginal, ModelType, BFull,
+                                  InputsForOutputs, Economies, FactorLabels, GVARlist, JLLlist, WishBRW, BRWlist,
+                                  nlag = 1){
+
+  # 1) Artificial time-series of the risk factors
+  BS_Set <- BuildRiskFactors_BS(ModelParaPE, residPdynOriginal, residYieOriginal, InputsForOutputs, Economies,
+                               ModelType, FactorLabels, GVARlist, JLLlist, WishBRW, BRWlist, nlag)
+
+  # Extract Unspanned factors from the full risk factor set
+  ZZ_BS <- BS_Set$ZZ_BS
+
+  if(any(ModelType == c("JPS original", "JPS global", "GVAR single"))){
+
+    G <- length(FactorLabels$Global)
+    N <- length(FactorLabels$Spanned)
+
+    UnspannedFactors_CS_BS <- function(Economy, G, N) {
+      AllFactors <- BS_Set$ZZ_BS[[Economy]]
+      AllFactors[ , (G + 1):(ncol(AllFactors) - N)]
+    }
+
+    DomesticMacro_BS <- do.call(cbind, lapply(Economies, UnspannedFactors_CS_BS, G, N))
+    GlobalMacro_BS <- do.call(cbind, lapply(Economies, function(country) ZZ_BS[[country]][ , seqi(1,G), drop = FALSE]))
+
+
+  }else{
+
+  Idxs <- Idx_UnspanFact(t(ZZ_BS), FactorLabels, Economies) # indexes of the variable of interest
+  GlobalMacro_BS <- ZZ_BS[ , Idxs$IdxGlobal, drop = FALSE]
+  DomesticMacro_BS <- ZZ_BS[ , Idxs$IdxunSpa, drop = FALSE]
+
+}
+  # 2) Artificial time-series of bond yields
+  Y_BS <- BuildYields_BS(ModelParaPE, ModelType, ZZ_BS, BFull, BS_Set, Economies)
+
+
+  return(list(ZZ_BS = ZZ_BS, GlobalMacro_BS = GlobalMacro_BS, DomesticMacro_BS = DomesticMacro_BS,
+              Y_BS= Y_BS))
+}
+#################################################################################################################
+#'Clean unnecessary outputs of JLL models in the bootstrap setup
+#'
+#'@param ModelBootstrap List of outputs to store bootstrap draws
+#'@param ndraws Total number of bootstrap draws
+#'@param ModelType A character vector indicating the model type to be estimated
+#'
+#'@keywords internal
+
+
+CleanOrthoJLL_Boot <- function(ModelBootstrap, ndraws, ModelType){
+  for (tt in 1:ndraws){
+    ModelBootstrap$NumOutDraws$IRF[[ModelType]][[tt]]$Yields$Ortho <- NULL
+    ModelBootstrap$NumOutDraws$FEVD[[ModelType]][[tt]]$Yields$Ortho <- NULL
+  }
+  ModelBootstrap$ConfBounds$IRF[[ModelType]]$Yields$Ortho <- NULL
+  ModelBootstrap$ConfBounds$FEVD[[ModelType]]$Yields$Ortho <- NULL
+  return(ModelBootstrap)
+}
+
+##############################################################################################################
+#'Compute the Feedback matrix of each bootstrap draw
+#'
+#'@param ModelType string-vector containing the label of the model to be estimated
+#'@param RiskFactors_TS Time-series of risk factors of the bootstrap (F x T)
+#'@param FactorLabels string-list based which contains the labels of all the variables present in the model
+#'@param Economies string-vector containing the names of the economies which are part of the economic system
+#'@param GVARlist list of necessary inputs for the estimation of GVAR-based models
+#'@param JLLlist list of necessary inputs for the estimation of JLL-based models
+#'@param WishBRW Whether the user wishes to estimate the physical parameter model with the Bias correction model from BRW (2012) (see "Bias_Correc_VAR" function).\cr
+#'              Default is set to 0.
+#'@param BRWlist list of necessary inputs for performing the bias-corrected estimation (see \code{\link{Bias_Correc_VAR}} function)
+#'
+#'@keywords internal
+
+FeedbackMat_BS <- function(ModelType, RiskFactors_TS, FactorLabels, Economies, GVARlist, JLLlist,
+                            WishBRW, BRWlist){
+
+    # Model-specific inputs
+    SpeInputs <- SpecificMLEInputs(ModelType, Economies, RiskFactors_TS, FactorLabels, GVARlist, JLLlist,
+                                   WishBRW, BRWlist)
+
+
+    if(WishBRW) SpeInputs$BRWinputs[c("checkBRW", "checkSigma")] <- 0
+
+    # 1) Two special cases
+    # a) JLL models without bias correction (avoid the unnecessary numerical optimization from the Sigma matrix)
+    if (any(ModelType == c("JLL original", "JLL No DomUnit", "JLL joint Sigma")) & !WishBRW){
+      SpeInputs$JLLinputs$WishSigmas <- 0
+      N <- length(FactorLabels$Spanned)
+      PdynPara <- JLL(RiskFactors_TS, N, SpeInputs$JLLinputs)
+      K1Z_BS <- PdynPara$k1
+
+    # b) GVAR single model and  bias correction
+      }else if(ModelType ==  "GVAR single" & WishBRW){
+      N <- length(FactorLabels$Spanned)
+      PdynPara <- Bias_Correc_VAR(ModelType, SpeInputs$BRWinputs, t(RiskFactors_TS[[1]]), N, Economies,
+                                  FactorLabels, SpeInputs$GVARinputs)
+
+      K1Z_BS <- PdynPara$Phi_tilde
+
+    }else{
+      # 2) All other specifications
+      PdynPara <- GetPdynPara(RiskFactors_TS, FactorLabels, Economies, ModelType, SpeInputs$BRWinputs,
+                            SpeInputs$GVARinputs, SpeInputs$JLLinputs)
+
+    if(any(ModelType %in% c("JPS original", "JPS global", "GVAR single"))){
+      K1Z_BS <- PdynPara[[Economies[1]]]$K1Z
+    }else{K1Z_BS <- PdynPara$K1Z}
+    }
+
+  return(K1Z_BS)
+}
+
+################################################################################################################
+#'Build the time-series of bond yields for each bootstrap draw
+#'
+#'@param ModelParaPE list of point estimates of the model parameter
+#'@param ModelType string-vector containing the label of the model to be estimated
+#'@param RiskFactors_BS Time-series of the risk factors (F x T)
+#'@param BFull B matrix of loadings
+#'@param BS_Set Set of bootstrap inputs
+#'@param Economies string-vector containing the names of the economies which are part of the economic system
+#'
+#'@keywords internal
+
+BuildYields_BS <- function(ModelParaPE, ModelType, RiskFactors_BS, BFull, BS_Set, Economies){
+
+
+  # Models estimated jointly
+  if(any(ModelType == c("JPS original", "JPS global", "GVAR single"))){
+    T <- nrow(RiskFactors_BS[[Economies[1]]])
+    TS_Labels <- rownames(RiskFactors_BS[[Economies[1]]])
+    Y_listBS <- list()
+
+    for (i in 1:length(Economies)){
+      YieldsLabels  <- rownames(ModelParaPE[[ModelType]][[Economies[i]]]$inputs$Y)
+
+      Y_CS <- matrix(NA, nrow= T  , ncol = length(YieldsLabels))
+      dimnames(Y_CS) <- list(TS_Labels, YieldsLabels)
+
+      A <- ModelParaPE[[ModelType]][[Economies[i]]]$rot$P$A
+      ZZ_BS <- RiskFactors_BS[[Economies[i]]]
+      Y_CS <-  BS_Set$resids_BS[[Economies[i]]]$residYields + matrix(A, nrow= T, ncol=length(YieldsLabels), byrow=T) + ZZ_BS%*%t(BFull[[Economies[i]]])
+      rownames(Y_CS) <-  TS_Labels
+
+      Y_listBS[[Economies[i]]] <- Y_CS
+    }
+
+    Y_BS <- do.call(cbind, lapply(1:length(Economies), function(i) {Y_listBS[[Economies[i]]]}))
+
+    # Models estimated separetely
+  }else{
+
+    T <- nrow(RiskFactors_BS)
+    TS_Labels <- rownames(RiskFactors_BS)
+    YieldsLabels  <- rownames(ModelParaPE[[ModelType]]$inputs$Y)
+
+    Y_BS <- matrix(NA, nrow= T  , ncol = length(YieldsLabels))
+    dimnames(Y_BS) <- list(TS_Labels, YieldsLabels)
+
+    A <- ModelParaPE[[ModelType]]$rot$P$A
+    Y_BS <-  BS_Set$resids_BS$residYields + matrix(A, nrow= T, ncol=length(YieldsLabels), byrow=T) + RiskFactors_BS%*%t(BFull)
+    rownames(Y_BS) <-  TS_Labels
+  }
+
+  return(Y_BS)
+}
+
+##############################################################################################################
+#'Gathers the estimate of the bootstrap draws
+#'
+#'@param ModelType string-vector containing the label of the model to be estimated
+#'@param ModelBootstrap List to store the bootstrap set
+#'@param Draw_Opt List of model estimated parameters
+#'@param Economies string-vector containing the names of the economies which are part of the economic system
+#'@param tt number of the bootstrap draw
+#'
+#'@keywords internal
+
+AdjustOptm_BS <- function(ModelType, ModelBootstrap, Draw_Opt, Economies, tt){
+  if (any(ModelType == c("JPS original", "JPS global", "GVAR single"))){
+
+    for (i in 1:length(Economies)){
+      ModelBootstrap$ParaDraws[[ModelType]][[Economies[i]]][[tt]] <- Draw_Opt[[ModelType]][[Economies[i]]]
+    }
+
+  }else{  ModelBootstrap$ParaDraws[[ModelType]][[tt]] <- Draw_Opt[[ModelType]]}
+
+  return(ModelBootstrap)
+}
+
+#############################################################################################################
+####################################################################################################
+#' Prepare the factor set for GVAR models  (Bootstrap version)
+#'
+#' @param ModelType string-vector containing the label of the model to be estimated
+#' @param RiskFactors Complete set of risk factors (KxT)
+#' @param Wgvar  transition matrix from GVAR models (CxC)
+#' @param Economies string-vector containing the names of the economies which are part of the economic system
+#' @param FactorLabels string-list based which contains the labels of all the variables present in the model
+#'
+#'@keywords internal
+
+
+DataSet_BS <- function(ModelType, RiskFactors, Wgvar, Economies, FactorLabels){
+
+
+  if (any(ModelType == c("GVAR single", "GVAR multi"))){
+
+    # 1) Pre-allocate list of factors
+    T <- ncol(RiskFactors) # length of model's time dimension
+    C <- length(Economies) # number of economies in of the economic system
+    N <- length(FactorLabels$Spanned) # number of countrey-specific spanned factors
+    M <- length(FactorLabels$Domestic) - N # Number of country-specific macro variables
+    M.star <- length(FactorLabels$Star) - N # Number of foreign-country-specific macro variables
+    G <- length(FactorLabels$Global) # Number of global variables
+
+    ListFactors <- vector(mode='list', length = length(Economies)+1) # length = all countries + global factors
+    names(ListFactors) <- c(Economies, 'Global')
+
+    # Country-specific factors (CSF)
+    CSF <- vector(mode='list', length = length(FactorLabels$Domestic))
+    names(CSF) <- FactorLabels$Domestic
+    for (i in 1:C){  ListFactors[[Economies[i]]] <- CSF }
+
+    #  Star factors (SF)
+    SF <- vector(mode='list', length = length(FactorLabels$Star))
+    names(SF) <- FactorLabels$Star
+    for (i in 1:length(Economies)){
+      ListFactors[[Economies[i]]] <- list(append(CSF,SF))
+      names(ListFactors[[Economies[i]]]) <- 'Factors'
+    }
+
+    # Global Factors (GF)
+    GF <- vector(mode='list', length = length(FactorLabels$Global))
+    names(GF) <- FactorLabels$Global
+    ListFactors[[ length(Economies)+1 ]] <- GF
+
+    # Yields
+    YieldsSeries <- vector(mode='list', length = C)
+    Wpca <- vector(mode='list', length = C)
+    names(Wpca) <- rep("Wpca", times=C)
+    YieldsList <- vector(mode='list', length = C)
+
+
+
+    # 2) Fill in list with the corresponding factors
+    # A) Country-specific variables (economy-related variables)
+
+    for (i in 1:C) {
+      for (j in 1:M){
+        ListFactors[[Economies[i]]]$Factors[[j]]<- as.matrix(RiskFactors[(c(FactorLabels$Tables[[Economies[i]]][j])),])
+      }
+    }
+
+    # B) Country-specific variables (pricing-related variables)
+    idx0 <- M
+    for (i in 1:C) {
+      for (j in 1:N){
+        ListFactors[[Economies[i]]]$Factors[[idx0+j]] <- as.matrix(RiskFactors[(c(FactorLabels$Tables[[Economies[i]]][idx0+j])),])
+      }
+    }
+
+    # C) Foreign country-specific variables (economy and pricing-related)
+    idx1 <- M+N
+    Z <- list()
+
+    for (j in 1:(M+N)){
+      X <- matrix(NA, nrow= C, ncol=T)
+      for (i in 1:C){
+        X[i,] <- ListFactors[[Economies[i]]]$Factors[[j]]
+        Z[[j]] <- X # Each element of the list contains the same country-specific variable of all countries
+      }
+    }
+    names(Z) <- FactorLabels$Domestic
+
+
+    # C.1) If star variables are computed with time-varying weigths
+    if (is.list(Wgvar)){
+      # Use only the transition matrices that are included in the sample span
+      t_First <- as.Date(colnames(RiskFactors)[1], format = "%d-%m-%Y")
+      t_Last <- as.Date(colnames(RiskFactors)[T], format = "%d-%m-%Y")
+
+      t_First_Wgvar <- format(t_First, "%Y")
+      t_Last_Wgvar <- format(t_Last, "%Y")
+
+      Wgvar_subset <- Wgvar[names(Wgvar) >= t_First_Wgvar & names(Wgvar) <= t_Last_Wgvar]
+
+      # Add common column label (i.e. the year of the observation) to all variables
+      Dates <- as.Date(colnames(RiskFactors), format = "%d-%m-%Y")
+      YearLabels <- substr(Dates, 1,4)
+      Z <- lapply(Z, function(x) {  colnames(x) <- paste0(YearLabels, seq_along(colnames(x)))
+      return(x)
+      })
+
+
+      # Compute the star variables with time-varying weigths
+      for (i in 1:C){
+        for (j in 1:(M+N)){
+
+          StarTimeVarTemp <- matrix(NA, nrow = T, ncol = 1)
+
+          for (k in 1:length(Wgvar_subset)) {
+            YearRef <- names(Wgvar_subset)[k] # year of reference
+            IdxYear <- grep(YearRef, colnames(Z[[j]]))
+            WgvarYear <- Wgvar_subset[[k]]
+            StarTimeVarTemp[IdxYear]  <- t(WgvarYear[i, ]%*% Z[[j]][, IdxYear])
+          }
+          # If the last year of the transition matrix happens earlier than the year of the last observation from the sample,
+          # then use the last transition matrix for the remaining observations
+          if (anyNA(StarTimeVarTemp)){
+            LenlastYear <- length(IdxYear)
+            IdxLastObs <- IdxYear[LenlastYear] + 1
+            StarTimeVarTemp[IdxLastObs:T]  <- t(WgvarYear[i, ]%*% Z[[j]][, (IdxLastObs):T])
+          }
+
+          ListFactors[[Economies[i]]]$Factors[[idx1+j]] <- StarTimeVarTemp
+        }
+      }
+
+      # c.2) If star variables are computed with time fixed weigths
+    }else{
+      if (any(ModelType == c("GVAR single", "GVAR multi"))){
+        for (i in 1:C){
+          for (j in 1:(M+N)){
+            ListFactors[[Economies[i]]]$Factors[[idx1+j]] <- t(Wgvar[i,]%*%Z[[j]])
+          }
+        }
+      }
+    }
+    # D) Global Factors
+    for (i in seqi(1,G)){
+      ListFactors[[length(Economies)+1]][[i]] <-as.matrix( RiskFactors[(c(FactorLabels$Global[i])),])
+    }
+
+  } else{
+    ListFactors <- NULL
+  }
+
+
+  return(ListFactors)
+}

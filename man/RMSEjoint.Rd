@@ -7,7 +7,7 @@
 RMSEjoint(ForecastOutputs)
 }
 \arguments{
-\item{ForecastOutputs}{List of country-specific forecasts (see "ForecastYieldsjointQ" function)}
+\item{ForecastOutputs}{List of country-specific forecasts}
 }
 \description{
 Compute the root mean square error ("joint Q" models)

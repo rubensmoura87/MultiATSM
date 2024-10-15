@@ -2,16 +2,16 @@
 % Please edit documentation in R/Folder_Creation.R
 \name{FolderCreationPoint}
 \alias{FolderCreationPoint}
-\title{Creates the folders and the path in which the graphical outputs are stored (ponit estimate version)}
+\title{Creates the folders and the path in which the graphical outputs are stored (point estimate version)}
 \usage{
 FolderCreationPoint(ModelType, Economies)
 }
 \arguments{
-\item{ModelType}{a string-vector containing the label of the model to be estimated}
+\item{ModelType}{A character vector indicating the model type to be estimated.}
 
-\item{Economies}{a string-vector containing the names of the economies which are part of the economic system}
+\item{Economies}{A character vector containing the names of the economies included in the system.}
 }
 \description{
-Creates the folders and the path in which the graphical outputs are stored (ponit estimate version)
+Creates the folders and the path in which the graphical outputs are stored (point estimate version)
 }
 \keyword{internal}

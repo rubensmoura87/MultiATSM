@@ -8,25 +8,15 @@
 #'@param type     'Jordan' -> K1Q will be of the Jordan type \cr
 #                 'NULL' --> no adjustment will be made
 #'
-#'@importFrom pracma mldivide
 #'
 #'@return Risk neutral feedback matrix K1Q.
-#'@examples
-#'data(CM_Yields)
-#'
-#' Y_China <- Yields[1:6,]
-#' Z_China <- Spanned_Factors(Y_China, Economies ="China", N=3)
-#' mat <-c(0.25 , 0.5 , 1, 3, 5, 10)
-#' dt <- 1/12
-#'type <- 'Jordan'
-#'Reg_K1Q(Y_China, mat, Z_China, dt, type)
 #'@references
-#' This function is based on the "Reg_K1Q" function by Le and Singleton (2018). \cr
+#' This function is modified version of the "Reg_K1Q" function by Le and Singleton (2018). \cr
 #'  "A Small Package of Matlab Routines for the Estimation of Some Term Structure Models." \cr
 #'  (Euro Area Business Cycle Network Training School - Term Structure Modelling).
 #'  Available at: https://cepr.org/40029
 #'
-#'@export
+#'@keywords internal
 
 
 
@@ -37,11 +27,25 @@ Reg_K1Q <- function(Y, mat, Z, dt,type){
   m <- round(min(mat)/dt) # shortest maturity adjusted for the time units of the model
 
   # Step 2: Interpolate yields by spline. Interpolation is made for each time unit of the model.
+  # Define target maturities
+  target_maturities <- seq(dt, M * dt, by = dt)
   b <- matrix(data=NA, ncol= ncol(Y) , nrow = M )
 
-  for(i in 1:ncol(Y)){
-    a <- stats::splinefun(mat, t(Y[,i]), method="fmm")
-    b[,i] <- t(a(seq(dt, M*dt, dt))) # each column contains one term structure in each point in time
+  # Interpolate using splinefun for each column
+  for (i in seq_len(ncol(Y))) {
+    spline_func <- tryCatch({
+      stats::splinefun(mat, Y[, i], method = "fmm")
+    }, error = function(e) {
+      stop(sprintf("Error: Spline interpolation failed for column %d: %s", i, e$message))
+    })
+
+    interpolated_values <- spline_func(target_maturities)
+
+    if (any(is.na(interpolated_values))) {
+      warning(sprintf("Warning: NA values encountered during interpolation for column %d.", i))
+    }
+
+    b[, i] <- interpolated_values
   }
 
   R <- b
@@ -62,14 +66,13 @@ Reg_K1Q <- function(Y, mat, Z, dt,type){
   }
   LHS <- Bn[n,] - d
 
-
   # Step 6: Construct the RHS from some equation
   RHS <- matrix(data=NA, ncol= ncol(Bn), nrow=nrow(n) )
   for (j in 1:ncol(Bn)){
     RHS[,j] <- (1-h/n)*Bn[n-h,j]
   }
 
-  K1Qh <- mldivide(RHS,LHS)
+  K1Qh <- qr.solve(RHS, LHS)
 
   # Get K^(1/h)
   eigendecomp <- eigen(K1Qh)
@@ -80,26 +83,28 @@ Reg_K1Q <- function(Y, mat, Z, dt,type){
 
   # Take the power of the absolute values of the eigenvalues
   powered_eigenvalues <- Mod(eigenvalues)^(1/h) * exp(1i * Arg(eigenvalues)/h)
+  if (ncol(Bn)==1){powered_eigenvalues <- matrix(powered_eigenvalues)} # useful for the case of one spanned factor
 
   # Construct K^(1/h)
   K1Q <- Re(eigenvectors %*% diag(powered_eigenvalues) %*% solve(eigendecomp$vectors))
+  # Check numerical issues in final matrix
+  if (any(is.nan(K1Q)) || any(is.infinite(K1Q))) {
+    stop("Numerical instability detected in the K1Q matrix")
+  }
+
 
   #Step 7: Convert  K1Q into Jordan form
-  if (type == "Jordan"){
-    K1Q <- Convert2JordanForm(K1Q)
-  }
-  return(K1Q)
+  if (type == "Jordan"){K1Q <- Convert2JordanForm(K1Q)  }
 
+    return(K1Q)
 }
-
-
 
 ################################################################################################
 #' Convert a generic matrix to its Jordan form
 #
 #'@param K1XQ  squared matrix in non-Jordan form
 #'
-#'@importFrom pracma numel zeros eye
+#'@importFrom pracma numel
 #'@importFrom  wrapr seqi
 #'
 #'@return squared matrix in Jordam form
@@ -119,10 +124,10 @@ Reg_K1Q <- function(Y, mat, Z, dt,type){
 Convert2JordanForm <- function(K1XQ) {
 
 
-  x <- t(eigen(K1XQ)$values) # Extract the eignevalues of matrix K1XQ.
+  x <- t(eigen(K1XQ)$values) # Extract the eigenvalues of matrix K1XQ.
 
   idx <- numeric(length(x))
-  for (j in 1:length(x)){ # Exclude eignenvalues with imaginary values
+  for (j in 1:length(x)){ # Exclude eigenvalues with imaginary values
     if (Im(x[j])==0){
       idx [j] <- 1
     } else{
@@ -145,13 +150,13 @@ Convert2JordanForm <- function(K1XQ) {
   }
 
 
-  imagx <- t(x[Im(x)!=0]) # Select only the eignenvalues with imaginary values
+  imagx <- t(x[Im(x)!=0]) # Select only the eigenvalues with imaginary values
   for (h in seqi(1,numel(imagx)/2)){
     lQ <- rbind(lQ, Re(imagx[2*h-1]), -abs(Im(imagx[2*h-1]))^2)
   }
 
   N <- numel(lQ)
-  K1Q <- rbind(zeros(1,N), eye(N-1,N))
+  if (N==1){ K1Q <- 0  }else{ K1Q <- rbind(rep(0, N), diag(1, N - 1, N))  }
   i0 <- 0
 
   if (N%%2!=0){
@@ -160,14 +165,13 @@ Convert2JordanForm <- function(K1XQ) {
     i0 <- 1
   }
 
-
+if (N > 1){
   for (h in seqi(1,numel(lQ)/2)){
     K1Q[i0+2*h-1,i0+2*h-1] <- lQ[2*h-1]
     K1Q[i0+2*h,i0+2*h] <- lQ[2*h-1]
     K1Q[i0+2*h-1,i0+2*h] <- lQ[2*h]
   }
-
+}
 
   return(K1Q)
 }
-

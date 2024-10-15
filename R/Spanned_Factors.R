@@ -1,18 +1,17 @@
-#' Compute the country-specific spanned factors
+#' Computes the country-specific spanned factors
 #
-#'@param Yields     matrix  (J x T), where  J - the number of maturities and  T - time series length
-#'@param Economies  C-dimensional string-vector containing the names of the economies which are part of the economic system
-#'@param N     scalar:  desired number of spanned factors (maximum number allowed is N= J)
+#'@param Yields     matrix  (J x T), where J is the number of maturities and T is the length of the time series.
+#'@param Economies  A character vector containing the names of the economies included in the system.
+#'@param N     Scalar representing the desired number of country-specific spanned factors (maximum allowed is N = J).
 #'
 #'@return Matrix containing the N spanned for all the countries of the system  (CJ xT)
 #'@examples
 #' data(CM_Yields)
 #'Economies <- c("China", "Brazil", "Mexico", "Uruguay")
 #'N <- 3
-#'Spanned_Factors(Yields, Economies, N)
+#'SpaFact_TS <- Spanned_Factors(Yields, Economies, N)
 #'
 #'@export
-
 
 
 Spanned_Factors <- function(Yields, Economies, N){
@@ -30,6 +29,7 @@ Spanned_Factors <- function(Yields, Economies, N){
     Idx <- grepl(Economies[i], rownames(Yields)) # Extract the yields of a single country
     Y_CS <- Yields[Idx,] # Country-specific yields
     W <- pca_weights_one_country(Y_CS, Economies[i]) # Weight matrix
+    if(N > nrow(Y_CS)){stop("The Number of country-specific spanned factors cannot exceed the number of country-specific bond yields.")}
     W <- W[1:N,]*100 # Select only the set of weights that will be used to compute the first N PCs
     if (i == 1){
       P <- W%*%Y_CS # Country-specific spanned factor
@@ -40,6 +40,7 @@ Spanned_Factors <- function(Yields, Economies, N){
     P <- rbind(P, Ptemp)
   }
   }
+
 
   return(P)
 }

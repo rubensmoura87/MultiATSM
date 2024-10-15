@@ -1,24 +1,24 @@
 #' Generates the labels factors
 #'
-#'@param N number of spanned factors per country (scalar)
-#'@param DomVar character-vector containing the names of the domestic variables
-#'@param GlobalVar character-vector containing the names of the global variables
-#'@param Economies string-vector containing the names of the economies which are part of the economic system
-#'@param ModelType string-vector containing the label of the model to be estimated
+#'@param N Integer. Number of country-specific spanned factors.
+#'@param DomVar A character vector containing the names of the domestic variables.
+#'@param GlobalVar A character vector containing the names of the global variables.
+#'@param Economies A character vector containing the names of the economies included in the system.
+#'@param ModelType A character vector indicating the model type to be estimated.
 #'
 #'
 #'@examples
 #'N <- 2
-#'DomVar <- c("inflation", "Economic growth")
+#'DomVar <- c("inflation", "Output gap")
 #'GlobalVar <- "Commodity Prices"
 #'Economies <- c("U.S.", "Canada", "Germany", "Japan")
-#'ModelType <- "JPS"
+#'ModelType <- "JPS original"
 #'
 #'VarLabels <- LabFac(N, DomVar, GlobalVar, Economies, ModelType)
 #'
 #'
 #'@returns
-#' List containing the country-specific risk factor labels
+#' List containing the risk factor labels
 #'
 #'@export
 
@@ -42,7 +42,7 @@ LabFac <- function(N, DomVar, GlobalVar, Economies, ModelType){
     for (j in 1:(N+M)){
       count1 <- count0 + j
       labelsDomVar[count1] <- paste(FactorLabels$Domestic[j], Economies[i])
-      if (any(ModelType == c("JLL original","JLL NoDomUnit", "JLL jointSigma"))){
+      if (any(ModelType == c("JLL original","JLL No DomUnit", "JLL joint Sigma"))){
         labelsDomVarJLL[count1] <- paste(FactorLabels$Domestic[j], Economies[i], "JLL")
       }
     }
@@ -55,7 +55,7 @@ LabFac <- function(N, DomVar, GlobalVar, Economies, ModelType){
   for (a in 1:C){
     idx1 <- idx0 + N + M
     FactorLabels$Tables$AllCountries[(idx0+1):idx1] <- do.call(cbind,lapply(FactorLabels$Tables[[Economies[a]]],matrix,nrow=1))
-    if (any(ModelType == c("JLL original", "JLL NoDomUnit", "JLL jointSigma"))){
+    if (any(ModelType == c("JLL original", "JLL No DomUnit", "JLL joint Sigma"))){
       FactorLabels$Tables$AllCountriesJLL[(idx0+1):idx1] <- do.call(cbind,lapply(FactorLabels$TablesJLL[[Economies[a]]],matrix,nrow=1))
     }
     idx0 <- idx1
@@ -80,6 +80,9 @@ LabFac <- function(N, DomVar, GlobalVar, Economies, ModelType){
 LabelsSpanned <-function(N){
 
   # Goal: assign the labels of the spanned factors depending on the number of spanned factors
+  if (!(N %in% 1:8)){
+    stop("N, the number of country-specific spanned factors, must be an integer between 1 and 8.")
+  }
 
   LabelsSpannedALL <- c("Level", "Slope", "Curvature", "Fourth PC", "Fifth PC", "Sixth PC", "Seventh PC", "Eighth PC")
 

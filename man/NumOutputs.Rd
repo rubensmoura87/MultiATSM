@@ -2,21 +2,20 @@
 % Please edit documentation in R/NumOutputs.R
 \name{NumOutputs}
 \alias{NumOutputs}
-\title{Construct the model numerical outputs (model fit, IRFs, GIRFs, FEVDs, GFEVDs, and risk premia decomposition)}
+\title{Constructs the model numerical outputs (model fit, IRFs, GIRFs, FEVDs, GFEVDs, and risk premia decomposition)}
 \usage{
 NumOutputs(ModelType, ModelPara, InputsForOutputs, FactorLabels, Economies)
 }
 \arguments{
-\item{ModelType}{a string-vector containing the label of the model to be estimated}
+\item{ModelType}{A character vector indicating the model type to be estimated.}
 
-\item{ModelPara}{List of model parameter estimates (See the "Optimization" function)}
+\item{ModelPara}{A list containing the point estimates of the model parameters. For details, refer to the outputs from the \code{\link{Optimization}} function.}
 
-\item{InputsForOutputs}{list conataining the desired horizon of analysis for the model fit, IRFs, GIRFs, FEVDs, GFEVDs
-and risk premia decomposition}
+\item{InputsForOutputs}{A list containing the necessary inputs for generating IRFs, GIRFs, FEVDs, GFEVDs and Term Premia.}
 
-\item{FactorLabels}{a string-list based which contains all the labels of all the variables present in the model}
+\item{FactorLabels}{A list of character vectors with labels for all variables in the model.}
 
-\item{Economies}{a string-vector containing the names of the economies which are part of the economic system}
+\item{Economies}{A character vector containing the names of the economies included in the system.}
 }
 \value{
 List of the model numerical outputs, namely
@@ -26,14 +25,20 @@ List of the model numerical outputs, namely
 \item FEVDs
 \item GIRFs
 \item GFEVDs
-\item Risk premia decomposition
+\item Bond yield decomposition
 }
 }
 \description{
-Construct the model numerical outputs (model fit, IRFs, GIRFs, FEVDs, GFEVDs, and risk premia decomposition)
+Constructs the model numerical outputs (model fit, IRFs, GIRFs, FEVDs, GFEVDs, and risk premia decomposition)
+}
+\details{
+Both IRFs and FEVDs are computed using the Cholesky decomposition method. The risk factors are ordered as follows: (i) global unspanned factors, and (ii) domestic unspanned and spanned factors for each country. The order of countries follows the sequence defined in the \code{Economies} vector.
 }
 \examples{
-# See examples in the vignette file of this package (Section 4).
+# See an example of implementation in the vignette file of this package (Section 4).
 
 
+}
+\references{
+Pesaran, H. Hashem, and Shin, Yongcheol. "Generalized impulse response analysis in linear multivariate models." Economics letters 58.1 (1998): 17-29.
 }

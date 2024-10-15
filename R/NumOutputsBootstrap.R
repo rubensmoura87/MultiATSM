@@ -1,10 +1,10 @@
 #' Numerical outputs (IRFs, GIRFs, FEVD, and GFEVD) for bootstrap
 #'
-#'@param ModelType string-vector containing the label of the model to be estimated
-#'@param ModelParaBoot list of model parameter estimates (see the "Optimization" function) after a bootstrap draw
-#'@param InputsForOutputs list conataining the desired inputs for the construction of the model fit, IRFs, GIRFs, FEVDs, and GFEVDs
-#'@param FactorLabels string-list based which contains all the labels of all the variables present in the model
-#'@param Economies  string-vector containing the names of the economies which are part of the economic system
+#'@param ModelType A character vector indicating the model type to be estimated.
+#'@param ModelParaBoot A list of model parameter estimates (see the "Optimization" function) after a bootstrap draw
+#'@param InputsForOutputs A list containing the necessary inputs for generating IRFs, GIRFs, FEVDs, GFEVDs and Term Premia.
+#'@param FactorLabels  A list of character vectors with labels for all variables in the model.
+#'@param Economies  A character vector containing the names of the economies included in the system.
 #'
 #'@keywords internal
 
@@ -16,12 +16,10 @@ NumOutputs_Bootstrap <- function(ModelType, ModelParaBoot, InputsForOutputs, Fac
 
 
   # If one chooseS models in which the estimation is done country-by-country
-  if ( any(ModelType == c("JPS" , "JPS jointP" ,"GVAR sepQ" ))){
+  if ( any(ModelType == c("JPS original" , "JPS global", "GVAR single"))){
     NumOutSep <- OutputConstructionSep_BS(ModelType, ModelParaBoot, InputsForOutputs, FactorLabels, Economies)
-  }
-
+  } else{
   # If one chooseS models in which the estimation is done jointly for all countries
-  if (any(ModelType == c("GVAR jointQ", "VAR jointQ", "JLL original", "JLL NoDomUnit", "JLL jointSigma"))){
     NumOutJoint <- OutputConstructionJoint_BS(ModelType, ModelParaBoot, InputsForOutputs, FactorLabels, Economies)
   }
 
@@ -37,9 +35,6 @@ NumOutputs_Bootstrap <- function(ModelType, ModelParaBoot, InputsForOutputs, Fac
 
   return(AllNumOutputs)
 }
-
-
-
 
 
 ######################################################################################################
@@ -72,8 +67,7 @@ OutputConstructionSep_BS <- function(ModelType, ModelParaBoot, InputsForOutputs,
   GIRFoutputs <- GIRFSep_BS(ModelType, ModelParaBoot, InputsForOutputs[[ModelType]]$GIRF$horiz, FactorLabels, Economies)
   GFEVDoutputs <- GFEVDsep_BS(ModelType, ModelParaBoot, InputsForOutputs[[ModelType]]$GFEVD$horiz, FactorLabels, Economies)
 
-  NumericalOutputs <- list(IRFoutputs, FEVDoutputs , GIRFoutputs, GFEVDoutputs)
-  names(NumericalOutputs) <- c("IRF" ,"FEVD" , "GIRF", "GFEVD")
+  NumericalOutputs <- list(IRF = IRFoutputs, FEVD = FEVDoutputs, GIRF = GIRFoutputs, GFEVD = GFEVDoutputs)
 
   return(NumericalOutputs)
 
@@ -98,8 +92,8 @@ OutputConstructionSep_BS <- function(ModelType, ModelParaBoot, InputsForOutputs,
 
 IRFsep_BS <- function(ModelType, ModelParaBoot, IRFhoriz, FactorLabels, Economies){
 
-  ModelTypeSet <- c("JPS", "JPS jointP", "GVAR sepQ", "VAR jointQ" , "GVAR jointQ",
-                    "JLL original", "JLL NoDomUnit", "JLL jointSigma")
+  ModelTypeSet <- c("JPS original", "JPS global", "GVAR single", "JPS multi", "GVAR multi", "JLL original",
+                    "JLL No DomUnit", "JLL joint Sigma")
   idxWishModels <- which(ModelTypeSet == ModelType)
 
   C <- length(Economies)
@@ -117,7 +111,7 @@ IRFsep_BS <- function(ModelType, ModelParaBoot, IRFhoriz, FactorLabels, Economie
   IRFoutputs <- list()
 
 
-  idxIndividual <- idxWishModels[ idxWishModels <= which(ModelTypeSet== "GVAR sepQ")] # Exclude all models in which the estimation is made jointly
+  idxIndividual <- idxWishModels[ idxWishModels <= which(ModelTypeSet== "GVAR single")] # Exclude all models in which the estimation is made jointly
 
   for(j in idxIndividual){
     for (i in 1:C){
@@ -127,8 +121,8 @@ IRFsep_BS <- function(ModelType, ModelParaBoot, IRFhoriz, FactorLabels, Economie
 
 
         # Generate factor labels depending on the models to be estimated
-        if ( ModelTypeSet[j] == "JPS") {AllFactorsLabels <- c(FactorLabels$Global, FactorLabels$Tables[[Economies[i]]])}
-        if ( ModelTypeSet[j] != "JPS") {AllFactorsLabels <-  c(FactorLabels$Global, FactorLabels$Tables$AllCountries) }
+        if ( ModelTypeSet[j] == "JPS original") {AllFactorsLabels <- c(FactorLabels$Global, FactorLabels$Tables[[Economies[i]]])}
+        if ( ModelTypeSet[j] != "JPS original") {AllFactorsLabels <-  c(FactorLabels$Global, FactorLabels$Tables$AllCountries) }
 
         # Summarize inputs for the IRFs
         SIGMA <- ModelParaBoot$ParaDraws[[ModelTypeSet[j]]][[Economies[i]]][[tt]]$ests$SSZ # KxK (variance-covariance matrix)
@@ -164,7 +158,7 @@ IRFsep_BS <- function(ModelType, ModelParaBoot, IRFhoriz, FactorLabels, Economie
         dimnames(IRFRiskFactors)[[3]] <- AllFactorsLabels
 
 
-        YieldsLabel <- rownames(ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[Economies[i]]][[tt]]$rot$P$A)
+        YieldsLabel <- rownames(ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[Economies[i]]][[tt]]$inputs$Y)
         dimnames(IRFYields)[[1]] <- Horiz
         dimnames(IRFYields)[[2]] <- YieldsLabel
         dimnames(IRFYields)[[3]] <- AllFactorsLabels
@@ -211,8 +205,8 @@ IRFsep_BS <- function(ModelType, ModelParaBoot, IRFhoriz, FactorLabels, Economie
 FEVDsep_BS <- function(ModelType, ModelParaBoot, FEVDhoriz, FactorLabels, Economies){
 
 
-  ModelTypeSet <- c("JPS", "JPS jointP", "GVAR sepQ", "VAR jointQ" , "GVAR jointQ",
-                    "JLL original", "JLL NoDomUnit", "JLL jointSigma")
+  ModelTypeSet <- c("JPS original", "JPS global", "GVAR single", "JPS multi", "GVAR multi", "JLL original",
+                    "JLL No DomUnit", "JLL joint Sigma")
   idxWishModels <- which(ModelTypeSet == ModelType)
 
   C <- length(Economies)
@@ -222,7 +216,7 @@ FEVDsep_BS <- function(ModelType, ModelParaBoot, FEVDhoriz, FactorLabels, Econom
   J <- numel(ModelParaBoot$GeneralInputs$mat)
   ndraws <- length(ModelParaBoot$ParaDraws[[ModelType]][[1]])
 
-  idxIndividual <- idxWishModels[ idxWishModels <= which(ModelTypeSet== "GVAR sepQ")] # Exclude all models in which the estimation is made jointly.
+  idxIndividual <- idxWishModels[ idxWishModels <= which(ModelTypeSet== "GVAR single")] # Exclude all models in which the estimation is made jointly.
 
   FEVDoutputsCS <- list()
   FEVDoutputsAllCountries <- list()
@@ -301,10 +295,10 @@ FEVDsep_BS <- function(ModelType, ModelParaBoot, FEVDhoriz, FactorLabels, Econom
         FEVDYields <- aperm(FEVDresYields, c(3, 2, 1))
 
         # 4) Prepare labels
-        if ( ModelTypeSet[j] == "JPS") {AllFactorsLabels <- c(FactorLabels$Global, FactorLabels$Tables[[Economies[i]]])}
-        if ( ModelTypeSet[j] != "JPS") {AllFactorsLabels <-  c(FactorLabels$Global, FactorLabels$Tables$AllCountries) }
+        if ( ModelTypeSet[j] == "JPS original") {AllFactorsLabels <- c(FactorLabels$Global, FactorLabels$Tables[[Economies[i]]])}
+        if ( ModelTypeSet[j] != "JPS original") {AllFactorsLabels <-  c(FactorLabels$Global, FactorLabels$Tables$AllCountries) }
 
-        YieldsLabel<- rownames(ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[Economies[i]]][[tt]]$rot$P$A)
+        YieldsLabel<- rownames(ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[Economies[i]]][[tt]]$inputs$Y)
 
         dimnames(FEVDFactors)[[1]] <- 1:(FEVDhoriz)
         dimnames(FEVDFactors)[[2]] <- AllFactorsLabels
@@ -362,8 +356,8 @@ FEVDsep_BS <- function(ModelType, ModelParaBoot, FEVDhoriz, FactorLabels, Econom
 
 GIRFSep_BS <- function(ModelType, ModelParaBoot, GIRFhoriz, FactorLabels, Economies){
 
-  ModelTypeSet <- c("JPS", "JPS jointP", "GVAR sepQ", "VAR jointQ" , "GVAR jointQ",
-                    "JLL original", "JLL NoDomUnit", "JLL jointSigma")
+  ModelTypeSet <- c("JPS original", "JPS global", "GVAR single", "JPS multi", "GVAR multi", "JLL original",
+                    "JLL No DomUnit", "JLL joint Sigma")
   idxWishModels <- which(ModelTypeSet == ModelType)
 
   N <- length(FactorLabels$Spanned)
@@ -373,7 +367,7 @@ GIRFSep_BS <- function(ModelType, ModelParaBoot, GIRFhoriz, FactorLabels, Econom
   J <- numel(ModelParaBoot$GeneralInputs$mat)
   ndraws <- length(ModelParaBoot$ParaDraws[[ModelType]][[1]])
 
-  idxIndividual <- idxWishModels[ idxWishModels <= which(ModelTypeSet== "GVAR sepQ")] # Exclude all models in which the estimation is made jointly
+  idxIndividual <- idxWishModels[ idxWishModels <= which(ModelTypeSet== "GVAR single")] # Exclude all models in which the estimation is made jointly
 
   GIRFoutputsCS <- list()
   GIRFoutputsAllCountries <- list()
@@ -433,8 +427,8 @@ GIRFSep_BS <- function(ModelType, ModelParaBoot, GIRFhoriz, FactorLabels, Econom
         GIRFYields<- aperm(AllResponsesToAllShocksYields, c(2,1,3))
 
         # 4) Prepare labels for the output
-        if(ModelTypeSet[j] == "JPS" ){  labelsGIRF <- c(FactorLabels$Global,FactorLabels$Tables[[Economies[i]]]) }
-        if(ModelTypeSet[j] == "JPS jointP" || ModelTypeSet[j] == "GVAR sepQ" ){  labelsGIRF <- c(FactorLabels$Global,FactorLabels$Tables$AllCountries) }
+        if(ModelTypeSet[j] == "JPS original" ){  labelsGIRF <- c(FactorLabels$Global,FactorLabels$Tables[[Economies[i]]]) }
+        if(ModelTypeSet[j] == "JPS global" || ModelTypeSet[j] == "GVAR single" ){  labelsGIRF <- c(FactorLabels$Global,FactorLabels$Tables$AllCountries) }
 
         # 4.1) Labels
         Horiz <- t(t(0:(GIRFhoriz-1))) # horizon of interest
@@ -443,7 +437,7 @@ GIRFSep_BS <- function(ModelType, ModelParaBoot, GIRFhoriz, FactorLabels, Econom
         dimnames(GIRFFactors)[[2]] <- labelsGIRF
         dimnames(GIRFFactors)[[3]] <- labelsGIRF
 
-        YieldsLabel<- rownames(ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[Economies[i]]][[tt]]$rot$P$A)
+        YieldsLabel<- rownames(ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[Economies[i]]][[tt]]$inputs$Y)
         dimnames(GIRFYields)[[1]] <- Horiz # We subtract 1, because the first element is the contemporaneous one
         dimnames(GIRFYields)[[2]] <- YieldsLabel
         dimnames(GIRFYields)[[3]] <- labelsGIRF
@@ -492,8 +486,8 @@ GIRFSep_BS <- function(ModelType, ModelParaBoot, GIRFhoriz, FactorLabels, Econom
 
 GFEVDsep_BS <- function(ModelType, ModelParaBoot, GFEVDhoriz, FactorLabels, Economies){
 
-  ModelTypeSet <- c("JPS", "JPS jointP", "GVAR sepQ", "VAR jointQ" , "GVAR jointQ",
-                    "JLL original", "JLL NoDomUnit", "JLL jointSigma")
+  ModelTypeSet <- c("JPS original", "JPS global", "GVAR single", "JPS multi", "GVAR multi", "JLL original",
+                    "JLL No DomUnit", "JLL joint Sigma")
   idxWishModels <- which(ModelTypeSet == ModelType)
 
   C <- length(Economies)
@@ -503,7 +497,7 @@ GFEVDsep_BS <- function(ModelType, ModelParaBoot, GFEVDhoriz, FactorLabels, Econ
   J <- length(ModelParaBoot$GeneralInputs$mat)
   ndraws <- length(ModelParaBoot$ParaDraws[[ModelType]][[1]])
 
-  idxIndividual <- idxWishModels[ idxWishModels <= which(ModelTypeSet== "GVAR sepQ")] # Exclude all models in which the estimation is made jointly.
+  idxIndividual <- idxWishModels[ idxWishModels <= which(ModelTypeSet== "GVAR single")] # Exclude all models in which the estimation is made jointly.
 
   GFEVDoutputsCS <- list()
   GFEVDoutputsAllCountires <- list()
@@ -613,10 +607,10 @@ GFEVDsep_BS <- function(ModelType, ModelParaBoot, GFEVDhoriz, FactorLabels, Econ
 
 
         # 4) Adjust labels:
-        if ( ModelTypeSet[j] == "JPS") {AllFactorsLabels <- c(FactorLabels$Global, FactorLabels$Tables[[Economies[i]]])}
-        if ( ModelTypeSet[j] != "JPS") {AllFactorsLabels <-  c(FactorLabels$Global, FactorLabels$Tables$AllCountries) }
+        if ( ModelTypeSet[j] == "JPS original") {AllFactorsLabels <- c(FactorLabels$Global, FactorLabels$Tables[[Economies[i]]])}
+        if ( ModelTypeSet[j] != "JPS original") {AllFactorsLabels <-  c(FactorLabels$Global, FactorLabels$Tables$AllCountries) }
 
-        YieldsLabel<- rownames(ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[Economies[i]]][[tt]]$rot$P$A)
+        YieldsLabel<- rownames(ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[Economies[i]]][[tt]]$inputs$Y)
 
         dimnames(GFEVDFactorsNormalized)[[1]] <- 1:(GFEVDhoriz)
         dimnames(GFEVDFactorsNormalized)[[2]] <- AllFactorsLabels
@@ -666,8 +660,8 @@ GFEVDsep_BS <- function(ModelType, ModelParaBoot, GFEVDhoriz, FactorLabels, Econ
 
 OutputConstructionJoint_BS <- function(ModelType, ModelParaBoot, InputsForOutputs, FactorLabels, Economies){
 
-  ModelTypeSet <- c("JPS", "JPS jointP", "GVAR sepQ", "VAR jointQ" , "GVAR jointQ",
-                    "JLL original", "JLL NoDomUnit", "JLL jointSigma")
+  ModelTypeSet <- c("JPS original", "JPS global", "GVAR single", "JPS multi", "GVAR multi", "JLL original",
+                    "JLL No DomUnit", "JLL joint Sigma")
   idxWishModels <- which(ModelTypeSet == ModelType)
   ndraws <- length(ModelParaBoot$ParaDraws[[ModelType]])
 
@@ -685,7 +679,7 @@ OutputConstructionJoint_BS <- function(ModelType, ModelParaBoot, InputsForOutput
                                 FactorLabels, Economies)
 
   # FOR JLL models: Non-orthogonalized IRFs
-  if (any(ModelType == c("JLL original", "JLL NoDomUnit", "JLL jointSigma"))){
+  if (any(ModelType == c("JLL original", "JLL No DomUnit", "JLL joint Sigma"))){
 
     # Generate the outputs with orthogonalized factros:
     IRFOrtho<- IRFjointOrthoJLL_BS(ModelType, ModelParaBoot, InputsForOutputs[[ModelType]]$IRF$horiz,
@@ -698,7 +692,7 @@ OutputConstructionJoint_BS <- function(ModelType, ModelParaBoot, InputsForOutput
                                         FactorLabels, Economies)
 
 
-    jointModelIdx <- idxWishModels[idxWishModels > which(ModelTypeSet == "GVAR jointQ") ]
+    jointModelIdx <- idxWishModels[idxWishModels > which(ModelTypeSet == "GVAR multi") ]
 
     for (j in jointModelIdx){
       # Merge the lists of orthogonalized and non-orthogonalized factors
@@ -758,8 +752,8 @@ OutputConstructionJoint_BS <- function(ModelType, ModelParaBoot, InputsForOutput
 
 IRFjoint_BS <- function(ModelType, ModelParaBoot, IRFhoriz, FactorLabels, Economies){
 
-  ModelTypeSet <- c("JPS", "JPS jointP", "GVAR sepQ", "VAR jointQ" , "GVAR jointQ",
-                    "JLL original", "JLL NoDomUnit", "JLL jointSigma")
+  ModelTypeSet <- c("JPS original", "JPS global", "GVAR single", "JPS multi", "GVAR multi", "JLL original",
+                    "JLL No DomUnit", "JLL joint Sigma")
   idxWishModels <- which(ModelTypeSet == ModelType)
 
   # Pre-allocation
@@ -776,8 +770,8 @@ IRFjoint_BS <- function(ModelType, ModelParaBoot, IRFhoriz, FactorLabels, Econom
   IRFoutputs <- list()
   IRFoutputsAllDraws <- list()
 
-  jointModelIdx <- idxWishModels[idxWishModels > which(ModelTypeSet == "GVAR sepQ") ]
-  L <- which(ModelTypeSet == "GVAR sepQ") # index of the model right before the first desired joint model.
+  jointModelIdx <- idxWishModels[idxWishModels > which(ModelTypeSet == "GVAR single") ]
+  L <- which(ModelTypeSet == "GVAR single") # index of the model right before the first desired joint model.
 
   for(j in jointModelIdx){
     for (tt in 1:ndraws){
@@ -799,7 +793,7 @@ IRFjoint_BS <- function(ModelType, ModelParaBoot, IRFhoriz, FactorLabels, Econom
       tempYields  <- array(0, c(CJ,K,IRFhoriz))
 
       # Compute the IRFs
-      if (any(ModelType == c("JLL original", "JLL NoDomUnit", "JLL jointSigma"))){  # Choleski term
+      if (any(ModelType == c("JLL original", "JLL No DomUnit", "JLL joint Sigma"))){  # Choleski term
         S <- ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[tt]]$ests$JLLoutcomes$Sigmas$Sigma_Y }
       else{   S <- t(chol(SIGMA)) }
       # Shock at t=0:
@@ -824,7 +818,7 @@ IRFjoint_BS <- function(ModelType, ModelParaBoot, IRFhoriz, FactorLabels, Econom
       dimnames(IRFRiskFactors)[[3]] <- AllFactorsLabels
 
 
-      YieldsLabel<- rownames(ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[tt]]$rot$P$A)
+      YieldsLabel<- rownames(ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[tt]]$inputs$Y)
       dimnames(IRFYields)[[1]] <- Horiz
       dimnames(IRFYields)[[2]] <-  YieldsLabel
       dimnames(IRFYields)[[3]] <- AllFactorsLabels
@@ -875,8 +869,8 @@ IRFjoint_BS <- function(ModelType, ModelParaBoot, IRFhoriz, FactorLabels, Econom
 
 FEVDjoint_BS <- function(ModelType, ModelParaBoot, FEVDhoriz, FactorLabels, Economies){
 
-  ModelTypeSet <- c("JPS", "JPS jointP", "GVAR sepQ", "VAR jointQ" , "GVAR jointQ",
-                    "JLL original", "JLL NoDomUnit", "JLL jointSigma")
+  ModelTypeSet <- c("JPS original", "JPS global", "GVAR single", "JPS multi", "GVAR multi", "JLL original",
+                    "JLL No DomUnit", "JLL joint Sigma")
   idxWishModels <- which(ModelTypeSet == ModelType)
 
   ndraws <- length(ModelParaBoot$ParaDraws[[ModelType]])
@@ -888,8 +882,8 @@ FEVDjoint_BS <- function(ModelType, ModelParaBoot, FEVDhoriz, FactorLabels, Econ
   K <- C*(M+N) + G
   J <- length(ModelParaBoot$GeneralInputs$mat)
 
-  jointModelIdx <- idxWishModels[idxWishModels > which(ModelTypeSet == "GVAR sepQ") ]
-  L <- which(ModelTypeSet == "GVAR sepQ") # index of the model right before the first desired joint model.
+  jointModelIdx <- idxWishModels[idxWishModels > which(ModelTypeSet == "GVAR single") ]
+  L <- which(ModelTypeSet == "GVAR single") # index of the model right before the first desired joint model.
 
   FEVDoutputs <- list()
   FEVDoutputsAllDraws <- list()
@@ -919,7 +913,7 @@ FEVDjoint_BS <- function(ModelType, ModelParaBoot, FEVDhoriz, FactorLabels, Econ
       invGSigmau <- solve(G0)%*%Sigma_y
 
       # Choleski term
-      if ( any(ModelType == c("JLL original", "JLL NoDomUnit", "JLL jointSigma" ))){
+      if ( any(ModelType == c("JLL original", "JLL No DomUnit", "JLL joint Sigma" ))){
         P <- ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[tt]]$ests$JLLoutcomes$Sigmas$Sigma_Y
       }else{ P <- t(chol(invGSigmau)) }
 
@@ -968,7 +962,7 @@ FEVDjoint_BS <- function(ModelType, ModelParaBoot, FEVDhoriz, FactorLabels, Econ
 
       # 4) Prepare labels
       labelsFEVDFactors <- c(FactorLabels$Global,FactorLabels$Tables$AllCountries)
-      YieldsLabel<- rownames(ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[tt]]$rot$P$A)
+      YieldsLabel<- rownames(ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[tt]]$inputs$Y)
 
       dimnames(FEVDFactors)[[1]] <- 1:(FEVDhoriz)
       dimnames(FEVDFactors)[[2]] <- labelsFEVDFactors
@@ -1030,8 +1024,8 @@ FEVDjoint_BS <- function(ModelType, ModelParaBoot, FEVDhoriz, FactorLabels, Econ
 
 GIRFjoint_BS <- function(ModelType, ModelParaBoot, GIRFhoriz, FactorLabels, Economies){
 
-  ModelTypeSet <- c("JPS", "JPS jointP", "GVAR sepQ", "VAR jointQ" , "GVAR jointQ",
-                    "JLL original", "JLL NoDomUnit", "JLL jointSigma")
+  ModelTypeSet <- c("JPS original", "JPS global", "GVAR single", "JPS multi", "GVAR multi", "JLL original",
+                    "JLL No DomUnit", "JLL joint Sigma")
   idxWishModels <- which(ModelTypeSet == ModelType)
 
   ndraws <- length(ModelParaBoot$ParaDraws[[ModelType]])
@@ -1044,8 +1038,8 @@ GIRFjoint_BS <- function(ModelType, ModelParaBoot, GIRFhoriz, FactorLabels, Econ
   J <- length(ModelParaBoot$GeneralInputs$mat)
   CJ <- C*J
 
-  jointModelIdx <- idxWishModels[idxWishModels > which(ModelTypeSet == "GVAR sepQ") ]
-  L <- which(ModelTypeSet == "GVAR sepQ") # index of the model right before the first desired joint model.
+  jointModelIdx <- idxWishModels[idxWishModels > which(ModelTypeSet == "GVAR single") ]
+  L <- which(ModelTypeSet == "GVAR single") # index of the model right before the first desired joint model.
 
   GIRFoutputs <- list()
   GIRFoutputsAllDraws <- list()
@@ -1113,7 +1107,7 @@ GIRFjoint_BS <- function(ModelType, ModelParaBoot, GIRFhoriz, FactorLabels, Econ
       dimnames(GIRFFactors)[[2]] <- labelsGIRF
       dimnames(GIRFFactors)[[3]] <- labelsGIRF
 
-      YieldsLabel<- rownames(ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[tt]]$rot$P$A)
+      YieldsLabel<- rownames(ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[tt]]$inputs$Y)
       dimnames(GIRFYields)[[1]] <- Horiz # We subtract 1, because the first element is the contemporaneous one
       dimnames(GIRFYields)[[2]] <- YieldsLabel
       dimnames(GIRFYields)[[3]] <- labelsGIRF
@@ -1162,8 +1156,8 @@ GIRFjoint_BS <- function(ModelType, ModelParaBoot, GIRFhoriz, FactorLabels, Econ
 
 GFEVDjoint_BS <- function(ModelType, ModelParaBoot, GFEVDhoriz, FactorLabels, Economies){
 
-  ModelTypeSet <- c("JPS", "JPS jointP", "GVAR sepQ", "VAR jointQ" , "GVAR jointQ",
-                    "JLL original", "JLL NoDomUnit", "JLL jointSigma")
+  ModelTypeSet <- c("JPS original", "JPS global", "GVAR single", "JPS multi", "GVAR multi", "JLL original",
+                    "JLL No DomUnit", "JLL joint Sigma")
   idxWishModels <- which(ModelTypeSet == ModelType)
 
   ndraws <- length(ModelParaBoot$ParaDraws[[ModelType]])
@@ -1175,8 +1169,8 @@ GFEVDjoint_BS <- function(ModelType, ModelParaBoot, GFEVDhoriz, FactorLabels, Ec
   K <- C*(M+N) + G
   J <- length(ModelParaBoot$GeneralInputs$mat)
 
-  jointModelIdx <- idxWishModels[idxWishModels > which(ModelTypeSet == "GVAR sepQ") ]
-  L <- which(ModelTypeSet == "GVAR sepQ") # index of the model right before the first desired joint model.
+  jointModelIdx <- idxWishModels[idxWishModels > which(ModelTypeSet == "GVAR single") ]
+  L <- which(ModelTypeSet == "GVAR single") # index of the model right before the first desired joint model.
 
   GFEVDoutputs <- list()
   GFEVDoutputsAllDraws <- list()
@@ -1283,7 +1277,7 @@ GFEVDjoint_BS <- function(ModelType, ModelParaBoot, GFEVDhoriz, FactorLabels, Ec
 
       # 4) Adjust labels:
       labelsGFEVDFactors <- c(FactorLabels$Global,FactorLabels$Tables$AllCountries)
-      YieldsLabel <- rownames(ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[tt]]$rot$P$A)
+      YieldsLabel <- rownames(ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[tt]]$inputs$Y)
 
 
       dimnames(GFEVDFactorsNormalized)[[1]] <- 1:(GFEVDhoriz)
@@ -1334,8 +1328,8 @@ GFEVDjoint_BS <- function(ModelType, ModelParaBoot, GFEVDhoriz, FactorLabels, Ec
 
 IRFjointOrthoJLL_BS <- function(ModelType, ModelParaBoot, IRFhoriz, FactorLabels, Economies){
 
-  ModelTypeSet <- c("JPS", "JPS jointP", "GVAR sepQ", "VAR jointQ" , "GVAR jointQ",
-                    "JLL original", "JLL NoDomUnit", "JLL jointSigma")
+  ModelTypeSet <- c("JPS original", "JPS global", "GVAR single", "JPS multi", "GVAR multi", "JLL original",
+                    "JLL No DomUnit", "JLL joint Sigma")
   idxWishModels <- which(ModelTypeSet == ModelType)
 
   ndraws <- length(ModelParaBoot$ParaDraws[[ModelType]])
@@ -1354,7 +1348,7 @@ IRFjointOrthoJLL_BS <- function(ModelType, ModelParaBoot, IRFhoriz, FactorLabels
 
 
   jointModelIdxJLL <- idxWishModels[idxWishModels >= which(ModelTypeSet == "JLL original") ]
-  L <- which(ModelTypeSet == "GVAR sepQ") # index of the model right before the first desired joint model.
+  L <- which(ModelTypeSet == "GVAR single") # index of the model right before the first desired joint model.
 
   for(j in jointModelIdxJLL){
     IRFAllDraws <- list()
@@ -1400,7 +1394,7 @@ IRFjointOrthoJLL_BS <- function(ModelType, ModelParaBoot, IRFhoriz, FactorLabels
       dimnames(IRFRiskFactors)[[2]] <- AllFactorsLabels
       dimnames(IRFRiskFactors)[[3]] <- AllFactorsLabels
 
-      YieldsLabel<- rownames(ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[tt]]$rot$P$A)
+      YieldsLabel<- rownames(ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[tt]]$inputs$Y)
       dimnames(IRFYields)[[1]] <- Horiz
       dimnames(IRFYields)[[2]] <- YieldsLabel
       dimnames(IRFYields)[[3]] <- AllFactorsLabels
@@ -1445,8 +1439,8 @@ IRFjointOrthoJLL_BS <- function(ModelType, ModelParaBoot, IRFhoriz, FactorLabels
 
 FEVDjointOrthogoJLL_BS <- function(ModelType, ModelParaBoot, FEVDhoriz, FactorLabels, Economies){
 
-  ModelTypeSet <- c("JPS", "JPS jointP", "GVAR sepQ", "VAR jointQ" , "GVAR jointQ",
-                    "JLL original", "JLL NoDomUnit", "JLL jointSigma")
+  ModelTypeSet <- c("JPS original", "JPS global", "GVAR single", "JPS multi", "GVAR multi", "JLL original",
+                    "JLL No DomUnit", "JLL joint Sigma")
   idxWishModels <- which(ModelTypeSet == ModelType)
 
   ndraws <- length(ModelParaBoot$ParaDraws[[ModelType]])
@@ -1461,7 +1455,7 @@ FEVDjointOrthogoJLL_BS <- function(ModelType, ModelParaBoot, FEVDhoriz, FactorLa
 
 
   jointModelIdxJLL <- idxWishModels[idxWishModels >= which(ModelTypeSet == "JLL original") ]
-  L <- which(ModelTypeSet == "GVAR sepQ") # index of the model right before the first desired joint model.
+  L <- which(ModelTypeSet == "GVAR single") # index of the model right before the first desired joint model.
 
   FEVDoutputs <- list()
   FEVDAllDraws <- list()
@@ -1537,7 +1531,7 @@ FEVDjointOrthogoJLL_BS <- function(ModelType, ModelParaBoot, FEVDhoriz, FactorLa
 
       # 4) Prepare labels
       labelsFEVDFactors <- c(FactorLabels$Global,FactorLabels$Tables$AllCountries)
-      YieldsLabel<- rownames(ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[tt]]$rot$P$A)
+      YieldsLabel<- rownames(ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[tt]]$inputs$Y)
 
       dimnames(FEVDFactors)[[1]] <- 1:(FEVDhoriz) # We subtract 1, because the first element is the contemporaneous one
       dimnames(FEVDFactors)[[2]] <- labelsFEVDFactors
@@ -1594,8 +1588,8 @@ FEVDjointOrthogoJLL_BS <- function(ModelType, ModelParaBoot, FEVDhoriz, FactorLa
 
 GIRFjointOrthoJLL_BS <- function(ModelType, ModelParaBoot, GIRFhoriz, FactorLabels, Economies){
 
-  ModelTypeSet <- c("JPS", "JPS jointP", "GVAR sepQ", "VAR jointQ" , "GVAR jointQ",
-                    "JLL original", "JLL NoDomUnit", "JLL jointSigma")
+  ModelTypeSet <- c("JPS original", "JPS global", "GVAR single", "JPS multi", "GVAR multi", "JLL original",
+                    "JLL No DomUnit", "JLL joint Sigma")
   idxWishModels <- which(ModelTypeSet == ModelType)
 
   C <- length(Economies) # Number of economies in the system
@@ -1609,7 +1603,7 @@ GIRFjointOrthoJLL_BS <- function(ModelType, ModelParaBoot, GIRFhoriz, FactorLabe
   ndraws <- length(ModelParaBoot$ParaDraws[[ModelType]])
 
   jointModelIdxJLL <- idxWishModels[idxWishModels >= which(ModelTypeSet == "JLL original") ]
-  L <- which(ModelTypeSet == "GVAR sepQ") # index of the model right before the first desired joint model.
+  L <- which(ModelTypeSet == "GVAR single") # index of the model right before the first desired joint model.
 
   GIRFoutputs <- list()
 
@@ -1675,7 +1669,7 @@ GIRFjointOrthoJLL_BS <- function(ModelType, ModelParaBoot, GIRFhoriz, FactorLabe
       dimnames(GIRFFactors)[[2]] <- labelsGIRF
       dimnames(GIRFFactors)[[3]] <- labelsGIRF
 
-      YieldsLabel<- rownames(ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[tt]]$rot$P$A)
+      YieldsLabel<- rownames(ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[tt]]$inputs$Y)
       dimnames(GIRFYields)[[1]] <- 0:(GIRFhoriz-1) # We subtract 1, because the first element is the contemporaneous one
       dimnames(GIRFYields)[[2]] <- YieldsLabel
       dimnames(GIRFYields)[[3]] <- labelsGIRF
@@ -1724,8 +1718,8 @@ GIRFjointOrthoJLL_BS <- function(ModelType, ModelParaBoot, GIRFhoriz, FactorLabe
 
 GFEVDjointOrthoJLL_BS <- function(ModelType, ModelParaBoot, GFEVDhoriz, FactorLabels, Economies){
 
-  ModelTypeSet <- c("JPS", "JPS jointP", "GVAR sepQ", "VAR jointQ" , "GVAR jointQ",
-                    "JLL original", "JLL NoDomUnit", "JLL jointSigma")
+  ModelTypeSet <- c("JPS original", "JPS global", "GVAR single", "JPS multi", "GVAR multi", "JLL original",
+                    "JLL No DomUnit", "JLL joint Sigma")
   idxWishModels <- which(ModelTypeSet == ModelType)
 
   ndraws <- length(ModelParaBoot$ParaDraws[[ModelType]])
@@ -1739,7 +1733,7 @@ GFEVDjointOrthoJLL_BS <- function(ModelType, ModelParaBoot, GFEVDhoriz, FactorLa
   CJ <- C*J
 
   jointModelIdxJLL <- idxWishModels[idxWishModels >= which(ModelTypeSet == "JLL original") ]
-  L <- which(ModelTypeSet == "GVAR sepQ") # index of the model right before the first desired joint model.
+  L <- which(ModelTypeSet == "GVAR single") # index of the model right before the first desired joint model.
 
   GFEVDoutputs <- list()
 
@@ -1847,7 +1841,7 @@ GFEVDjointOrthoJLL_BS <- function(ModelType, ModelParaBoot, GFEVDhoriz, FactorLa
 
       # 4) Adjust labels:
       labelsGFEVDFactors <- c(FactorLabels$Global,FactorLabels$Tables$AllCountries)
-      YieldsLabel <- rownames(ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[tt]]$rot$P$A)
+      YieldsLabel <- rownames(ModelParaBoot$ParaDraws[[ModelTypeSet[[j]]]][[tt]]$inputs$Y)
 
 
       dimnames(GFEVDFactorsNormalized)[[1]] <- 1:(GFEVDhoriz) # We subtract 1, because the first element is the contemporaneous one
@@ -1906,7 +1900,7 @@ BUnspannedAdapSep_BS <- function(G, M, ModelParaBoot, Economies, Economy, ModelT
   N <- ModelParaBoot$GeneralInputs$N
 
 
-  if( ModelType== "JPS"){
+  if( ModelType== "JPS original"){
     K <- nrow(ModelParaBoot$ParaDraws[[ModelType]][[Economies[i]]][[tt]]$ests$K1Z)
     BUnspanned <- matrix(0, nrow=J, ncol= K)
     BSpanned <- ModelParaBoot$ParaDraws[[ModelType]][[Economies[i]]][[tt]]$rot$P$B
@@ -1914,7 +1908,7 @@ BUnspannedAdapSep_BS <- function(G, M, ModelParaBoot, Economies, Economy, ModelT
   }
 
 
-  else if( any(ModelType == c("JPS jointP", "GVAR sepQ"))){
+  else if( any(ModelType == c("JPS global", "GVAR single"))){
     K <- nrow(ModelParaBoot$ParaDraws[[ModelType]][[Economies[i]]][[tt]]$ests$K1Z)
     BUnspanned <- matrix(0, nrow=J, ncol= K)
     BSpanned <- ModelParaBoot$ParaDraws[[ModelType]][[Economies[i]]][[tt]]$rot$P$B

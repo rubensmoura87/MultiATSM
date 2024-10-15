@@ -2,50 +2,45 @@
 % Please edit documentation in R/JLL.R
 \name{JLL}
 \alias{JLL}
-\title{Set of inputs present at JLL's P-dynamics}
+\title{Estimates the P-dynamics from JLL-based models}
 \usage{
-JLL(NonOrthoFactors, N, JLLinputs)
+JLL(NonOrthoFactors, N, JLLinputs, CheckInputs = F)
 }
 \arguments{
-\item{NonOrthoFactors}{Risk factors before the orthogonalization (FxT)}
+\item{NonOrthoFactors}{A numeric matrix (F x T) representing the time series of risk factors before the orthogonalization process.}
 
-\item{N}{Number of country-specific spanned factors}
+\item{N}{Integer. Number of country-specific spanned factors.}
 
-\item{JLLinputs}{List of necessary inputs to estimate JLL outputs:
-\enumerate{
-    \item Economies:  set of economies that are part of the economic system (string-vector)
-    \item "DomUnit": name of the economy which is assigned as the dominant unit. \cr
-                If no dominant unit is assigned, then this variable is defined as "None"
-    \item WishSigmas: equal to "1" if one wishes the variance-covariance matrices and the Cholesky factorizations
-                (can take long if they need to be estimated). Set "0", otherwise.
-    \item SigmaNonOrtho: NULL or some F x F matrix from the non-orthogonalized dynamics
-    \item JLLModelType: available options are "JLL original", "JLL jointSigma"  or "JLL NoDomUnit"
+\item{JLLinputs}{List of necessary inputs to estimate JLL models:
+ \enumerate{
+     \item Economies:  set of economies that are part of the economic system (string-vector)
+     \item \code{DomUnit}: A string specifying the name of the economy assigned as the dominant unit. \cr
+                 If no dominant unit is assigned, set this variable to "None".
+     \item \code{WishSigmas}: Set to "1" if the user wishes to estimate the variance-covariance matrices and Cholesky factorizations \cr
+                 (this can take a long time). Set to "0" if not.
+     \item \code{SigmaNonOrtho}: A NULL value or an F x F matrix from the non-orthogonalized dynamics.
+     \item \code{JLLModelType}: A string specifying the type of JLL model. Available options are: "JLL original", "JLL joint Sigma", or "JLL No DomUnit".
 }}
+
+\item{CheckInputs}{A logical flag to indicate whether to perform a prior consistency check on the inputs provided in \code{JLLinputs}. The default is set to FALSE}
 }
 \value{
 List of model parameters from both the orthogonalized and non-orthogonalized versions of the JLL's based models
 }
 \description{
-Set of inputs present at JLL's P-dynamics
-}
-\details{
-For the models 'JLL original' or "JLL jointSigma" the name of one dominant economy must assigned.\cr
-For the model 'JLL  NoDomUnit', the name of one dominant economy must be set as "None".
+Estimates the P-dynamics from JLL-based models
 }
 \examples{
 \donttest{
 data(CM_Factors)
-ZZ <- RiskFactors
+RF_TS <- RiskFactors
 N <- 3
 
-JLLinputs <- list()
-JLLinputs$Economies <- c( "China", "Brazil", "Mexico", "Uruguay")
-JLLinputs$DomUnit <- "China"
-JLLinputs$WishSigmas <- 1
-JLLinputs$SigmaNonOrtho <- NULL
-JLLinputs$JLLModelType <- "JLL original"
+JLLinputs <- list(Economies = c("China", "Brazil", "Mexico", "Uruguay"), DomUnit = "China",
+                  WishSigmas = 1, SigmaNonOrtho = NULL, JLLModelType = "JLL original")
 
-JLL(ZZ, N, JLLinputs)
+
+JLLPara <- JLL(RF_TS, N, JLLinputs)
 
 }
 }

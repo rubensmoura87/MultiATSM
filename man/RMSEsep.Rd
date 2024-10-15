@@ -12,3 +12,4 @@ RMSEsep(ForecastOutputs)
 \description{
 Compute the root mean square error ("sep Q" models)
 }
+\keyword{internal}

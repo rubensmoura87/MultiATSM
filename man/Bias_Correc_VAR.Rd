@@ -2,7 +2,7 @@
 % Please edit documentation in R/BiasCorrection.R
 \name{Bias_Correc_VAR}
 \alias{Bias_Correc_VAR}
-\title{Estimate an unbiased VAR(1) using stochastic approximation (Bauer, Rudebusch and Wu, 2012)}
+\title{Estimates an unbiased VAR(1) using stochastic approximation (Bauer, Rudebusch and Wu, 2012)}
 \usage{
 Bias_Correc_VAR(
   ModelType,
@@ -18,67 +18,60 @@ Bias_Correc_VAR(
 )
 }
 \arguments{
-\item{ModelType}{string-vector containing the label of the model to be estimated}
+\item{ModelType}{A character vector indicating the model type to be estimated.}
 
-\item{BRWinputs}{List containing the following necessary inputs for the estimation of the BRW model:
+\item{BRWinputs}{A list containing the necessary inputs for the BRW model estimation:
 \enumerate{
-\item flag_mean: flag whether mean- (TRUE) or median- (FALSE) unbiased estimation is desired. Default is set to TRUE;
-\item gamma: adjustment parameter. Value parameters should vary between 0 and 1. Default is set to 0.5;
-\item N_iter: number of iterations used in the stochatic approximation algorithm after burn-in. Default is set to 5,000;
-\item N_burn: number of burn-in iterations used in the stochatic approximation algorithm. Default is set to 0.15*N_iter;
-\item B: number of bootstrap samples per iteration to calculate noisy measure of mean/median of the OLS estimator.
-       Default is set to 50;
-\item check: flag whether the user wishes to perform the closeness check. Default is set to TRUE;
-\item B_check: number of bootstrap samples used in the closeness check. Default is set to 100,000.
+\item \code{flag_mean}: Logical. Determines whether mean- (TRUE) or median- (FALSE) unbiased estimation is desired. Default is TRUE.
+\item \code{gamma}: Numeric. Adjustment parameter between 0 and 1. Default is 0.5.
+\item \code{N_iter}: Integer. Number of iterations for the stochastic approximation algorithm after burn-in. Default is 5,000.
+\item \code{N_burn}: Integer. Number of burn-in iterations. Default is 15% of \code{N_iter}.
+\item \code{B}: Integer. Number of bootstrap samples per iteration for calculating the noisy measure of the OLS estimator's mean or median. Default is 50.
+\item \code{check}: Logical. Indicates whether to perform a closeness check. Default is TRUE.
+\item \code{B_check}: Integer. Number of bootstrap samples for the closeness check. Default is 100,000.
 }}
 
-\item{RiskFactors}{time series of the risk factors (T x F)}
+\item{RiskFactors}{A numeric matrix (T x F) representing the time series of risk factors.}
 
-\item{N}{number of country-specific spanned factors (scalar)}
+\item{N}{Integer. Number of country-specific spanned factors.}
 
-\item{Economies}{string-vector containing the names of the economies which are part of the economic system}
+\item{Economies}{A character vector containing the names of the economies included in the system.}
 
-\item{FactorLabels}{string-list based which contains the labels of all variables present in the model}
+\item{FactorLabels}{A list of character vectors with labels for all variables in the model.}
 
-\item{GVARinputs}{inputs used in the estimation of the GVAR-based models (see "GVAR" function). Default is set to NULL}
+\item{GVARinputs}{List. Inputs for GVAR model estimation (see \code{\link{GVAR}} function). Default is NULL.}
 
-\item{JLLinputs}{inputs used in the estimation of the JLL-based models (see "JLL" function). Default is set to NULL}
+\item{JLLinputs}{List. Inputs for JLL model estimation (see \code{\link{JLL}} function). Default is NULL.}
 
-\item{ev_restr}{largest eigenvalue restriction under the P-measure. Default is set to 1}
+\item{ev_restr}{Numeric. Restriction on the largest eigenvalue under the P-measure. Default is 1.}
 
-\item{nargout}{number of elements present in the list of outputs. Default is set to 4}
+\item{nargout}{Integer. Number of elements in the output list. Default is 4.}
 }
 \value{
 Bias-corrected VAR paramaters based on the framework of Bauer, Rudebusch and Wu (2012). The list contains:
 \enumerate{
-\item Phi_tilde estimated coefficient matrix (F x F);
-\item mu_tilde: estimated intercept (F x 1);
-\item V_tilde: estimated variance-covariance matrix (F x F);
-\item dist: root mean square distance (scalar);
-\item Phi_sample: sample estimated variance-covariance matrix used in the checks (F x F x B_check) - this output is
-     reported if nargout is set to 5.
+\item \code{Phi_tilde}: estimated coefficient matrix (F x F);
+\item \code{mu_tilde}: estimated intercept (F x 1);
+\item \code{V_tilde}: estimated variance-covariance matrix (F x F);
+\item \code{dist}: root mean square distance (scalar);
+\item \code{Phi_sample}: sample estimated variance-covariance matrix used in the checks (F x F x B_check) - this output is
+     reported if nargout is 5.
 }
 }
 \description{
-Estimate an unbiased VAR(1) using stochastic approximation (Bauer, Rudebusch and Wu, 2012)
+Estimates an unbiased VAR(1) using stochastic approximation (Bauer, Rudebusch and Wu, 2012)
 }
 \examples{
 \donttest{
 data(CM_Factors)
 Factors <- t(RiskFactors[1:7,])
 
-BRWinputs <- list()
-BRWinputs$flag_mean <- TRUE
-BRWinputs$gamma <- 0.4
-BRWinputs$N_iter <- 1000
-BRWinputs$N_burn <- 100
-BRWinputs$B <- 10
-BRWinputs$check <- 1
-BRWinputs$B_check <- 5000
+BRWinputs <- list(flag_mean = TRUE, gamma = 0.4, N_iter = 1000, N_burn = 100,
+                  B = 10, check = 1, B_check = 5000)
 
 Economies <- "China"
 N <- 3
-ModelType <- "JPS"
+ModelType <- "JPS original"
 FactorLabels <- NULL
 
 
@@ -88,6 +81,6 @@ BRWpara <- Bias_Correc_VAR(ModelType, BRWinputs, Factors, N, Economies, FactorLa
 }
 \references{
 Bauer, Rudebusch and, Wu (2012). "Correcting Estimation Bias in Dynamic Term Structure Models" \cr
-This function is based on the "est_unb_var" Matlab function available at Cynthia Wu's website
+This function is based on the \code{est_unb_var} Matlab function available at Cynthia Wu's website
 (https://sites.google.com/view/jingcynthiawu/).
 }

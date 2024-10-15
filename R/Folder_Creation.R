@@ -1,7 +1,7 @@
-#' Creates the folders and the path in which the graphical outputs are stored (ponit estimate version)
+#' Creates the folders and the path in which the graphical outputs are stored (point estimate version)
 #'
-#'@param ModelType a string-vector containing the label of the model to be estimated
-#'@param Economies a string-vector containing the names of the economies which are part of the economic system
+#'@param ModelType A character vector indicating the model type to be estimated.
+#'@param Economies A character vector containing the names of the economies included in the system.
 #'
 #'@keywords internal
 #'
@@ -20,7 +20,7 @@ VarTypeSet <- c("Factors", "Yields")
   for (h in 1:length(OutputTypeSet)){PathsGraphs[[ModelType]][[OutputTypeSet[h]]] <- list()}
 
 
-if (ModelType == "JPS" || ModelType == "JPS jointP" || ModelType == "GVAR sepQ"){
+if (any(ModelType ==c("JPS original", "JPS global", "GVAR single"))){
 for (h in 1:length(OutputTypeSet)){
   for (v in 1:length(VarTypeSet)){
   for (i in 1:C){
@@ -56,7 +56,7 @@ for (h in 1:length(OutputTypeSet)){
                                                                                   "/Point Estimate/", OutputTypeSet[h],
                                                                                   "/", VarTypeSet[v], sep="")
 
-          if (ModelType == "JLL original" || ModelType == "JLL NoDomUnit" || ModelType == "JLL jointSigma"){
+          if (any(ModelType ==c("JLL original", "JLL No DomUnit", "JLL joint Sigma"))){
 
               OrthoLabel <- paste(VarTypeSet,"Ortho")
               PathsGraphs[[ModelType]][[OutputTypeSet[h]]][[OrthoLabel[v]]] <- paste(tempdir(),"/Outputs/", ModelType, "/Point Estimate/",
@@ -104,7 +104,7 @@ FolderCreationBoot <- function(ModelType, Economies){
   }
 
 
-  if (any(ModelType == c("JPS", "JPS jointP", "GVAR sepQ"))){
+  if (any(ModelType == c("JPS original", "JPS global", "GVAR single"))){
     for (h in 1:length(OutputTypeSet)){
       for (v in 1:length(VarTypeSet)){
         for (i in 1:C){
@@ -139,7 +139,7 @@ FolderCreationBoot <- function(ModelType, Economies){
 
 
 
-        if (any(ModelType == c("JLL original", "JLL NoDomUnit", "JLL jointSigma"))){
+        if (any(ModelType == c("JLL original", "JLL No DomUnit", "JLL joint Sigma"))){
             OrthoLabel <- paste(VarTypeSet,"Ortho")
             PathsGraphs[[ModelType]][[OutputTypeSet[h]]][[OrthoLabel[v]]] <- paste(tempdir(),"/Outputs/", ModelType, "/Bootstrap/",
                                                                                    OutputTypeSet[h], "/", VarTypeSet[v],

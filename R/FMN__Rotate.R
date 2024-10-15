@@ -8,7 +8,6 @@
 #'
 #'@return      y1 - list of outputs after the transformation, the structure parallels that of y0
 #'
-#'@importFrom pracma mldivide
 #'
 #'@details
 #' This function performs a rotation from a model with Z as states to one with S = U0 + U1*Z as states. \cr
@@ -33,7 +32,7 @@ FMN__Rotate <- function(y0, U1, U0){
 
 
   N <- dim(U1)[1]
-  if (missing('U0') || is.null(U0)){ U0 <- zeros(N,1) }
+  if (missing('U0') || is.null(U0)){ U0 <- matrix(0, nrow = N, ncol = 1) }
   y1 <- list()
 
 
@@ -49,7 +48,7 @@ FMN__Rotate <- function(y0, U1, U0){
 
   # pricing:  Mapping of parameters X <-> Z.
   if ("B" %in% names(y0)){
-    y1$B <- mrdivide(y0$B,U1) # BX* BZ = U1 --> BZ = BX*U1^(-1)
+    y1$B <- if (N == 1) mrdivide(matrix(y0$B), U1) else mrdivide(y0$B, U1) # BX* BZ = U1 --> BZ = BX*U1^(-1)
     y1$A <- y0$A - y1$B%*%U0 # AX = AZ + BZ*U0 --> AZ = AX - BZ*U0
   }
 
@@ -82,30 +81,35 @@ FMN__Rotate <- function(y0, U1, U0){
   if ( !("P" %in% names(y0)) && !("Q" %in% names(y0)) && !("B" %in% names(y0)) && !("A" %in% names(y0)) ) {
 
     NP <- numel(y0$K0)
-    if (NP-N !=0){ U0 <- rbind(U0, zeros(NP-N,1))}
+    if (NP-N !=0){ U0 <- rbind(U0, matrix(0, nrow= NP-N,ncol =1))}
     U1 <- magic::adiag(U1, diag(NP-N))
 
-    p <- dim(y0$K1)[2]/dim(y0$K1)[1]
+    p <- if (is.matrix(y0$K1)) dim(y0$K1)[2]/dim(y0$K1)[1] else 1
 
-    y1 <- list()
-    y1$K1 <- array(data=NA, c(dim(y0$K1)))
+    if (is.null(dim(y0$K1))) {y1$K1 <- NA } else {y1$K1 <- array(data = NA, dim = dim(y0$K1)) }
     temp <- 0
     for (i in 1:p){
-      a <- as.matrix(U1%*%y0$K1[, ((i-1)*NP+1):(i*NP)])
+      if (is.matrix(y0$K1)) {
+      a <- U1 %*% y0$K1[, ((i-1) * NP + 1):(i * NP)]
       b <- as.matrix(U1)
       y1$K1[, ((i-1)*NP+1):(i*NP)] <- mrdivide(a,b)
       temp <- temp + y1$K1[, ((i-1)*NP+1):(i*NP)]
+      } else{
+      a <- U1 %*% y0$K1
+      b <- as.matrix(U1)
+      y1$K1 <- mrdivide(a,b)
+      temp <- temp + y1$K1
+      }
     }
 
     y1$K0 <- U0+U1%*%y0$K0-temp%*%U0
-    N <- dim(y0$SS)[1]
-    M <- dim(y0$SS)[2]/N-1
+    N <-  if (is.null(dim(y0$SS))) 1 else dim(y0$SS)[1]
+    M <-  if (is.null(dim(y0$SS))) 0 else dim(y0$SS)[2]/N-1
     SSi <- array(y0$SS, c(N, N, M+1))
     SSi <- mult__prod(mult__prod(U1, drop(SSi), c=NULL), t(U1), c= NULL)
     y1$SS = array(SSi, c(N, N*(M+1)))
 
   }
-
 
 
   return(y1)

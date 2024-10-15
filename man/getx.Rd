@@ -2,7 +2,7 @@
 % Please edit documentation in R/getx.R
 \name{getx}
 \alias{getx}
-\title{Obtain the auxiliary values corresponding to each parameter, its size and its  name}
+\title{Obtain the auxiliary values corresponding to each parameter, its size and its name}
 \usage{
 getx(con, varargin, Economies, FactorLabels, JLLinputs = NULL)
 }
@@ -13,12 +13,12 @@ getx(con, varargin, Economies, FactorLabels, JLLinputs = NULL)
 
 \item{Economies}{string-vector containing the names of the economies which are part of the economic system}
 
-\item{FactorLabels}{list of necessary inputs for the estimation of JLL-based models (see "JLL" function)}
+\item{FactorLabels}{list of necessary inputs for the estimation of JLL-based models (see \code{JLL} function)}
 
 \item{JLLinputs}{Necessary inputs for the estimation of the JLL-based models}
 }
 \description{
-Obtain the auxiliary values corresponding to each parameter, its size and its  name
+Obtain the auxiliary values corresponding to each parameter, its size and its name
 }
 \references{
 This function is a modified version of the "getx" function by Le and Singleton (2018). \cr

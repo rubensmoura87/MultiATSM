@@ -1,9 +1,9 @@
-#' Obtain the auxiliary values corresponding to each parameter, its size and its  name
+#' Obtain the auxiliary values corresponding to each parameter, its size and its name
 
 #'@param con If con = 'concentration' and a parameter's name contains '@@', then its auxiliary value is set to empty
 #'@param varargin variable inputs used in the optimization (see "optimization" function)
 #'@param Economies string-vector containing the names of the economies which are part of the economic system
-#'@param FactorLabels list of necessary inputs for the estimation of JLL-based models (see "JLL" function)
+#'@param FactorLabels list of necessary inputs for the estimation of JLL-based models (see \code{JLL} function)
 #'@param JLLinputs     Necessary inputs for the estimation of the JLL-based models
 #'
 #'
@@ -389,7 +389,6 @@ if (!is.null(JLLinputs)){
 
     for (i in 1:M){
       halfm <- sqrtm_robust(b[ ,(N*(i-1)+1):(N*i)]) # sqrtm (): computes a matrix square root such that Y=X^(1/2)*X^(1/2).
-
       a <- rbind(a, t(t(halfm[IdxNONzeroSigmaJLL])))
     }
 

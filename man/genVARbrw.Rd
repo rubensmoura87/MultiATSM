@@ -18,7 +18,7 @@ Generate M data sets from VAR(1) model
 }
 \references{
 Bauer, Rudebusch and, Wu (2012). "Correcting Estimation Bias in Dynamic Term Structure Models". \cr
-This function is similar to the"genVAR" Matlab function available at Cynthia Wu's website
+This function is based on to the"genVAR" Matlab function available at Cynthia Wu's website
 (https://sites.google.com/view/jingcynthiawu/).
 }
 \keyword{internal}

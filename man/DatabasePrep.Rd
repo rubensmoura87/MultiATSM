@@ -2,7 +2,7 @@
 % Please edit documentation in R/DatabasePrep.R
 \name{DatabasePrep}
 \alias{DatabasePrep}
-\title{Prepare the GVARFactors database}
+\title{Gather data of several countries in a list. Particularly useful for GVAR-based setups (Compute "GVARFactors")}
 \usage{
 DatabasePrep(
   t_First,
@@ -17,31 +17,29 @@ DatabasePrep(
 )
 }
 \arguments{
-\item{t_First}{sample starting date (yyyy-mm-dd)}
+\item{t_First}{Start date of the sample period in the format yyyy-mm-dd.}
 
-\item{t_Last}{sample last date (yyyy-mm-dd)}
+\item{t_Last}{End date of the sample period in the format yyyy-mm-dd.}
 
-\item{Economies}{string-vector containing the names of the economies which are part of the economic system}
+\item{Economies}{A character vector containing the names of the economies included in the system.}
 
-\item{N}{number of country-specific spanned factor (scalar)}
+\item{N}{Integer. Number of country-specific spanned factors.}
 
-\item{FactorLabels}{list containing the factor labels}
+\item{FactorLabels}{A list of character vectors with labels for all variables in the model.}
 
-\item{ModelType}{string-vector containing the label of the model to be estimated}
+\item{ModelType}{A character vector indicating the model type to be estimated.}
 
-\item{Wgvar}{GVAR transition matrix (CxC), if GVAR type model is chosen; default is set to NULL.}
+\item{Wgvar}{GVAR transition matrix of size C x C, applicable if a GVAR-type model is selected. Default is NULL.}
 
-\item{DataPathMacro}{path of the Excel file containing the macroeconomic data (if any). The default is linked to the Excel file available in the package.}
+\item{DataPathMacro}{File path to the Excel file containing macroeconomic data, if provided. The default path points to the Excel file available within the package.}
 
-\item{DataPathYields}{path of the Excel file containing the yields data (if any). The default is linked to the Excel file available in the package.}
+\item{DataPathYields}{File path to the Excel file containing yields data, if provided. The default path points to the Excel file available within the package}
 }
 \value{
-List of the risk factor set used in the estimation of the GVAR model
-
 List containing the risk factor set used in the estimation of the GVAR-based models
 }
 \description{
-Prepare the GVARFactors database
+Gather data of several countries in a list. Particularly useful for GVAR-based setups (Compute "GVARFactors")
 }
 \examples{
 DomVar <- c("Eco_Act", "Inflation")
@@ -50,10 +48,12 @@ t0 <- "2006-09-01"
 tF <-  "2019-01-01"
 Economies <- c("China", "Brazil", "Mexico", "Uruguay", "Russia")
 N <- 3
-ModelType <- "JPS jointQ"
+ModelType <- "GVAR multi"
 FactorLabels <-  LabFac(N, DomVar, GlobalVar, Economies, ModelType)
+Wgvar <- Transition_Matrix(t_First = "2006", t_Last= "2019", Economies, type = "Sample Mean")
 
-GVARFactors <- DatabasePrep(t0, tF, Economies, N, FactorLabels, ModelType)
+
+GVARFactors <- DatabasePrep(t0, tF, Economies, N, FactorLabels, ModelType, Wgvar)
 
 
 }

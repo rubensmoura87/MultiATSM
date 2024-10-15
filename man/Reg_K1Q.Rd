@@ -23,19 +23,10 @@ Risk neutral feedback matrix K1Q.
 \description{
 Estimate the risk-neutral feedbak matrix K1Q using linear regressions
 }
-\examples{
-data(CM_Yields)
-
-Y_China <- Yields[1:6,]
-Z_China <- Spanned_Factors(Y_China, Economies ="China", N=3)
-mat <-c(0.25 , 0.5 , 1, 3, 5, 10)
-dt <- 1/12
-type <- 'Jordan'
-Reg_K1Q(Y_China, mat, Z_China, dt, type)
-}
 \references{
-This function is based on the "Reg_K1Q" function by Le and Singleton (2018). \cr
+This function is modified version of the "Reg_K1Q" function by Le and Singleton (2018). \cr
  "A Small Package of Matlab Routines for the Estimation of Some Term Structure Models." \cr
  (Euro Area Business Cycle Network Training School - Term Structure Modelling).
  Available at: https://cepr.org/40029
 }
+\keyword{internal}

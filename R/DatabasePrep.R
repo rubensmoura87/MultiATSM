@@ -1,20 +1,15 @@
-#' Prepare the GVARFactors database
-
-
-#'@param t_First             sample starting date (yyyy-mm-dd)
-#'@param t_Last              sample last date (yyyy-mm-dd)
-#'@param Economies           string-vector containing the names of the economies which are part of the economic system
-#'@param N                   number of country-specific spanned factor (scalar)
-#'@param FactorLabels        list containing the factor labels
-#'@param ModelType           string-vector containing the label of the model to be estimated
-#'@param Wgvar               GVAR transition matrix (CxC), if GVAR type model is chosen; default is set to NULL.
-#'@param DataPathMacro       path of the Excel file containing the macroeconomic data (if any). The default is linked to the Excel file available in the package.
-#'@param DataPathYields      path of the Excel file containing the yields data (if any). The default is linked to the Excel file available in the package.
+#' Gather data of several countries in a list. Particularly useful for GVAR-based setups (Compute "GVARFactors")
 #'
-#'@return List of the risk factor set used in the estimation of the GVAR model
+#'@param t_First        Start date of the sample period in the format yyyy-mm-dd.
+#'@param t_Last         End date of the sample period in the format yyyy-mm-dd.
+#'@param Economies      A character vector containing the names of the economies included in the system.
+#'@param N              Integer. Number of country-specific spanned factors.
+#'@param FactorLabels   A list of character vectors with labels for all variables in the model.
+#'@param ModelType      A character vector indicating the model type to be estimated.
+#'@param Wgvar          GVAR transition matrix of size C x C, applicable if a GVAR-type model is selected. Default is NULL.
+#'@param DataPathMacro  File path to the Excel file containing macroeconomic data, if provided. The default path points to the Excel file available within the package.
+#'@param DataPathYields File path to the Excel file containing yields data, if provided. The default path points to the Excel file available within the package
 #'
-#'
-#'@importFrom pracma isempty
 #'
 #'
 #'@examples
@@ -24,10 +19,12 @@
 #' tF <-  "2019-01-01"
 #' Economies <- c("China", "Brazil", "Mexico", "Uruguay", "Russia")
 #' N <- 3
-#' ModelType <- "JPS jointQ"
+#' ModelType <- "GVAR multi"
 #' FactorLabels <-  LabFac(N, DomVar, GlobalVar, Economies, ModelType)
+#' Wgvar <- Transition_Matrix(t_First = "2006", t_Last= "2019", Economies, type = "Sample Mean")
 #'
-#' GVARFactors <- DatabasePrep(t0, tF, Economies, N, FactorLabels, ModelType)
+#'
+#' GVARFactors <- DatabasePrep(t0, tF, Economies, N, FactorLabels, ModelType, Wgvar)
 #'
 #'
 #'@returns
@@ -96,9 +93,9 @@ DatabasePrep <- function(t_First, t_Last, Economies, N, FactorLabels, ModelType,
   YieldsList <- vector(mode='list', length = C)
 
 
-  # 3) Remove series which are entierly filled with NAs
+  # 3) Remove series which are entirely filled with NAs
   AllFactorsClean <- RemoveNA(SampleYields, SampleMacro, Economies)
-  # A) Select yields with common matiruties accross countries
+  # A) Select yields with common maturities across countries
   mats <- vector(mode='list', length = C)
   for (i in 1:C){
     mats[[i]] <- names(AllFactorsClean$Yields[[Economies[i]]])
@@ -150,9 +147,9 @@ DatabasePrep <- function(t_First, t_Last, Economies, N, FactorLabels, ModelType,
   }
   names(Z) <- FactorLabels$Domestic
 
-  if (any(ModelType == c("GVAR sepQ", "GVAR jointQ"))){
+  if (any(ModelType == c("GVAR single", "GVAR multi"))){
 
-    if (isempty(Wgvar)){ stop("The transition matrix needs to be specified!")}
+    if (length(Wgvar) == 0){ stop("The transition matrix needs to be specified!")}
 
 
     # c.1) If star variables are computed with time-varying weigths
@@ -229,7 +226,6 @@ DatabasePrep <- function(t_First, t_Last, Economies, N, FactorLabels, ModelType,
 
 
 #################################################################################################################
-
 #' Exclude series that contain NAs
 
 #'@param YieldsData     List of country-specific bond yields

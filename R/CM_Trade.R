@@ -5,6 +5,6 @@
 #' @docType data
 #' @usage data("CM_Trade")
 #' @format list containing the bilateral trade flows
-#' @references Candelon, B. and Moura, R. "A Multicountry Model of the Term Structures of Interest Rates with a GVAR".
+#' @references Candelon, B. and Moura, R. (Forthcoming) "A Multicountry Model of the Term Structures of Interest Rates with a GVAR". (Journal of Financial Econometrics)
 #' @keywords Trade Flows
 NULL

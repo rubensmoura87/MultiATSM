@@ -14,7 +14,7 @@ data("CM_Trade")
 Trade Flows data used in Candelon and Moura (2023)
 }
 \references{
-Candelon, B. and Moura, R. "Sovereign yield curves and the COVID-19 in emerging markets".
+Candelon, B. and Moura, R. (2023) "Sovereign yield curves and the COVID-19 in emerging markets". (Economic Modelling)
 }
 \keyword{Flows}
 \keyword{Trade}

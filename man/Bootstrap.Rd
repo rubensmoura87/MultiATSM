@@ -8,58 +8,52 @@ Bootstrap(
   ModelType,
   ModelParaPE,
   NumOutPE,
-  mat,
   Economies,
   InputsForOutputs,
   FactorLabels,
-  DataFrequency,
-  vararginPE,
-  JLLinputs = NULL,
-  GVARinputs = NULL,
-  BRWinputs = NULL
+  JLLlist = NULL,
+  GVARlist = NULL,
+  WishBC = 0,
+  BRWlist = NULL
 )
 }
 \arguments{
-\item{ModelType}{string-vector containing the label of the model to be estimated}
+\item{ModelType}{A character vector indicating the model type to be estimated.}
 
-\item{ModelParaPE}{point estimate from the model parameters (see the outputs of the "Optimization" function)}
+\item{ModelParaPE}{A list containing the point estimates of the model parameters. For details, refer to the outputs from the \code{\link{Optimization}} function.}
 
-\item{NumOutPE}{point estimate from the numerical outputs (see the outputs of the "NumOutputs" function)}
+\item{NumOutPE}{The point estimate derived from numerical outputs. See the outputs from the \code{\link{NumOutputs}} function for further information.}
 
-\item{mat}{vector of maturities (in years) used in the estimation}
+\item{Economies}{A character vector containing the names of the economies included in the system.}
 
-\item{Economies}{string-vector containing the names of the economies which are part of the economic system}
+\item{InputsForOutputs}{A list containing the necessary inputs for generating IRFs, GIRFs, FEVDs, GFEVDs and Term Premia.}
 
-\item{InputsForOutputs}{list containing the desired inputs for the construction of IRFs, GIRFs, FEVDs, and GFEVDs.}
+\item{FactorLabels}{A list of character vectors with labels for all variables in the model.}
 
-\item{FactorLabels}{string-list based which contains the labels of all the variables present in the model}
+\item{JLLlist}{List. Inputs for JLL model estimation (see \code{\link{JLL}} function). Default is NULL.}
 
-\item{DataFrequency}{character-based vector: "Daily All Days", "Daily Business Days", "Weekly", "Monthly", "Quarterly", "Annually"}
+\item{GVARlist}{List. Inputs for GVAR model estimation (see \code{\link{GVAR}} function). Default is NULL.}
 
-\item{vararginPE}{list containg starting values and constraints (see arguments of the "Optimization" function)}
+\item{WishBC}{Whether to estimate the physical parameter model with bias correction, based on the method by Bauer, Rudebusch and Wu (2012) (see \code{\link{Bias_Correc_VAR}} function). Default is set to 0.}
 
-\item{JLLinputs}{list of necessary inputs for the estimation of JLL-based models (see "JLL" function)}
-
-\item{GVARinputs}{list of necessary inputs for the estimation of GVAR-based models (see "GVAR" function)}
-
-\item{BRWinputs}{list of necessary inputs for performing the bias-corrected estimation (see "Bias_Correc_VAR" function)}
+\item{BRWlist}{List of necessary inputs for performing the bias-corrected estimation (see \code{\link{Bias_Correc_VAR}} function).}
 }
 \value{
 list containing the following elements:
 \itemize{
 \item list of model parameters for one each one the draws;
-\item list of numerical outputs (IRFs, GIRFs, FEVDs, GFEVDs) for each one of the draws;
-\item Confidence bands for the chosen level of significance.
+\item list of numerical outputs (IRFs, GIRFs, FEVDs, GFEVDs and Term Premia) for each one of the draws;
+\item Confidence bounds for the chosen level of significance.
 }
 }
 \description{
 Generates the bootstrap-related outputs
 }
 \examples{
-# See examples in the vignette file of this package (Section 4).
+# See an example of implementation in the vignette file of this package (Section 4).
 
 }
 \references{
-This function is a modified and extended version of the "VARirbound" function from "A toolbox for VAR analysis"
+This function is a modified and extended version of the \code{VARirbound} function from "A toolbox for VAR analysis"
 by Ambrogio Cesa-Bianchi (https://github.com/ambropo/VAR-Toolbox)
 }

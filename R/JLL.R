@@ -1,38 +1,32 @@
-#' Set of inputs present at JLL's P-dynamics
+#' Estimates the P-dynamics from JLL-based models
 #'
-#'@param NonOrthoFactors Risk factors before the orthogonalization (FxT)
-#'@param N Number of country-specific spanned factors
-#'@param JLLinputs List of necessary inputs to estimate JLL outputs:
+#'@param NonOrthoFactors A numeric matrix (F x T) representing the time series of risk factors before the orthogonalization process.
+#'@param N Integer. Number of country-specific spanned factors.
+#'@param JLLinputs List of necessary inputs to estimate JLL models:
 #'  \enumerate{
 #'      \item Economies:  set of economies that are part of the economic system (string-vector)
-#'      \item "DomUnit": name of the economy which is assigned as the dominant unit. \cr
-#'                  If no dominant unit is assigned, then this variable is defined as "None"
-#'      \item WishSigmas: equal to "1" if one wishes the variance-covariance matrices and the Cholesky factorizations
-#'                  (can take long if they need to be estimated). Set "0", otherwise.
-#'      \item SigmaNonOrtho: NULL or some F x F matrix from the non-orthogonalized dynamics
-#'      \item JLLModelType: available options are "JLL original", "JLL jointSigma"  or "JLL NoDomUnit"
-#'  }
-
+#'      \item \code{DomUnit}: A string specifying the name of the economy assigned as the dominant unit. \cr
+#'                  If no dominant unit is assigned, set this variable to "None".
+#'      \item \code{WishSigmas}: Set to "1" if the user wishes to estimate the variance-covariance matrices and Cholesky factorizations \cr
+#'                  (this can take a long time). Set to "0" if not.
+#'      \item \code{SigmaNonOrtho}: A NULL value or an F x F matrix from the non-orthogonalized dynamics.
+#'      \item \code{JLLModelType}: A string specifying the type of JLL model. Available options are: "JLL original", "JLL joint Sigma", or "JLL No DomUnit".
+#'}
+#'@param CheckInputs A logical flag to indicate whether to perform a prior consistency check on the inputs provided in \code{JLLinputs}. The default is set to FALSE
+#'
 #'@examples
 #'\donttest{
 #'data(CM_Factors)
-#' ZZ <- RiskFactors
+#' RF_TS <- RiskFactors
 #' N <- 3
 #'
-#' JLLinputs <- list()
-#' JLLinputs$Economies <- c( "China", "Brazil", "Mexico", "Uruguay")
-#' JLLinputs$DomUnit <- "China"
-#' JLLinputs$WishSigmas <- 1
-#' JLLinputs$SigmaNonOrtho <- NULL
-#' JLLinputs$JLLModelType <- "JLL original"
+#' JLLinputs <- list(Economies = c("China", "Brazil", "Mexico", "Uruguay"), DomUnit = "China",
+#'                   WishSigmas = 1, SigmaNonOrtho = NULL, JLLModelType = "JLL original")
 #'
-#' JLL(ZZ, N, JLLinputs)
+#'
+#' JLLPara <- JLL(RF_TS, N, JLLinputs)
 #'
 #'}
-
-#'@details
-#' For the models 'JLL original' or "JLL jointSigma" the name of one dominant economy must assigned.\cr
-#' For the model 'JLL  NoDomUnit', the name of one dominant economy must be set as "None".
 #'@references
 #' Jotiskhatira, Le and Lundblad (2015). "Why do interest rates in different currencies co-move?" (Journal of Financial Economics)
 #'@return      List of model parameters from both the orthogonalized and non-orthogonalized versions of the JLL's based models
@@ -40,311 +34,40 @@
 #'@export
 
 
-JLL <- function(NonOrthoFactors, N, JLLinputs){
-
+JLL <- function(NonOrthoFactors, N, JLLinputs, CheckInputs= F){
 
 # 0. Preliminary works/checks
-
- if ((grepl("JLL original", JLLinputs$JLLModelType) ||
-      grepl("JLL jointSigma", JLLinputs$JLLModelType)) & JLLinputs$DomUnit == "None"){
-    stop("In 'JLL original' DomUnit cannot be 'None'. One dominant country is required! " )
- }
-
-  if ( grepl("JLL NoDomUnit", JLLinputs$JLLModelType) & JLLinputs$DomUnit != "None"){
-    stop("In 'JLL NoDomUnit' DomUnit cannot cannot contain a name of a country. DomUnit must be set as 'None'! " )
-  }
-
-
-  if (JLLinputs$DomUnit != "None"){
-    IdxDomUnit <- which(JLLinputs$DomUnit== JLLinputs$Economies) # Index of the dominant country
-  }
+if(isTRUE(CheckInputs)){ CheckJLLinputs(NonOrthoFactors, JLLinputs)}
 
 # System dimension
-T <- ncol(NonOrthoFactors)
 K <- nrow(NonOrthoFactors)
-C <- length(JLLinputs$Economies)
-
-# Extract the number of global factors
-G <- c()
-for (h in 1:K){
-  G[h] <- all(sapply(JLLinputs$Economies, grepl, rownames(NonOrthoFactors))[h,] == 0)
-}
-
+G <- c() # Extract the number of global factors
+for (h in 1:K){ G[h] <- all(sapply(JLLinputs$Economies, grepl, rownames(NonOrthoFactors))[h,] == 0)}
 G <- length(G[G==TRUE]) # Number of global unspnned factors
-M <- (K-G)/C - N # Number of domestic unspnned factors
-
+C <- length(JLLinputs$Economies)
 # Factor labels
-FactorsJLL <- c()
-FactorLabels <- list()
-
-for (i in 1:C){
-  Idx <- which(grepl(JLLinputs$Economies[i], rownames(NonOrthoFactors)))
-  FactorLabels[[JLLinputs$Economies[i]]] <-  rownames(NonOrthoFactors)[Idx]
-
-  JLLlab <- paste(FactorLabels[[JLLinputs$Economies[i]]], "JLL")
-  FactorsJLL <- append(FactorsJLL, JLLlab)
-}
-
-FactorLabels$Global <- rownames(NonOrthoFactors)[seqi(1,G)]
-LabelsJLL <- c(FactorLabels$Global, FactorsJLL)
-
+Labels_All <- GetLabels_JLL(NonOrthoFactors,JLLinputs, G)
 
 # 1) Pre-allocation of the factors set
-MacroGlobal <- NonOrthoFactors[c(FactorLabels$Global),]
-FullFactorsSet <- list()
+Fact_NonOrtho <- Factors_NonOrtho(NonOrthoFactors, JLLinputs, Labels_All, N)
 
-for (i in 1:C){
-  FullFactorsSet[[JLLinputs$Economies[i]]]$Macro <- NonOrthoFactors[FactorLabels[[JLLinputs$Economies[i]]], ][1:M,]
-  FullFactorsSet[[JLLinputs$Economies[i]]]$Pricing <- NonOrthoFactors[FactorLabels[[JLLinputs$Economies[i]]][(M+1):(N+M)],]
-}
+# 2) Get coefficients from the orthogonalized regressions
+Ortho_RegSet <- OrthoReg_JLL(JLLinputs, Fact_NonOrtho, rownames(NonOrthoFactors), Labels_All$LabelsJLL)
 
+# 3) VAR(1) with orthogonalized factors
+Para_VAR_Ortho <- OrthoVAR_JLL(NonOrthoFactors, JLLinputs, Ortho_RegSet, Labels_All, N)
 
-# 2) Orthogonalization of pricing factors
-PricingRegressEQ6 <- list()
-b <- list()
-P_e <- list()
-c <- list()
+# 4) Obtain the non-orthogonalized model parameters
+Para_VAR_NoOrtho <- NoOrthoVAR_JLL(Ortho_RegSet, Para_VAR_Ortho)
 
-# Equation 6
-for (i in 1:C){
-  PricingRegressEQ6[[JLLinputs$Economies[i]]] <- stats::lm( t(FullFactorsSet[[JLLinputs$Economies[i]]]$Pricing)~ t(FullFactorsSet[[JLLinputs$Economies[i]]]$Macro) -1)
-  b[[JLLinputs$Economies[i]]] <- t(PricingRegressEQ6[[JLLinputs$Economies[i]]]$coefficients)
-  P_e[[JLLinputs$Economies[i]]] <- t(PricingRegressEQ6[[JLLinputs$Economies[i]]]$residuals)
-}
+# 5) Obtain sigmas/Cholesky factorizations
+Sigmas <- Get_Sigama_JLL(JLLinputs, Labels_All, Ortho_RegSet, Para_VAR_Ortho, N)
 
-# Equation 10
-if (JLLinputs$DomUnit == "None"){
-  for (i in 1:C){
-    c[[JLLinputs$Economies[i]]] <- matrix(0, N, N)
-  }
-}else{
-  PricingRegressEQ10 <- list()
-  P_e_star <- list()
-  c <- list()
-
-  for (j in 1:(C-1)){
-    PricingRegressEQ10[[JLLinputs$Economies[-IdxDomUnit][j]]] <- stats::lm( t(P_e[[JLLinputs$Economies[-IdxDomUnit][j]]]) ~ t(P_e[[JLLinputs$DomUnit]]) -1)
-    P_e_star[[JLLinputs$Economies[-IdxDomUnit][j]]] <- t(PricingRegressEQ10[[JLLinputs$Economies[-IdxDomUnit][j]]]$residuals)
-    c[[JLLinputs$Economies[-IdxDomUnit][j]]] <- t(PricingRegressEQ10[[JLLinputs$Economies[-IdxDomUnit][j]]]$coefficients)
-  }
-}
-
-
-# 3) Orthogonalization of macro factors
-MacroRegressEQ8 <- list()
-a_W <- list()
-M_e <- list()
-a_DU_CS <- list() # Dominant unit country
-if (JLLinputs$DomUnit == "None"){
-  # Equation 8
-  for (i in 1:C){
-    MacroRegressEQ8[[JLLinputs$Economies[i]]] <- stats::lm( t(FullFactorsSet[[JLLinputs$Economies[i]]]$Macro)~ t(MacroGlobal) -1)
-    a_W[[JLLinputs$Economies[i]]] <- t(MacroRegressEQ8[[JLLinputs$Economies[i]]]$coefficients)
-    M_e[[JLLinputs$Economies[i]]] <- t(MacroRegressEQ8[[JLLinputs$Economies[i]]]$residuals)
-    a_DU_CS[[JLLinputs$Economies[i]]] <- matrix(0, M, G)
-  }
-
-}else{
-  MacroRegressEQ9 <- list()
-  M_e_CS <- list()
-  # Equation 8
-  MacroRegressEQ8[[JLLinputs$DomUnit]] <- stats::lm( t(FullFactorsSet[[JLLinputs$DomUnit]]$Macro)~ t(MacroGlobal) -1)
-  a_W[[JLLinputs$DomUnit]] <- t(MacroRegressEQ8[[JLLinputs$DomUnit]]$coefficients)
-  M_e[[JLLinputs$DomUnit]] <- t(MacroRegressEQ8[[JLLinputs$DomUnit]]$residuals)
-
-  # Equation 9
-  for (j in 1:(C-1)){
-    MacroRegressEQ9[[JLLinputs$Economies[-IdxDomUnit][j]]] <- stats::lm( t(FullFactorsSet[[JLLinputs$Economies[-IdxDomUnit][j]]]$Macro)~ t(MacroGlobal) + t(M_e[[JLLinputs$DomUnit]]) -1)
-    a_W[[JLLinputs$Economies[-IdxDomUnit][j]]] <- t(MacroRegressEQ9[[JLLinputs$Economies[-IdxDomUnit][j]]]$coefficients)[,seqi(1,G)]
-    a_DU_CS[[JLLinputs$Economies[-IdxDomUnit][j]]] <-t(MacroRegressEQ9[[JLLinputs$Economies[-IdxDomUnit][j]]]$coefficients)[,(G+1):(G+M)]
-    M_e_CS[[JLLinputs$Economies[-IdxDomUnit][j]]] <- t(MacroRegressEQ9[[JLLinputs$Economies[-IdxDomUnit][j]]]$residuals)
-  }
-}
-
-
-# 4) Build the Pi matrices:
-# PIb
-PIb <- diag(K)
-idxRow0 <- G+M
-idxCol0 <- G
-for (i in 1:C){
-  idxRow1 <- idxRow0+N
-  idxCol1 <- idxCol0 + M
-  PIb[(idxRow0+1):idxRow1, (idxCol0+1):idxCol1] <- b[[JLLinputs$Economies[i]]]
-  idxRow0 <- idxRow1+M
-  idxCol0 <- idxCol1 +N
-}
-
-rownames(PIb) <- rownames(NonOrthoFactors)
-colnames(PIb) <- LabelsJLL
-
-# PIac
-PIac <- diag(K)
-idxRow00 <- G
-for (i in 1:C){
-  idxRow11 <- idxRow00+ M
-  PIac[(idxRow00+1):idxRow11, 1:G] <- a_W[[JLLinputs$Economies[i]]]
-  idxRow00 <- idxRow11+N
-}
-
-if (JLLinputs$DomUnit !='None' ){
-  # Place the orthogonalization of the pricing factors with respect to the dominant unit
-  idxRowaDU0 <- G + M +N
-  idxColaDU0 <- G
-  idxColaDU1 <- idxColaDU0 + M
-  for (j in 1:(C-1)){
-    idxRowaDU1 <- idxRowaDU0 + M
-    PIac[(idxRowaDU0+1):idxRowaDU1, (idxColaDU0+1):idxColaDU1] <- a_DU_CS[[JLLinputs$Economies[-IdxDomUnit][j]]]
-    idxRowaDU0 <- idxRowaDU1 + N
-  }
-
-
-  # Place the orthogonalization of the pricing factors with respect to the dominant unit
-  # (c coefficients from equation 10)
-  idxRowc0 <- G + M + N + M
-  idxColc0 <- G + M
-  idxColc1 <- idxColc0 + N
-  for (j in 1:(C-1)){
-    idxRowc1 <- idxRowc0 + N
-    PIac[(idxRowc0+1):idxRowc1, (idxColc0+1):idxColc1] <- c[[JLLinputs$Economies[-IdxDomUnit][j]]]
-    idxRowc0 <- idxRowc1 +M
-  }
-
-}
-
-
-rownames(PIac) <- rownames(NonOrthoFactors)
-colnames(PIac) <- LabelsJLL
-
-
-# PI
-PI <- PIb%*%PIac
-
-rownames(PI) <- rownames(NonOrthoFactors)
-colnames(PI) <- LabelsJLL
-
-# 5) VAR(1) with orthogonalized factors
-AllDomFactorsOrtho <- matrix(NA, nrow= C*(N+M), ncol = T)
-count0 <- 0
-if (JLLinputs$DomUnit== 'None'){
-  for(i in 1:C){
-    count1 <- N+M + count0
-    AllDomFactorsOrtho[(count0+1):count1,] <- rbind(M_e[[JLLinputs$Economies[i]]],P_e[[JLLinputs$Economies[i]]])
-    count0 <- count1
-  }
-}else{
-  DomUnitOrtho <- rbind(M_e[[JLLinputs$DomUnit]], P_e[[JLLinputs$DomUnit]])
-  NoDomUnitOrtho <- matrix(NA, nrow= (C-1)*(N+M), ncol = T)
-  for(i in 1:(C-1)){
-    count1 <- N+M + count0
-    NoDomUnitOrtho[(count0+1):count1,] <- rbind(M_e_CS[[JLLinputs$Economies[-IdxDomUnit][i]]], P_e_star[[JLLinputs$Economies[-IdxDomUnit][i]]])
-    count0 <- count1
-  }
-  AllDomFactorsOrtho <- rbind(DomUnitOrtho, NoDomUnitOrtho)
-}
-
-Ye <- rbind(MacroGlobal, AllDomFactorsOrtho)
-rownames(Ye) <- LabelsJLL
-
-# Build the vector of non-orthogonalized factors
-# (to make sure that the dominant unit country will be placed right after the global factors)
-if (JLLinputs$DomUnit == "None"){
-  Y <- NonOrthoFactors
-}else{
-  Y <- matrix(NA, nrow= K, ncol = T)
-  rownames(Y) <- rownames(NonOrthoFactors)
-  Y[seqi(1,G), ] <- NonOrthoFactors[seqi(1,G),] # Global factors
-  Y[(G+1):(G+M+N),] <- NonOrthoFactors[FactorLabels[[IdxDomUnit]],]  # Dominant country
-
-  COUNTER0 <- G+M+N
-  for(i in 1:(C-1)){ # Non-dominant countries
-    COUNTER1 <- N+M + COUNTER0
-    Y[(COUNTER0+1):COUNTER1,] <- NonOrthoFactors[FactorLabels[[JLLinputs$Economies[-IdxDomUnit][i]]],]
-    COUNTER0 <- COUNTER1
-  }
-}
-
-
-
-# 5.a) Set the constrains on the feedback matrix
-Bcon<-  FeedbackMatrixRestrictionsJLL(JLLinputs$DomUnit, K,G,M,N)
-
-# 5.b) Estimate the VAR(1) with the orthogonalized variables
-intercept <- rep(1, times= T-1)
-RHS <- rbind(intercept, Ye[,1:(T-1)])
-LHS <- Ye[,2:T]
-
-Coeff <- Reg__OLSconstrained(Y= LHS, X= RHS, Bcon, G=NULL)
-k0_e <- Coeff[,1]
-k1_e <- Coeff[,2:(K+1)]
-
-# Add Labels to k1_e
-rownames(k1_e) <- LabelsJLL
-colnames(k1_e) <- LabelsJLL
-
-# 6) Obtain the non-orthogonalized factors:
-k0 <- PI%*%k0_e
-k1 <- PI%*%k1_e%*%solve(PI)
-
-# Ensures that the almost zero elements of k1 are actually zeros (this procedure avoids weired IRFs)
-idxZEROS <- which(Bcon[,2:(K+1)] == 0)
-k1[idxZEROS] <- 0
-
-
-
-# 6) Sigmas/Cholesky factorizations
-
-if (JLLinputs$WishSigmas == 1){
-# If the Variance-covariance matrix of the orthogonalized factors are NOT provided
-if (is.null(JLLinputs$SigmaNonOrtho)){
-
-  T <- ncol(Ye)
-
-  LHS <- Ye[,2:T]
-  RHS <- Ye[,1:(T-1)]
-
-
-  et <- LHS - k0_e - k1_e%*%RHS
-  SIGMA_Unres <- et%*%t(et)/dim(et)[2]
-
-  #Labels
-  rownames(SIGMA_Unres) <- LabelsJLL
-  colnames(SIGMA_Unres) <- LabelsJLL
-
-  # If the estimation of SIGMA_Ye is necessary
-  Sigma_Ye <- EstimationSigma_Ye(SIGMA_Unres, et, M, G, JLLinputs$Economies, JLLinputs$DomUnit)
-
-  # Cholesky term (non-orthogonalized factors)
-  Sigma_Y <- PI%*%Sigma_Ye
-
-  # Variance-covariance matrices
-  Sigma_Res_Ortho <- Sigma_Ye%*%t(Sigma_Ye) #  Orthogonalized dynamics
-  Sigma_Res_NonOrtho <- Sigma_Y%*%t(Sigma_Y) # Non-orthogonalized dynamics
-
-
-}else{
-  Sigma_Res_NonOrtho <- JLLinputs$SigmaNonOrtho
-  Sigma_Y <- t(chol(JLLinputs$SigmaNonOrtho))
-  Sigma_Ye <- solve(PI)%*%Sigma_Y
-  Sigma_Res_Ortho <- Sigma_Ye%*%t(Sigma_Ye)
-}
-
-  ZeroIdxSigmaJLL <- IDXZeroRestrictionsJLLVarCovOrtho(M, N, G, JLLinputs$Economies, JLLinputs$DomUnit) # Identify the zero elements of the orthogonalized variance-covariance matrix
-  # (usuful for distinguishing real zeros from nearly zero elements, later on in the code)
-  Sigmas <- list(Sigma_Res_Ortho, Sigma_Res_NonOrtho, Sigma_Y, Sigma_Ye, ZeroIdxSigmaJLL)
-
-  names(Sigmas) <- c("VarCov_Ortho", "VarCov_NonOrtho", "Sigma_Y", "Sigma_Ye", "ZeroIdxSigmaJLLOrtho")
-} else{
-  Sigmas <- NULL
-}
-
-
-# 7) Prepare the outputs
-
-outputs <- list(a_W, a_DU_CS, b, c, PIb, PIac, PI, Ye, k0_e, k1_e, k0, k1, Sigmas)
-
-names(outputs) <- c('a_W','a_DU_CS', 'b', 'c', 'PIb', 'PIac', 'PI', 'Ye', 'k0_e','k1_e', 'k0', 'k1', 'Sigmas')
-
+# 6) Prepare the outputs
+outputs <- list(a_W = Ortho_RegSet$a_W, a_DU_CS= Ortho_RegSet$a_DU_CS, b = Ortho_RegSet$b, c = Ortho_RegSet$c,
+                PIb = Ortho_RegSet$PIb, PIac = Ortho_RegSet$PIac, PI = Ortho_RegSet$PI, Ye = Ortho_RegSet$Ye,
+                k0_e = Para_VAR_Ortho$k0_e, k1_e = Para_VAR_Ortho$k1_e, k0 = Para_VAR_NoOrtho$k0,
+                k1 = Para_VAR_NoOrtho$k1, Sigmas = Sigmas)
 
 return(outputs)
 }
@@ -352,8 +75,7 @@ return(outputs)
 
 ###############################################################################################################
 #' Find the indexes of zero-restrictions from the orthogonalized variance-covariance matrix from the JLL-based models
-#
-
+#'
 #'@param M number of country-specific unspanned factors (scalar)
 #'@param N number of country-specific spanned factors (scalar)
 #'@param G number of global unspanned factors (scalar)
@@ -416,7 +138,6 @@ IDXZeroRestrictionsJLLVarCovOrtho <- function(M, N, G, Economies, DomUnit){
     }
   }
 
-
   # Zero restrictions of Macro country i on Macro country j
   if ( DomUnit != "None"){
     for (i in 1:C){
@@ -457,10 +178,697 @@ IDXZeroRestrictionsJLLVarCovOrtho <- function(M, N, G, Economies, DomUnit){
   IdxZerosVarCovOrtho  <- which(VarCovOrtho ==0)
   IdxZerosSigma_Ye<- which(CholOrtho == 0)
 
-  IDXzerosJLL <- list(IdxZerosSigma_Ye, IdxZerosVarCovOrtho)
-  names(IDXzerosJLL) <- c("Sigma_Ye","VarCovOrtho")
+  IDXzerosJLL <- list(Sigma_Ye = IdxZerosSigma_Ye, VarCovOrtho = IdxZerosVarCovOrtho)
 
   return(IDXzerosJLL)
 
 }
+####################################################################################################################
+#' Generate the variable labels of the JLL models
+#'
+#'@param NonOrthoFactors Risk factors before the orthogonalization (FxT)
+#'@param JLLinputs List of necessary inputs to estimate JLL-based setups
+#'@param G number of global unspanned factors (scalar)
+#'
+#'@keywords internal
 
+GetLabels_JLL <- function(NonOrthoFactors, JLLinputs, G){
+
+  C <- length(JLLinputs$Economies)
+
+  FactorsJLL <- c()
+  FactorLabels <- list()
+
+  for (i in 1:C){
+    Idx <- which(grepl(JLLinputs$Economies[i], rownames(NonOrthoFactors)))
+    FactorLabels[[JLLinputs$Economies[i]]] <-  rownames(NonOrthoFactors)[Idx]
+
+    JLLlab <- paste(FactorLabels[[JLLinputs$Economies[i]]], "JLL")
+    FactorsJLL <- append(FactorsJLL, JLLlab)
+  }
+
+  FactorLabels$Global <- rownames(NonOrthoFactors)[seqi(1,G)]
+  LabelsJLL <- c(FactorLabels$Global, FactorsJLL)
+
+  return(list(FactorLabels = FactorLabels, LabelsJLL = LabelsJLL))
+}
+####################################################################################################################
+#'Makes the pre-allocation of the factors set for JLL-based models
+#'
+#'@param NonOrthoFactors Risk factors before the orthogonalization (FxT)
+#'@param JLLinputs List of necessary inputs to estimate JLL-based setups
+#'@param FactorLab Variable labels from JLL-based models
+#'@param N number of country-specific spanned factors (scalar)
+#'
+#'@keywords internal
+
+Factors_NonOrtho <- function(NonOrthoFactors, JLLinputs, FactorLab, N){
+
+  M <- length(FactorLab$FactorLabels[[1]]) - N
+
+  # Domestic factors
+  FullFactorsSet <- list()
+  C <- length(JLLinputs$Economies)
+  for (i in 1:C){
+    EcoLabs <- JLLinputs$Economies[[i]]
+    LabelofInt <- FactorLab$FactorLabels[[EcoLabs]]
+
+    FullFactorsSet[[EcoLabs]]$Macro <- NonOrthoFactors[LabelofInt, ][1:M, ]
+    FullFactorsSet[[EcoLabs]]$Pricing <- NonOrthoFactors[LabelofInt, ][(M+1):(N+M), ]
+  }
+
+  # Global factors
+  Lab_global <- FactorLab$FactorLabels$Global
+  G <- length(Lab_global)
+  MacroGlobal <- NonOrthoFactors[Lab_global, , drop=FALSE]
+
+  Out <- list(MacroGlobal = MacroGlobal, FullFactorsSet = FullFactorsSet)
+  return(Out)
+}
+
+####################################################################################################################
+#' Compute Sigmas/Cholesky factorizations
+#'
+#'@param JLLinputs List of necessary inputs to estimate JLL-based setups
+#'@param FacSet Set of factors used in the estimation of JLL-based setups
+#'@param Para_Ortho_Reg Set of parameters obtained from the JLL regressions
+#'@param Para_Ortho_VAR Set of parameters obtained from the VAR(1) of JLL-based models
+#'@param N number of country-specific spanned factors (scalar)
+#'
+#'
+#'@keywords internal
+
+
+Get_Sigama_JLL <- function(JLLinputs, FacSet, Para_Ortho_Reg, Para_Ortho_VAR, N){
+
+
+  M <- length(FacSet$FactorLabels[[1]]) - N
+  G <- length(FacSet$FactorLabels$Global)
+
+  Ye <- Para_Ortho_VAR$Ye
+  k0_e <- Para_Ortho_VAR$k0_e
+  k1_e <- Para_Ortho_VAR$k1_e
+  PI <- Para_Ortho_Reg$PI
+
+  LabelsJLL <- FacSet$LabelsJLL
+
+if (JLLinputs$WishSigmas == 1){
+  # If the Variance-covariance matrix of the orthogonalized factors are NOT provided
+  if (is.null(JLLinputs$SigmaNonOrtho)){
+
+    T <- ncol(Ye)
+
+    LHS <- Ye[ , 2:T]
+    RHS <- Ye[ , 1:(T-1)]
+
+
+    et <- LHS - k0_e - k1_e%*%RHS
+    SIGMA_Unres <- et%*%t(et)/dim(et)[2]
+
+    #Labels
+    dimnames(SIGMA_Unres) <- list(LabelsJLL, LabelsJLL)
+
+    # If the estimation of SIGMA_Ye is necessary
+    Sigma_Ye <- EstimationSigma_Ye(SIGMA_Unres, et, M, G, JLLinputs$Economies, JLLinputs$DomUnit)
+
+    # Cholesky term (non-orthogonalized factors)
+    Sigma_Y <- PI%*%Sigma_Ye
+
+    # Variance-covariance matrices
+    Sigma_Res_Ortho <- Sigma_Ye%*%t(Sigma_Ye) #  Orthogonalized dynamics
+    Sigma_Res_NonOrtho <- Sigma_Y%*%t(Sigma_Y) # Non-orthogonalized dynamics
+
+
+  }else{
+    Sigma_Res_NonOrtho <- JLLinputs$SigmaNonOrtho
+    Sigma_Y <- t(chol(JLLinputs$SigmaNonOrtho))
+    Sigma_Ye <- solve(PI)%*%Sigma_Y
+    Sigma_Res_Ortho <- Sigma_Ye%*%t(Sigma_Ye)
+  }
+
+  ZeroIdxSigmaJLL <- IDXZeroRestrictionsJLLVarCovOrtho(M, N, G, JLLinputs$Economies, JLLinputs$DomUnit) # Identify the zero elements of the orthogonalized variance-covariance matrix
+  # (usuful for distinguishing real zeros from nearly zero elements, later on in the code)
+  Sigmas <- list(Sigma_Res_Ortho, Sigma_Res_NonOrtho, Sigma_Y, Sigma_Ye, ZeroIdxSigmaJLL)
+  names(Sigmas) <- c("VarCov_Ortho", "VarCov_NonOrtho", "Sigma_Y", "Sigma_Ye", "ZeroIdxSigmaJLLOrtho")
+
+} else{
+  Sigmas <- NULL
+}
+
+return(Sigmas)
+}
+#############################################################################################################
+#' Check consistency of the inputs provided in JLL-based models
+#'
+#'@param RiskFactorsNonOrtho Risk factors before the orthogonalization (FxT)
+#'@param JLLinputs List of necessary inputs to estimate JLL-based setups
+#'
+#'@keywords internal
+
+CheckJLLinputs <- function(RiskFactorsNonOrtho, JLLinputs){
+
+  # CHECK 1: Check whether the model type is correctly specified
+  if( !JLLinputs$JLLModelType %in% c("JLL original", "JLL No DomUnit", "JLL joint Sigma")){
+    stop("JLLModelType input must be one of the following inputs: 'JLL original', 'JLL No DomUnit', 'JLL joint Sigma'.")}
+
+  # CHECK 2: Check whether country names are correctly specified
+  if(!(all(sapply(JLLinputs$Economies, is.character)))){
+    stop("All elements of the list 'Economies' must be exclusively country names")
+  }
+
+  # CHECK 3: Check for the consistency of dominant unit
+  if ((grepl("JLL original", JLLinputs$JLLModelType) ||
+       grepl("JLL jointSigma", JLLinputs$JLLModelType)) & JLLinputs$DomUnit == "None"){
+  stop("In 'JLL original' and 'jointSigma', the  DomUnit input cannot be 'None'. One dominant country is required.")
+}
+
+if ( grepl("JLL No DomUnit", JLLinputs$JLLModelType) & JLLinputs$DomUnit != "None"){
+  stop("In 'JLL No DomUnit' DomUnit cannot cannot contain a name of a country. DomUnit must be set as 'None'." )
+}
+
+  # CHECK 4: Check the exitence condition of global factors
+  G <- c() # Extract the number of global factors
+  for (h in 1:nrow(RiskFactorsNonOrtho)){ G[h] <- all(sapply(JLLinputs$Economies, grepl, rownames(RiskFactorsNonOrtho))[h,] == 0)}
+  G <- length(G[G==TRUE]) # Number of global unspnned factors
+
+  if (G==0){stop( "JLL-based models must contain at least one global factor.")}
+
+}
+###############################################################################################################
+#'Get coefficients from the orthogonalized regressions
+#'
+#'@param JLLinputs List of necessary inputs to estimate JLL-based setups
+#'@param FacSet Set of factors used in the estimation of JLL-based setups
+#'@param FactorLab_NonOrth Variable labels of the non-orthogonalized risk factors
+#'@param FactorLab_JLL Variable labels of the orthogonalized risk factors
+#'
+#'@keywords internal
+
+OrthoReg_JLL <- function(JLLinputs, FacSet, FactorLab_NonOrth, FactorLab_JLL){
+
+  # Preliminary work
+  FullFactorsSet <- FacSet$FullFactorsSet
+  MacroGlobal <- FacSet$MacroGlobal
+  Label_DU <- JLLinputs$DomUnit # label of the dominant unit
+
+  if (Label_DU != "None"){ IdxDomUnit <- which(Label_DU == JLLinputs$Economies)} # Index of the dominant country
+
+  G <- nrow(FacSet$MacroGlobal)
+  C <- length(JLLinputs$Economies)
+  M <- nrow(FacSet$FullFactorsSet[[1]]$Macro)
+  N <- nrow(FacSet$FullFactorsSet[[1]]$Pricing)
+  K <- (M+N)*C + G
+
+  PricingRegressEQ6 <- list()
+  b <- list()
+  P_e <- list()
+  c <- list()
+
+# 1) Orthogonalization of the pricing factors
+  # Equation 6
+  for (i in 1:C){
+    Label_Eco <- JLLinputs$Economies[i] # label of all economies
+
+    PricingRegressEQ6[[Label_Eco]] <- stats::lm( t(FullFactorsSet[[Label_Eco]]$Pricing)~ t(FullFactorsSet[[Label_Eco]]$Macro) -1)
+    b[[Label_Eco]] <- t(PricingRegressEQ6[[Label_Eco]]$coefficients)
+    P_e[[Label_Eco]] <- t(PricingRegressEQ6[[Label_Eco]]$residuals)
+  }
+
+  # Equation 10
+  P_e_star <- list()
+  if (Label_DU == "None"){
+    for (i in 1:C){
+    c[[JLLinputs$Economies[i]]] <- matrix(0, N, N)
+    P_e_star[[JLLinputs$Economies[i]]] <- NA
+    }
+
+    }else{
+    PricingRegressEQ10 <- list()
+    c <- list()
+
+    for (j in 1:(C-1)){
+      Label_No_DU <- JLLinputs$Economies[-IdxDomUnit][j] # label of the no dominant units
+
+      PricingRegressEQ10[[Label_No_DU]] <- stats::lm( t(P_e[[Label_No_DU]]) ~ t(P_e[[Label_DU]]) -1)
+      P_e_star[[Label_No_DU]] <- t(PricingRegressEQ10[[Label_No_DU]]$residuals)
+      c[[Label_No_DU]] <- t(PricingRegressEQ10[[Label_No_DU]]$coefficients)
+    }
+  }
+
+  # 2) Orthogonalization of the macro factors
+  MacroRegressEQ8 <- list()
+  a_W <- list()
+  M_e <- list()
+  a_DU_CS <- list() # Dominant unit country
+  M_e_CS <- list()
+  if (Label_DU == "None"){
+    # Equation 8
+    for (i in 1:C){
+      Label_Eco <- JLLinputs$Economies[i] # label of all economies
+
+      MacroRegressEQ8[[Label_Eco]] <- stats::lm( t(FullFactorsSet[[Label_Eco]]$Macro)~ t(MacroGlobal) -1)
+      a_W[[Label_Eco]] <- t(MacroRegressEQ8[[Label_Eco]]$coefficients)
+      M_e[[Label_Eco]] <- t(MacroRegressEQ8[[Label_Eco]]$residuals)
+      a_DU_CS[[Label_Eco]] <- matrix(0, M, G)
+      M_e_CS[[Label_Eco]] < NA
+      }
+
+  }else{
+    MacroRegressEQ9 <- list()
+      # Equation 8
+    MacroRegressEQ8[[Label_DU]] <- stats::lm( t(FullFactorsSet[[Label_DU]]$Macro)~ t(MacroGlobal) -1)
+    a_W[[Label_DU]] <- t(MacroRegressEQ8[[Label_DU]]$coefficients)
+    M_e[[Label_DU]] <- t(MacroRegressEQ8[[Label_DU]]$residuals)
+
+    # Equation 9
+    for (j in 1:(C-1)){
+      Label_No_DU <- JLLinputs$Economies[-IdxDomUnit][j] # label of the no dominant units
+
+      MacroRegressEQ9[[Label_No_DU]] <- stats::lm( t(FullFactorsSet[[Label_No_DU]]$Macro)~ t(MacroGlobal) + t(M_e[[Label_DU]]) -1)
+      a_W[[Label_No_DU]] <- t(MacroRegressEQ9[[Label_No_DU]]$coefficients)[,seqi(1,G)]
+      a_DU_CS[[Label_No_DU]] <-t(MacroRegressEQ9[[Label_No_DU]]$coefficients)[,(G+1):(G+M)]
+      M_e_CS[[Label_No_DU]] <- t(MacroRegressEQ9[[Label_No_DU]]$residuals)
+    }
+  }
+
+  # 3) Build the Pi matrices:
+  # PIb
+  PIb <- diag(K)
+  idxRow0 <- G + M
+  idxCol0 <- G
+  for (i in 1:C){
+    Label_Eco <- JLLinputs$Economies[i] # label of all economies
+
+    idxRow1 <- idxRow0+N
+    idxCol1 <- idxCol0 + M
+    PIb[(idxRow0+1):idxRow1, (idxCol0+1):idxCol1] <- b[[Label_Eco]]
+    idxRow0 <- idxRow1+M
+    idxCol0 <- idxCol1 +N
+  }
+   dimnames(PIb) <- list(FactorLab_NonOrth, FactorLab_JLL)
+  # PIac
+  PIac <- diag(K)
+  idxRow00 <- G
+  for (i in 1:C){
+    Label_Eco <- JLLinputs$Economies[i] # label of all economies
+
+    idxRow11 <- idxRow00+ M
+    PIac[(idxRow00+1):idxRow11, 1:G] <- a_W[[Label_Eco]]
+    idxRow00 <- idxRow11+N
+  }
+
+  if (Label_DU !='None' ){
+    # Place the orthogonalization of the pricing factors with respect to the dominant unit
+    idxRowaDU0 <- G + M +N
+    idxColaDU0 <- G
+    idxColaDU1 <- idxColaDU0 + M
+    for (j in 1:(C-1)){
+      Label_No_DU <- JLLinputs$Economies[-IdxDomUnit][j] # label of the no dominant units
+
+      idxRowaDU1 <- idxRowaDU0 + M
+      PIac[(idxRowaDU0+1):idxRowaDU1, (idxColaDU0+1):idxColaDU1] <- a_DU_CS[[Label_No_DU]]
+      idxRowaDU0 <- idxRowaDU1 + N
+    }
+
+    # Place the orthogonalization of the pricing factors with respect to the dominant unit
+    # (c coefficients from equation 10)
+    idxRowc0 <- G + M + N + M
+    idxColc0 <- G + M
+    idxColc1 <- idxColc0 + N
+    for (j in 1:(C-1)){
+      Label_No_DU <- JLLinputs$Economies[-IdxDomUnit][j] # label of the no dominant units
+
+      idxRowc1 <- idxRowc0 + N
+      PIac[(idxRowc0+1):idxRowc1, (idxColc0+1):idxColc1] <- c[[Label_No_DU]]
+      idxRowc0 <- idxRowc1 +M
+    }
+
+  }
+
+  dimnames(PIac) <- list(FactorLab_NonOrth, FactorLab_JLL)
+  # PI
+  PI <- PIb%*%PIac
+  dimnames(PI) <- list(FactorLab_NonOrth, FactorLab_JLL)
+
+  # 4) Output to export
+  Times_Series <- list(P_e = P_e, P_e_star = P_e_star, M_e = M_e, M_e_CS = M_e_CS)
+  Out <- list(a_W =a_W, a_DU_CS= a_DU_CS, b = b, c = c, PIb = PIb, PIac = PIac, PI = PI, TS_Factors = Times_Series)
+return(Out)
+}
+##############################################################################################################
+#'VAR(1) with orthogonalized factors (JLL models)
+#'
+#'@param NonOrthoFactors Risk factors before the orthogonalization (FxT)
+#'@param JLLinputs List of necessary inputs to estimate JLL-based setups
+#'@param Ortho_Set Set of orthogonalized risk factors
+#'@param FactLabels Variable labels of the orthogonalized risk factors
+#'@param N number of country-specific spanned factors (scalar)
+#'
+#'
+#'@keywords internal
+
+OrthoVAR_JLL <- function(NonOrthoFactors, JLLinputs, Ortho_Set, FactLabels, N){
+
+  # 1) Preliminary work
+  LabelsJLL <- FactLabels$LabelsJLL
+  Label_DU <- JLLinputs$DomUnit
+  if (Label_DU != "None"){ IdxDomUnit <- which(Label_DU== JLLinputs$Economies)} # Index of the dominant country
+
+  K <- nrow(NonOrthoFactors)
+  T <- ncol(NonOrthoFactors)
+
+  C <- length(JLLinputs$Economies)
+  M <- length(FactLabels$FactorLabels[[1]]) - N
+  G <- length(FactLabels$FactorLabels$Global)
+
+  M_e <- Ortho_Set$TS_Factors$M_e
+  P_e <- Ortho_Set$TS_Factors$P_e
+  M_e_CS <- Ortho_Set$TS_Factors$M_e_CS
+  P_e_star <- Ortho_Set$TS_Factors$P_e_star
+
+  # 2) Build orthogonalized domestic risk factors
+  AllDomFactorsOrtho <- matrix(NA, nrow= K - G, ncol = T)
+  count0 <- 0
+  if (Label_DU == 'None'){
+    for(i in 1:C){
+      EcoLab <- JLLinputs$Economies[i]
+      count1 <- N+M + count0
+      AllDomFactorsOrtho[(count0+1):count1,] <- rbind(M_e[[EcoLab]], P_e[[EcoLab]])
+      count0 <- count1
+    }
+  }else{
+    DomUnitOrtho <- rbind(M_e[[Label_DU]], P_e[[Label_DU]])
+    NoDomUnitOrtho <- matrix(NA, nrow= (C-1)*(N+M), ncol = T)
+    for(i in 1:(C-1)){
+      Eco_NoDU <- JLLinputs$Economies[-IdxDomUnit][i]
+
+      count1 <- N+M + count0
+      NoDomUnitOrtho[(count0+1):count1,] <- rbind(M_e_CS[[Eco_NoDU]], P_e_star[[Eco_NoDU]])
+      count0 <- count1
+    }
+    AllDomFactorsOrtho <- rbind(DomUnitOrtho, NoDomUnitOrtho)
+  }
+
+  # Add global factors
+  MacroGlobal <- NonOrthoFactors[seqi(1,G), ]
+  Ye <- rbind(MacroGlobal, AllDomFactorsOrtho)
+  rownames(Ye) <- LabelsJLL
+
+  # Build the vector of non-orthogonalized factors
+  # (to make sure that the dominant unit country will be placed right after the global factors)
+  if (Label_DU == "None"){Y <- NonOrthoFactors
+  }else{
+    Y <- matrix(NA, nrow= K, ncol = T)
+    rownames(Y) <- rownames(NonOrthoFactors)
+    Y[seqi(1,G), ] <- MacroGlobal  # Global factors
+    Y[(G+1):(G+M+N),] <- NonOrthoFactors[FactLabels$FactorLabels[[IdxDomUnit]],]  # Dominant country
+
+    COUNTER0 <- G+M+N
+    for(i in 1:(C-1)){ # Non-dominant countries
+      Eco_NoDU <- JLLinputs$Economies[-IdxDomUnit][i]
+
+      COUNTER1 <- N+M + COUNTER0
+      Y[(COUNTER0+1):COUNTER1,] <- NonOrthoFactors[FactLabels$FactorLabels[[Eco_NoDU]], ]
+      COUNTER0 <- COUNTER1
+    }
+  }
+
+  # 3.a) Set the constrains on the feedback matrix
+  Bcon <-  FeedbackMatrixRestrictionsJLL(Label_DU, K,G,M,N)
+  # 3.b) Estimate the VAR(1) with the orthogonalized variables
+  intercept <- rep(1, times= T-1)
+  RHS <- rbind(intercept, Ye[,1:(T-1)])
+  LHS <- Ye[ , 2:T]
+
+  Coeff <- Reg__OLSconstrained(Y= LHS, X= RHS, Bcon, G=NULL)
+  k0_e <- Coeff[,1]
+  k1_e <- Coeff[,2:(K+1)]
+
+  # Add Labels to k1_e
+  dimnames(k1_e) <- list(LabelsJLL,LabelsJLL)
+
+  # 4) Output to export
+  Out <- list(k0_e = k0_e, k1_e = k1_e, Ye=Ye, Bcon = Bcon)
+  return(Out)
+}
+#########################################################################################################
+#'Obtain the non-orthogonalized model parameters
+#'
+#'@param Para_Ortho_Reg Set of parameters obtained from the JLL regressions
+#'@param Para_Ortho_VAR Set of parameters obtained from the VAR(1) of JLL-based models
+#'
+#'@keywords internal
+
+
+NoOrthoVAR_JLL <-function(Para_Ortho_Reg, Para_Ortho_VAR){
+
+  PI <- Para_Ortho_Reg$PI
+  k0_e <- Para_Ortho_VAR$k0_e
+  k1_e <- Para_Ortho_VAR$k1_e
+  Bcon <-Para_Ortho_VAR$Bcon
+
+  K <- nrow(PI)
+
+  # Obtain the non-orthogonalized factors
+  k0 <- PI%*%k0_e
+  k1 <- PI%*%k1_e%*%solve(PI)
+  # Ensures that the almost zero elements of k1 are actually zeros (this procedure avoids weird IRFs)
+  idxZEROS <- which(Bcon[,2:(K+1)] == 0)
+  k1[idxZEROS] <- 0
+
+  Out <- list(k0=k0, k1=k1)
+  return(Out)
+}
+#########################################################################################################
+#' Build the log-likelihood function of the P-dynamics from the JLL-based models
+#
+
+#'@param VecPara   vector that contains all the non-zero entries of the lower-triangualar part of the Cholesky factorization
+#'@param res       residuals from the VAR of the JLL model (K x T)
+#'@param IdxNONzero    vector that contains indexes of the matrix of the non-zero entries of the Cholesky factorization
+#'@param K              dimensions of the variance-covariance matrix (scalar)
+#'
+#
+#'@keywords internal
+#'@return value of the log-likelihood function (scalar)
+
+
+llk_JLL_Sigma <- function(VecPara, res, IdxNONzero, K){
+
+
+  Se <- matrix(0, K,K)
+  Se[IdxNONzero] <- VecPara # restricted Se matrix
+  Sigma_Res <- Se%*%t(Se)
+  y <- GaussianDensity(res,Sigma_Res)
+
+  llk <- -mean(y)
+
+  return(llk)
+}
+
+#################################################################################################################
+#' Impose the zero-restrictions on the Cholesky-factorization from JLL-based models.
+
+#'@param SigmaUnres unrestricted variance-covariance matrix (K X K)
+#'@param M          number of domestic unspanned factors per country (scalar)
+#'@param G          number of global unspanned factors (scalar)
+#'@param N         number of country-specific spanned factors (scalar)
+#'@param Economies string-vector containing the names of the economies which are part of the economic system
+#'@param DomUnit Name of the economy which is assigned as the dominant unit. \cr
+#'               If no dominant unit is assigned, then this variable is defined as "none"
+#'
+#'
+#'@keywords internal
+#'@return   restricted version the Cholesky factorization matrix from JLL-based models (K x K)
+#
+
+
+CholRestrictionsJLL <- function(SigmaUnres, M, G, N, Economies, DomUnit){
+
+  C <- length(Economies)
+
+  if (DomUnit != "None"){
+    IdxDomUnit <- which(DomUnit== Economies) # Index of the dominant country
+  }
+
+  # Transform the matrix to be the Cholesky form
+  SigmaUnres <- t(chol(SigmaUnres))
+
+  # i) Zero restrictions of global variables on spanned factors
+  idx0Global <- G + M
+  for (h in 1:C){
+    idx1Global <- idx0Global+ N
+    SigmaUnres[(idx0Global+1):idx1Global, 1:G] <- 0
+    idx0Global <- idx1Global + M
+  }
+
+  # ii) Zero restrictions of macro domestic variables on spanned factors
+  for (i in 1:C){
+    idx0RowMacroSpanned <- G + M
+    idx0ColMacroSpanned <- G +(i-1)*(M+N)
+    idx1ColMacroSpanned <- idx0ColMacroSpanned + M
+    for (h in 1:C){ # Fix the columns and loop through the rows
+      idx1RowMacroSpanned <- idx0RowMacroSpanned + N
+      SigmaUnres[(idx0RowMacroSpanned+1):idx1RowMacroSpanned, (idx0ColMacroSpanned+1):idx1ColMacroSpanned] <- 0
+      idx0RowMacroSpanned <- idx1RowMacroSpanned + M
+    }
+  }
+
+
+  # iii) Zero restrictions of spanned factors on macro domestic variables
+  for (i in 1:C){
+    idx0RowSpannedMacro <- G
+    idx0ColSpannedMacro <- G + M +(i-1)*(M+N)
+    idx1ColSpannedMacro <- idx0ColSpannedMacro + N
+    for (h in 1:C){ # Fix the columns and loop through the rows
+      idx1RowSpannedMacro <- idx0RowSpannedMacro + M
+      SigmaUnres[(idx0RowSpannedMacro+1):idx1RowSpannedMacro, (idx0ColSpannedMacro+1):idx1ColSpannedMacro] <- 0
+      idx0RowSpannedMacro <- idx1RowSpannedMacro + N
+    }
+  }
+
+
+  # iv) Zero restrictions of Macro country i on Macro country j
+  if ( DomUnit != "None"){
+    for (i in 1:C){
+      if (i!=IdxDomUnit){
+        idx0RowMacroMacro <- G
+        idx0ColMacroMacro <- G +(i-1)*(M+N)
+        idx1ColMacroMacro <- idx0ColMacroMacro + M
+        for (h in 1:C){ # Fix the columns and loop through the rows
+          idx1RowMacroMacro <- idx0RowMacroMacro + M
+          if (i != h){
+            SigmaUnres[(idx0RowMacroMacro+1):idx1RowMacroMacro, (idx0ColMacroMacro+1):idx1ColMacroMacro] <- 0
+          }
+          idx0RowMacroMacro <- idx1RowMacroMacro + N
+        }
+      }
+    }
+  }
+
+  # v) Zero restrictions of Spanned factors of country i on Spanned factors country j
+  if (DomUnit != "None"){
+    for (i in 1:C){
+      if ( i!=IdxDomUnit){
+        idx0RowSpannedSpanned <- G + M
+        idx0ColSpannedSpanned <- G + M +(i-1)*(M+N)
+        idx1ColSpannedSpanned <- idx0ColSpannedSpanned + N
+        for (h in 1:C){ # Fix the columns and loop through the rows
+          idx1RowSpannedSpanned <- idx0RowSpannedSpanned + N
+          if (i != h){
+            SigmaUnres[(idx0RowSpannedSpanned+1):idx1RowSpannedSpanned, (idx0ColSpannedSpanned+1):idx1ColSpannedSpanned] <- 0
+          }
+          idx0RowSpannedSpanned <- idx1RowSpannedSpanned + M
+        }
+      }
+    }
+  }
+
+  CholJLL<- SigmaUnres
+
+  return(CholJLL)
+
+}
+###########################################################################################################
+#' Estimate numerically the Cholesky-factorization from the JLL-based models
+#'
+
+#'@param SigmaUnres   unrestricted variance-covariance matrix (K x K)
+#'@param res          residuals from the VAR of the JLL model (K x T)
+#'@param M          number of domestic unspanned factors per country (scalar)
+#'@param G          number of global unspanned factors (scalar)
+#'@param Economies  string-vector containing the names of the economies which are part of the economic system
+#'@param DomUnit Name of the economy which is assigned as the dominant unit. \cr
+#'               If no dominant unit is assigned, then this variable is defined as "none"
+#'
+#'
+#'@keywords internal
+#'@return    Cholesky-factorization after the maximization (K x K)
+#'
+
+
+EstimationSigma_Ye <- function(SigmaUnres, res, M, G, Economies, DomUnit){
+
+  # SIGMA_Ye
+  K <- nrow(SigmaUnres)
+  C <- length(Economies)
+  N <- (K - G - M*C)/C
+
+  # Set the constraints in the Sigma matrix
+  Se <- CholRestrictionsJLL(SigmaUnres, M, G, N, Economies, DomUnit)
+  IdxNONzeroSigmaJLL <- which(Se!=0)
+  x <- Se[IdxNONzeroSigmaJLL] # vector containing the initial guesses
+
+  MLfunction <- functional::Curry(llk_JLL_Sigma, res=res, IdxNONzero= IdxNONzeroSigmaJLL, K=K)
+
+  iter <- 'off' # hides the outputs of each iteration. If one wants to display these features then set 'iter'
+  options200 <- neldermead::optimset(MaxFunEvals = 200000*numel(x), Display = iter,
+                                     MaxIter = 200000, GradObj='off', TolFun= 10^-2, TolX= 10^-2)
+
+
+  Xmax <- neldermead::fminsearch(MLfunction, x, options200)$optbase$xopt
+  SIGMA_Ye <- matrix(0, K,K)
+  SIGMA_Ye[IdxNONzeroSigmaJLL]<- Xmax # Cholesky term (orthogonalized factors)
+
+  #Labels
+  rownames(SIGMA_Ye) <- rownames(SigmaUnres)
+  colnames(SIGMA_Ye) <- rownames(SigmaUnres)
+
+  return(SIGMA_Ye)
+}
+#######################################################################################################
+#' Set the zero-restrictions on the feedback matrix of JLL's P-dynamics
+#'
+
+#'@param DomUnit Name of the economy which is assigned as the dominant unit. \cr
+#'               If no dominant unit is assigned, then this variable is defined as "none"
+#'@param K       Total number of risk factors of the economic system (scalar)
+#'@param G       Number of global unspanned factors (scalar)
+#'@param M       Number of country-specific unspanned factors (scalar)
+#'@param N       Number of country-specific spanned factors (scalar)
+#
+#'@keywords internal
+#'@return       matrix containing the restrictions of the feedback matrix (K x K)
+
+FeedbackMatrixRestrictionsJLL<- function(DomUnit,K,G,M,N){
+
+  C <- (K-G)/(M+N) # number of countries of the system
+
+
+  Bcon <- matrix(0, nrow= K, ncol=K+1) # Includes all variables and the intercept
+  Bcon[, 1] <- NaN # Intercept
+  Bcon[ ,2:(G+1)] <- NaN # Global
+
+  if (DomUnit== "None"){
+    IDXrow000 <- G
+    IDXcol000 <- G+1
+
+    for (i in 1:C){
+      IDXrow111 <- IDXrow000 + M +N
+      IDXcol111 <- IDXcol000 + M +N
+
+      Bcon[(IDXrow000+1):IDXrow111,(IDXcol000+1):IDXcol111] <- NaN
+
+      IDXrow000 <- IDXrow111
+      IDXcol000 <- IDXcol111
+    }
+  } else{ # With a dominant unit
+
+    Bcon [, (G+1+1):(G+M+N+1)] <- NaN # Dominant unit
+
+    IDXrow000 <- G + M + N
+    IDXcol000 <- G+M+N+1
+
+    for (i in 1:(C-1)){
+      IDXrow111 <- IDXrow000 + M +N
+      IDXcol111 <- IDXcol000 + M +N
+
+      Bcon[(IDXrow000+1):IDXrow111,(IDXcol000+1):IDXcol111] <- NaN
+
+      IDXrow000 <- IDXrow111
+      IDXcol000 <- IDXcol111
+    }
+  }
+
+  return(Bcon)
+}

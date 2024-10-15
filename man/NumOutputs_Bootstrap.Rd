@@ -13,15 +13,15 @@ NumOutputs_Bootstrap(
 )
 }
 \arguments{
-\item{ModelType}{string-vector containing the label of the model to be estimated}
+\item{ModelType}{A character vector indicating the model type to be estimated.}
 
-\item{ModelParaBoot}{list of model parameter estimates (see the "Optimization" function) after a bootstrap draw}
+\item{ModelParaBoot}{A list of model parameter estimates (see the "Optimization" function) after a bootstrap draw}
 
-\item{InputsForOutputs}{list conataining the desired inputs for the construction of the model fit, IRFs, GIRFs, FEVDs, and GFEVDs}
+\item{InputsForOutputs}{A list containing the necessary inputs for generating IRFs, GIRFs, FEVDs, GFEVDs and Term Premia.}
 
-\item{FactorLabels}{string-list based which contains all the labels of all the variables present in the model}
+\item{FactorLabels}{A list of character vectors with labels for all variables in the model.}
 
-\item{Economies}{string-vector containing the names of the economies which are part of the economic system}
+\item{Economies}{A character vector containing the names of the economies included in the system.}
 }
 \description{
 Numerical outputs (IRFs, GIRFs, FEVD, and GFEVD) for bootstrap

@@ -2,20 +2,20 @@
 % Please edit documentation in R/pca_weights_one_country.R
 \name{pca_weights_one_country}
 \alias{pca_weights_one_country}
-\title{Weigth matrix from principal components (matrix of eigenvectors)}
+\title{Weight matrix from principal components}
 \usage{
 pca_weights_one_country(Y, Economy)
 }
 \arguments{
-\item{Y}{matrix dimension (J x T), where  J - the number of maturities and  T - time series length}
+\item{Y}{A numeric matrix (T x J) representing the time series of bond yields of a specific country}
 
-\item{Economy}{string-vector containg the name of one economy}
+\item{Economy}{String-vector containing the name of a single economy.}
 }
 \value{
-matrix (J x J)
+A matrix (J x J) that corresponds to the eigenvectors of the variance-covariance matrix of yields
 }
 \description{
-Weigth matrix from principal components (matrix of eigenvectors)
+Weight matrix from principal components
 }
 \examples{
 data("CM_Yields")

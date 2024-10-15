@@ -14,7 +14,7 @@ data("CM_Factors_GVAR")
 Risk factors data used in the GVAR models - Candelon and Moura (forthcoming, JFEC)
 }
 \references{
-Candelon, B. and Moura, R. "A Multicountry Model of the Term Structures of Interest Rates with a GVAR".
+Candelon, B. and Moura, R. (Forthcoming) "A Multicountry Model of the Term Structures of Interest Rates with a GVAR". (Journal of Financial Econometrics)
 }
 \keyword{Factors}
 \keyword{GVAR}
