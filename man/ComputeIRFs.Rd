@@ -22,6 +22,8 @@ ComputeIRFs(
 \arguments{
 \item{SIGMA}{Variance-covariance matrix}
 
+\item{K1Z}{Loading As}
+
 \item{BLoad}{Loading Bs}
 
 \item{FactorLabels}{List containing the label of factors}
@@ -41,8 +43,6 @@ ComputeIRFs(
 \item{PI}{matrix PI for JLL-based models}
 
 \item{Mode}{allows for the orthogonalized version in the case of JLL-based models}
-
-\item{Aload}{Loading As}
 }
 \description{
 Compute IRFs of all models

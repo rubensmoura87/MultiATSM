@@ -85,7 +85,7 @@ Functionf_vectorized <- function(x, sizex, f, con, ListInputSet, ModelType, Fact
 #'@param Economies string-vector containing the names of the economies which are part of the economic system
 #'@param JLLinputs Set of necessary inputs used in the estimation of the JLL-based models
 #'@param GVARinputs Set of necessary inputs used in the estimation of the GVAR-based models
-#'@param varargin variable inputs used in the optimization (see "Optimization" function)
+#'@param ListInputSet variable inputs used in the optimization (see "Optimization" function)
 #'
 #'@keywords internal
 #'

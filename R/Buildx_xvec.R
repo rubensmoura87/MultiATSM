@@ -135,7 +135,7 @@ Remove_at <- function(s){
 #########################################################################################################
 #'Adjust the constant label
 #'
-#'@param Const_Type Type of constraint (Full Name)
+#'@param Const_Type_Full Type of constraint (Full Name)
 #'
 #'@keywords internal
 

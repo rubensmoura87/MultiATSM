@@ -2062,7 +2062,7 @@ BUnspannedAdapSep <- function(G,M, ModelPara, Economies, Economy, ModelType){
 #'Compute IRFs of all models
 #'
 #'@param SIGMA Variance-covariance matrix
-#'@param Aload Loading As
+#'@param K1Z Loading As
 #'@param BLoad Loading Bs
 #'@param FactorLabels List containing the label of factors
 #'@param FacDim Dimension of the P-dynamics

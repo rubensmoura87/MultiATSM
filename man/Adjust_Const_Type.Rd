@@ -7,7 +7,7 @@
 Adjust_Const_Type(Const_Type_Full)
 }
 \arguments{
-\item{Const_Type}{Type of constraint (Full Name)}
+\item{Const_Type_Full}{Type of constraint (Full Name)}
 }
 \description{
 Adjust the constant label

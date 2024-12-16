@@ -32,7 +32,7 @@ contains @ to empty}
 
 \item{GVARinputs}{Set of necessary inputs used in the estimation of the GVAR-based models}
 
-\item{varargin}{variable inputs used in the optimization (see "Optimization" function)}
+\item{ListInputSet}{variable inputs used in the optimization (see "Optimization" function)}
 }
 \value{
 same form as varargin, except now the parameters are updated with the values provided by the auxiliary x.
