@@ -43,11 +43,7 @@ NumOutputs <- function(ModelType, ModelPara, InputsForOutputs, FactorLabels, Eco
 
   }
   # If one chooseS models in which the estimation is done jointly for all countries
-  else if ( any(ModelType == c("GVAR multi", "JPS multi", "JLL original", "JLL No DomUnit", "JLL joint Sigma"))){
-
-    NumOutJoint <- OutputConstructionJoint(ModelType, ModelPara,InputsForOutputs, FactorLabels, Economies)
-
-  }
+  else { NumOutJoint <- OutputConstructionJoint(ModelType, ModelPara,InputsForOutputs, FactorLabels, Economies) }
 
 
 
@@ -71,7 +67,6 @@ NumOutputs <- function(ModelType, ModelPara, InputsForOutputs, FactorLabels, Eco
   GraphicalOutputs(ModelType, ModelPara, AllNumOutputs, InputsForOutputs, Economies, FactorLabels)
   return(AllNumOutputs)
 }
-
 
 
 
@@ -103,21 +98,18 @@ OutputConstructionSep <- function(ModelType, ModelPara, InputsForOutputs, Factor
 
   # Output summary
   # Total Variance Explained and Model fit
-  Total_Var_exp <- VarianceExplainedSep(ModelType, ModelPara, FactorLabels, Economies)
-  ModFit <- YieldsFitsep(ModelType, ModelPara, FactorLabels, Economies)
+  Total_Var_exp <- VarianceExplained(ModelType, ModelPara, FactorLabels, Economies)
+  ModFit <- YieldsFit(ModelType, ModelPara, FactorLabels, Economies)
   cat(" ** Model Fit \n")
 
-  # IRF and FEVD
-  IRFoutputs <- IRFsep(ModelType, ModelPara, InputsForOutputs[[ModelType]]$IRF$horiz, FactorLabels, Economies)
-  cat(" ** IRFs \n")
+  # IRF and GIRF
+  IRFout <- IRFandGIRF(ModelType, ModelPara, InputsForOutputs[[ModelType]]$IRF$horiz, FactorLabels, Economies)
+  cat(" ** IRFs and GIRFs  \n")
 
   FEVDoutputs <- FEVDsep(ModelType, ModelPara, InputsForOutputs[[ModelType]]$FEVD$horiz, FactorLabels, Economies)
   cat(" ** FEVD \n")
 
   # GIRF and GFEVD
-  GIRFoutputs <- GIRFSep(ModelType, ModelPara, InputsForOutputs[[ModelType]]$GIRF$horiz, FactorLabels, Economies)
-  cat(" ** GIRFs \n")
-
   GFEVDoutputs <- GFEVDsep(ModelType, ModelPara, InputsForOutputs[[ModelType]]$GFEVD$horiz, FactorLabels, Economies)
   cat(" ** GFEVD \n")
 
@@ -125,7 +117,7 @@ OutputConstructionSep <- function(ModelType, ModelPara, InputsForOutputs, Factor
   TermPremia <- TermPremiaDecompSep(ModelPara, FactorLabels, ModelType, InputsForOutputs, Economies)
   cat(" ** Term Premia \n")
 
-  NumericalOutputs <- list(Total_Var_exp, ModFit, IRFoutputs, FEVDoutputs, GIRFoutputs, GFEVDoutputs, TermPremia)
+  NumericalOutputs <- list(Total_Var_exp, ModFit, IRFout$IRFs, FEVDoutputs, IRFout$GIRFs, GFEVDoutputs, TermPremia)
   names(NumericalOutputs) <- c("PC var explained", "Fit", "IRF", "FEVD", "GIRF", "GFEVD", "TermPremiaDecomp")
 
   return(NumericalOutputs)
@@ -135,7 +127,7 @@ OutputConstructionSep <- function(ModelType, ModelPara, InputsForOutputs, Factor
 ######################################################################################################
 ####################### 1) Total Variance Explained #########################################
 ######################################################################################################
-#' Percentage explained by the spanned factors of the variations in the set of observed yields for "sep Q" models
+#' Percentage explained by the spanned factors of the variations in the set of observed yields for all models
 #'
 #'@param ModelType  string-vector containing the label of the model to be estimated
 #'@param ModelPara List of model parameter estimates (see the "Optimization" function)
@@ -145,42 +137,44 @@ OutputConstructionSep <- function(ModelType, ModelPara, InputsForOutputs, Factor
 #'@keywords internal
 #'
 
+VarianceExplained <- function(ModelType, ModelPara, FactorLabels, Economies){
 
-VarianceExplainedSep<-function(ModelType, ModelPara, FactorLabels, Economies){
+C <- length(Economies)
+N <- length(FactorLabels$Spanned)
 
-  ModelTypeSet <- c("JPS original", "JPS global", "GVAR single", "JPS multi", "GVAR multi", "JLL original",
-                    "JLL No DomUnit", "JLL joint Sigma")
-  idxWishModels <- which(ModelTypeSet == ModelType)
+Total_Var_exp <- list()
 
 
-  C <- length(Economies)
-  N <- length(FactorLabels$Spanned)
-
-  Total_Var_exp_per_model <- list()
-  Total_Var_exp_All <- list()
-  idxIndividual <- idxWishModels[ idxWishModels <= which(ModelTypeSet== "GVAR single")] # Exclude all models in which the estimation is made jointly
-
-  for(j in idxIndividual){
-    for (i in 1:C){
-      H <- eigen(stats::cov(t(ModelPara[[ModelTypeSet[j]]][[Economies[i]]]$inputs$Y)))$values
-      percentages_explained <- cumsum(H)/sum(H)
-      Total_Var_exp_per_model[[i]] <-percentages_explained[1:N]
-    }
-    names(Total_Var_exp_per_model) <- Economies
-    Total_Var_exp_All[[j]] <- Total_Var_exp_per_model
+# Models estimated individually
+if ( any(ModelType == c("JPS original", "JPS global", "GVAR single"))){
+  for (i in 1:C){
+    H <- eigen(stats::cov(t(ModelPara[[ModelType]][[Economies[i]]]$inputs$Y)))$values
+    percentages_explained <- cumsum(H)/sum(H)
+    Total_Var_exp[[i]] <-percentages_explained[1:N]
   }
-  Total_Var_exp_All  <- Total_Var_exp_All[unlist(lapply(Total_Var_exp_All, length) != 0)]
 
-  names(Total_Var_exp_All) <- ModelTypeSet[idxIndividual]
+}else{
+  # Models estimated jointly
+  J <- numel(ModelPara[[ModelType]]$inputs$mat)
+  idx0 <- 0
+  for (i in 1:C){
+    idx1 <- idx0 + J
+    H <- eigen(stats::cov(t(ModelPara[[ModelType]]$inputs$Y[(idx0+1):idx1,])))$values
+    percentages_explained <- cumsum(H)/sum(H)
+    Total_Var_exp[[i]] <-percentages_explained[1:N]
+    idx0 <- idx1
+  }
+}
+  names(Total_Var_exp) <- Economies
 
-  return(Total_Var_exp_All)
+  return(Total_Var_exp)
 }
 
 
 ######################################################################################################
 ########################################### 2) Model Fit #############################################
 ######################################################################################################
-#' Computes two measures of model fit for bond yields
+#' Computes two measures of model fit for bond yields (all models)
 #'
 #'@param ModelType a string-vector containing the label of the model to be estimated
 #'@param ModelPara List of model parameter estimates (See the "Optimization" function)
@@ -197,9 +191,7 @@ VarianceExplainedSep<-function(ModelType, ModelPara, FactorLabels, Economies){
 #'@keywords internal
 
 
-YieldsFitsep <- function(ModelType, ModelPara, FactorLabels, Economies){
-
-  # 1) Redefining variables
+YieldsFit <- function(ModelType, ModelPara, FactorLabels, Economies){
 
   N <- length(FactorLabels$Spanned)
   G <- length(FactorLabels$Global)
@@ -208,166 +200,217 @@ YieldsFitsep <- function(ModelType, ModelPara, FactorLabels, Economies){
 
   Output <- list()
 
-  for (i in 1:C){
-    mat <- ModelPara[[ModelType]][[Economies[i]]]$inputs$mat
-    Z <- ModelPara[[ModelType]][[Economies[i]]]$inputs$AllFactors
-    YieldData <- ModelPara[[ModelType]][[Economies[i]]]$inputs$Y
+  # I) Models estimated individually
+  if ( any(ModelType == c("JPS original", "JPS global", "GVAR single"))){
+
+    mat <- ModelPara[[ModelType]][[Economies[1]]]$inputs$mat
+    J <- length(mat)
+
+    for (i in 1:C){
+
+      YieldData <- ModelPara[[ModelType]][[Economies[i]]]$inputs$Y
+      Z <- ModelPara[[ModelType]][[Economies[i]]]$inputs$AllFactors
+
+      T <- ncol(Z)
+
+      Afull <- ModelPara[[ModelType]][[Economies[i]]]$rot$P$A
+      Bspanned <- ModelPara[[ModelType]][[Economies[i]]]$rot$P$B
+      K0Z <- ModelPara[[ModelType]][[Economies[i]]]$ests$K0Z
+      K1Z <- ModelPara[[ModelType]][[Economies[i]]]$ests$K1Z
+
+      # 2) MODEL FIT MEASURES
+      # a) Model Fit (Yields)
+      # Extract spanned factors from the list of unspanned factors
+      if (ModelType == "JPS original"){ AllLabels <- c(FactorLabels$Global, FactorLabels$Tables[[Economies[i]]]) }
+      else { AllLabels <- c(FactorLabels$Global, FactorLabels$Tables$AllCountries)}
+
+      LabelSpannedCS <- c(FactorLabels$Tables[[Economies[i]]][-(1:M)])
+      IdxSpanned <- match(LabelSpannedCS, AllLabels)
+
+      P <- Z[IdxSpanned,] # Set of spanned factors
+
+      # Compute model fit
+      Yieldfit <- Y_Fit(Afull, Bspanned, P, J, T, dimnames(YieldData))
+
+      # b) Model-implied Yields
+      Bfull <- BUnspannedAdapSep(G, M, ModelPara, Economies, Economies[i], ModelType)
+      dimnames(Bfull) <- list(rownames(YieldData), rownames(Z))
+
+      YieldModelImplied <- Y_ModImp(Afull, Bfull, K0Z, K1Z, Z, J, T, dimnames(YieldData))
+
+      # 3) Prepare outputs
+      fits<- list(Yieldfit, YieldModelImplied)
+      names(fits) <- c("Yield Fit","Yield Model Implied")
+
+      Output[[ModelType]][[Economies[i]]] <-  fits
+    }
+
+    # II) Models estimated jointly
+    }else{
+
+
+    Z <- ModelPara[[ModelType]]$inputs$AllFactors
+    YieldData <- ModelPara[[ModelType]]$inputs$Y
+
+    mat <- ModelPara[[ModelType]]$inputs$mat
+    Afull <- ModelPara[[ModelType]]$rot$P$A
+    Bspanned <- ModelPara[[ModelType]]$rot$P$B
+    K0Z <- ModelPara[[ModelType]]$ests$K0Z
+    K1Z <- ModelPara[[ModelType]]$ests$K1Z
 
     J <- length(mat)
     T <- ncol(Z)
 
-    Afull <- ModelPara[[ModelType]][[Economies[i]]]$rot$P$A
-    Bspanned <- ModelPara[[ModelType]][[Economies[i]]]$rot$P$B
-    K0Z <- ModelPara[[ModelType]][[Economies[i]]]$ests$K0Z
-    K1Z <- ModelPara[[ModelType]][[Economies[i]]]$ests$K1Z
-
     # 2) MODEL FIT MEASURES
     # a) Model Fit (Yields)
     # Extract spanned factors from the list of unspanned factors
-    if (ModelType == "JPS original"){ AllLabels <- c(FactorLabels$Global, FactorLabels$Tables[[Economies[i]]]) }
-    if (any(ModelType == c("JPS global", 'GVAR single'))){ AllLabels <- c(FactorLabels$Global, FactorLabels$Tables$AllCountries)}
+    IdxSpanned <- c()
+    idxSpa0 <- G + M
+    for (j in 1:C){
+      idxSpa1 <- idxSpa0 + N
 
-    LabelSpannedCS <- c(FactorLabels$Tables[[Economies[i]]][-(1:M)])
-    IdxSpanned <- match(LabelSpannedCS, AllLabels)
+      if (j ==1){ IdxSpanned <- (idxSpa0+1):idxSpa1
+      }  else{      IdxSpanned <- c(IdxSpanned, (idxSpa0+1):idxSpa1) }
 
-    P <- Z[IdxSpanned,] # Set of spanned factors
+      idxSpa0 <- idxSpa1 + M
+    }
+
+    P <- Z[IdxSpanned, ] # Set of spanned factors
 
     # Compute model fit
-    Yieldfit<- matrix(NA, nrow= J, ncol =T)
-    for (h in 1:T){
-      Yieldfit[,h] <- Afull + Bspanned%*%P[,h]
-    }
-    rownames(Yieldfit) <- rownames(YieldData)
-    colnames(Yieldfit) <- colnames(YieldData)
+    Yieldfit <- Y_Fit(Afull, Bspanned, P, C*J, T, dimnames(YieldData))
 
 
     # b) Model-implied Yields
-    Bfull <- BUnspannedAdapSep(G,M, ModelPara, Economies, Economies[i], ModelType)
+    Bfull <- BUnspannedAdapJoint(G,M,N,C, J, Bspanned)
+    dimnames(Bfull) <- list(rownames(YieldData), rownames(Z))
 
-    row.names(Bfull) <- rownames(YieldData)
-    colnames(Bfull) <- rownames(Z)
+    YieldModelImplied <- Y_ModImp(Afull, Bfull, K0Z, K1Z, Z, C*J, T, dimnames(YieldData))
 
-    YieldModelImplied<- matrix(NA, nrow= J, ncol =T)
-    for (h in 2:T){ #  first observation is discarded
-      YieldModelImplied[,h] <- Afull + Bfull%*%(K0Z + K1Z%*% Z[,h-1])
-    }
-    rownames(YieldModelImplied) <- rownames(YieldData)
-    colnames(YieldModelImplied) <- colnames(YieldData)
+    Output<- list(Yieldfit, YieldModelImplied)
+    names(Output) <- c("Yield Fit","Yield Model Implied")
 
-    # 3) Prepare outputs
-    fits<- list(Yieldfit, YieldModelImplied)
-    names(fits) <- c("Yield Fit","Yield Model Implied")
-
-    Output[[ModelType]][[Economies[i]]] <-  fits
   }
-
 
   return(Output)
 }
 
 ######################################################################################################
-########################################### 2) IRFs ##################################################
+########################################### 3) IRFs ##################################################
 ######################################################################################################
-#' IRFs for "sep Q" models
+#' IRFs and GIRFs for all models
 #'
 #'@param ModelType  string-vector containing the label of the model to be estimated
 #'@param ModelPara list of model parameter estimates (See the "Optimization" function)
-#'@param IRFhoriz single numerical vector conataining the desired horizon of analysis for the IRFs
+#'@param IRFhoriz single numerical vector containing the desired horizon of analysis for the IRFs
 #'@param FactorLabels string-list based which contains the labels of all the variables present in the model
 #'@param Economies  string-vector containing the names of the economies which are part of the economic system
 #'
 #'@details
-#' Structural shocks are identified via Cholesky decomposition
+#' The Structural shocks from the IRFs are identified via Cholesky decomposition
+#'
 #'
 #'@keywords internal
 
 
-IRFsep <- function(ModelType, ModelPara, IRFhoriz, FactorLabels, Economies){
+IRFandGIRF <- function(ModelType, ModelPara, IRFhoriz, FactorLabels, Economies){
 
-  ModelTypeSet <- c("JPS original", "JPS global", "GVAR single", "JPS multi", "GVAR multi", "JLL original",
-                    "JLL No DomUnit", "JLL joint Sigma")
-  idxWishModels <- which(ModelTypeSet == ModelType)
-
+  # Pre-allocation
   C <- length(Economies)
   G <- length(FactorLabels$Global)
   N <- length(FactorLabels$Spanned)
   M <- length(FactorLabels$Domestic) - N
-  # Pre-allocation
+
   IRFoutputs <- list()
-  IRFCS <- list()
+  GIRFoutputs <- list()
 
-  idxIndividual <- idxWishModels[ idxWishModels <= which(ModelTypeSet== "GVAR single")] # Exclude all models in which the estimation is made jointly
 
-  for(j in idxIndividual){
+  # 1) SINGLE COUNTRY MODELS
+  if ( any(ModelType == c("JPS original", "JPS global", "GVAR single"))){
+
+    J <- length(ModelPara[[ModelType]][[Economies[1]]]$inputs$mat)
+    K <- nrow(ModelPara[[ModelType]][[Economies[1]]]$inputs$AllFactors)
+
     for (i in 1:C){
-      J <- numel(ModelPara[[ModelTypeSet[[j]]]][[Economies[i]]]$inputs$mat)
-      K <- nrow(ModelPara[[ModelTypeSet[[j]]]][[Economies[i]]]$inputs$AllFactors)
+
+      YieldsLabel<- rownames(ModelPara[[ModelType]][[Economies[i]]]$inputs$Y) # Yield labels
+      # a) Summarize inputs for the IRFs
+      SIGMA <- ModelPara[[ModelType]][[Economies[i]]]$ests$SSZ # KxK (variance-covariance matrix)
+      K1Z <- ModelPara[[ModelType]][[Economies[i]]]$ests$K1Z # KxK (feedback matrix)
+      B <- BUnspannedAdapSep(G,M, ModelPara, Economies, Economies[i], ModelType)
+
+      # b) Compute IRFs
+      IRFs <- ComputeIRFs(SIGMA, K1Z, B, FactorLabels, K, J, IRFhoriz, YieldsLabel, ModelType, Economies[i])
+      IRFoutputs[[ModelType]][[Economies[i]]] <- IRFs # Store Country specific IRFs
+
+      # c) Compute GIRFs
+      G0.y <- ModelPara[[ModelType]][[Economies[i]]]$ests$Gy.0
+      GIRFs <- ComputeGIRFs(SIGMA, K1Z, B, G0.y, FactorLabels, K, J, IRFhoriz, YieldsLabel, ModelType, Economies[i])
+      GIRFoutputs[[ModelType]][[Economies[i]]] <- GIRFs # Store Country specific GIRFs
+      }
+
+  } else{
+
+  # 2) JOINT COUNTRY MODELS
+    J <- length(ModelPara[[ModelType]]$inputs$mat)
+    K <- nrow(ModelPara[[ModelType]]$inputs$AllFactors)
+    YieldsLabel<- rownames(ModelPara[[ModelType]]$inputs$Y) # Yield labels
+
+    # a) Summarize inputs for the IRFs
+    if ( any(ModelType ==c("JLL original", "JLL No DomUnit", "JLL joint Sigma"))){
+      SIGMA <- ModelPara[[ModelType]]$ests$JLLoutcomes$Sigmas$Sigma_Y # For JLL models, we selected the cholesky factor, which won't be compute inside "the"ComputeIRFs"
+    }else{  SIGMA <- ModelPara[[ModelType]]$ests$SSZ} # KxK (variance-covariance matrix)
+
+    K1Z <- ModelPara[[ModelType]]$ests$K1Z # KxK (feedback matrix)
+    BSpanned <- ModelPara[[ModelType]]$rot$P$B
+    B <- BUnspannedAdapJoint(G,M,N,C, J, BSpanned)
+
+    # b) Compute IRFs
+    IRFoutputs[[ModelType]] <- ComputeIRFs(SIGMA, K1Z, B, FactorLabels, K, C*J, IRFhoriz, YieldsLabel, ModelType)
+
+    # c) Compute GIRFs
+    G0.y <- ModelPara[[ModelType]]$ests$Gy.0
+    GIRFs <- ComputeGIRFs(SIGMA, K1Z, B, G0.y, FactorLabels, K, C*J, IRFhoriz, YieldsLabel, ModelType)
+    GIRFoutputs[[ModelType]] <- GIRFs # Store Country specific GIRFs
 
 
-      # Generate factor labels depending on the models to be estimated
-      if ( ModelTypeSet[j] == "JPS original") {AllFactorsLabels <- c(FactorLabels$Global, FactorLabels$Tables[[Economies[i]]])}
-      else {AllFactorsLabels <-  c(FactorLabels$Global, FactorLabels$Tables$AllCountries) }
+    # 3) JLL-BASED MODELS (orthogonalized outputs)
+    if (any(ModelType == c("JLL original", "JLL No DomUnit", "JLL joint Sigma"))){
 
       # Summarize inputs for the IRFs
-      SIGMA <- ModelPara[[ModelTypeSet[[j]]]][[Economies[i]]]$ests$SSZ # KxK (variance-covariance matrix)
-      A0 <- ModelPara[[ModelTypeSet[[j]]]][[Economies[i]]]$ests$K0Z # Kx1 (matrix of intercepts)
-      A1 <- ModelPara[[ModelTypeSet[[j]]]][[Economies[i]]]$ests$K1Z # KxK (feedback matrix)
+      K1Ze <- ModelPara[[ModelType]]$ests$JLLoutcomes$k1_e # KxK (feedback matrix)
+      PI <- ModelPara[[ModelType]]$ests$JLLoutcomes$PI
+      Se <- ModelPara[[ModelType]]$ests$JLLoutcomes$Sigmas$Sigma_Ye
 
+      # a) Compute IRFs orthogonalized
+      IRFOrtho <- list()
+      IRFOrtho[[ModelType]] <- ComputeIRFs(Se, K1Ze, B, FactorLabels, K, C*J, IRFhoriz, YieldsLabel,
+                                           ModelType, PI = PI, Mode= "Ortho")
 
-      B <- BUnspannedAdapSep(G,M, ModelPara, Economies, Economies[i], ModelTypeSet[j])
+      # Gather Outputs
+      IRFoutputs[[ModelType]]$Factors <- list(NonOrtho = IRFoutputs[[ModelType]]$Factors,
+                                              Ortho = IRFOrtho[[ModelType]]$Factors)
+      IRFoutputs[[ModelType]]$Yields <- list(NonOrtho = IRFoutputs[[ModelType]]$Yields,
+                                             Ortho = IRFOrtho[[ModelType]]$Yields)
 
+      # b) Compute GIRFs orthogonalized
+      GIRFsOrtho <- list()
+      GIRFsOrtho[[ModelType]] <- ComputeGIRFs(SIGMA, K1Z, B, G0.y, FactorLabels, K, C*J, IRFhoriz, YieldsLabel,
+                                              ModelType, PI = PI, Mode = "Ortho")
 
-      # Initialization of IRFs of interest
-      tempFactors <- array(0, c(K, K, IRFhoriz))
-      tempYields  <- array(0, c(J,K,IRFhoriz))
+      # Gather Outputs
+      GIRFoutputs[[ModelType]]$Factors <- list(NonOrtho = GIRFoutputs[[ModelType]]$Factors,
+                                               Ortho = GIRFsOrtho[[ModelType]]$Factors)
+      GIRFoutputs[[ModelType]]$Yields <- list(NonOrtho = GIRFoutputs[[ModelType]]$Yields,
+                                              Ortho = GIRFsOrtho[[ModelType]]$Yields)
 
-      # Compute the IRFs
-      S <- t(chol(SIGMA)) # Choleski term
-      # Shock at t=0:
-      tempFactors[ ,  , 1] <- S
-      tempYields[ , , 1]  <- B %*% S
-      # Shock at t=1:
-      for (r in 2:IRFhoriz){
-        if (r == 2) { A1h <- A1} else { A1h <- A1h %*% A1}
-        tempFactors[ , , r] <- A1h%*%S # IRF (t+h) = A1^h*S
-        tempYields[ , , r]      <- B%*%A1h%*%S
       }
-      IRFRiskFactors <- aperm(tempFactors, c(3,1,2))
-      IRFYields <- aperm(tempYields, c(3,1,2))
-
-      Horiz <- t(t(0:(IRFhoriz-1))) #Add a column for horizon of interest
-
-
-      # Adjust the variable labels
-      dimnames(IRFRiskFactors)[[1]] <- Horiz
-      dimnames(IRFRiskFactors)[[2]] <- AllFactorsLabels
-      dimnames(IRFRiskFactors)[[3]] <- AllFactorsLabels
-
-      YieldsLabel<- rownames(ModelPara[[ModelTypeSet[[j]]]][[Economies[i]]]$inputs$Y)
-      dimnames(IRFYields)[[1]] <- Horiz
-      dimnames(IRFYields)[[2]] <- YieldsLabel
-      dimnames(IRFYields)[[3]] <- AllFactorsLabels
-
-      # Store Country specific IRFs
-      IRFCS[[i]] <- list(IRFRiskFactors, IRFYields)
-      names(IRFCS[[i]]) <- c("Factors", "Yields")
-
-
     }
 
-    # Prepare output per country
-    names(IRFCS) <- Economies
-
-    IRFoutputs[[j]] <- IRFCS
-
-  }
-  IRFoutputs  <- IRFoutputs[unlist(lapply(IRFoutputs, length) != 0)]
-
-  names(IRFoutputs) <- ModelTypeSet[idxIndividual]
-
-  return(IRFoutputs)
-
+  Out <- list(IRFs = IRFoutputs, GIRFs = GIRFoutputs)
+  return(Out)
 }
+
 
 #########################################################################################################
 ################################### 3) FEVD #############################################################
@@ -503,130 +546,6 @@ FEVDsep <- function(ModelType, ModelPara, FEVDhoriz, FactorLabels, Economies){
 
   return(FEVDoutputs)
 
-}
-
-
-#########################################################################################################
-################################### 4) GIRF #############################################################
-#########################################################################################################
-#' GIRFs for "sep Q" models
-#'
-#'@param ModelType string-vector containing the label of the model to be estimated
-#'@param ModelPara list of model parameter estimates (see the "Optimization" function)
-#'@param GIRFhoriz single numerical vector conataining the desired horizon of analysis for the GIRFs
-#'@param FactorLabels   string-list based which contains all the labels of all the variables present in the model
-#'@param Economies  string-vector containing the names of the economies which are part of the economic system
-#'
-#' @references
-#' \itemize{
-#' \item This function is a modified and extended version of the "irf" function from
-#' Smith, L.V. and A. Galesi (2014). GVAR Toolbox 2.0, available at https://sites.google.com/site/gvarmodelling/gvar-toolbox.
-#'
-#' \item Pesaran and Shin, 1998. "Generalized impulse response analysis in linear multivariate models" (Economics Letters)
-#' }
-#'
-#'@keywords internal
-
-
-
-
-GIRFSep <- function(ModelType, ModelPara, GIRFhoriz, FactorLabels, Economies){
-
-  ModelTypeSet <- c("JPS original", "JPS global", "GVAR single", "JPS multi", "GVAR multi", "JLL original",
-                    "JLL No DomUnit", "JLL joint Sigma")
-  idxWishModels <- which(ModelTypeSet == ModelType)
-
-
-  N <- length(FactorLabels$Spanned)
-  C <- length(Economies) # Number of economies in the system
-  M <- length(FactorLabels$Domestic) - N # Number of country-specific domestic variables
-  G <- length(FactorLabels$Global) # Number of global variables
-
-  idxIndividual <- idxWishModels[ idxWishModels <= which(ModelTypeSet== "GVAR single")] # Exclude all models in which the estimation is made jointly
-
-  GIRFoutputs <- list()
-
-  for (j in  idxIndividual){
-    for (i in 1:C){
-      J <- numel(ModelPara[[ModelTypeSet[[j]]]][[Economies[i]]]$inputs$mat)
-      K <- nrow(ModelPara[[ModelTypeSet[[j]]]][[Economies[i]]]$inputs$AllFactors)
-
-      G0.y <- ModelPara[[ModelTypeSet[[j]]]][[Economies[i]]]$ests$Gy.0
-      Sigma.y <- ModelPara[[ModelTypeSet[[j]]]][[Economies[i]]]$ests$SSZ
-      F1 <- ModelPara[[ModelTypeSet[[j]]]][[Economies[i]]]$ests$K1Z
-
-      B <- BUnspannedAdapSep(G,M, ModelPara, Economies, Economies[i], ModelTypeSet[j])
-
-      # 1) Dynamic multiplier:
-      Ry.h <- array(NA, c(K,K,GIRFhoriz))
-      Ry.h[, ,1] <- diag(K) # dynamic multiplier at t=0
-
-      for (w in 2:GIRFhoriz) {
-        Ry.h[, ,w] <- F1%*%Ry.h[, ,w-1]
-      }
-
-      # 2) Build the vector containing the one unit-shock for each variable of the system
-      ey.j <- diag(K)
-
-      # 3) GIRFs:
-      # 3.1) Factors
-      AllResponsesToAllShocksFactors <- array(NA, c(K,GIRFhoriz,K))
-      AllResponsesToShockOfOneVariableFactors <- matrix(NA, ncol= GIRFhoriz , nrow = K)
-      for (g in 1:K){
-        for (w in 1:GIRFhoriz){
-          numFactors <- (Ry.h[,,w]%*% solve(G0.y)%*%Sigma.y%*%ey.j[,g]) # numerator from equation at the bottom of the page 22 (PS, 1998)
-          demFactors <- 1/sqrt((t(ey.j[,g])%*%Sigma.y%*%ey.j[,g])) # denominator from equation at the bottom of the page 22 (PS, 1998)
-          AllResponsesToShockOfOneVariableFactors[,w] <- numFactors*drop(demFactors)
-        }
-        AllResponsesToAllShocksFactors[,,g] <- AllResponsesToShockOfOneVariableFactors
-      }
-
-      GIRFFactors <- aperm(AllResponsesToAllShocksFactors, c(2,1,3))
-
-      #3.2) Yields
-      AllResponsesToAllShocksYields <- array(NA, c(J,GIRFhoriz,K))
-      AllResponsesToShockOfOneVariableYields <- matrix(NA, ncol= GIRFhoriz , nrow = J)
-      for (g in 1:K){
-        for (w in 1:GIRFhoriz){
-          numYields <- B%*%(Ry.h[,,w]%*% solve(G0.y)%*%Sigma.y%*%ey.j[,g]) # numerator from equation at the bottom of the page 22 (PS, 1998)
-          demYields <- 1/sqrt((t(ey.j[,g])%*%Sigma.y%*%ey.j[,g])) # denominator from equation at the bottom of the page 22 (PS, 1998)
-          AllResponsesToShockOfOneVariableYields[,w] <- numYields*drop(demYields)
-        }
-        AllResponsesToAllShocksYields[,,g] <- AllResponsesToShockOfOneVariableYields
-      }
-
-      GIRFYields <- aperm(AllResponsesToAllShocksYields, c(2,1,3))
-
-      # 4) Prepare labels for the output
-      if(ModelTypeSet[j] == "JPS original" ){  labelsGIRF <- c(FactorLabels$Global,FactorLabels$Tables[[Economies[i]]]) }
-      if(ModelTypeSet[j] == "JPS global" || ModelTypeSet[j] == "GVAR single" ){  labelsGIRF <- c(FactorLabels$Global,FactorLabels$Tables$AllCountries) }
-
-      # 4.1) Add columns containig the horizons
-      Horiz <- t(t(0:(GIRFhoriz-1))) #Add a column for horizon of interest
-
-      # 4.2) Labels
-      dimnames(GIRFFactors)[[1]] <- Horiz # We subtract 1, because the first element is the contemporaneous one
-      dimnames(GIRFFactors)[[2]] <- labelsGIRF
-      dimnames(GIRFFactors)[[3]] <- labelsGIRF
-
-      YieldsLabel<- rownames(ModelPara[[ModelTypeSet[[j]]]][[Economies[i]]]$inputs$Y)
-      dimnames(GIRFYields)[[1]] <- Horiz # We subtract 1, because the first element is the contemporaneous one
-      dimnames(GIRFYields)[[2]] <- YieldsLabel
-      dimnames(GIRFYields)[[3]] <- labelsGIRF
-
-
-      GIRFoutputs[[ModelTypeSet[j]]][[Economies[i]]] <- list(GIRFFactors,GIRFYields)
-      names(GIRFoutputs[[ModelTypeSet[j]]][[Economies[i]]]) <- c("Factors","Yields")
-
-
-    }
-  }
-
-  GIRFoutputs  <- GIRFoutputs[unlist(lapply(GIRFoutputs, length) != 0)]
-
-  names(GIRFoutputs) <- ModelTypeSet[idxIndividual]
-
-  return(GIRFoutputs)
 }
 
 #########################################################################################################
@@ -1080,22 +999,17 @@ TermPremiaDecompSep <- function(ModelPara, FactorLabels, ModelType, InputsForOut
 OutputConstructionJoint <- function(ModelType, ModelPara, InputsForOutputs, FactorLabels,
                                     Economies){
 
-  ModelTypeSet <- c("JPS original", "JPS global", "GVAR single", "JPS multi", "GVAR multi", "JLL original",
-                    "JLL No DomUnit", "JLL joint Sigma")
-  idxWishModels <- which(ModelTypeSet == ModelType)
-
 
   # Output summary
   # Total Variance Explained and Model Fit
-  Total_Var_exp <- VarianceExplainedJoint(ModelType, ModelPara, FactorLabels, Economies)
-  ModFit <- YieldsFitJoint(ModelType, ModelPara, FactorLabels, Economies)
+  Total_Var_exp <- VarianceExplained(ModelType, ModelPara, FactorLabels, Economies)
+  ModFit <- YieldsFit(ModelType, ModelPara, FactorLabels, Economies)
 
   # IRF and FEVD
-  IRFoutputs <- IRFjoint(ModelType, ModelPara, InputsForOutputs[[ModelType]]$IRF$horiz, FactorLabels, Economies)
+  IRFout <- IRFandGIRF(ModelType, ModelPara, InputsForOutputs[[ModelType]]$IRF$horiz, FactorLabels, Economies)
   FEVDoutputs <- FEVDjoint(ModelType, ModelPara, InputsForOutputs[[ModelType]]$FEVD$horiz, FactorLabels, Economies)
 
   # GIRFS and GFEVD
-  GIRFoutputs <- GIRFjoint(ModelType, ModelPara, InputsForOutputs[[ModelType]]$GIRF$horiz, FactorLabels, Economies)
   GFEVDoutputs <- GFEVDjoint(ModelType, ModelPara, InputsForOutputs[[ModelType]]$GFEVD$horiz, FactorLabels, Economies)
 
   # Risk Premia decomposition
@@ -1106,288 +1020,28 @@ OutputConstructionJoint <- function(ModelType, ModelPara, InputsForOutputs, Fact
   if (any(ModelType == c("JLL original", "JLL No DomUnit", "JLL joint Sigma"))){
 
     # Generate the outputs with orthogonalized factros:
-    IRFOrtho<- IRFjointOrthoJLL(ModelType, ModelPara, InputsForOutputs[[ModelType]]$IRF$horiz, FactorLabels, Economies)
-    GIRFOrtho <- GIRFjointOrthoJLL(ModelType, ModelPara, InputsForOutputs[[ModelType]]$GIRF$horiz, FactorLabels, Economies)
     FEVDOrtho <- FEVDjointOrthogoJLL(ModelType, ModelPara, InputsForOutputs[[ModelType]]$FEVD$horiz, FactorLabels,Economies)
     GFEVDOrtho <- GFEVDjointOrthoJLL(ModelType, ModelPara, InputsForOutputs[[ModelType]]$GFEVD$horiz, FactorLabels, Economies)
 
 
-    jointModelIdx <- idxWishModels[idxWishModels > which(ModelTypeSet == "GVAR multi") ]
-    for (j in jointModelIdx){
       # Merge the lists of orthogonalized and non-orthogonalized factors
-      # IRF
-      IRFoutputs[[ModelTypeSet[j]]]$Factors <- list(IRFoutputs[[ModelTypeSet[j]]]$Factors, IRFOrtho[[ModelTypeSet[j]]]$Factors)
-      IRFoutputs[[ModelTypeSet[j]]]$Yields <- list(IRFoutputs[[ModelTypeSet[j]]]$Yields, IRFOrtho[[ModelTypeSet[j]]]$Yields)
-      names(IRFoutputs[[ModelTypeSet[j]]]$Factors) <- c("NonOrtho", "Ortho")
-      names(IRFoutputs[[ModelTypeSet[j]]]$Yields) <- c("NonOrtho", "Ortho")
-      # GIRF
-      GIRFoutputs[[ModelTypeSet[j]]]$Factors <- list(GIRFoutputs[[ModelTypeSet[j]]]$Factors, GIRFOrtho[[ModelTypeSet[j]]]$Factors)
-      GIRFoutputs[[ModelTypeSet[j]]]$Yields <- list(GIRFoutputs[[ModelTypeSet[j]]]$Yields, GIRFOrtho[[ModelTypeSet[j]]]$Yields)
-      names(GIRFoutputs[[ModelTypeSet[j]]]$Factors) <- c("NonOrtho", "Ortho")
-      names(GIRFoutputs[[ModelTypeSet[j]]]$Yields) <- c("NonOrtho", "Ortho")
-      # FEVD
-      FEVDoutputs[[ModelTypeSet[j]]]$Factors <- list(FEVDoutputs[[ModelTypeSet[j]]]$Factors, FEVDOrtho[[ModelTypeSet[j]]]$Factors)
-      FEVDoutputs[[ModelTypeSet[j]]]$Yields <- list(FEVDoutputs[[ModelTypeSet[j]]]$Yields, FEVDOrtho[[ModelTypeSet[j]]]$Yields)
-      names(FEVDoutputs[[ModelTypeSet[j]]]$Factors) <- c("NonOrtho", "Ortho")
-      names(FEVDoutputs[[ModelTypeSet[j]]]$Yields) <- c("NonOrtho", "Ortho")
+       # FEVD
+      FEVDoutputs[[ModelType]]$Factors <- list(FEVDoutputs[[ModelType]]$Factors, FEVDOrtho[[ModelType]]$Factors)
+      FEVDoutputs[[ModelType]]$Yields <- list(FEVDoutputs[[ModelType]]$Yields, FEVDOrtho[[ModelType]]$Yields)
+      names(FEVDoutputs[[ModelType]]$Factors) <- c("NonOrtho", "Ortho")
+      names(FEVDoutputs[[ModelType]]$Yields) <- c("NonOrtho", "Ortho")
       # GFEVD
-      GFEVDoutputs[[ModelTypeSet[j]]]$Factors <- list(GFEVDoutputs[[ModelTypeSet[j]]]$Factors, GFEVDOrtho[[ModelTypeSet[j]]]$Factors)
-      GFEVDoutputs[[ModelTypeSet[j]]]$Yields <- list(GFEVDoutputs[[ModelTypeSet[j]]]$Yields, GFEVDOrtho[[ModelTypeSet[j]]]$Yields)
-      names(GFEVDoutputs[[ModelTypeSet[j]]]$Factors) <- c("NonOrtho", "Ortho")
-      names(GFEVDoutputs[[ModelTypeSet[j]]]$Yields) <- c("NonOrtho", "Ortho")
+      GFEVDoutputs[[ModelType]]$Factors <- list(GFEVDoutputs[[ModelType]]$Factors, GFEVDOrtho[[ModelType]]$Factors)
+      GFEVDoutputs[[ModelType]]$Yields <- list(GFEVDoutputs[[ModelType]]$Yields, GFEVDOrtho[[ModelType]]$Yields)
+      names(GFEVDoutputs[[ModelType]]$Factors) <- c("NonOrtho", "Ortho")
+      names(GFEVDoutputs[[ModelType]]$Yields) <- c("NonOrtho", "Ortho")
 
     }
-  }
 
-
-
-  NumericalOutputs <- list(Total_Var_exp, ModFit, IRFoutputs, FEVDoutputs, GIRFoutputs, GFEVDoutputs, TermPremia)
+  NumericalOutputs <- list(Total_Var_exp, ModFit, IRFout$IRFs, FEVDoutputs, IRFout$GIRFs, GFEVDoutputs, TermPremia)
   names(NumericalOutputs) <- c("PC var explained","Fit","IRF", 'FEVD', "GIRF", "GFEVD", "TermPremiaDecomp")
 
   return(NumericalOutputs)
-
-}
-
-
-######################################################################################################
-####################### 1) Total Variance Explained #########################################
-######################################################################################################
-#' Percentage explained by the spanned factors of the variations in the set of observed yields for "joint Q" models
-#'
-#'@param ModelType string-vector containing the label of the model to be estimated
-#'@param ModelPara list of model parameter estimates (see the "Optimization" function)
-#'@param FactorLabels  string-list based which contains all the labels of all the variables present in the model
-#'@param Economies  string-vector containing the names of the economies which are part of the economic system
-#'
-#'
-#'@keywords internal
-
-
-
-VarianceExplainedJoint<-function(ModelType, ModelPara, FactorLabels, Economies){
-
-  ModelTypeSet <- c("JPS original", "JPS global", "GVAR single", "JPS multi", "GVAR multi", "JLL original",
-                    "JLL No DomUnit", "JLL joint Sigma")
-  idxWishModels <- which(ModelTypeSet == ModelType)
-
-
-  N <- length(FactorLabels$Spanned)
-  C <- length(Economies)
-  J <- numel(ModelPara[[ModelType]]$inputs$mat)
-  jointModelIdx <- idxWishModels[idxWishModels > which(ModelTypeSet == "GVAR single") ]
-  L <- which(ModelTypeSet == "GVAR single") # index of the model right before the first desired joint model.
-
-  Total_Var_exp_per_country <- list()
-  Total_Var_exp_All <- list()
-
-  for(j in jointModelIdx){
-    idx0 <- 0
-    for (i in 1:C){
-      idx1 <- idx0 + J
-      H <- eigen(stats::cov(t(ModelPara[[ModelTypeSet[j]]]$inputs$Y[(idx0+1):idx1,])))$values
-      percentages_explained <- cumsum(H)/sum(H)
-      Total_Var_exp_per_country[[i]] <-percentages_explained[1:N]
-      idx0 <- idx1
-    }
-    names(Total_Var_exp_per_country) <- Economies
-    Total_Var_exp_All[[j-L]] <- Total_Var_exp_per_country
-  }
-
-  # Clean empty lists
-  Total_Var_exp_All  <- Total_Var_exp_All[unlist(lapply(Total_Var_exp_All, length) != 0)]
-
-  names(Total_Var_exp_All) <- ModelTypeSet[jointModelIdx]
-
-
-  return(Total_Var_exp_All)
-}
-
-######################################################################################################
-########################################### 2) Model Fit #############################################
-######################################################################################################
-#' Computes two measures of model fit for bond yields
-#'
-#'@param ModelType  string-vector containing the label of the model to be estimated
-#'@param ModelPara list of model parameter estimates (see the "Optimization" function)
-#'@param FactorLabels  string-list based which contains all the labels of all the variables present in the model
-#'@param Economies  string-vector containing the names of the economies which are part of the economic system
-#'
-#'@details
-#' "Model-implied yields" is the measure of fit based exclusively on the risk-neutral parameters, whereas the
-#' "Model-Fit" takes into account both the risk-neutral and the physical parameters.
-#'
-#' @references
-#' See, for instance, Jotiskhatira, Le and Lundblad (2015). "Why do interest rates in different currencies co-move?" (Journal of Financial Economics)
-#'
-#'@keywords internal
-
-
-YieldsFitJoint <- function(ModelType, ModelPara, FactorLabels, Economies){
-
-  # 1) Redefining variables
-  Z <- ModelPara[[ModelType]]$inputs$AllFactors
-  YieldData <- ModelPara[[ModelType]]$inputs$Y
-
-  mat <- ModelPara[[ModelType]]$inputs$mat
-  Afull <- ModelPara[[ModelType]]$rot$P$A
-  Bspanned <- ModelPara[[ModelType]]$rot$P$B
-  K0Z <- ModelPara[[ModelType]]$ests$K0Z
-  K1Z <- ModelPara[[ModelType]]$ests$K1Z
-
-  N <- length(FactorLabels$Spanned)
-  G <- length(FactorLabels$Global)
-  M <- length(FactorLabels$Domestic) - N
-  C <- length(Economies)
-  J <- length(mat)
-  CJ <- C*J
-  T <- ncol(Z)
-
-
-
-  # 2) MODEL FIT MEASURES
-  # a) Model Fit (Yields)
-  # Extract spanned factors from the list of unspanned factors
-  IdxSpanned <- c()
-  idxSpa0 <- G + M
-  for (j in 1:C){
-    idxSpa1 <- idxSpa0 + N
-
-    if (j ==1){ IdxSpanned <- (idxSpa0+1):idxSpa1
-    }  else{
-      IdxSpanned <- c(IdxSpanned, (idxSpa0+1):idxSpa1)
-    }
-    idxSpa0 <- idxSpa1 + M
-  }
-
-  P <- Z[IdxSpanned,] # Set of spanned factors
-
-  # Compute model fit
-  Yieldfit<- matrix(NA, nrow= CJ, ncol =T)
-  for (i in 1:T){
-    Yieldfit[,i] <- Afull + Bspanned%*%P[,i]
-  }
-  rownames(Yieldfit) <- rownames(YieldData)
-  colnames(Yieldfit) <- colnames(YieldData)
-
-
-  # b) Model-implied Yields
-  Bfull <- BUnspannedAdapJoint(G,M,N,C, J, Bspanned)
-  row.names(Bfull) <- rownames(YieldData)
-  colnames(Bfull) <- rownames(Z)
-
-  YieldModelImplied<- matrix(NA, nrow= CJ, ncol =T)
-  for (i in 2:T){ #  first observation is discarded
-    YieldModelImplied[,i] <- Afull + Bfull%*%(K0Z + K1Z%*% Z[,i-1])
-  }
-  rownames(YieldModelImplied) <- rownames(YieldData)
-  colnames(YieldModelImplied) <- colnames(YieldData)
-
-
-  Output<- list(Yieldfit, YieldModelImplied)
-  names(Output) <- c("Yield Fit","Yield Model Implied")
-
-  return(Output)
-}
-
-######################################################################################################
-########################################### 3) IRFs ##################################################
-######################################################################################################
-#' IRFs for "joint Q" models
-#'
-#'@param ModelType  string-vector containing the label of the model to be estimated
-#'@param ModelPara list of model parameter estimates (see the "Optimization" function)
-#'@param IRFhoriz single numerical vector conataining the desired horizon of analysis for the IRFs
-#'@param FactorLabels string-list based which contains all the labels of all the variables present in the model
-#'@param Economies  string-vector containing the names of the economies which are part of the economic system
-#'
-#'@details
-#' Structural shocks are identified via Cholesky decomposition
-#'
-#' @keywords internal
-
-
-IRFjoint <- function(ModelType, ModelPara, IRFhoriz, FactorLabels, Economies){
-
-  ModelTypeSet <- c("JPS original", "JPS global", "GVAR single", "JPS multi", "GVAR multi", "JLL original",
-                    "JLL No DomUnit", "JLL joint Sigma")
-  idxWishModels <- which(ModelTypeSet == ModelType)
-
-  C <- length(Economies)
-  N <- length(FactorLabels$Spanned)
-  G <- length(FactorLabels$Global)
-  # Pre-allocation
-  IRFoutputs <- list()
-
-  jointModelIdx <- idxWishModels[idxWishModels > which(ModelTypeSet == "GVAR single") ]
-  L <- which(ModelTypeSet == "GVAR single") # index of the model right before the first desired joint model.
-
-  for(j in jointModelIdx){
-
-    J <- numel(ModelPara[[ModelType]]$inputs$mat)
-    K <- nrow(ModelPara[[ModelType]]$inputs$AllFactors)
-    M <- (K-G)/C - N
-    CJ <- C*J
-
-    # Generate factor labels depending on the models to be estimated
-    AllCountryLabels <- c()
-    AllFactorsLabels <-  c(FactorLabels$Global, FactorLabels$Tables$AllCountries)
-
-    # Summarize inputs for the IRFs
-    SIGMA <- ModelPara[[ModelTypeSet[[j]]]]$ests$SSZ # KxK (variance-covariance matrix)
-    A0 <- ModelPara[[ModelTypeSet[[j]]]]$ests$K0Z # Kx1 (matrix of intercepts)
-    A1 <- ModelPara[[ModelTypeSet[[j]]]]$ests$K1Z # KxK (feedback matrix)
-
-    BSpanned <- ModelPara[[ModelTypeSet[[j]]]]$rot$P$B
-    B <- BUnspannedAdapJoint(G,M,N,C, J, BSpanned)
-
-    # Initialization of IRFs of interest
-    tempFactors <- array(0, c(K, K, IRFhoriz))
-    tempYields  <- array(0, c(CJ,K,IRFhoriz))
-
-    # Compute the IRFs
-    if ( any(ModelType ==c("JLL original", "JLL No DomUnit", "JLL joint Sigma"))){
-      S <- ModelPara[[ModelTypeSet[[j]]]]$ests$JLLoutcomes$Sigmas$Sigma_Y
-    }else{ S <- t(chol(SIGMA))} # Choleski term
-    # Shock at t=0:
-    tempFactors[ ,  , 1] <- S
-    tempYields[ , , 1]  <- B %*% S
-    # Shock at t=1:
-    for (r in 2:IRFhoriz){
-      if (r == 2) { A1h <- A1} else { A1h <- A1h %*% A1}
-      tempFactors[ , , r] <- A1h%*%S # IRF (t+h) = A1^h*S
-      tempYields[ , , r]      <- B%*%A1h%*%S
-    }
-    IRFRiskFactors <- aperm(tempFactors, c(3,1,2))
-    IRFYields <- aperm(tempYields, c(3,1,2))
-
-    Horiz <- t(t(0:(IRFhoriz-1))) #Add a column for horizon of interest
-
-
-    # Adjust the variable labels
-    dimnames(IRFRiskFactors)[[1]] <- Horiz
-    dimnames(IRFRiskFactors)[[2]] <- AllFactorsLabels
-    dimnames(IRFRiskFactors)[[3]] <- AllFactorsLabels
-
-    YieldsLabel<- rownames(ModelPara[[ModelTypeSet[[j]]]]$inputs$Y)
-    dimnames(IRFYields)[[1]] <- Horiz
-    dimnames(IRFYields)[[2]] <- YieldsLabel
-    dimnames(IRFYields)[[3]] <- AllFactorsLabels
-
-
-    IRFoutputsAllCountries <- list(IRFRiskFactors,IRFYields)
-    names(IRFoutputsAllCountries) <- c("Factors","Yields")
-
-    # Prepare output per country
-    IRFoutputs[[j-L]] <- IRFoutputsAllCountries
-
-  }
-  # Clean empty lists
-  IRFoutputs  <- IRFoutputs[unlist(lapply(IRFoutputs, length) != 0)]
-
-  names(IRFoutputs) <- ModelTypeSet[jointModelIdx]
-
-
-  return(IRFoutputs)
 
 }
 
@@ -1530,134 +1184,6 @@ FEVDjoint <- function(ModelType, ModelPara, FEVDhoriz, FactorLabels, Economies){
 
   return(FEVDoutputs)
 
-}
-
-
-#########################################################################################################
-################################### 5) GIRF #############################################################
-#########################################################################################################
-#' GIRFs for "joint Q" models
-#'
-#'@param ModelType a string-vector containing the label of the model to be estimated
-#'@param ModelPara List of model parameter estimates (See the "Optimization" function)
-#'@param GIRFhoriz single numerical vector conataining the desired horizon of analysis for the GIRFs
-#'@param FactorLabels  a string-list based which contains all the labels of all the variables present in the model
-#'@param Economies a string-vector containing the names of the economies which are part of the economic system
-
-#'
-#'@references
-#' \itemize{
-#' \item This function is a modified and extended version of the "irf" function from
-#' Smith, L.V. and A. Galesi (2014). GVAR Toolbox 2.0, available at https://sites.google.com/site/gvarmodelling/gvar-toolbox.
-#'
-#' \item Pesaran and Shin, 1998. "Generalized impulse response analysis in linear multivariate models" (Economics Letters)
-#' }
-#'
-#'
-#'@keywords internal
-
-
-
-GIRFjoint <- function(ModelType, ModelPara, GIRFhoriz, FactorLabels, Economies){
-
-  ModelTypeSet <- c("JPS original", "JPS global", "GVAR single", "JPS multi", "GVAR multi", "JLL original",
-                    "JLL No DomUnit", "JLL joint Sigma")
-  idxWishModels <- which(ModelTypeSet == ModelType)
-
-  N <- length(FactorLabels$Spanned)
-  C <- length(Economies) # Number of economies in the system
-  M <- length(FactorLabels$Domestic) - N # Number of country-specific domestic variables
-  G <- length(FactorLabels$Global) # Number of global variables
-  K <- C*(M+N)+G # All factors of the system
-
-
-  jointModelIdx <- idxWishModels[idxWishModels > which(ModelTypeSet == "GVAR single") ]
-  L <- which(ModelTypeSet == "GVAR single") # index of the model right before the first desired joint model.
-
-  GIRFoutputs <- list()
-
-  for (j in  jointModelIdx){
-    J <- numel(ModelPara[[ModelTypeSet[[j]]]]$inputs$mat)
-    CJ <- C*J
-
-    G0.y <- ModelPara[[ModelTypeSet[[j]]]]$ests$Gy.0
-    Sigma.y <- ModelPara[[ModelTypeSet[[j]]]]$ests$SSZ
-    F1 <- ModelPara[[ModelTypeSet[[j]]]]$ests$K1Z
-
-    BSpanned <- ModelPara[[ModelTypeSet[[j]]]]$rot$P$B
-    B <- BUnspannedAdapJoint(G,M,N,C, J, BSpanned)
-
-    # 1) Dynamic multiplier:
-    Ry.h <- array(NA, c(K,K,GIRFhoriz))
-    Ry.h[, ,1] <- diag(K) # dynamic multiplier at t=0
-
-    for (i in 2:GIRFhoriz) {
-      Ry.h[, ,i] <- F1%*%Ry.h[, ,i-1]
-    }
-
-    # 2) Build the vector containing the one unit-shock for each variable of the system
-    ey.j <- diag(K)
-
-    # 3) GIRFs:
-    # 3.1) Factors
-    AllResponsesToAllShocksFactors <- array(NA, c(K,GIRFhoriz,K))
-    AllResponsesToShockOfOneVariableFactors <- matrix(NA, ncol= GIRFhoriz , nrow = K)
-    for (g in 1:K){
-      for (i in 1:GIRFhoriz){
-        numFactors <- (Ry.h[,,i]%*% solve(G0.y)%*%Sigma.y%*%ey.j[,g]) # numerator from equation at the bottom of the page 22 (PS, 1998)
-        demFactors <- 1/sqrt((t(ey.j[,g])%*%Sigma.y%*%ey.j[,g])) # denominator from equation at the bottom of the page 22 (PS, 1998)
-        AllResponsesToShockOfOneVariableFactors[,i] <- numFactors*drop(demFactors)
-      }
-      AllResponsesToAllShocksFactors[,,g] <- AllResponsesToShockOfOneVariableFactors
-    }
-
-
-    GIRFFactors <- aperm(AllResponsesToAllShocksFactors, c(2,1,3))
-
-
-    #3.2) Yields
-    AllResponsesToAllShocksYields <- array(NA, c(CJ,GIRFhoriz,K))
-    AllResponsesToShockOfOneVariableYields <- matrix(NA, ncol= GIRFhoriz , nrow = CJ)
-    for (g in 1:K){
-      for (i in 1:GIRFhoriz){
-        numYields <- B%*%(Ry.h[,,i]%*% solve(G0.y)%*%Sigma.y%*%ey.j[,g]) # numerator from equation at the bottom of the page 22 (PS, 1998)
-        demYields <- 1/sqrt((t(ey.j[,g])%*%Sigma.y%*%ey.j[,g])) # denominator from equation at the bottom of the page 22 (PS, 1998)
-        AllResponsesToShockOfOneVariableYields[,i] <- numYields*drop(demYields)
-      }
-      AllResponsesToAllShocksYields[,,g] <- AllResponsesToShockOfOneVariableYields
-    }
-
-    GIRFYields <- aperm(AllResponsesToAllShocksYields, c(2,1,3))
-
-    # 4) Prepare labels for the output
-    # 4.1) Add columns containig the horizons
-    Horiz <- t(t(0:(GIRFhoriz-1))) #Add a column for horizon of interest
-
-    # 4.2) Labels
-    labelsGIRF <- c(FactorLabels$Global,FactorLabels$Tables$AllCountries)
-
-    dimnames(GIRFFactors)[[1]] <- 0:(GIRFhoriz-1) # We subtract 1, because the first element is the contemporaneous one
-    dimnames(GIRFFactors)[[2]] <- labelsGIRF
-    dimnames(GIRFFactors)[[3]] <- labelsGIRF
-
-    YieldsLabel<- rownames(ModelPara[[ModelTypeSet[[j]]]]$inputs$Y)
-    dimnames(GIRFYields)[[1]] <- 0:(GIRFhoriz-1) # We subtract 1, because the first element is the contemporaneous one
-    dimnames(GIRFYields)[[2]] <- YieldsLabel
-    dimnames(GIRFYields)[[3]] <- labelsGIRF
-
-
-    GIRFoutputsAllCountries <- list(GIRFFactors,GIRFYields)
-    names(GIRFoutputsAllCountries) <- c("Factors","Yields")
-
-    GIRFoutputs[[j-L]] <- GIRFoutputsAllCountries
-
-  }
-  # Clean empty lists
-  GIRFoutputs  <- GIRFoutputs[unlist(lapply(GIRFoutputs, length) != 0)]
-
-  names(GIRFoutputs) <- ModelTypeSet[jointModelIdx]
-
-  return(GIRFoutputs)
 }
 
 #########################################################################################################
@@ -2081,109 +1607,6 @@ TermPremiaDecompJoint <- function(ModelPara, FactorLabels, ModelType, InputsForO
 }
 
 
-
-
-######################################################################################################
-############################ 8) IRFs with orthogonalized factors #####################################
-######################################################################################################
-#' Orthogonalized IRFs for JLL models
-#'
-#'@param ModelType  string-vector containing the label of the model to be estimated
-#'@param ModelPara list of model parameter estimates (see the "Optimization" function)
-#'@param IRFhoriz single numerical vector conataining the desired horizon of analysis for the IRFs
-#'@param FactorLabels  string-list based which contains all the labels of all the variables present in the model
-#'@param Economies  string-vector containing the names of the economies which are part of the economic system
-#'
-#'@details
-#' Structural shocks are identified via Cholesky decomposition
-#'
-#'@keywords internal
-
-
-IRFjointOrthoJLL <- function(ModelType, ModelPara, IRFhoriz, FactorLabels, Economies){
-
-  ModelTypeSet <- c("JPS original", "JPS global", "GVAR single", "JPS multi", "GVAR multi", "JLL original",
-                    "JLL No DomUnit", "JLL joint Sigma")
-  idxWishModels <- which(ModelTypeSet == ModelType)
-
-  C <- length(Economies)
-  G <- length(FactorLabels$Global)
-  N <- length(FactorLabels$Spanned)
-  # Pre-allocation
-  IRFoutputs <- list()
-
-  jointModelIdxJLL <- idxWishModels[idxWishModels >= which(ModelTypeSet == "JLL original") ]
-  L <- which(ModelTypeSet == "GVAR single") # index of the model right before the first desired joint model.
-
-  for(j in jointModelIdxJLL){
-
-    J <- numel(ModelPara[[ModelTypeSet[[j]]]]$inputs$mat)
-    K <- nrow(ModelPara[[ModelTypeSet[[j]]]]$inputs$AllFactors)
-    M <- (K-G)/C - N
-    CJ <- C*J
-
-    # Generate factor labels depending on the models to be estimated
-    AllCountryLabels <- c()
-    AllFactorsLabels <-  c(FactorLabels$Global, FactorLabels$Tables$AllCountriesJLL)
-
-    # Summarize inputs for the IRFs
-    SIGMAe <- ModelPara[[ModelTypeSet[[j]]]]$ests$JLLoutcomes$Sigmas$VarCov_Ortho # KxK (variance-covariance matrix)
-    A0e <- ModelPara[[ModelTypeSet[[j]]]]$ests$JLLoutcomes$k0_e # Kx1 (matrix of intercepts)
-    A1e <- ModelPara[[ModelTypeSet[[j]]]]$ests$JLLoutcomes$k1_e # KxK (feedback matrix)
-    PI <- ModelPara[[ModelTypeSet[[j]]]]$ests$JLLoutcomes$PI
-
-    BSpanned <- ModelPara[[ModelTypeSet[[j]]]]$rot$P$B
-    B <- BUnspannedAdapJoint(G,M,N,C, J, BSpanned)
-
-    # Initialization of IRFs of interest
-    tempFactors <- array(0, c(K, K, IRFhoriz))
-    tempYields  <- array(0, c(CJ,K,IRFhoriz))
-
-    # Compute the IRFs
-    Se <- ModelPara[[ModelTypeSet[[j]]]]$ests$JLLoutcomes$Sigmas$Sigma_Ye
-
-    # Shock at t=0:
-    tempFactors[ ,  , 1] <- Se
-    tempYields[ , , 1]  <- B%*%PI%*% Se
-    # Shock at t=1:
-    for (r in 2:IRFhoriz){
-      if (r == 2) { A1h <- A1e} else { A1h <- A1h %*% A1e}
-      tempFactors[ , , r] <- A1h%*%Se # IRF (t+h) = A1^h*S
-      tempYields[ , , r]      <- B%*%PI%*%A1h%*%Se
-    }
-    IRFRiskFactors <- aperm(tempFactors, c(3,1,2))
-    IRFYields <- aperm(tempYields, c(3,1,2))
-
-    Horiz <- t(t(0:(IRFhoriz-1))) #Add a column for horizon of interest
-
-    # Adjust the variable labels
-    dimnames(IRFRiskFactors)[[1]] <- Horiz
-    dimnames(IRFRiskFactors)[[2]] <- AllFactorsLabels
-    dimnames(IRFRiskFactors)[[3]] <- AllFactorsLabels
-
-    YieldsLabel<- rownames(ModelPara[[ModelTypeSet[[j]]]]$inputs$Y)
-    dimnames(IRFYields)[[1]] <- Horiz
-    dimnames(IRFYields)[[2]] <- YieldsLabel
-    dimnames(IRFYields)[[3]] <- AllFactorsLabels
-
-
-    IRFoutputsAllCountries <- list(IRFRiskFactors,IRFYields)
-    names(IRFoutputsAllCountries) <- c("Factors","Yields")
-
-    # Prepare output per country
-    IRFoutputs[[j-L]] <- IRFoutputsAllCountries
-
-  }
-  # Clean empty lists
-  IRFoutputs  <- IRFoutputs[unlist(lapply(IRFoutputs, length) != 0)]
-
-  names(IRFoutputs) <- ModelTypeSet[jointModelIdxJLL]
-
-
-  return(IRFoutputs)
-
-}
-
 #########################################################################################################
 ################################### 9) FEVD with orthogonalized factors #################################
 #########################################################################################################
@@ -2317,135 +1740,6 @@ FEVDjointOrthogoJLL <- function(ModelType, ModelPara, FEVDhoriz, FactorLabels, E
 
   return(FEVDoutputs)
 
-}
-
-
-#########################################################################################################
-################################### 10) GIRF With orthogonalized factors #################################
-#########################################################################################################
-#' Orthogonalized GIRFs for JLL models
-#'
-#'@param ModelType a string-vector containing the label of the model to be estimated
-#'@param ModelPara List of model parameter estimates (See the "Optimization" function)
-#'@param GIRFhoriz single numerical vector conataining the desired horizon of analysis for the GIRFs
-#'@param FactorLabels  a string-list based which contains all the labels of all the variables present in the model
-#'@param Economies a string-vector containing the names of the economies which are part of the economic system
-#'
-#'
-#'@references
-#' \itemize{
-#' \item This function is a modified and extended version of the "irf" function from
-#' Smith, L.V. and A. Galesi (2014). GVAR Toolbox 2.0, available at https://sites.google.com/site/gvarmodelling/gvar-toolbox.
-#'
-#' \item Pesaran and Shin, 1998. "Generalized impulse response analysis in linear multivariate models" (Economics Letters)
-#' }
-#'
-#'
-#'@keywords internal
-
-
-
-GIRFjointOrthoJLL <- function(ModelType, ModelPara, GIRFhoriz, FactorLabels, Economies){
-
-  ModelTypeSet <- c("JPS original", "JPS global", "GVAR single", "JPS multi", "GVAR multi", "JLL original",
-                    "JLL No DomUnit", "JLL joint Sigma")
-  idxWishModels <- which(ModelTypeSet == ModelType)
-
-  N <- length(FactorLabels$Spanned)
-  C <- length(Economies) # Number of economies in the system
-  M <- length(FactorLabels$Domestic) - N # Number of country-specific domestic variables
-  G <- length(FactorLabels$Global) # Number of global variables
-  K <- C*(M+N)+G # All factors of the system
-
-
-  jointModelIdxJLL <- idxWishModels[idxWishModels >= which(ModelTypeSet == "JLL original") ]
-  L <- which(ModelTypeSet == "GVAR single") # index of the model right before the first desired joint model.
-
-  GIRFoutputs <- list()
-
-  for (j in  jointModelIdxJLL){
-    J <- numel(ModelPara[[ModelTypeSet[[j]]]]$inputs$mat)
-    CJ <- C*J
-
-    G0.y <- ModelPara[[ModelTypeSet[[j]]]]$ests$Gy.0
-    Sigma.y <- ModelPara[[ModelTypeSet[[j]]]]$ests$JLLoutcomes$Sigmas$VarCov_Ortho
-    F1e <- ModelPara[[ModelTypeSet[[j]]]]$ests$JLLoutcomes$k1_e
-    PI <- ModelPara[[ModelTypeSet[[j]]]]$ests$JLLoutcomes$PI
-
-    BSpanned <- ModelPara[[ModelTypeSet[[j]]]]$rot$P$B
-    B <- BUnspannedAdapJoint(G,M,N,C, J, BSpanned)
-
-    # 1) Dynamic multiplier:
-    Ry.h <- array(NA, c(K,K,GIRFhoriz))
-    Ry.h[, ,1] <- diag(K) # dynamic multiplier at t=0
-
-    for (i in 2:GIRFhoriz) {
-      Ry.h[, ,i] <- F1e%*%Ry.h[, ,i-1]
-    }
-
-    # 2) Build the vector containing the one unit-shock for each variable of the system
-    ey.j <- diag(K)
-
-    # 3) GIRFs:
-    # 3.1) Factors
-    AllResponsesToAllShocksFactors <- array(NA, c(K,GIRFhoriz,K))
-    AllResponsesToShockOfOneVariableFactors <- matrix(NA, ncol= GIRFhoriz , nrow = K)
-    for (g in 1:K){
-      for (i in 1:GIRFhoriz){
-        numFactors <- (PI%*%Ry.h[,,i]%*% solve(G0.y)%*%Sigma.y%*%ey.j[,g]) # numerator from equation at the bottom of the page 22
-        demFactors <- 1/sqrt((t(ey.j[,g])%*%Sigma.y%*%ey.j[,g])) # denominator from equation at the bottom of the page 22
-        AllResponsesToShockOfOneVariableFactors[,i] <- numFactors*drop(demFactors)
-      }
-      AllResponsesToAllShocksFactors[,,g] <- AllResponsesToShockOfOneVariableFactors
-    }
-
-    GIRFFactors <- aperm(AllResponsesToAllShocksFactors, c(2,1,3))
-
-    #3.2) Yields
-    AllResponsesToAllShocksYields <- array(NA, c(CJ,GIRFhoriz,K))
-    AllResponsesToShockOfOneVariableYields <- matrix(NA, ncol= GIRFhoriz , nrow = CJ)
-    for (g in 1:K){
-      for (i in 1:GIRFhoriz){
-        numYields <- B%*%(PI%*%Ry.h[,,i]%*% solve(G0.y)%*%Sigma.y%*%ey.j[,g]) # numerator from equation at the bottom of the page 22
-        demYields <- 1/sqrt((t(ey.j[,g])%*%Sigma.y%*%ey.j[,g])) # denominator from equation at the bottom of the page 22
-        AllResponsesToShockOfOneVariableYields[,i] <- numYields*drop(demYields)
-      }
-      AllResponsesToAllShocksYields[,,g] <- AllResponsesToShockOfOneVariableYields
-    }
-
-
-    GIRFYields <- aperm(AllResponsesToAllShocksYields, c(2,1,3))
-
-
-    # 4) Prepare labels for the output
-    # 4.1) Add columns containig the horizons
-    Horiz <- t(t(0:(GIRFhoriz-1))) #Add a column for horizon of interest
-
-    # 4.2) Labels
-    labelsGIRF <- c(FactorLabels$Global,FactorLabels$Tables$AllCountries)
-
-    dimnames(GIRFFactors)[[1]] <- Horiz # We subtract 1, because the first element is the contemporaneous one
-    dimnames(GIRFFactors)[[2]] <- labelsGIRF
-    dimnames(GIRFFactors)[[3]] <- labelsGIRF
-
-    YieldsLabel<- rownames(ModelPara[[ModelTypeSet[[j]]]]$inputs$Y)
-    dimnames(GIRFYields)[[1]] <- Horiz # We subtract 1, because the first element is the contemporaneous one
-    dimnames(GIRFYields)[[2]] <- YieldsLabel
-    dimnames(GIRFYields)[[3]] <- labelsGIRF
-
-
-    GIRFoutputsAllCountries <- list(GIRFFactors,GIRFYields)
-    names(GIRFoutputsAllCountries) <- c("Factors","Yields")
-
-    GIRFoutputs[[j-L]] <- GIRFoutputsAllCountries
-
-  }
-  # Clean empty lists
-  GIRFoutputs  <- GIRFoutputs[unlist(lapply(GIRFoutputs, length) != 0)]
-
-  names(GIRFoutputs) <- ModelTypeSet[jointModelIdxJLL]
-
-  return(GIRFoutputs)
 }
 
 #########################################################################################################
@@ -2629,13 +1923,58 @@ GFEVDjointOrthoJLL <- function(ModelType, ModelPara, GFEVDhoriz, FactorLabels, E
 ######################################################################################################
 ######################################## AUXILIARY FUNCTIONS #########################################
 ######################################################################################################
+#' Model-implied yields (cross-section)
+#'
+#'@param ALoad  A loadings
+#'@param BLoad B loadings
+#'@param Spa_TS time series of spanned factors
+#'@param MatLength length of the vector of maturities
+#'@param TDim Time-series dimension
+#'@param YieldLab Label of yields
+#'
+#'@keywords internal
 
+Y_Fit <- function(ALoad, BLoad, Spa_TS , MatLength, TDim, YieldLab){
+
+  Yieldfit<- matrix(NA, nrow = MatLength, ncol = TDim)
+  for (h in 1:TDim){   Yieldfit[,h] <- ALoad + BLoad%*%Spa_TS[,h] }
+  dimnames(Yieldfit) <- YieldLab
+
+  return(Yieldfit)
+}
+
+##############################################################
+#' Model-implied yields (P-dynamics)
+#'
+#'@param ALoad  A loadings
+#'@param BLoad B loadings
+#'@param K0Z intercept from the P-dynamics
+#'@param K1Z feedback matrix from the P-dynamics
+#'@param PdynFact time series of the risk-factors spanned factors
+#'@param MatLength length of the vector of maturities
+#'@param TDim Time-series dimension
+#'@param YieldLab Label of yields
+#'
+#'
+#'@keywords internal
+
+Y_ModImp <- function(ALoad, BLoad, K0Z, K1Z, PdynFact, MatLength, TDim, YieldLab){
+
+  YieldModelImplied <- matrix(NA, nrow= MatLength, ncol = TDim)
+  for (h in 2:TDim){ #  first observation is discarded
+    YieldModelImplied[,h] <- ALoad + BLoad%*%(K0Z + K1Z%*% PdynFact[,h-1])
+  }
+  dimnames(YieldModelImplied) <- YieldLab
+
+
+  return(YieldModelImplied)
+}
 
 
 #####################################################################################################
 #' Transform B_spanned into B_unspanned for jointQ models
-
-
+#'
+#'
 #'@param G number of global unspanned factors
 #'@param M number of domestic unspanned factors
 #'@param N number of domestic spanned factors
@@ -2700,7 +2039,7 @@ BUnspannedAdapSep <- function(G,M, ModelPara, Economies, Economy, ModelType){
 
 
 
-  if( any(ModelType == c("JPS global","GVAR single" ))){
+  else if( any(ModelType == c("JPS global","GVAR single" ))){
     K <- C*(N+M) + G
     BUnspanned <- matrix(0, nrow=J, ncol= K)
     BSpanned <- ModelPara[[ModelType]][[Economies[i]]]$rot$P$B
@@ -2719,6 +2058,167 @@ BUnspannedAdapSep <- function(G,M, ModelPara, Economies, Economy, ModelType){
 
   return(BUnspanned)
 }
+#####################################################################################################
+#'Compute IRFs of all models
+#'
+#'@param SIGMA Variance-covariance matrix
+#'@param Aload Loading As
+#'@param BLoad Loading Bs
+#'@param FactorLabels List containing the label of factors
+#'@param FacDim Dimension of the P-dynamics
+#'@param MatLength Length of the maturity vector
+#'@param IRFhoriz Horizon of the analysis
+#'@param YieldsLabel Label of bond yields
+#'@param ModelType Desired model type
+#'@param Economy specific economy under study
+#'@param PI matrix PI for JLL-based models
+#'@param Mode allows for the orthogonalized version in the case of JLL-based models
+#'
+#'@keywords internal
+
+ComputeIRFs <- function(SIGMA, K1Z, BLoad, FactorLabels, FacDim, MatLength, IRFhoriz, YieldsLabel, ModelType,
+                        Economy = NULL, PI = NULL, Mode = FALSE){
+
+
+  # 1) Initialization of IRFs of interest
+  tempFactors <- array(0, c(FacDim, FacDim, IRFhoriz))
+  tempYields  <- array(0, c(MatLength, FacDim,IRFhoriz))
+
+
+  # 2) Compute the IRFs
+  if (Mode == "Ortho" & any(ModelType == c("JLL original", "JLL No DomUnit", "JLL joint Sigma"))) {AdjTerm <- PI
+  } else{ AdjTerm <- diag(FacDim) }
+
+  # Choleski term
+  if ( any(ModelType ==c("JLL original", "JLL No DomUnit", "JLL joint Sigma"))){
+     S <- SIGMA  } else{ S <- t(chol(SIGMA))}
+
+  # Shock at t=0:
+  tempFactors[ ,  , 1] <- S
+  tempYields[ , , 1]  <- BLoad %*%AdjTerm%*%S
+  # Shock at t=1:
+  for (r in 2:IRFhoriz){
+    if (r == 2) { A1h <- K1Z} else { A1h <- A1h %*% K1Z}
+    tempFactors[ , , r] <- A1h%*%S # IRF (t+h) = A1^h*S
+    tempYields[ , , r]      <- BLoad%*%AdjTerm%*%A1h%*%S
+  }
+  IRFRiskFactors <- aperm(tempFactors, c(3,1,2))
+  IRFYields <- aperm(tempYields, c(3,1,2))
+
+  Horiz <- t(t(0:(IRFhoriz-1))) #Add a column for horizon of interest
+
+
+  # 3) Adjust the variable labels
+  # Factor Labels
+  if ( ModelType == "JPS original") {AllFactorsLabels <- c(FactorLabels$Global, FactorLabels$Tables[[Economy]])}
+  else if(any(ModelType == c("JPS global", "GVAR single"))) {
+    AllFactorsLabels <-  c(FactorLabels$Global, FactorLabels$Tables$AllCountries)
+  }else{ AllFactorsLabels <-  c(FactorLabels$Global, FactorLabels$Tables$AllCountries)}
+
+
+  dimnames(IRFRiskFactors) <- list(Horiz, AllFactorsLabels, AllFactorsLabels)
+  dimnames(IRFYields) <- list(Horiz, YieldsLabel, AllFactorsLabels)
+
+
+  Out <- list(Factors = IRFRiskFactors, Yields = IRFYields)
+
+  return(Out)
+}
+##########################################################################################################
+
+##########################################################################################################
+#'Compute GIRFs for all models
+#'
+#'@param Sigma.y Variance-covariance matrix
+#'@param F1 Feedback matrix
+#'@param BLoad Loading Bs
+#'@param G0.y Contemporaneous matrix
+#'@param FactorLabels List containing the labels of the factors
+#'@param FacDim Dimension of the P-dynamics
+#'@param MatLength Length of the maturity vector
+#'@param GIRFhoriz Horizon of the analysis
+#'@param YieldsLabel Label o yields
+#'@param ModelType desired Model type
+#'@param Economy Economy under study
+#'@param PI matrix PI for JLL-based models
+#'@param Mode allows for the orthogonalized version in the case of JLL-based models
+#'
+#'
+#'#'#' @references
+#' \itemize{
+#' \item This function is a ppartially based on the version of the "irf" function from
+#' Smith, L.V. and A. Galesi (2014). GVAR Toolbox 2.0, available at https://sites.google.com/site/gvarmodelling/gvar-toolbox.
+#'
+#' \item Pesaran and Shin, 1998. "Generalized impulse response analysis in linear multivariate models" (Economics Letters)
+#' }
+#'
+#'@keywords internal
+
+ComputeGIRFs <- function(Sigma.y, F1, BLoad, G0.y, FactorLabels,  FacDim, MatLength, GIRFhoriz, YieldsLabel,
+                         ModelType, Economy = NULL, PI = NULL, Mode = FALSE){
+
+  # 1) Dynamic multiplier:
+  Ry.h <- array(NA, c(FacDim,FacDim, GIRFhoriz))
+  Ry.h[, ,1] <- diag(FacDim) # dynamic multiplier at t=0
+
+  for (w in 2:GIRFhoriz) {  Ry.h[, ,w] <- F1%*%Ry.h[, ,w-1] }
+
+  # 2) Build the vector containing the one unit-shock for each variable of the system
+  ey.j <- diag(FacDim)
+
+  # 3) GIRFs:
+  if (Mode == "Ortho" & any(ModelType == c("JLL original", "JLL No DomUnit", "JLL joint Sigma"))) {AdjTerm <- PI
+  } else{ AdjTerm <- diag(FacDim) }
+
+  # 3.1) Factors
+  AllResponsesToAllShocksFactors <- array(NA, c(FacDim,GIRFhoriz,FacDim))
+  AllResponsesToShockOfOneVariableFactors <- matrix(NA, ncol= GIRFhoriz , nrow = FacDim)
+  for (g in 1:FacDim){
+    for (w in 1:GIRFhoriz){
+      numFactors <- AdjTerm%*%(Ry.h[,,w]%*% solve(G0.y)%*%Sigma.y%*%ey.j[,g]) # numerator from equation at the bottom of the page 22 (PS, 1998)
+      demFactors <- 1/sqrt((t(ey.j[,g])%*%Sigma.y%*%ey.j[,g])) # denominator from equation at the bottom of the page 22 (PS, 1998)
+      AllResponsesToShockOfOneVariableFactors[,w] <- numFactors*drop(demFactors)
+    }
+    AllResponsesToAllShocksFactors[,,g] <- AllResponsesToShockOfOneVariableFactors
+  }
+
+  GIRFFactors <- aperm(AllResponsesToAllShocksFactors, c(2,1,3))
+
+  #3.2) Yields
+  AllResponsesToAllShocksYields <- array(NA, c(MatLength, GIRFhoriz, FacDim))
+  AllResponsesToShockOfOneVariableYields <- matrix(NA, ncol= GIRFhoriz , nrow = MatLength)
+  for (g in 1:FacDim){
+    for (w in 1:GIRFhoriz){
+      numYields <- BLoad%*%AdjTerm%*%(Ry.h[,,w]%*% solve(G0.y)%*%Sigma.y%*%ey.j[,g]) # numerator from equation at the bottom of the page 22 (PS, 1998)
+      demYields <- 1/sqrt((t(ey.j[,g])%*%Sigma.y%*%ey.j[,g])) # denominator from equation at the bottom of the page 22 (PS, 1998)
+      AllResponsesToShockOfOneVariableYields[,w] <- numYields*drop(demYields)
+    }
+    AllResponsesToAllShocksYields[,,g] <- AllResponsesToShockOfOneVariableYields
+  }
+
+  GIRFYields <- aperm(AllResponsesToAllShocksYields, c(2,1,3))
+
+  # 4) Prepare labels for the output
+  if(ModelType == "JPS original" ){  labelsGIRF <- c(FactorLabels$Global,FactorLabels$Tables[[Economy]]) }
+  else if(any(ModelType == c("JPS global", "GVAR single"))) {
+    labelsGIRF <-  c(FactorLabels$Global, FactorLabels$Tables$AllCountries)
+  }else{ labelsGIRF <-  c(FactorLabels$Global, FactorLabels$Tables$AllCountries)}
+
+  # 4.1) Add columns containig the horizons
+  Horiz <- t(t(0:(GIRFhoriz-1))) #Add a column for horizon of interest
+
+  # 4.2) Labels
+  dimnames(GIRFFactors) <- list(Horiz, labelsGIRF, labelsGIRF)
+  dimnames(GIRFYields) <- list(Horiz, YieldsLabel, labelsGIRF)
+
+
+  GIRFoutputs <- list(Factors = GIRFFactors, Yields = GIRFYields)
+
+
+  return(GIRFoutputs)
+}
+
+
 
 ########################################################################################################
 ########################################################################################################
@@ -2774,10 +2274,7 @@ if (any(ModelType == c("JPS global", 'GVAR single'))){ AllLabels <- c(FactorLabe
 
   X <- matrix(NA, nrow=nrow(PP), ncol = ncol(PP))
 
-  for (t in 1:T){
-    X[,t] <- solve(Wpca%*%BnX, tol = 1e-50)%*%(PP[,t] - Wpca%*%AnX)
-  }
-
+  for (t in 1:T){    X[,t] <- solve(Wpca%*%BnX, tol = 1e-50)%*%(PP[,t] - Wpca%*%AnX)  }
 
   # Loadings of the other maturities
   MatTU <- mat/dt

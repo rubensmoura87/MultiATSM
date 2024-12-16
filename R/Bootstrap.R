@@ -383,7 +383,7 @@ BuildRiskFactors_BS <- function(ModelParaPE, residPdynOriginal, residYieOriginal
       }
       # now update the LAG matrix
       if (jj<T-1+nlag){
-        LAG <- rbind(ZZ_Boot[jj, ], LAG[1,seqi(1,((nlag-1)*K)) ] )
+        LAG <- rbind(ZZ_Boot[jj, ], LAG[1,seq_len((nlag-1)*K) ] )
         LAGplus <- cbind(1, LAG)
       }
     }
@@ -462,7 +462,7 @@ Gen_Artificial_Series <- function(ModelParaPE, residPdynOriginal, residYieOrigin
     }
 
     DomesticMacro_BS <- do.call(cbind, lapply(Economies, UnspannedFactors_CS_BS, G, N))
-    GlobalMacro_BS <- do.call(cbind, lapply(Economies, function(country) ZZ_BS[[country]][ , seqi(1,G), drop = FALSE]))
+    GlobalMacro_BS <- do.call(cbind, lapply(Economies, function(country) ZZ_BS[[country]][ , seq_len(G), drop = FALSE]))
 
 
   }else{
@@ -771,7 +771,7 @@ DataSet_BS <- function(ModelType, RiskFactors, Wgvar, Economies, FactorLabels){
       }
     }
     # D) Global Factors
-    for (i in seqi(1,G)){
+    for (i in seq_len(G)){
       ListFactors[[length(Economies)+1]][[i]] <-as.matrix( RiskFactors[(c(FactorLabels$Global[i])),])
     }
 

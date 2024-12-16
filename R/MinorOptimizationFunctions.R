@@ -124,10 +124,7 @@ x2pos<- function(x,nargout){
 
   if (nargout ==1){
     output <- y
-  }else{
-    output <- list(y, dy)
-    names(output) <- c("y","dy")
-  }
+  }else{    output <- list(y=y, dy=dy)  }
 
 
   return(output)

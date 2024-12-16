@@ -204,7 +204,7 @@ DatabasePrep <- function(t_First, t_Last, Economies, N, FactorLabels, ModelType,
   }
   # D) Global Factors
 
-  for (i in seqi(1,G)){
+  for (i in seq_len(G)){
     ListFactors[[length(Economies)+1]][[i]] <- AllFactorsClean$Global[[FactorLabels$Global[i]]]
   }
   # E) Yields + Wpca:

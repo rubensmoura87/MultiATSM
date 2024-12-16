@@ -109,7 +109,7 @@ IDXZeroRestrictionsJLLVarCovOrtho <- function(M, N, G, Economies, DomUnit){
   idx0Global <- G + M
   for (h in 1:C){
     idx1Global <- idx0Global+ N
-    CholOrtho[(idx0Global+1):idx1Global, seqi(1,G)] <- 0
+    CholOrtho[(idx0Global+1):idx1Global, seq_len(G)] <- 0
     idx0Global <- idx1Global + M
   }
 
@@ -207,7 +207,7 @@ GetLabels_JLL <- function(NonOrthoFactors, JLLinputs, G){
     FactorsJLL <- append(FactorsJLL, JLLlab)
   }
 
-  FactorLabels$Global <- rownames(NonOrthoFactors)[seqi(1,G)]
+  FactorLabels$Global <- rownames(NonOrthoFactors)[seq_len(G)]
   LabelsJLL <- c(FactorLabels$Global, FactorsJLL)
 
   return(list(FactorLabels = FactorLabels, LabelsJLL = LabelsJLL))
@@ -445,7 +445,7 @@ OrthoReg_JLL <- function(JLLinputs, FacSet, FactorLab_NonOrth, FactorLab_JLL){
       Label_No_DU <- JLLinputs$Economies[-IdxDomUnit][j] # label of the no dominant units
 
       MacroRegressEQ9[[Label_No_DU]] <- stats::lm( t(FullFactorsSet[[Label_No_DU]]$Macro)~ t(MacroGlobal) + t(M_e[[Label_DU]]) -1)
-      a_W[[Label_No_DU]] <- t(MacroRegressEQ9[[Label_No_DU]]$coefficients)[,seqi(1,G)]
+      a_W[[Label_No_DU]] <- t(MacroRegressEQ9[[Label_No_DU]]$coefficients)[ , seq_len(G)]
       a_DU_CS[[Label_No_DU]] <-t(MacroRegressEQ9[[Label_No_DU]]$coefficients)[,(G+1):(G+M)]
       M_e_CS[[Label_No_DU]] <- t(MacroRegressEQ9[[Label_No_DU]]$residuals)
     }
@@ -570,7 +570,7 @@ OrthoVAR_JLL <- function(NonOrthoFactors, JLLinputs, Ortho_Set, FactLabels, N){
   }
 
   # Add global factors
-  MacroGlobal <- NonOrthoFactors[seqi(1,G), ]
+  MacroGlobal <- NonOrthoFactors[seq_len(G), ]
   Ye <- rbind(MacroGlobal, AllDomFactorsOrtho)
   rownames(Ye) <- LabelsJLL
 
@@ -580,7 +580,7 @@ OrthoVAR_JLL <- function(NonOrthoFactors, JLLinputs, Ortho_Set, FactLabels, N){
   }else{
     Y <- matrix(NA, nrow= K, ncol = T)
     rownames(Y) <- rownames(NonOrthoFactors)
-    Y[seqi(1,G), ] <- MacroGlobal  # Global factors
+    Y[seq_len(G), ] <- MacroGlobal  # Global factors
     Y[(G+1):(G+M+N),] <- NonOrthoFactors[FactLabels$FactorLabels[[IdxDomUnit]],]  # Dominant country
 
     COUNTER0 <- G+M+N

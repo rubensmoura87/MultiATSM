@@ -31,7 +31,7 @@ BootstrapBoundsSet <- function(ModelType, ModelBootstrap, NumOutPE, InputsForOut
   }
 
   # If one chooseS models in which the estimation is done jointly for all countries
-  if ( any(ModelType ==c("GVAR multi", "JPS multi", "JLL original", "JLL No DomUnit", "JLL joint Sigma"))){
+  else {
 
 
     IRFandGIRFjoint <- IRFandGIRFbs_jointQ(ModelType, ModelBootstrap, NumOutPE, InputsForOutputs,

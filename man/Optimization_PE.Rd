@@ -6,7 +6,7 @@
 \usage{
 Optimization_PE(
   f,
-  varargin,
+  ListInputSet,
   FactorLabels,
   Economies,
   ModelType,
@@ -19,7 +19,7 @@ Optimization_PE(
 \arguments{
 \item{f}{vector-valued objective function (function)}
 
-\item{varargin}{list contain starting values and constraints:
+\item{ListInputSet}{list contain starting values and constraints:
                        for each input argument K (of f), we need four inputs that look like:
    \enumerate{
        \item a starting value: K0

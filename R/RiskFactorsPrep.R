@@ -29,7 +29,7 @@ RiskFactorsPrep <- function(FactorSet, Economies, FactorLabels, Initial_Date, Fi
 
 
   ZZfull <- matrix(NA, nrow= C*(N+M)+G, ncol = T)
-  ZZfull[seqi(1,G),] <- do.call(rbind,lapply(FactorSet$Global, matrix, ncol=T))
+  ZZfull[seq_len(G),] <- do.call(rbind,lapply(FactorSet$Global, matrix, ncol=T))
 
   # 1) Assign variables:
   idx0 <- G

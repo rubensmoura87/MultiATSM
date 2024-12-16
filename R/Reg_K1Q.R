@@ -105,7 +105,6 @@ Reg_K1Q <- function(Y, mat, Z, dt,type){
 #'@param K1XQ  squared matrix in non-Jordan form
 #'
 #'@importFrom pracma numel
-#'@importFrom  wrapr seqi
 #'
 #'@return squared matrix in Jordam form
 #'@details
@@ -141,17 +140,17 @@ Convert2JordanForm <- function(K1XQ) {
     lQ <- as.numeric(vector())
   }else{
     lQ <- realx[1]
-    realx <- realx[seqi(2,length(realx))]
+    realx <- realx[seq_len(max(0, length(realx) - 1)) + 1]
   }
 
 
-  for (h in seqi(1,numel(realx)/2)){
+  for (h in seq_len(numel(realx)/2)){
     lQ <- rbind( lQ, 0.5*(realx[2*h-1]+realx[2*h]), (0.5*(realx[2*h-1]- realx[2*h]))^2)
   }
 
 
   imagx <- t(x[Im(x)!=0]) # Select only the eigenvalues with imaginary values
-  for (h in seqi(1,numel(imagx)/2)){
+  for (h in seq_len(numel(imagx)/2)){
     lQ <- rbind(lQ, Re(imagx[2*h-1]), -abs(Im(imagx[2*h-1]))^2)
   }
 
@@ -166,7 +165,7 @@ Convert2JordanForm <- function(K1XQ) {
   }
 
 if (N > 1){
-  for (h in seqi(1,numel(lQ)/2)){
+  for (h in seq_len(numel(lQ)/2)){
     K1Q[i0+2*h-1,i0+2*h-1] <- lQ[2*h-1]
     K1Q[i0+2*h,i0+2*h] <- lQ[2*h-1]
     K1Q[i0+2*h-1,i0+2*h] <- lQ[2*h]

@@ -30,7 +30,7 @@ ForecastYields <- function(ModelType, ModelPara, InputsForOutputs, FactorLabels,
   cat("4) OUT-OF-SAMPLE FORECASTING ANALYSIS \n")
   WishForecast <- InputsForOutputs[[ModelType]]$Forecasting$WishForecast
 
-  if (WishForecast ==0){ print( "No bond yields forecasts were generated")} else{
+  if (WishForecast ==0){ cat( "No bond yields forecasts were generated \n")} else{
 
   Jmisc::tic()
   # 1) Redefine some general model outputs
@@ -164,7 +164,7 @@ Idx_UnspanFact <- function(RiskFactors_TS, FactorLabels, Economies){
   G <- length(FactorLabels$Global)
   C <- length(Economies)
 
-  IdxGlobal <- seqi(1,G)
+  IdxGlobal <- seq_len(G)
   IdxSpa  <- IdxSpanned(G, M, N, C)
   IdxAll <- 1:nrow(RiskFactors_TS)
   IdxunSpa <- IdxAll[-c(IdxGlobal,IdxSpa)]
@@ -194,7 +194,7 @@ Get_Unspanned <- function(ModelPara, FactorLabels, Economies, ModelType){
     }
 
     DomesticMacroVar <- do.call(rbind, lapply(Economies, UnspannedFactors_CS, G, N))
-    GlobalMacroVar <- ModelPara[[ModelType]][[Economies[1]]]$inputs$AllFactors[seqi(1,G), , drop = FALSE]
+    GlobalMacroVar <- ModelPara[[ModelType]][[Economies[1]]]$inputs$AllFactors[seq_len(G), , drop = FALSE]
 
 } else{
   ZZfull <- ModelPara[[ModelType]]$inputs$AllFactors

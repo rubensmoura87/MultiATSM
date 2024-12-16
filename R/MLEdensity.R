@@ -360,7 +360,7 @@ Get_llk <- function(P, Y, Z, N, mat, We, Wpca, K0Z, K1Z, SSZ, LoadBs, LoadAs, Mo
       se <- sqrt(mean(as.vector(eQ^2))) # Scalar
     } else{
       C <- nrow(P)/N
-      se<- rep(NA, times= C)
+      se <- rep(NA, times= C)
       idx0 <- 0
       for (i in 1:C){
         idx1 <- idx0+ J-N
@@ -852,10 +852,10 @@ mult__prod <- function(a,b,c){
       if (sa[2]!= sb[1] || sb[2]!= sc[1]) {
         stop("arrays do not commute")
       } else {
-        k <- array(a, c(sa[1:2], 1, 1, sa[seqi(3,length(sa))] ))
-        l <- array(b, c(1, sb[1:2], 1, sb[seqi(3,length(sb))]) )
+        k <- array(a, c(sa[1:2], 1, 1, sa[seq_len(max(0, length(sa) - 2)) +2] )) #
+        l <- array(b, c(1, sb[1:2], 1, sb[seq_len(max(0, length(sb) - 2)) +2]) )
         d <- array(0, c(dim(k),T))
-        for (j in 1:T){ d[ , , , ,j] <-k*l[ , , , , j] }
+        for (j in 1:T){ d[ , , , ,j] <- k*l[ , , , , j] }
         d <- colSums(d)
         m <- array(c, c(1, 1, sc))
         o <- array(0, c(dim(d)[1], 1, 1, dim(m)[length(dim(m))-1], T) )
@@ -865,7 +865,7 @@ mult__prod <- function(a,b,c){
               o[ p, , , q,j] <- d[p,,,j]*m[,,,q,j] }}}
         d <- o
         sd <- dim(d)
-        d <- array(d, c(sd[1], sd[seqi(4,length(sd))] ))
+        d <- array(d, c(sd[1], sd[seq_len(max(0, length(sd) - 3)) +3 ] )) #
       }
     }
   }
@@ -879,7 +879,6 @@ mult__prod <- function(a,b,c){
 #'@param M multi-dimension array
 #'
 #'
-#'@importFrom wrapr seqi
 #'@keywords internal
 
 
@@ -907,7 +906,7 @@ mult_inv_large <- function(M){
     stop("mult_inv_large: The first two dimensions of M must be m x m slices.")
   }
 
-  p <- prod(seqi(3,length(sn)))
+  p <- prod(seq_len(max(0, length(sn) - 2)) +2)
 
 
   RHS <- kronecker(array(1, c(p,1)), diag(m))
@@ -916,7 +915,7 @@ mult_inv_large <- function(M){
 
   X <- array(X, c(n, p, m))
   X <- aperm(X, c(1,3,2))
-  X <- array(X, c(n,m,seqi(3,length(sn))))
+  X <- array(X, c(n,m, seq_len(max(0, length(sn) - 2)) +2 ))
 
 
   return(X)
@@ -1040,7 +1039,7 @@ mult_logabsdet <- function(M){
     stop("mult_logabsdet: The first two dimensions of M must be m x m slices.")
   }
 
-  p <- prod(seqi(3,length(sn)))
+  p <- prod(seq_len(max(0, length(sn) - 2)) +2) #
 
 
   u <-lu(M)$U
@@ -1055,9 +1054,6 @@ mult_logabsdet <- function(M){
 
 #'@param a array (M x N x T)
 #'@param b array (N x K x T)
-
-
-#'@importFrom wrapr seqi
 #'@return c  array (M x K x T)
 #'
 #'@keywords internal
@@ -1089,10 +1085,10 @@ multiprod_2terms <- function(a,b){
       if (sa[2]!=sb[1]){
         stop('arrays do not commute')
       }else{
-        d <- array(a, c(sa[1:2], 1, seqi(3,length(sa))))
+        d <- array(a, c(sa[1:2], 1, seq_len(max(0, length(sa) - 2)) +2))
         g <- array(b, c(1, sb))
         h <- array(0, c(dim(d),T))
-        for (f in 1:T){    h[,,,f] <- d*g[,,,f]     } # Note: this loop does not accomodate arrays of other dimensions
+        for (f in 1:T){    h[,,,f] <- d*g[,,,f]     } # Note: this loop does not accommodate arrays of other dimensions
         c <- colSums(h)
         sc <- dim(c)
         c <- array(c, c(sc[1:length(sc)]))

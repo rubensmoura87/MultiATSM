@@ -197,7 +197,7 @@ GVAR_PrepFactors <- function(GVARinputs, DomLabels, StarLabels, GlobalLabels, N)
   # d) Global lagged (Global.Lt)
   Global.Lt <- list()
   X <- matrix(NA, nrow= G, ncol=(T-1))
-  for (j in seqi(1,G)){
+  for (j in seq_len(G)){
     X[j,] <- GVARinputs$GVARFactors$Global[[j]][1:(T-1)]
   }
   Global.Lt <- X
@@ -340,21 +340,24 @@ if (any(GVARinputs$VARXtype == paste("constrained:", DomLabels))){
 
 # 2) Prepare outputs:
 ParaVARX <- list()
+
+idxPhi0 <- 1
+idxPhi1 <- idxPhi0 + (N+M)
+idxPhi1.star <- idxPhi1 + (N+M)
+idxPhi.global <- idxPhi1.star+G
+
+if (G == 0){ Idx_G <- c()} else{Idx_G <- (idxPhi1.star+1):idxPhi.global}
+
 for (i in 1:C){
   ParaVARX[[i]] <- vector(mode = 'list', length = 6)
   names(ParaVARX[[i]]) <- c('Phi0', 'Phi1', 'Phi1.star', 'Phi.global', 'Sigma', 'Phi0.star')
 
-  idxPhi0 <- 1
-  idxPhi1 <- idxPhi0 + (N+M)
-  idxPhi1.star <- idxPhi1 + (N+M)
-  idxPhi.global <- idxPhi1.star+G
-
-  ParaVARX[[i]][[1]] <- Coeff[[i]][,idxPhi0]
-  ParaVARX[[i]][[2]] <- Coeff[[i]][,(idxPhi0+1):idxPhi1]
-  ParaVARX[[i]][[3]] <- Coeff[[i]][,(idxPhi1+1):idxPhi1.star]
-  ParaVARX[[i]][[4]] <- Coeff[[i]][, seqi(idxPhi1.star+1,idxPhi.global)]
-  ParaVARX[[i]][[5]] <- Sigma[[i]]
-  ParaVARX[[i]][[6]] <- phi0_star[[i]]
+  ParaVARX[[i]]$Phi0 <- Coeff[[i]][,idxPhi0]
+  ParaVARX[[i]]$Phi1 <- Coeff[[i]][,(idxPhi0+1):idxPhi1]
+  ParaVARX[[i]]$Phi1.star <- Coeff[[i]][,(idxPhi1+1):idxPhi1.star]
+  ParaVARX[[i]]$Phi.global <- Coeff[[i]][, Idx_G]
+  ParaVARX[[i]]$Sigma <- Sigma[[i]]
+  ParaVARX[[i]]$Phi0.star <- phi0_star[[i]]
 }
 names(ParaVARX) <- GVARinputs$Economies
 
@@ -513,9 +516,9 @@ if (length(X) != 0 ){
 
   Phi.w1 <- matrix(NA, nrow=G, ncol= G)
   Phi.w0 <- matrix(NA, nrow=G, ncol= 1)
-  for (i in seqi(1,G)){
+  for (i in seq_len(G)){
     Phi.w0[i,] <- stats::lm( LHS[,i] ~ RHS)$coefficients[1]
-    Phi.w1[i,] <- stats::lm( LHS[,i] ~ RHS)$coefficients[seqi(2,G+1)]
+    Phi.w1[i,] <- stats::lm( LHS[,i] ~ RHS)$coefficients[seq_len(max(G, 0)) + 1]
   }
 
   eta.t <- matrix(NA, nrow= G, ncol=T-1)
@@ -629,7 +632,7 @@ Get_Gy1<- function(ParaVARX, GVARinputs, G1, Phi.w1){
   } else { D1 <- c()}
 
   topGy.1 <- matrix(0, nrow =G, ncol= C*(MN) +G)
-  topGy.1[seqi(1,G),seqi(1,G)] <- Phi.w1
+  topGy.1[seq_len(G),seq_len(G)] <- Phi.w1
 
   bottomGy.1 <- cbind(D1,G1)
   Gy.1 <- rbind(topGy.1, bottomGy.1)

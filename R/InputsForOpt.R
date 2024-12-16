@@ -400,7 +400,7 @@ BuildATSM_RiskFactors <- function(InitialSampleDate, FinalSampleDate, Yields, Gl
     CommonLabelsGlob <- intersect(rownames(GlobalMacroFactors), AllFactorLabels)
     GlobalMacroFactorsClean <- GlobalMacroFactors[rownames(GlobalMacroFactors) %in% CommonLabelsGlob, ]
 
-    RiskFactors[seqi(1,G), ] <-  GlobalMacroFactorsClean
+    RiskFactors[seq_len(G), ] <-  GlobalMacroFactorsClean
   }
   # Input the spanned factors
   PP <- Spanned_Factors(Yields, Economies, N)
@@ -428,11 +428,11 @@ BuildATSM_RiskFactors <- function(InitialSampleDate, FinalSampleDate, Yields, Gl
 
 
     for (i in 1:C){
-      if (BS_Adj){RiskFactors[seqi(1,G), ] <- GlobalMacroFactors[((1+G*(i-1)):(G + G*(i-1))), ]   }
+      if (BS_Adj){RiskFactors[seq_len(G), ] <- GlobalMacroFactors[((1+G*(i-1)):(G + G*(i-1))), ]   }
 
       if (ModelType == 'JPS original'){
         idxCountryFactors <- which(grepl(Economies[i], rownames(RiskFactors))) # index of the rows of the country-specific factors
-        idxFactors <- c(seqi(1,G), idxCountryFactors) # index global + country-specific factors
+        idxFactors <- c(seq_len(G), idxCountryFactors) # index global + country-specific factors
         RiskFactorsList[[Economies[i]]]  <-  RiskFactors[idxFactors, ]
       }  else {
         RiskFactorsList[[Economies[i]]] <- RiskFactors

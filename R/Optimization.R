@@ -1,7 +1,7 @@
 #' Peform the minimization of mean(f)
 #'
 #' @param f vector-valued objective function (function)
-#' @param varargin list contain starting values and constraints:
+#' @param ListInputSet list contain starting values and constraints:
 #'                        for each input argument K (of f), we need four inputs that look like:
 #'    \enumerate{
 #'        \item a starting value: K0
@@ -47,39 +47,44 @@
 #'
 #'@keywords internal
 
-Optimization_PE <- function(f, varargin, FactorLabels, Economies, ModelType, JLLinputs = NULL, GVARinputs= NULL,
+Optimization_PE <- function(f, ListInputSet, FactorLabels, Economies, ModelType, JLLinputs = NULL, GVARinputs= NULL,
                             tol= 1e-4, TimeCount = TRUE){
 
   # 1) Transform initial guesses of K1XQ and SSZ into auxiliary parameters that
   # will NOT be concentrated out of the log-likelihood function (llk)
-  AuxVec_0 <- getx(con = "concentration", varargin, Economies, FactorLabels, JLLinputs)
+  AuxVec_0 <- Build_xvec(ListInputSet, Economies, FactorLabels, JLLinputs)
 
   # 2) Likelihood function:
-  FFvec <- functional::Curry(f_with_vectorized_parameters, sizex= AuxVec_0$sizex , f, con = 'concentration',
-                             varargin, ModelType, FactorLabels, Economies, JLLinputs, GVARinputs, nargout = 1)
+  FFvec <- functional::Curry(Functionf_vectorized, sizex= AuxVec_0$Dim_x , f, con = 'concentration',
+                             ListInputSet, ModelType, FactorLabels, Economies, JLLinputs, GVARinputs,
+                             WithEstimation = TRUE)
 
   # 3) Optimization of the llk
   if (TimeCount) {Jmisc::tic()}
-  AuxVec_opt <- OptimizationSetup_ATSM(AuxVec_0, FFvec, varargin$OptRun, tol)
+  AuxVec_opt <- OptimizationSetup_ATSM(AuxVec_0, FFvec, ListInputSet$OptRun, tol)
   if (TimeCount) {Jmisc::toc()}
 
   # 4) Build the full auxiliary vector, including concentrated parameters
-  Up_Temp <- update_para(AuxVec_opt$x0, sizex= AuxVec_opt$sizex, ii= NULL, con= 'concentration',
-                    FactorLabels, Economies, JLLinputs, GVARinputs, varargin) # update the parameter set which were NOT concentrated out after the optimization.
+  Up_Temp <- Update_ParaList(AuxVec_opt$x0, sizex= AuxVec_opt$Dim_x, con= 'concentration', FactorLabels,
+                         Economies, JLLinputs, GVARinputs, ListInputSet) # update the parameter set which were NOT concentrated out after the optimization.
 
-  FF_opt <- functional::Curry(f_with_vectorized_parameters, sizex= AuxVec_opt$sizex, f, con = 'concentration',
-                          varargin= Up_Temp, ModelType, FactorLabels, Economies, JLLinputs, GVARinputs, nargout=2)
+  FF_opt <- functional::Curry(Functionf_vectorized, sizex= AuxVec_opt$Dim_x, f, con = 'concentration',
+                              ListInputSet = Up_Temp, ModelType, FactorLabels, Economies, JLLinputs, GVARinputs,
+                              WithEstimation = FALSE)
 
-  ParaLabels <- names(varargin)
+  ParaLabels <- names(ListInputSet)
   Up_Temp_Full <- ParaATSM_opt_ALL(Up_Temp, FF_opt, AuxVec_opt, ParaLabels)
 
   # 5) Produce outputs to export:
-  x0_opt <- getx(con='', Up_Temp_Full, Economies, FactorLabels, JLLinputs)$x0
-  sizex_AllPara <- getx(con='', Up_Temp_Full, Economies, FactorLabels, JLLinputs)$sizex
+  OutExport <- Build_xvec(Up_Temp_Full, Economies, FactorLabels, JLLinputs)
+  x0_opt <-   OutExport$x0
+  sizex_AllPara <- OutExport$Dim_x
 
-  FF_export <- functional::Curry(f_with_vectorized_parameters, sizex=sizex_AllPara, f=f, con='', varargin=Up_Temp_Full,
-                                 ModelType, FactorLabels, Economies, JLLinputs, GVARinputs, nargout=2)
-  out <- FF_export(x=x0_opt)$out
+  FF_export <- functional::Curry(Functionf_vectorized, sizex = sizex_AllPara, f=f, con='',
+                                 ListInputSet = Up_Temp_Full,  ModelType, FactorLabels, Economies,
+                                 JLLinputs, GVARinputs, WithEstimation = FALSE)
+
+   out <- FF_export(x=x0_opt)$out
 
   return(out)
 }
@@ -432,7 +437,7 @@ ParaATSM_opt_ALL <- function(Update_Temp, FF_opt, AuxVecSet_opt, ParaLabels){
 
   for (i in 1:((length(Update_Temp) -1))){ # for loop: remove the @ from the parameters' labels.
     if (contain('@', Update_Temp[[i]]$Label) ) {
-      namexi <- killa(Update_Temp[[i]]$Label)
+      namexi <- Remove_at(Update_Temp[[i]]$Label)
       Update_Temp[[i]]$Label <- namexi
 
       si <- strfind(namexi, ':')
@@ -528,7 +533,7 @@ df__dx <-function(f, x){
       dxm[i] <- hxm[i]/(2^(n-1))
 
       temp[[n, 1]] = (f(x=x+dxp) - f(x=x-dxm))/(dxp[i]+dxm[i])
-      for (k in seqi(2,n)){
+      for (k in seq_len(max(0, n - 1)) + 1){
         temp[[n,k]] = ((2^(k-1))*temp[[n,k-1]] - temp[[n-1, k-1]])/(2^(k-1)-1)
       }
     }

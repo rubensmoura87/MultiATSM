@@ -1,12 +1,12 @@
 ## Resubmission
-This is a re-submission. In this version, I have made substantial changes to the previous version of the package. This includes the:
+This is a re-submission. In this version, I have: 
 
-* update the DOI from Candelon and Moura's paper (forthcoming, JFEC) in the package description, since this paper has now been published;
-* change in the labels of the different classes of models to make them more intuitive for the users; 
-* inclusion of the *LoadData* function to simplify the process of loading the required dataset used in the several examples;
-* development of the *InputsForOpt* function (and its several sub-functions) to better handle the model inputs that need to be used for the estimation of the several model types;
-* reshape the *Optimization* function so the optimization routines of the model point estimates, bootstraps and out-of-sample forecast are now unified;
-* adaptation of the *Bootstrap* function (and its several sub-functions) so now the confidence intervals of all models can be estimated within the same function set;
-* adaptation of the *ForecastYields* function (and its several sub-functions) so now the bond yield forecasts of all model classes can be estimated within the same function set;
-* Within the *NumOutputs* function, I have fixed a bug in the *TermPremiaDecompSep* function;
-* Finally, the package's vignette and the exportable function documentations have been changed accordingly to reflect all the changes mentioned. Overall, the package interface has been greatly simplified, as it can be noted in Section 4 of the package's vignette.
+* replaced the use of the *seqi* function to eliminate the package dependence with the *wrapr* package
+* rewritten the overall code to allow to switch the *hablar* package from the *Imports* to the *Suggests* dependence section
+* greatly simplified the previously named *getx* function and its *true2aux* sub-function (now named *Build_xvec* and  *GetAuxPara*, respectively)  
+* greatly simplified the previously named *f_with_vectorized_parameters* function and its *update_para* and *aux2true* sub-functions (now named *Functionf_vectorized*, *Update_ParaList* , and  *GetTruePara*, respectively) 
+* created the *VarianceExplained* function that encompasses the functionalities of the previously available *VarianceExplainedSep* and *VarianceExplainedJoint* functions
+* created the *YieldsFit* function that encompasses the functionalities of the previously available *YieldsFitSep* and *YieldsFitJoint* functions
+* created the *IRFandGIRF* function that encompasses the functionalities of the previously available *IRFsep*, *IRFjoint*, *IRFjointOrthoJLL*, *GIRFsep*, *GIRFjoint* and *GIRFjointOrthoJLL* functions.
+* created the *IRFandGIRF_BS* function that encompasses the functionalities of the previously available *IRFsep_BS*, *IRFjoint_BS*, *IRFjointOrthoJLL_BS*, *GIRFsep_BS*, *GIRFjoint_BS* and *GIRFjointOrthoJLL_BS* functions.
+* created the *IRFandGIRFgraphs* function that encompasses the functionalities of the previously available *IRFgraphsSep*, *IRFgraphsJoint*, *IRFgraphsJLLOrtho*, *GIRFgraphsSep*, *GIRFgraphsJoint* and *GIRFgraphsJLLOrtho* functions.
