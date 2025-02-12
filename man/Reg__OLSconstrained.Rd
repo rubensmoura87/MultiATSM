@@ -4,7 +4,7 @@
 \alias{Reg__OLSconstrained}
 \title{Restricted OLS regression}
 \usage{
-Reg__OLSconstrained(Y, X, Bcon, G)
+Reg__OLSconstrained(Y, X, Bcon, G = NULL)
 }
 \arguments{
 \item{Y}{left hand side variables (M x T)}
@@ -22,13 +22,13 @@ matrix of coefficient (M x N)
 Restricted OLS regression
 }
 \details{
-# Estimate of B is obtained by minimizing the objective:\cr
-  sum_t (Y_t-B X_t)' G^(-1) (Y_t-B*X_t) \cr
+Estimate of B is obtained by minimizing the objective:
+  sum_t (Y_t-B X_t)' G^(-1) (Y_t-B*X_t)
 subject to the constraint that B = Bcon for all non-nan entries of Bcon
 }
 \references{
-This function is based on the "Reg__OLSconstrained" function by Le and Singleton (2018). \cr
- "A Small Package of Matlab Routines for the Estimation of Some Term Structure Models." \cr
+This function is based on the "Reg__OLSconstrained" function by Le and Singleton (2018).
+ "A Small Package of Matlab Routines for the Estimation of Some Term Structure Models."
  (Euro Area Business Cycle Network Training School - Term Structure Modelling).
 Available at: https://cepr.org/40029
 }

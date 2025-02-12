@@ -7,7 +7,7 @@
 llk_JLL_Sigma(VecPara, res, IdxNONzero, K)
 }
 \arguments{
-\item{VecPara}{vector that contains all the non-zero entries of the lower-triangualar part of the Cholesky factorization}
+\item{VecPara}{vector that contains all the non-zero entries of the lower-triangular part of the Cholesky factorization}
 
 \item{res}{residuals from the VAR of the JLL model (K x T)}
 

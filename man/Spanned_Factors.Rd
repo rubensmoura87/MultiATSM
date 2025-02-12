@@ -7,14 +7,14 @@
 Spanned_Factors(Yields, Economies, N)
 }
 \arguments{
-\item{Yields}{matrix  (J x T), where J is the number of maturities and T is the length of the time series.}
+\item{Yields}{A matrix  (J x T), where J is the number of maturities and T is the length of the time series.}
 
 \item{Economies}{A character vector containing the names of the economies included in the system.}
 
 \item{N}{Scalar representing the desired number of country-specific spanned factors (maximum allowed is N = J).}
 }
 \value{
-Matrix containing the N spanned for all the countries of the system  (CJ xT)
+Matrix containing the N spanned factors for all the countries of the system  (CJ x T)
 }
 \description{
 Computes the country-specific spanned factors

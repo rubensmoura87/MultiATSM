@@ -22,13 +22,13 @@ Estimates a standard VAR(1)
 }
 \examples{
 data("CM_Factors")
-#Example 1: unconstrained case
+# Example 1: unconstrained case
 VAR(RiskFactors, VARtype= 'unconstrained')
-#Example 2: constrainted case
+
+# Example 2: constrained case
 K <- nrow(RiskFactors)
-Bcon <-matrix(0, nrow = K, ncol = K+1)
+Bcon <- matrix(0, nrow = K, ncol = K+1)
 Bcon[ , 1:3] <- NaN
 VAR(RiskFactors, VARtype= 'constrained', Bcon)
-
 
 }

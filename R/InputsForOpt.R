@@ -1,36 +1,31 @@
-#' Generates several  inputs that are necessary to build the likelihood function
+#' Generates inputs necessary to build the likelihood function for the ATSM model
 #'
-#'@param InitialSampleDate Start date of the sample period in the format "dd-mm-yyyy"
-#'@param FinalSampleDate End date of the sample period in the format "dd-mm-yyyy"
-#'@param ModelType A character vector indicating the model type to be estimated.
-#'@param Yields A numerical matrix with time series of yields (JxT or CJ x T)
-#'@param GlobalMacro A numerical matrix with time series of the global risk factors (G x T)
-#'@param DomMacro A numerical matrix with time series of the country-specific risk factors for all C countries (CM x T)
-#'@param FactorLabels A list of character vectors with labels for all variables in the model.
-#'@param Economies  A character vector containing the names of the economies included in the system.
-#'@param DataFrequency  A character vector specifying the frequency of the data. Available options are:
-#'        "Daily All Days", "Daily Business Days", "Weekly", "Monthly", "Quarterly", or "Annually".
-#'@param GVARlist A list containing the necessary inputs for the estimation of GVAR-based models
-#'@param JLLlist  A list of necessary inputs for the estimation of JLL-based models. If the chosen model is "JLL original" or "JLL joint Sigma", then a dominant unit economy must be chosen. Otherwise, this list must be set as 'None'.
-#'@param WishBRW Whether to estimate the physical parameter model with bias correction, based on the method by Bauer, Rudebusch and Wu (2012) (see \code{\link{Bias_Correc_VAR}} function). Default is set to 0.
-#'@param BRWlist List of necessary inputs for performing the bias-corrected estimation (see \code{\link{Bias_Correc_VAR}} function).
-#'@param UnitYields A character string indicating the maturity unit of yields. Options are: (i) "Month" for yields expressed in months, or (ii) "Year" for yields expressed in years. Default is "Month".
-#'@param CheckInputs A logical value indicating whether to perform a prior check on the consistency of the provided input list.
-#'        Default is TRUE.
-#'@param BS_Adj A logical value indicating whether to adjust the global series for the sepQ models in the Bootstrap setting.
-#'        Default is FALSE.
+#' @param InitialSampleDate Start date of the sample period in the format "dd-mm-yyyy"
+#' @param FinalSampleDate End date of the sample period in the format "dd-mm-yyyy"
+#' @param ModelType A character vector indicating the model type to be estimated. Available options: "JPS original", "JPS global", "GVAR single", "JPS multi", "GVAR multi", "JLL original", "JLL No DomUnit", "JLL joint Sigma".
+#' @param Yields A numerical matrix with time series of yields (JxT or CJ x T)
+#' @param GlobalMacro A numerical matrix with time series of the global risk factors (G x T)
+#' @param DomMacro A numerical matrix with time series of the country-specific risk factors for all C countries (CM x T)
+#' @param FactorLabels A list of character vectors with labels for all variables in the model.
+#' @param Economies A character vector containing the names of the economies included in the system.
+#' @param DataFrequency A character vector specifying the frequency of the data. Available options are: "Daily All Days", "Daily Business Days", "Weekly", "Monthly", "Quarterly", or "Annually".
+#' @param GVARlist A list containing the necessary inputs for the estimation of GVAR-based models
+#' @param JLLlist A list of necessary inputs for the estimation of JLL-based models. If the chosen model is "JLL original" or "JLL joint Sigma", then a dominant unit economy must be chosen. Otherwise, this list must be set as 'None'.
+#' @param WishBRW Logical. Whether to estimate the physical parameter model with bias correction, based on the method by Bauer, Rudebusch and Wu (2012). Default is FALSE.
+#' @param BRWlist List of necessary inputs for performing the bias-corrected estimation.
+#' @param UnitYields A character string indicating the maturity unit of yields. Options are: "Month" for yields expressed in months, or "Year" for yields expressed in years. Default is "Month".
+#' @param CheckInputs Logical. Whether to perform a prior check on the consistency of the provided input list. Default is TRUE.
+#' @param BS_Adj Logical. Whether to adjust the global series for the sepQ models in the Bootstrap setting. Default is FALSE.
 #'
+#' @importFrom pracma null
 #'
-#'@importFrom pracma null
-#'
-#'@return List of necessary inputs for performing the model optimization.
-#'@examples
-#'\donttest{
+#' @return An object of class 'ATSMModelInputs' containing the necessary inputs for performing the model optimization.
+#' @examples
+#' \donttest{
 #' # Example 1:
 #' data(CM_GlobalMacroFactors)
 #' data(CM_DomMacroFactors)
 #' data(CM_Yields)
-#'
 #'
 #' ModelType <- "JPS original"
 #' Economies <- "Mexico"
@@ -40,93 +35,92 @@
 #' GlobalVar <- c("Gl_Eco_Act") # Global Variables
 #' DomVar <- c("Eco_Act") # Domestic Variables
 #' FactorLabels <- LabFac(N, DomVar, GlobalVar, Economies, ModelType)
-
+#'
 #' DataFreq <- "Monthly"
 #'
 #' ATSMInputs <- InputsForOpt(t0, tF, ModelType, Yields, GlobalMacroVar, DomesticMacroVar,
 #'                              FactorLabels, Economies, DataFreq, CheckInputs = FALSE)
-
-
-#'# Example 2:
+#'
+#' # Example 2:
 #' LoadData("CM_2024")
 #'
 #' ModelType <- "GVAR multi"
-
+#'
 #' Economies <- c("China", "Brazil", "Mexico", "Uruguay")
 #' t0 <- "01-05-2007" # InitialSampleDate (Format: "dd-mm-yyyy")
-#' tF <- "01-12-2019" # FinalSampleDate (Format: "dd-mm-yyyy")#'
+#' tF <- "01-12-2019" # FinalSampleDate (Format: "dd-mm-yyyy")
 #' N <- 2
 #' GlobalVar <- c("Gl_Eco_Act", "Gl_Inflation") # Global Variables
 #' DomVar <- c("Inflation") # Domestic Variables
-#' FactorLabels <- LabFac(N, DomVar,GlobalVar, Economies, ModelType)
+#' FactorLabels <- LabFac(N, DomVar, GlobalVar, Economies, ModelType)
 #'
 #' DataFreq <- "Monthly"
 #' GVARlist <- list(VARXtype = "unconstrained", W_type = "Sample Mean",
 #'                  t_First_Wgvar = "2007", t_Last_Wgvar = "2019")
-
-#'ATSMInputs <- InputsForOpt(t0, tF, ModelType, Yields, GlobalMacroVar, DomesticMacroVar,
+#'
+#' ATSMInputs <- InputsForOpt(t0, tF, ModelType, Yields, GlobalMacroVar, DomesticMacroVar,
 #'                            FactorLabels, Economies, DataFreq, GVARlist, CheckInputs = FALSE)
 #'
 #' # Example 3:
 #' if (requireNamespace('neldermead', quietly = TRUE)) {
-#'LoadData("CM_2024")
+#' LoadData("CM_2024")
 #'
-#'ModelType <- "JLL original"
+#' ModelType <- "JLL original"
 #'
 #' Economies <- c("China", "Brazil", "Uruguay")
 #' t0 <- "01-05-2007" # InitialSampleDate (Format: "dd-mm-yyyy")
-#' tF <- "01-12-2019" # FinalSampleDate (Format: "dd-mm-yyyy")#'
+#' tF <- "01-12-2019" # FinalSampleDate (Format: "dd-mm-yyyy")
 #' N <- 2
 #' GlobalVar <- c("Gl_Eco_Act", "Gl_Inflation") # Global Variables
 #' DomVar <- c("Eco_Act", "Inflation") # Domestic Variables
-#' FactorLabels <- LabFac(N, DomVar,GlobalVar, Economies, ModelType)
+#' FactorLabels <- LabFac(N, DomVar, GlobalVar, Economies, ModelType)
 #'
 #' JLLinputs <- list(DomUnit = "China")
 #'
 #' DataFrequency <- "Monthly"
 #'
-#'ATSMInputs <- InputsForOpt(t0, tF, ModelType, Yields, GlobalMacroVar, DomesticMacroVar,
+#' ATSMInputs <- InputsForOpt(t0, tF, ModelType, Yields, GlobalMacroVar, DomesticMacroVar,
 #'                            FactorLabels, Economies, DataFreq, JLLlist = JLLinputs,
 #'                            CheckInputs = FALSE)
-#'} else {
+#' } else {
 #'  message("skipping functionality due to missing Suggested dependency")
-#'}
-#'
-#'
-#'}
-#'@export
-
+#' }
+#' }
+#' @export
 
 InputsForOpt <- function(InitialSampleDate, FinalSampleDate, ModelType, Yields, GlobalMacro, DomMacro,
-                         FactorLabels, Economies, DataFrequency, GVARlist  = NULL, JLLlist = NULL,
-                         WishBRW=0, BRWlist = NULL, UnitYields= "Month", CheckInputs= TRUE, BS_Adj = FALSE){
+                         FactorLabels, Economies, DataFrequency, GVARlist = NULL, JLLlist = NULL,
+                         WishBRW = FALSE, BRWlist = NULL, UnitYields = "Month", CheckInputs = TRUE, BS_Adj = FALSE) {
 
+  # Print initial message with model type and sample period
   cat(paste("1) PREPARING INPUTS FOR THE ESTIMATION OF THE MODEL:", ModelType, ". SAMPLE PERIOD:", InitialSampleDate,
             "-", FinalSampleDate, "\n"))
 
-  # Define label of a set of models
+  # Define labels for single and multi-country models
   Label_Single_Models <- c("JPS original", "JPS global", "GVAR single")
   Label_Multi_Models <- c("GVAR multi", "JPS multi", "JLL original", "JLL No DomUnit", "JLL joint Sigma")
 
-  # Check consistence of inputs across models
-  if(isTRUE(CheckInputs)){ CheckInputsForMLE(InitialSampleDate, FinalSampleDate, Economies, DomMacro, GlobalMacro,
-                                             UnitYields, DataFrequency, Label_Single_Models, Label_Multi_Models,
-                                             FactorLabels, GVARlist, ModelType)}
+  # Check consistency of inputs across models if CheckInputs is TRUE
+  if (isTRUE(CheckInputs)) {
+  CheckInputsForMLE(InitialSampleDate, FinalSampleDate, Economies, DomMacro, GlobalMacro, UnitYields,
+                    DataFrequency, Label_Single_Models, Label_Multi_Models, FactorLabels, GVARlist, ModelType) }
 
-  # Make sure that both bond yields and the risk factors have coinciding time spans
+
+  # Construct the time-series of the risk factors
   cat("1.1) Constructing the time-series of the risk factors \n")
-  RiskFactors <- BuildATSM_RiskFactors(InitialSampleDate, FinalSampleDate, Yields, GlobalMacro, DomMacro,
+  RiskFactors <-  BuildATSM_RiskFactors(InitialSampleDate, FinalSampleDate, Yields, GlobalMacro, DomMacro,
                                        Economies, FactorLabels, ModelType, BS_Adj)
+
   Yields <- AdjustYieldsDates(Yields, RiskFactors, Economies)
 
   # Build the vector of common maturities across countries
   mat <- Maturities(Yields, Economies, UnitYields)
 
   # Collect general input lists
-  ModelInputsGen <- GeneralMLEInputs(Yields, RiskFactors, FactorLabels, mat, DataFrequency,
-                                     Label_Multi_Models, Economies, ModelType)
+  ModelInputsGen <- GeneralMLEInputs(Yields, RiskFactors, FactorLabels, mat, DataFrequency, Label_Multi_Models,
+                                     Economies, ModelType)
 
-  # Collect model-specific input lists (GVARinputs, JLLinputs and BRWlist)
+  # Collect model-specific input lists (GVARinputs, JLLinputs, and BRWlist)
   ModelInputsSpe <- SpecificMLEInputs(ModelType, Economies, RiskFactors, FactorLabels, GVARlist, JLLlist,
                                       WishBRW, BRWlist, DataPathTrade = NULL)
 
@@ -137,10 +131,125 @@ InputsForOpt <- function(InitialSampleDate, FinalSampleDate, ModelType, Yields, 
 
   # Gather outputs to export
   Outputs <- Outputs2exportMLE(Label_Multi_Models, Economies, RiskFactors, Yields, mat, ModelInputsGen,
-                               ModelInputsSpe, PdynPara, ModelType)
+                              ModelInputsSpe, PdynPara, ModelType)
 
-  return(Outputs)
+  # Store metadata inside the class without explicitly exporting it
+  attr(Outputs, "ModelInfo") <- list(
+    ModelType = ModelType,
+    Economies = Economies,
+    InitialSampleDate = InitialSampleDate,
+    FinalSampleDate = FinalSampleDate,
+    RiskFactors = RiskFactors,
+    Yields = Yields,
+    DataFrequency = DataFrequency,
+    Maturities = mat,
+    G = length(FactorLabels$Global),
+    NC = length(FactorLabels$Spanned)*length(Economies),
+    MC = (length(FactorLabels$Domestic) - length(FactorLabels$Spanned))*length(Economies)
+    )
+
+  # Return the structured Outputs object
+  return(structure(Outputs, class = "ATSMModelInputs"))
 }
+##########################################################################################################################
+#' Print method for ATSMModelInputs objects
+#' @param Object An object of class 'ATSMModelInputs'
+#' @param ... Additional arguments (not used)
+#'
+#' @export
+
+print.ATSMModelInputs <- function(Object, ...) {
+
+  info <- attr(Object, "ModelInfo")
+
+  cat("ATSM Model Inputs Object\n")
+  cat("------------------------------------------\n")
+  cat("Model Type:", info$ModelType, "\n")
+  cat("Economic System:", paste(info$Economies, collapse = ", "), "\n")
+  cat("Sample Period:", info$InitialSampleDate, "-", info$FinalSampleDate, "\n")
+  cat("Data Frequency:", info$DataFrequency, "\n")
+  cat("Common Maturities across Countries:", info$Maturities, "years \n")
+  cat("------------------------------------------\n\n")
+
+  cat("Key Structure of the Economic System: \n")
+  cat("------------------------------------------\n")
+  cat("Total amount of spanned factors in the system:", info$NC, "\n")
+  cat("Total amount of global unspanned factors in the system:", info$G, "\n")
+  cat("Total amount of country-specific unspanned factors in the system:", info$MC, "\n")
+  cat("Total amount of risk factors in the system:", info$NC + info$G + info$MC, "\n")
+  cat("------------------------------------------\n")
+
+  invisible(Object)
+}
+##########################################################################################################################
+#' Summary method for ATSMModelInputs objects
+#' @param Object An object of class 'ATSMModelInputs'
+#' @param ... Additional arguments (not used)
+#'
+#' @export
+
+summary.ATSMModelInputs <- function(Object, ...) {
+
+
+  info <- attr(Object, "ModelInfo")
+
+  # Function to print the summary statistics
+  summary_TS <- function(mat) {
+    data.frame(
+      Mean = round(rowMeans(mat, na.rm = TRUE), 3),
+      Std_Dev = round(apply(mat, 1, sd, na.rm = TRUE), 3),
+      Min = round(apply(mat, 1, min, na.rm = TRUE), 3),
+      Max = round(apply(mat, 1, max, na.rm = TRUE), 3),
+      row.names = rownames(mat)
+    )
+    }
+
+  cat("Summary Statistics From the Time Series Components:\n")
+  cat("------------------------------------------------------\n")
+
+  cat("1) Risk Factors:\n")
+  # Single-country estimation
+  if(info$ModelType %in% c("JPS original", "JPS global", "GVAR single")){
+    for(i in 1:length(info$Economies)){
+    cat("\n Model", info$Economies[i] , "\n")
+    summary_result <- summary_TS(info$RiskFactors[[i]])
+    print(summary_result)
+    }
+
+    # Multicountry estimation
+}else{
+  summary_result <- summary_TS(info$RiskFactors)
+  print(summary_result)
+}
+
+
+  cat("\n 2) Bond Yields:\n")
+  # Single-country estimation
+  if(info$ModelType %in% c("JPS original", "JPS global", "GVAR single")){
+
+    J <- length(info$Maturities)
+
+    for(i in 1:length(info$Economies)){
+      cat("\n Model", info$Economies[i] , "\n")
+
+      # Extract rows for the current country
+      country_rows <- ((i - 1) * J + 1):(i * J)
+      country_yields <- info$Yields[country_rows, ] * 100
+
+      summary_result <- summary_TS(country_yields)
+      print(summary_result)
+    }
+
+    # Multicountry estimation
+}else{
+  summary_result <- summary_TS((info$Yields)*100)
+  print(summary_result)
+}
+  cat("------------------------------------------------------\n")
+
+  invisible(Object)
+}
+
 ##########################################################################################################################
 #' Create a vector of numerical maturities in years
 #'
@@ -207,7 +316,6 @@ Maturities <- function(DataYields, Economies, UnitYields){
 #'}
 #'@param DataPathTrade path of the Excel file containing the data (if any)
 #'
-#'
 #'@keywords internal
 
 
@@ -232,10 +340,7 @@ SpecificMLEInputs <-function(ModelType, Economies, RiskFactors, FactorLabels, GV
     GVARFactors <- DataSet_BS(ModelType, RiskFactors, Wgvar, Economies, FactorLabels)
 
     # Build the list of the necessary inputs to estimate a GVAR model:
-    GVARinputs <- list()
-    GVARinputs$Economies <- Economies
-    GVARinputs$GVARFactors <- GVARFactors
-    GVARinputs$VARXtype <- GVARlist$VARXtype
+    GVARinputs <- list( Economies = Economies, GVARFactors = GVARFactors, VARXtype = GVARlist$VARXtype)
 
     if (W_type == "Time-varying"){
       GVARinputs$Wgvar <- Wgvar[[t0]]
@@ -301,7 +406,7 @@ AdjustYieldsDates <- function(Yields, PdynamicsFactors, Economies){
 #################################################################################################################
 #' Loads data sets from several papers
 
-#'@param DataPaper  Available options are \code{BR_2017} (Bauer and Rudebusch, 2017) , \code{CM_2023} (Candelon and Moura, 2023), \code{CM_2024} (Candelon and Moura, forthcoming)
+#'@param DataPaper  Available options are \code{BR_2017} (Bauer and Rudebusch, 2017) , \code{CM_2023} (Candelon and Moura, 2023), \code{CM_2024} (Candelon and Moura, 2024)
 #'
 #'
 #'@examples
@@ -322,31 +427,31 @@ AdjustYieldsDates <- function(Yields, PdynamicsFactors, Economies){
 #'\enumerate{
 #'\item Bauer and Rudebusch (2017). "Resolving the Spanning Puzzle in Macro-Finance Term Structure Models" (Review of Finance)
 #'\item Candelon and Moura (2023). "Sovereign yield curves and the COVID-19 in emerging markets" (Economic Modelling)
-#'\item Candelon and Moura (forthcoming). "A Multicountry Model of the Term Structures of Interest Rates with a GVAR" (Journal of Financial Econometrics)
+#'\item Candelon and Moura (2024). "A Multicountry Model of the Term Structures of Interest Rates with a GVAR" (Journal of Financial Econometrics)
 #'}
 #'@export
 
 
 
-LoadData <- function(DataPaper){
+LoadData <- function(DataPaper) {
+  switch(DataPaper,
+         "BR_2017" = utils::data("BR_jps_gro_R3"),
+         "CM_2024" = {
+           utils::data("CM_GlobalMacroFactors")
+           utils::data('CM_DomMacroFactors')
+           utils::data('CM_Trade')
+           utils::data('CM_Yields')
+         },
+         "CM_2023" = {
+           utils::data("CM_GlobalMacro_2023")
+           utils::data('CM_DomMacro_2023')
+           utils::data('CM_Trade_2023')
+           utils::data('CM_Yields_2023')
+         },
+         stop("Database unavailable.")
+  )
+}
 
-  if (DataPaper == "BR_2017"){  utils::data("BR_jps_gro_R3")}
-  else if (DataPaper == "CM_2024") {
-    utils::data("CM_GlobalMacroFactors")
-    utils::data('CM_DomMacroFactors')
-    utils::data('CM_Trade')
-    utils::data('CM_Yields')
-  }
-  else if (DataPaper == "CM_2023"){
-    utils::data("CM_GlobalMacro_2023")
-    utils::data('CM_DomMacro_2023')
-    utils::data('CM_Trade_2023')
-    utils::data('CM_Yields_2023')
-  }else{
-    stop("Database unavailable.")
-  }
-
-  }
 
 #################################################################################################################
 #' Builds the time series of the risk factors that are used in the estimation of the ATSM
@@ -367,7 +472,6 @@ LoadData <- function(DataPaper){
 #'@keywords internal
 
 
-
 BuildATSM_RiskFactors <- function(InitialSampleDate, FinalSampleDate, Yields, GlobalMacroFactors,
                                   DomMacroFactors, Economies, FactorLabels, ModelType, BS_Adj = FALSE){
 
@@ -382,11 +486,9 @@ BuildATSM_RiskFactors <- function(InitialSampleDate, FinalSampleDate, Yields, Gl
   F <- C*(M+N) + G
   T <- ncol(DomMacroFactors)
 
-
   RiskFactors <- matrix(NA, nrow =  F, ncol = T)
   colnames(RiskFactors) <- colnames(DomMacroFactors)
   rownames(RiskFactors) <- AllFactorLabels
-
 
   # Input the global factors
   if (BS_Adj == FALSE || (any(ModelType == c("JPS multi", "GVAR multi", "JLL original", "JLL No DomUnit",
@@ -423,7 +525,6 @@ BuildATSM_RiskFactors <- function(InitialSampleDate, FinalSampleDate, Yields, Gl
   if (any(ModelType == c("JPS original", "JPS global", "GVAR single"))) {
     RiskFactorsList <- list()
 
-
     for (i in 1:C){
       if (BS_Adj){RiskFactors[seq_len(G), ] <- GlobalMacroFactors[((1+G*(i-1)):(G + G*(i-1))), ]   }
 
@@ -436,14 +537,13 @@ BuildATSM_RiskFactors <- function(InitialSampleDate, FinalSampleDate, Yields, Gl
       }
     }
     RiskFactors <- RiskFactorsList
-
   }
-  return(RiskFactors)
+
+   return(RiskFactors)
 }
 
 ###################################################################################################################
 #' Get delta t
-#'
 #'
 #' @param DataFrequency single element character-based vector. Available options are: "Daily All Days", \cr
 #'                      "Daily Business Days", "Weekly", "Monthly",  "Quarterly", "Annually"
@@ -458,7 +558,6 @@ Getdt <- function(DataFrequency){
   else if (DataFrequency == "Monthly"){ dt <- 1/12}
   else if (DataFrequency == "Quarterly"){ dt <- 1/4}
   else if (DataFrequency == "Annually"){ dt <- 1}
-
 
   return(dt)
 }
@@ -510,9 +609,7 @@ CheckInputsForMLE <- function(t0, tF, Economies, DomesticMacroFac, GlobalMacroFa
 
   # CHECK 5: data frequency chosen
   if(!(DataFreq %in% c("Daily All Days", "Daily Business Days", "Weekly", "Monthly",  "Quarterly", "Annually"))){
-    stop(paste("Data frequency option", DataFreq, "is unavailable. Available options are: 'Daily All Days', 'Daily Business Days', 'Weekly', 'Monthly',  'Quarterly', 'Annually'."))
-  }
-
+    stop(paste("Data frequency option", DataFreq, "is unavailable. Available options are: 'Daily All Days', 'Daily Business Days', 'Weekly', 'Monthly',  'Quarterly', 'Annually'."))}
   # CHECK 6: unit of bond yields chosen
   if(!(UnitYields %in% c("Month", "Year"))){
     stop(paste("Bond yield time-unit option", UnitYields,"is unavailable. Available options are 'Month' or 'Year'."))}
@@ -599,7 +696,6 @@ GeneralMLEInputs <- function(Yields, RiskFactors, FactorLabels, mat, DataFrequen
   if ( any(ModelType == Label_Multi_Models)){
     ListInputs <- list(Wpca = Wpca, We = We, WpcaFull = WpcaFull, Yields = Y, SpaFact = PP, K1XQ = K1XQ, Gy.0 = Gy.0)
   }
-
 
   return(ListInputs)
 }
@@ -771,8 +867,6 @@ GetPdynPara_BC <- function(ModelType, BRWinputs, RiskFactors, Economies, FactorL
 
   return(Out)
 }
-
-
 
 
 ####################################################################################################################

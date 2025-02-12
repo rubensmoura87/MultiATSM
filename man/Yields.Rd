@@ -3,7 +3,7 @@
 \docType{data}
 \name{Yields}
 \alias{Yields}
-\title{Data: Yields - Candelon and Moura (forthcoming, JFEC)}
+\title{Data: Yields - Candelon and Moura (2024, JFEC)}
 \format{
 matrix containing the Yields of the models
 
@@ -15,7 +15,7 @@ data("CM_Yields")
 data("CM_Yields_2023")
 }
 \description{
-Yields data used in Candelon and Moura (forthcoming, JFEC)
+Yields data used in Candelon and Moura (2024, JFEC)
 
 Bond yield data used in Candelon and Moura (2023)
 }

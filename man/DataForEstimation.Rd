@@ -33,7 +33,7 @@ DataForEstimation(
 
 \item{ModelType}{String-vector containing the label of the model to be estimated}
 
-\item{DataFrequency}{Character-based-vector. Avaialable options are: "Daily All Days", "Daily Business Days", "Weekly", "Monthly", "Quarterly", "Annually"}
+\item{DataFrequency}{Character-based-vector. Available options are: "Daily All Days", "Daily Business Days", "Weekly", "Monthly", "Quarterly", "Annually"}
 
 \item{W_type}{Three possibilities:
 \itemize{
@@ -74,7 +74,6 @@ N <- 2
 ModelType <- "JPS original"
 FactorLabels <-  LabFac(N, DomVar, GlobalVar, Economies, ModelType)
 DataFrequency <- "Monthly"
-
 
 DataModel <- DataForEstimation(t0, tF, Economies, N, FactorLabels, ModelType, DataFrequency)
 

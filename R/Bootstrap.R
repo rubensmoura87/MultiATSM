@@ -633,152 +633,131 @@ AdjustOptm_BS <- function(ModelType, ModelBootstrap, Draw_Opt, Economies, tt){
 
 #############################################################################################################
 ####################################################################################################
-#' Prepare the factor set for GVAR models  (Bootstrap version)
+#' Prepare the factor set for GVAR models (Bootstrap version)
 #'
-#' @param ModelType string-vector containing the label of the model to be estimated
-#' @param RiskFactors Complete set of risk factors (KxT)
-#' @param Wgvar  transition matrix from GVAR models (CxC)
-#' @param Economies string-vector containing the names of the economies which are part of the economic system
-#' @param FactorLabels string-list based which contains the labels of all the variables present in the model
+#' @param ModelType A character vector containing the label of the model to be estimated.
+#' @param RiskFactors A matrix of the complete set of risk factors (K x T).
+#' @param Wgvar A transition matrix from GVAR models (C x C).
+#' @param Economies A character vector containing the names of the economies included in the system.
+#' @param FactorLabels A list of character vectors with labels for all variables in the model.
 #'
-#'@keywords internal
+#' @return A list containing the factor set for GVAR models.
+#' @keywords internal
+DataSet_BS <- function(ModelType, RiskFactors, Wgvar, Economies, FactorLabels) {
 
-
-DataSet_BS <- function(ModelType, RiskFactors, Wgvar, Economies, FactorLabels){
-
-
-  if (any(ModelType == c("GVAR single", "GVAR multi"))){
-
-    # 1) Pre-allocate list of factors
-    T <- ncol(RiskFactors) # length of model's time dimension
-    C <- length(Economies) # number of economies in of the economic system
-    N <- length(FactorLabels$Spanned) # number of countrey-specific spanned factors
-    M <- length(FactorLabels$Domestic) - N # Number of country-specific macro variables
-    M.star <- length(FactorLabels$Star) - N # Number of foreign-country-specific macro variables
-    G <- length(FactorLabels$Global) # Number of global variables
-
-    ListFactors <- vector(mode='list', length = length(Economies)+1) # length = all countries + global factors
-    names(ListFactors) <- c(Economies, 'Global')
-
-    # Country-specific factors (CSF)
-    CSF <- vector(mode='list', length = length(FactorLabels$Domestic))
-    names(CSF) <- FactorLabels$Domestic
-    for (i in 1:C){  ListFactors[[Economies[i]]] <- CSF }
-
-    #  Star factors (SF)
-    SF <- vector(mode='list', length = length(FactorLabels$Star))
-    names(SF) <- FactorLabels$Star
-    for (i in 1:length(Economies)){
-      ListFactors[[Economies[i]]] <- list(append(CSF,SF))
-      names(ListFactors[[Economies[i]]]) <- 'Factors'
-    }
-
-    # Global Factors (GF)
-    GF <- vector(mode='list', length = length(FactorLabels$Global))
-    names(GF) <- FactorLabels$Global
-    ListFactors[[ length(Economies)+1 ]] <- GF
-
-    # Yields
-    YieldsSeries <- vector(mode='list', length = C)
-    Wpca <- vector(mode='list', length = C)
-    names(Wpca) <- rep("Wpca", times=C)
-    YieldsList <- vector(mode='list', length = C)
-
-
-
-    # 2) Fill in list with the corresponding factors
-    # A) Country-specific variables (economy-related variables)
-
-    for (i in 1:C) {
-      for (j in 1:M){
-        ListFactors[[Economies[i]]]$Factors[[j]]<- as.matrix(RiskFactors[(c(FactorLabels$Tables[[Economies[i]]][j])),])
-      }
-    }
-
-    # B) Country-specific variables (pricing-related variables)
-    idx0 <- M
-    for (i in 1:C) {
-      for (j in 1:N){
-        ListFactors[[Economies[i]]]$Factors[[idx0+j]] <- as.matrix(RiskFactors[(c(FactorLabels$Tables[[Economies[i]]][idx0+j])),])
-      }
-    }
-
-    # C) Foreign country-specific variables (economy and pricing-related)
-    idx1 <- M+N
-    Z <- list()
-
-    for (j in 1:(M+N)){
-      X <- matrix(NA, nrow= C, ncol=T)
-      for (i in 1:C){
-        X[i,] <- ListFactors[[Economies[i]]]$Factors[[j]]
-        Z[[j]] <- X # Each element of the list contains the same country-specific variable of all countries
-      }
-    }
-    names(Z) <- FactorLabels$Domestic
-
-
-    # C.1) If star variables are computed with time-varying weigths
-    if (is.list(Wgvar)){
-      # Use only the transition matrices that are included in the sample span
-      t_First <- as.Date(colnames(RiskFactors)[1], format = "%d-%m-%Y")
-      t_Last <- as.Date(colnames(RiskFactors)[T], format = "%d-%m-%Y")
-
-      t_First_Wgvar <- format(t_First, "%Y")
-      t_Last_Wgvar <- format(t_Last, "%Y")
-
-      Wgvar_subset <- Wgvar[names(Wgvar) >= t_First_Wgvar & names(Wgvar) <= t_Last_Wgvar]
-
-      # Add common column label (i.e. the year of the observation) to all variables
-      Dates <- as.Date(colnames(RiskFactors), format = "%d-%m-%Y")
-      YearLabels <- substr(Dates, 1,4)
-      Z <- lapply(Z, function(x) {  colnames(x) <- paste0(YearLabels, seq_along(colnames(x)))
-      return(x)
-      })
-
-
-      # Compute the star variables with time-varying weigths
-      for (i in 1:C){
-        for (j in 1:(M+N)){
-
-          StarTimeVarTemp <- matrix(NA, nrow = T, ncol = 1)
-
-          for (k in 1:length(Wgvar_subset)) {
-            YearRef <- names(Wgvar_subset)[k] # year of reference
-            IdxYear <- grep(YearRef, colnames(Z[[j]]))
-            WgvarYear <- Wgvar_subset[[k]]
-            StarTimeVarTemp[IdxYear]  <- t(WgvarYear[i, ]%*% Z[[j]][, IdxYear])
-          }
-          # If the last year of the transition matrix happens earlier than the year of the last observation from the sample,
-          # then use the last transition matrix for the remaining observations
-          if (anyNA(StarTimeVarTemp)){
-            LenlastYear <- length(IdxYear)
-            IdxLastObs <- IdxYear[LenlastYear] + 1
-            StarTimeVarTemp[IdxLastObs:T]  <- t(WgvarYear[i, ]%*% Z[[j]][, (IdxLastObs):T])
-          }
-
-          ListFactors[[Economies[i]]]$Factors[[idx1+j]] <- StarTimeVarTemp
-        }
-      }
-
-      # c.2) If star variables are computed with time fixed weigths
-    }else{
-      if (any(ModelType == c("GVAR single", "GVAR multi"))){
-        for (i in 1:C){
-          for (j in 1:(M+N)){
-            ListFactors[[Economies[i]]]$Factors[[idx1+j]] <- t(Wgvar[i,]%*%Z[[j]])
-          }
-        }
-      }
-    }
-    # D) Global Factors
-    for (i in seq_len(G)){
-      ListFactors[[length(Economies)+1]][[i]] <-as.matrix( RiskFactors[(c(FactorLabels$Global[i])),])
-    }
-
-  } else{
-    ListFactors <- NULL
+  if (!any(ModelType %in% c("GVAR single", "GVAR multi"))) {
+    return(NULL)
   }
 
+  # 1) Pre-allocate list of factors
+  T <- ncol(RiskFactors) # length of model's time dimension
+  C <- length(Economies) # number of economies in the economic system
+  N <- length(FactorLabels$Spanned) # number of country-specific spanned factors
+  M <- length(FactorLabels$Domestic) - N # number of country-specific macro variables
+  G <- length(FactorLabels$Global) # number of global variables
+
+  ListFactors <- vector(mode = 'list', length = length(Economies) + 1) # length = all countries + global factors
+  names(ListFactors) <- c(Economies, 'Global')
+
+  # Initialize country-specific factors (CSF) and star factors (SF)
+  CSF <- vector(mode = 'list', length = length(FactorLabels$Domestic))
+  names(CSF) <- FactorLabels$Domestic
+  SF <- vector(mode = 'list', length = length(FactorLabels$Star))
+  names(SF) <- FactorLabels$Star
+
+  for (i in 1:C) {
+    ListFactors[[Economies[i]]] <- list(Factors = c(CSF, SF))
+  }
+
+  # Initialize global factors (GF)
+  GF <- vector(mode = 'list', length = length(FactorLabels$Global))
+  names(GF) <- FactorLabels$Global
+  ListFactors[[length(Economies) + 1]] <- GF
+
+  # 2) Fill in list with the corresponding factors
+  # A) Country-specific variables (economy-related variables)
+  for (i in 1:C) {
+    for (j in 1:M) {
+      ListFactors[[Economies[i]]]$Factors[[j]] <- as.matrix(RiskFactors[(c(FactorLabels$Tables[[Economies[i]]][j])), ])
+    }
+  }
+
+  # B) Country-specific variables (pricing-related variables)
+  idx0 <- M
+  for (i in 1:C) {
+    for (j in 1:N) {
+      ListFactors[[Economies[i]]]$Factors[[idx0 + j]] <- as.matrix(RiskFactors[(c(FactorLabels$Tables[[Economies[i]]][idx0 + j])), ])
+    }
+  }
+
+  # C) Foreign country-specific variables (economy and pricing-related)
+  idx1 <- M + N
+  Z <- lapply(1:(M + N), function(j) {
+    X <- matrix(NA, nrow = C, ncol = T)
+    for (i in 1:C) {
+      X[i, ] <- ListFactors[[Economies[i]]]$Factors[[j]]
+    }
+    X
+  })
+  names(Z) <- FactorLabels$Domestic
+
+  # C.1) If star variables are computed with time-varying weights
+  if (is.list(Wgvar)) {
+    # Use only the transition matrices that are included in the sample span
+    t_First <- as.Date(colnames(RiskFactors)[1], format = "%d-%m-%Y")
+    t_Last <- as.Date(colnames(RiskFactors)[T], format = "%d-%m-%Y")
+
+    t_First_Wgvar <- format(t_First, "%Y")
+    t_Last_Wgvar <- format(t_Last, "%Y")
+
+    Wgvar_subset <- Wgvar[names(Wgvar) >= t_First_Wgvar & names(Wgvar) <= t_Last_Wgvar]
+
+    # Add common column label (i.e. the year of the observation) to all variables
+    Dates <- as.Date(colnames(RiskFactors), format = "%d-%m-%Y")
+    YearLabels <- substr(Dates, 1, 4)
+    Z <- lapply(Z, function(x) {
+      colnames(x) <- paste0(YearLabels, seq_along(colnames(x)))
+      x
+    })
+
+    # Compute the star variables with time-varying weights
+    for (i in 1:C) {
+      for (j in 1:(M + N)) {
+        StarTimeVarTemp <- matrix(NA, nrow = T, ncol = 1)
+
+        for (k in 1:length(Wgvar_subset)) {
+          YearRef <- names(Wgvar_subset)[k] # year of reference
+          IdxYear <- grep(YearRef, colnames(Z[[j]]))
+          WgvarYear <- Wgvar_subset[[k]]
+          StarTimeVarTemp[IdxYear] <- t(WgvarYear[i, ] %*% Z[[j]][, IdxYear])
+        }
+        # If the last year of the transition matrix happens earlier than the year of the last observation from the sample,
+        # then use the last transition matrix for the remaining observations
+        if (anyNA(StarTimeVarTemp)) {
+          LenlastYear <- length(IdxYear)
+          IdxLastObs <- IdxYear[LenlastYear] + 1
+          StarTimeVarTemp[IdxLastObs:T] <- t(WgvarYear[i, ] %*% Z[[j]][, (IdxLastObs):T])
+        }
+
+        ListFactors[[Economies[i]]]$Factors[[idx1 + j]] <- StarTimeVarTemp
+      }
+    }
+
+    # C.2) If star variables are computed with time fixed weights
+  } else {
+    if (any(ModelType == c("GVAR single", "GVAR multi"))) {
+      for (i in 1:C) {
+        for (j in 1:(M + N)) {
+          ListFactors[[Economies[i]]]$Factors[[idx1 + j]] <- t(Wgvar[i, ] %*% Z[[j]])
+        }
+      }
+    }
+  }
+
+  # D) Global Factors
+  for (i in seq_len(G)) {
+    ListFactors[[length(Economies) + 1]][[i]] <- as.matrix(RiskFactors[(c(FactorLabels$Global[i])), ])
+  }
 
   return(ListFactors)
 }

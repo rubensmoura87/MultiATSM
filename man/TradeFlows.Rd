@@ -3,7 +3,7 @@
 \docType{data}
 \name{TradeFlows}
 \alias{TradeFlows}
-\title{Data: Trade Flows - Candelon and Moura (forthcoming, JFEC)}
+\title{Data: Trade Flows - Candelon and Moura (2024, JFEC)}
 \format{
 list containing the bilateral trade flows
 }
@@ -11,10 +11,10 @@ list containing the bilateral trade flows
 data("CM_Trade")
 }
 \description{
-Trade Flows data used in Candelon and Moura (forthcoming, JFEC)
+Trade Flows data used in Candelon and Moura (2024, JFEC)
 }
 \references{
-Candelon, B. and Moura, R. (Forthcoming) "A Multicountry Model of the Term Structures of Interest Rates with a GVAR". (Journal of Financial Econometrics)
+Candelon, B. and Moura, R. (2024) "A Multicountry Model of the Term Structures of Interest Rates with a GVAR". (Journal of Financial Econometrics)
 }
 \keyword{Flows}
 \keyword{Trade}

@@ -11,9 +11,23 @@ License: GPL-2 | GPL-3
 Encoding: UTF-8
 RoxygenNote: 7.2.3
 Imports: pracma, ggplot2
-Suggests: readxl, readr, magic, Jmisc, functional, cowplot, reshape2,
-        sjmisc, stringr, knitr, rmarkdown, bookdown, kableExtra,
-        neldermead, magrittr, hablar
+Suggests: 
+    readxl,
+    readr,
+    magic,
+    Jmisc,
+    functional,
+    cowplot,
+    reshape2,
+    sjmisc,
+    stringr,
+    knitr,
+    rmarkdown,
+    bookdown,
+    kableExtra,
+    neldermead,
+    magrittr,
+    hablar
 Depends: R (>= 4.3.0)
 VignetteBuilder: knitr
 URL: https://github.com/rubensmoura87/MultiATSM

@@ -3,7 +3,7 @@
 \docType{data}
 \name{RiskFactors}
 \alias{RiskFactors}
-\title{Data: Risk Factors - Candelon and Moura (forthcoming, JFEC)}
+\title{Data: Risk Factors - Candelon and Moura (2024, JFEC)}
 \format{
 matrix containing the  risk factors of the models
 }
@@ -11,10 +11,10 @@ matrix containing the  risk factors of the models
 data("CM_Factors")
 }
 \description{
-Risk factors data used in Candelon and Moura (forthcoming, JFEC)
+Risk factors data used in Candelon and Moura (2024, JFEC)
 }
 \references{
-Candelon, B. and Moura, R. (Forthcoming) "A Multicountry Model of the Term Structures of Interest Rates with a GVAR". (Journal of Financial Econometrics)
+Candelon, B. and Moura, R. (2024) "A Multicountry Model of the Term Structures of Interest Rates with a GVAR". (Journal of Financial Econometrics)
 }
 \keyword{Factors}
 \keyword{Risk}

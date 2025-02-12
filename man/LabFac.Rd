@@ -32,5 +32,4 @@ ModelType <- "JPS original"
 
 VarLabels <- LabFac(N, DomVar, GlobalVar, Economies, ModelType)
 
-
 }

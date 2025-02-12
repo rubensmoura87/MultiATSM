@@ -2,7 +2,7 @@
 % Please edit documentation in R/InputsForOpt.R
 \name{InputsForOpt}
 \alias{InputsForOpt}
-\title{Generates several  inputs that are necessary to build the likelihood function}
+\title{Generates inputs necessary to build the likelihood function for the ATSM model}
 \usage{
 InputsForOpt(
   InitialSampleDate,
@@ -16,7 +16,7 @@ InputsForOpt(
   DataFrequency,
   GVARlist = NULL,
   JLLlist = NULL,
-  WishBRW = 0,
+  WishBRW = FALSE,
   BRWlist = NULL,
   UnitYields = "Month",
   CheckInputs = TRUE,
@@ -28,7 +28,7 @@ InputsForOpt(
 
 \item{FinalSampleDate}{End date of the sample period in the format "dd-mm-yyyy"}
 
-\item{ModelType}{A character vector indicating the model type to be estimated.}
+\item{ModelType}{A character vector indicating the model type to be estimated. Available options: "JPS original", "JPS global", "GVAR single", "JPS multi", "GVAR multi", "JLL original", "JLL No DomUnit", "JLL joint Sigma".}
 
 \item{Yields}{A numerical matrix with time series of yields (JxT or CJ x T)}
 
@@ -40,30 +40,27 @@ InputsForOpt(
 
 \item{Economies}{A character vector containing the names of the economies included in the system.}
 
-\item{DataFrequency}{A character vector specifying the frequency of the data. Available options are:
-"Daily All Days", "Daily Business Days", "Weekly", "Monthly", "Quarterly", or "Annually".}
+\item{DataFrequency}{A character vector specifying the frequency of the data. Available options are: "Daily All Days", "Daily Business Days", "Weekly", "Monthly", "Quarterly", or "Annually".}
 
 \item{GVARlist}{A list containing the necessary inputs for the estimation of GVAR-based models}
 
 \item{JLLlist}{A list of necessary inputs for the estimation of JLL-based models. If the chosen model is "JLL original" or "JLL joint Sigma", then a dominant unit economy must be chosen. Otherwise, this list must be set as 'None'.}
 
-\item{WishBRW}{Whether to estimate the physical parameter model with bias correction, based on the method by Bauer, Rudebusch and Wu (2012) (see \code{\link{Bias_Correc_VAR}} function). Default is set to 0.}
+\item{WishBRW}{Logical. Whether to estimate the physical parameter model with bias correction, based on the method by Bauer, Rudebusch and Wu (2012). Default is FALSE.}
 
-\item{BRWlist}{List of necessary inputs for performing the bias-corrected estimation (see \code{\link{Bias_Correc_VAR}} function).}
+\item{BRWlist}{List of necessary inputs for performing the bias-corrected estimation.}
 
-\item{UnitYields}{A character string indicating the maturity unit of yields. Options are: (i) "Month" for yields expressed in months, or (ii) "Year" for yields expressed in years. Default is "Month".}
+\item{UnitYields}{A character string indicating the maturity unit of yields. Options are: "Month" for yields expressed in months, or "Year" for yields expressed in years. Default is "Month".}
 
-\item{CheckInputs}{A logical value indicating whether to perform a prior check on the consistency of the provided input list.
-Default is TRUE.}
+\item{CheckInputs}{Logical. Whether to perform a prior check on the consistency of the provided input list. Default is TRUE.}
 
-\item{BS_Adj}{A logical value indicating whether to adjust the global series for the sepQ models in the Bootstrap setting.
-Default is FALSE.}
+\item{BS_Adj}{Logical. Whether to adjust the global series for the sepQ models in the Bootstrap setting. Default is FALSE.}
 }
 \value{
-List of necessary inputs for performing the model optimization.
+An object of class 'ATSMModelInputs' containing the necessary inputs for performing the model optimization.
 }
 \description{
-Generates several  inputs that are necessary to build the likelihood function
+Generates inputs necessary to build the likelihood function for the ATSM model
 }
 \examples{
 \donttest{
@@ -71,7 +68,6 @@ Generates several  inputs that are necessary to build the likelihood function
 data(CM_GlobalMacroFactors)
 data(CM_DomMacroFactors)
 data(CM_Yields)
-
 
 ModelType <- "JPS original"
 Economies <- "Mexico"
@@ -81,25 +77,29 @@ N <- 3
 GlobalVar <- c("Gl_Eco_Act") # Global Variables
 DomVar <- c("Eco_Act") # Domestic Variables
 FactorLabels <- LabFac(N, DomVar, GlobalVar, Economies, ModelType)
+
 DataFreq <- "Monthly"
 
 ATSMInputs <- InputsForOpt(t0, tF, ModelType, Yields, GlobalMacroVar, DomesticMacroVar,
                              FactorLabels, Economies, DataFreq, CheckInputs = FALSE)
+
 # Example 2:
 LoadData("CM_2024")
 
 ModelType <- "GVAR multi"
+
 Economies <- c("China", "Brazil", "Mexico", "Uruguay")
 t0 <- "01-05-2007" # InitialSampleDate (Format: "dd-mm-yyyy")
-tF <- "01-12-2019" # FinalSampleDate (Format: "dd-mm-yyyy")#'
+tF <- "01-12-2019" # FinalSampleDate (Format: "dd-mm-yyyy")
 N <- 2
 GlobalVar <- c("Gl_Eco_Act", "Gl_Inflation") # Global Variables
 DomVar <- c("Inflation") # Domestic Variables
-FactorLabels <- LabFac(N, DomVar,GlobalVar, Economies, ModelType)
+FactorLabels <- LabFac(N, DomVar, GlobalVar, Economies, ModelType)
 
 DataFreq <- "Monthly"
 GVARlist <- list(VARXtype = "unconstrained", W_type = "Sample Mean",
                  t_First_Wgvar = "2007", t_Last_Wgvar = "2019")
+
 ATSMInputs <- InputsForOpt(t0, tF, ModelType, Yields, GlobalMacroVar, DomesticMacroVar,
                            FactorLabels, Economies, DataFreq, GVARlist, CheckInputs = FALSE)
 
@@ -111,11 +111,11 @@ ModelType <- "JLL original"
 
 Economies <- c("China", "Brazil", "Uruguay")
 t0 <- "01-05-2007" # InitialSampleDate (Format: "dd-mm-yyyy")
-tF <- "01-12-2019" # FinalSampleDate (Format: "dd-mm-yyyy")#'
+tF <- "01-12-2019" # FinalSampleDate (Format: "dd-mm-yyyy")
 N <- 2
 GlobalVar <- c("Gl_Eco_Act", "Gl_Inflation") # Global Variables
 DomVar <- c("Eco_Act", "Inflation") # Domestic Variables
-FactorLabels <- LabFac(N, DomVar,GlobalVar, Economies, ModelType)
+FactorLabels <- LabFac(N, DomVar, GlobalVar, Economies, ModelType)
 
 JLLinputs <- list(DomUnit = "China")
 
@@ -127,7 +127,5 @@ ATSMInputs <- InputsForOpt(t0, tF, ModelType, Yields, GlobalMacroVar, DomesticMa
 } else {
  message("skipping functionality due to missing Suggested dependency")
 }
-
-
 }
 }

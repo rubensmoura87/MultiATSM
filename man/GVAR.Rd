@@ -4,10 +4,10 @@
 \alias{GVAR}
 \title{Estimates a GVAR(1) and a VARX(1,1,1) models}
 \usage{
-GVAR(GVARinputs, N, CheckInputs = F)
+GVAR(GVARinputs, N, CheckInputs = FALSE)
 }
 \arguments{
-\item{GVARinputs}{GVARinputs List. Inputs for GVAR model estimation:
+\item{GVARinputs}{List of inputs for GVAR model estimation:
 \enumerate{
        \item  \code{Economies}:  A character vector containing the names of the economies included in the system.
        \item  \code{GVARFactors}: A list of all variables used in the estimation of the VARX model \cr
@@ -65,6 +65,7 @@ GVARinputs$Wgvar <- matrix( c(0, 0.83, 0.86, 0.38,
 N <- 3
 
 GVARPara <- GVAR(GVARinputs, N)
+
 }
 \references{
 Chudik and Pesaran, (2016). "Theory and Practice of GVAR modelling" (Journal of Economic Surveys)

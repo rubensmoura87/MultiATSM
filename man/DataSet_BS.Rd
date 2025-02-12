@@ -2,22 +2,25 @@
 % Please edit documentation in R/Bootstrap.R
 \name{DataSet_BS}
 \alias{DataSet_BS}
-\title{Prepare the factor set for GVAR models  (Bootstrap version)}
+\title{Prepare the factor set for GVAR models (Bootstrap version)}
 \usage{
 DataSet_BS(ModelType, RiskFactors, Wgvar, Economies, FactorLabels)
 }
 \arguments{
-\item{ModelType}{string-vector containing the label of the model to be estimated}
+\item{ModelType}{A character vector containing the label of the model to be estimated.}
 
-\item{RiskFactors}{Complete set of risk factors (KxT)}
+\item{RiskFactors}{A matrix of the complete set of risk factors (K x T).}
 
-\item{Wgvar}{transition matrix from GVAR models (CxC)}
+\item{Wgvar}{A transition matrix from GVAR models (C x C).}
 
-\item{Economies}{string-vector containing the names of the economies which are part of the economic system}
+\item{Economies}{A character vector containing the names of the economies included in the system.}
 
-\item{FactorLabels}{string-list based which contains the labels of all the variables present in the model}
+\item{FactorLabels}{A list of character vectors with labels for all variables in the model.}
+}
+\value{
+A list containing the factor set for GVAR models.
 }
 \description{
-Prepare the factor set for GVAR models  (Bootstrap version)
+Prepare the factor set for GVAR models (Bootstrap version)
 }
 \keyword{internal}

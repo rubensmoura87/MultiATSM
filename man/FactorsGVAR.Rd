@@ -3,7 +3,7 @@
 \docType{data}
 \name{FactorsGVAR}
 \alias{FactorsGVAR}
-\title{Data: Risk Factors for the GVAR - Candelon and Moura (forthcoming, JFEC)}
+\title{Data: Risk Factors for the GVAR - Candelon and Moura (2024, JFEC)}
 \format{
 list containing the variables used in the GVAR models
 }
@@ -11,10 +11,10 @@ list containing the variables used in the GVAR models
 data("CM_Factors_GVAR")
 }
 \description{
-Risk factors data used in the GVAR models - Candelon and Moura (forthcoming, JFEC)
+Risk factors data used in the GVAR models - Candelon and Moura (2024, JFEC)
 }
 \references{
-Candelon, B. and Moura, R. (Forthcoming) "A Multicountry Model of the Term Structures of Interest Rates with a GVAR". (Journal of Financial Econometrics)
+Candelon, B. and Moura, R. (2024) "A Multicountry Model of the Term Structures of Interest Rates with a GVAR". (Journal of Financial Econometrics)
 }
 \keyword{Factors}
 \keyword{GVAR}

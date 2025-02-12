@@ -154,7 +154,7 @@ kableExtra::kbl(se, align = "c", caption ="Portfolio of yields with errors") %>%
 For replicability, it is important to note that the $P-$dynamics results reported in Table \@ref(tab:PdynTab) for the *MultiATSM* package make use of the principal component weights provided by BR (2017). Such a matrix is simply a scaled-up version of the one provided by the function `pca_weights_one_country()` of this package. Accordingly, despite the numerical differences on the weight matrices, both methods generate time series of spanned factors which are perfectly correlated. Another difference between the two approaches relates to the construction form of the log-likelihood function (llk): while in the BR (2017) code the llk is expressed in terms of a portfolio of yields, the *MultiATSM* package generates this same input directly as a function of observed yields (i.e. both procedures lead to equivalent llk up to the Jacobian term).
 
 
-# Candelon and Moura (forthcoming)
+# Candelon and Moura (2024)
 
 The multi-country framework introduced in @CandelonMoura2024 was designed to enhance the tractability of large-scale ATSMs, providing a deeper understanding of the intricate global economic mechanisms that underlie yield curve fluctuations. This framework also reinforces the statistical validity of inference and enhances the predictive capabilities of these models. This novel setup, embodied by the *GVAR multi* model class, is benchmarked against the findings of @JotikasthiraLeLundblad2015, which are captured by the *JLL original* model class. The paper showcases an empirical illustration involving China, Brazil, Mexico, and Uruguay.
 

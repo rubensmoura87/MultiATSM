@@ -1,6 +1,6 @@
-#'@title Data: Yields - Candelon and Moura (forthcoming, JFEC)
+#'@title Data: Yields - Candelon and Moura (2024, JFEC)
 #'
-#' @description Yields data used in Candelon and Moura (forthcoming, JFEC)
+#' @description Yields data used in Candelon and Moura (2024, JFEC)
 #' @name Yields
 #' @docType data
 #' @usage data("CM_Yields")

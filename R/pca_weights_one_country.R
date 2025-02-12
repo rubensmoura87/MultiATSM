@@ -1,22 +1,24 @@
-#' Weight matrix from principal components
-#
-#'@param Y        A numeric matrix (T x J) representing the time series of bond yields of a specific country
-#'@param Economy  String-vector containing the name of a single economy.
+#' Computes the PCA weights for a single country
+#'
+#' @param Yields A matrix of bond yields (J x T) for a single country, where J is the number of maturities and T is the time series length.
+#' @param Economy A character string indicating the name of the economy.
 #'
 #'
 #'@return A matrix (J x J) that corresponds to the eigenvectors of the variance-covariance matrix of yields
 #'@examples
-#'data("CM_Yields")
-#'pca_weights_one_country(Yields, Economy= "Brazil")
+#' data(CM_Yields)
+#' Economy <- "Mexico"
+#' pca_weights <- pca_weights_one_country(Yields, Economy)
+#'
 #'@export
 
 
-pca_weights_one_country <- function(Y, Economy) {
+pca_weights_one_country <- function(Yields, Economy) {
 
 
   # Extract the yields of a single country
-  Idx <- grepl(Economy, rownames(Y))
-  Y_CS <- Y[Idx,] # Country-specific yields
+  Idx <- grepl(Economy, rownames(Yields))
+  Y_CS <- Yields[Idx,] # Country-specific yields
 
     # Store the eigenvectors of the matrix of yields
   H <- eigen(stats::cov(t(Y_CS)))

@@ -50,5 +50,4 @@ Economies <- c("China", "Brazil", "Mexico", "Uruguay")
 type <- "Sample Mean"
 W_mat <- Transition_Matrix(t_First, t_Last, Economies, type, DataConnectedness = TradeFlows)
 
-
 }

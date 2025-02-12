@@ -88,7 +88,6 @@ WishStationarityQ <- 1
 WishGraphRiskFac <- 0
 WishGraphYields <- 1
 
-
 InputsList <- InputsForOutputs(ModelType, Horiz, DesiredOutputGraphs, OutputLabel,
                               WishStationarityQ, WishGraphYields, WishGraphRiskFac)
 }

@@ -22,6 +22,10 @@
 
 Reg_K1Q <- function(Y, mat, Z, dt,type){
 
+  # Validate inputs
+  if (!is.numeric(dt) || dt <= 0) { stop("dt must be a positive numeric value.")  }
+  if (!is.character(type) || !(type %in% c("Jordan", "NULL"))) { stop("type must be either 'Jordan' or 'NULL'.") }
+
   # Step 1: Define the boundaries of the maturities that will be interpolated
   M <- round(max(mat)/dt) # longest maturity adjusted for the time units of the model
   m <- round(min(mat)/dt) # shortest maturity adjusted for the time units of the model
@@ -29,7 +33,7 @@ Reg_K1Q <- function(Y, mat, Z, dt,type){
   # Step 2: Interpolate yields by spline. Interpolation is made for each time unit of the model.
   # Define target maturities
   target_maturities <- seq(dt, M * dt, by = dt)
-  b <- matrix(data=NA, ncol= ncol(Y) , nrow = M )
+  b <- matrix(data = NA, ncol = ncol(Y) , nrow = M )
 
   # Interpolate using splinefun for each column
   for (i in seq_len(ncol(Y))) {

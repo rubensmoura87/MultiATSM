@@ -7,7 +7,7 @@
 LoadData(DataPaper)
 }
 \arguments{
-\item{DataPaper}{Available options are \code{BR_2017} (Bauer and Rudebusch, 2017) , \code{CM_2023} (Candelon and Moura, 2023), \code{CM_2024} (Candelon and Moura, forthcoming)}
+\item{DataPaper}{Available options are \code{BR_2017} (Bauer and Rudebusch, 2017) , \code{CM_2023} (Candelon and Moura, 2023), \code{CM_2024} (Candelon and Moura, 2024)}
 }
 \value{
 Complete set of data from several papers.
@@ -31,6 +31,6 @@ LoadData("CM_2024")
 \enumerate{
 \item Bauer and Rudebusch (2017). "Resolving the Spanning Puzzle in Macro-Finance Term Structure Models" (Review of Finance)
 \item Candelon and Moura (2023). "Sovereign yield curves and the COVID-19 in emerging markets" (Economic Modelling)
-\item Candelon and Moura (forthcoming). "A Multicountry Model of the Term Structures of Interest Rates with a GVAR" (Journal of Financial Econometrics)
+\item Candelon and Moura (2024). "A Multicountry Model of the Term Structures of Interest Rates with a GVAR" (Journal of Financial Econometrics)
 }
 }

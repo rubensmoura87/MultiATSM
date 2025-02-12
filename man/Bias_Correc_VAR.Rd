@@ -48,7 +48,7 @@ Bias_Correc_VAR(
 \item{nargout}{Integer. Number of elements in the output list. Default is 4.}
 }
 \value{
-Bias-corrected VAR paramaters based on the framework of Bauer, Rudebusch and Wu (2012). The list contains:
+Bias-corrected VAR parameters based on the framework of Bauer, Rudebusch and Wu (2012). The list contains:
 \enumerate{
 \item \code{Phi_tilde}: estimated coefficient matrix (F x F);
 \item \code{mu_tilde}: estimated intercept (F x 1);
@@ -73,7 +73,6 @@ Economies <- "China"
 N <- 3
 ModelType <- "JPS original"
 FactorLabels <- NULL
-
 
 BRWpara <- Bias_Correc_VAR(ModelType, BRWinputs, Factors, N, Economies, FactorLabels)
 }

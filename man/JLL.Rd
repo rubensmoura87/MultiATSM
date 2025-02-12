@@ -4,7 +4,7 @@
 \alias{JLL}
 \title{Estimates the P-dynamics from JLL-based models}
 \usage{
-JLL(NonOrthoFactors, N, JLLinputs, CheckInputs = F)
+JLL(NonOrthoFactors, N, JLLinputs, CheckInputs = FALSE)
 }
 \arguments{
 \item{NonOrthoFactors}{A numeric matrix (F x T) representing the time series of risk factors before the orthogonalization process.}
@@ -39,9 +39,7 @@ N <- 3
 JLLinputs <- list(Economies = c("China", "Brazil", "Mexico", "Uruguay"), DomUnit = "China",
                   WishSigmas = 1, SigmaNonOrtho = NULL, JLLModelType = "JLL original")
 
-
 JLLPara <- JLL(RF_TS, N, JLLinputs)
-
 }
 }
 \references{
