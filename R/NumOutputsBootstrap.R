@@ -57,7 +57,7 @@ IRFandGIRF_BS <- function(ModelType, ModelParaBoot, IRFhoriz, FactorLabels, Econ
     for (i in 1:C){
       ndraws <- length(ModelParaBoot$ParaDraws[[ModelType]][[1]])
       K <- nrow(ModelParaBoot$ParaDraws[[ModelType]][[Economies[i]]][[1]]$ests$K1Z)
-      J <- numel(ModelParaBoot$GeneralInputs$mat)
+      J <- length(ModelParaBoot$GeneralInputs$mat)
 
       YieldsLabel<- rownames(ModelParaBoot$ParaDraws[[ModelType]][[Economies[i]]][[1]]$inputs$Y) # Yield labels
       for (tt in 1:ndraws){
@@ -83,7 +83,7 @@ IRFandGIRF_BS <- function(ModelType, ModelParaBoot, IRFhoriz, FactorLabels, Econ
     # 2) JOINT COUNTRY MODELS
     ndraws <- length(ModelParaBoot$ParaDraws[[ModelType]])
     for (tt in 1:ndraws){
-    J <- numel(ModelParaBoot$GeneralInputs$mat)
+    J <- length(ModelParaBoot$GeneralInputs$mat)
     K <- nrow(ModelParaBoot$ParaDraws[[ModelType]][[1]]$ests$K1Z)
     YieldsLabel<- rownames(ModelParaBoot$ParaDraws[[ModelType]][[1]]$inputs$Y) # Yield labels
 
@@ -175,7 +175,7 @@ FEVDandGFEVD_BS <- function(ModelType, ModelParaBoot, FEVDhoriz, FactorLabels, E
     for (i in 1:C){
       ndraws <- length(ModelParaBoot$ParaDraws[[ModelType]][[1]])
       K <- nrow(ModelParaBoot$ParaDraws[[ModelType]][[Economies[i]]][[1]]$ests$K1Z)
-      J <- numel(ModelParaBoot$GeneralInputs$mat)
+      J <- length(ModelParaBoot$GeneralInputs$mat)
 
       YieldsLabel<- rownames(ModelParaBoot$ParaDraws[[ModelType]][[Economies[i]]][[1]]$inputs$Y) # Yield labels
       for (tt in 1:ndraws){
@@ -201,7 +201,7 @@ FEVDandGFEVD_BS <- function(ModelType, ModelParaBoot, FEVDhoriz, FactorLabels, E
     # 2) JOINT COUNTRY MODELS
     ndraws <- length(ModelParaBoot$ParaDraws[[ModelType]])
     for (tt in 1:ndraws){
-      J <- numel(ModelParaBoot$GeneralInputs$mat)
+      J <- length(ModelParaBoot$GeneralInputs$mat)
       K <- nrow(ModelParaBoot$ParaDraws[[ModelType]][[1]]$ests$K1Z)
       YieldsLabel<- rownames(ModelParaBoot$ParaDraws[[ModelType]][[1]]$inputs$Y) # Yield labels
 

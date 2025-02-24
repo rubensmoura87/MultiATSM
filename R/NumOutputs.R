@@ -118,7 +118,7 @@ if ( any(ModelType == c("JPS original", "JPS global", "GVAR single"))){
 
 }else{
   # Models estimated jointly
-  J <- numel(ModelPara[[ModelType]]$inputs$mat)
+  J <- length(ModelPara[[ModelType]]$inputs$mat)
   idx0 <- 0
   for (i in 1:C){
     idx1 <- idx0 + J
@@ -540,8 +540,12 @@ TermPremiaDecomp <- function(ModelPara, FactorLabels, ModelType, InputsForOutput
 Y_Fit <- function(ALoad, BLoad, Spa_TS , MatLength, TDim, YieldLab){
 
   Yieldfit<- matrix(NA, nrow = MatLength, ncol = TDim)
+  if(is.null(dim(Spa_TS))){
+    for (h in 1:TDim){   Yieldfit[,h] <- ALoad + BLoad%*%Spa_TS[h] }
+  }else{
   for (h in 1:TDim){   Yieldfit[,h] <- ALoad + BLoad%*%Spa_TS[,h] }
-  dimnames(Yieldfit) <- YieldLab
+  }
+    dimnames(Yieldfit) <- YieldLab
 
   return(Yieldfit)
 }

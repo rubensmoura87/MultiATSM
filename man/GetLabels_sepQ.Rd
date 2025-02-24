@@ -2,7 +2,7 @@
 % Please edit documentation in R/MLEdensity.R
 \name{GetLabels_sepQ}
 \alias{GetLabels_sepQ}
-\title{Generate the factor labels for models estimated on a country-by-country bases}
+\title{Generate the factor labels for models estimated on a country-by-country basis}
 \usage{
 GetLabels_sepQ(Economy, ModelType, FactorLabels)
 }
@@ -14,6 +14,6 @@ GetLabels_sepQ(Economy, ModelType, FactorLabels)
 \item{FactorLabels}{list containing the factor labels}
 }
 \description{
-Generate the factor labels for models estimated on a country-by-country bases
+Generate the factor labels for models estimated on a country-by-country basis
 }
 \keyword{internal}

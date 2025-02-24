@@ -10,7 +10,7 @@ sqrtm_robust(m)
 \item{m}{squared matrix (KxK)}
 }
 \value{
-squred matrix x (KxK) such that x%*%x = m
+squared matrix x (KxK) such that x%*%x = m
 }
 \description{
 Compute the square root of a matrix

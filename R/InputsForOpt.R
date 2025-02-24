@@ -17,8 +17,6 @@
 #' @param CheckInputs Logical. Whether to perform a prior check on the consistency of the provided input list. Default is TRUE.
 #' @param BS_Adj Logical. Whether to adjust the global series for the sepQ models in the Bootstrap setting. Default is FALSE.
 #'
-#' @importFrom pracma null
-#'
 #' @return An object of class 'ATSMModelInputs' containing the necessary inputs for performing the model optimization.
 #' @examples
 #' \donttest{
@@ -152,105 +150,6 @@ InputsForOpt <- function(InitialSampleDate, FinalSampleDate, ModelType, Yields, 
   return(structure(Outputs, class = "ATSMModelInputs"))
 }
 ##########################################################################################################################
-#' Print method for ATSMModelInputs objects
-#' @param Object An object of class 'ATSMModelInputs'
-#' @param ... Additional arguments (not used)
-#'
-#' @export
-
-print.ATSMModelInputs <- function(Object, ...) {
-
-  info <- attr(Object, "ModelInfo")
-
-  cat("ATSM Model Inputs Object\n")
-  cat("------------------------------------------\n")
-  cat("Model Type:", info$ModelType, "\n")
-  cat("Economic System:", paste(info$Economies, collapse = ", "), "\n")
-  cat("Sample Period:", info$InitialSampleDate, "-", info$FinalSampleDate, "\n")
-  cat("Data Frequency:", info$DataFrequency, "\n")
-  cat("Common Maturities across Countries:", info$Maturities, "years \n")
-  cat("------------------------------------------\n\n")
-
-  cat("Key Structure of the Economic System: \n")
-  cat("------------------------------------------\n")
-  cat("Total amount of spanned factors in the system:", info$NC, "\n")
-  cat("Total amount of global unspanned factors in the system:", info$G, "\n")
-  cat("Total amount of country-specific unspanned factors in the system:", info$MC, "\n")
-  cat("Total amount of risk factors in the system:", info$NC + info$G + info$MC, "\n")
-  cat("------------------------------------------\n")
-
-  invisible(Object)
-}
-##########################################################################################################################
-#' Summary method for ATSMModelInputs objects
-#' @param Object An object of class 'ATSMModelInputs'
-#' @param ... Additional arguments (not used)
-#'
-#' @export
-
-summary.ATSMModelInputs <- function(Object, ...) {
-
-
-  info <- attr(Object, "ModelInfo")
-
-  # Function to print the summary statistics
-  summary_TS <- function(mat) {
-    data.frame(
-      Mean = round(rowMeans(mat, na.rm = TRUE), 3),
-      Std_Dev = round(apply(mat, 1, sd, na.rm = TRUE), 3),
-      Min = round(apply(mat, 1, min, na.rm = TRUE), 3),
-      Max = round(apply(mat, 1, max, na.rm = TRUE), 3),
-      row.names = rownames(mat)
-    )
-    }
-
-  cat("Summary Statistics From the Time Series Components:\n")
-  cat("------------------------------------------------------\n")
-
-  cat("1) Risk Factors:\n")
-  # Single-country estimation
-  if(info$ModelType %in% c("JPS original", "JPS global", "GVAR single")){
-    for(i in 1:length(info$Economies)){
-    cat("\n Model", info$Economies[i] , "\n")
-    summary_result <- summary_TS(info$RiskFactors[[i]])
-    print(summary_result)
-    }
-
-    # Multicountry estimation
-}else{
-  summary_result <- summary_TS(info$RiskFactors)
-  print(summary_result)
-}
-
-
-  cat("\n 2) Bond Yields:\n")
-  # Single-country estimation
-  if(info$ModelType %in% c("JPS original", "JPS global", "GVAR single")){
-
-    J <- length(info$Maturities)
-
-    for(i in 1:length(info$Economies)){
-      cat("\n Model", info$Economies[i] , "\n")
-
-      # Extract rows for the current country
-      country_rows <- ((i - 1) * J + 1):(i * J)
-      country_yields <- info$Yields[country_rows, ] * 100
-
-      summary_result <- summary_TS(country_yields)
-      print(summary_result)
-    }
-
-    # Multicountry estimation
-}else{
-  summary_result <- summary_TS((info$Yields)*100)
-  print(summary_result)
-}
-  cat("------------------------------------------------------\n")
-
-  invisible(Object)
-}
-
-##########################################################################################################################
 #' Create a vector of numerical maturities in years
 #'
 #'@param DataYields matrix containing all yields of the system (JxT,if the model is single-country-based
@@ -272,7 +171,7 @@ Maturities <- function(DataYields, Economies, UnitYields){
 
   C <- length(Economies)
   s <- rownames(DataYields)
-  AllMat <- readr::parse_number(s)
+  AllMat <- as.numeric(gsub("[^0-9.-]", "", s))
   J <- length(AllMat)/C
   mat <- AllMat[1:J]/fac
 
@@ -653,7 +552,7 @@ GeneralMLEInputs <- function(Yields, RiskFactors, FactorLabels, mat, DataFrequen
     YCS <- Yields[(idxJ0+1):idxJ1,] # Yields (JxT)
     WpcaCS <- pca_weights_one_country(YCS, Economy= Economies[i])[1:N,] # matrix of weights for the portfolio without errors (N x J)
     WpcaCS <- 100*matrix(WpcaCS, nrow=N) # useful command for the case N = 1
-    WeCS <- t(null(matrix(WpcaCS, nrow=N))) # matrix of weights for the yield portfolios priced with errors
+    WeCS <- t(pracma::null(matrix(WpcaCS, nrow=N))) # matrix of weights for the yield portfolios priced with errors
     WpcaFullCS <- rbind(WpcaCS, WeCS)
     PPCS <- Spanned_Factors(YCS, Economies = Economies[i], N) # Spanned Factors (N x T)
     K1XQCS <-  Reg_K1Q(YCS, mat, PPCS, dt, type="Jordan")
@@ -751,9 +650,7 @@ GetPdynPara <- function(RiskFactors, FactorLabels, Economies,  ModelType, BRWinp
     PdynPara <- GetPdynPara_NoBC(ModelType, RiskFactors, Economies, N, GVARinputs, JLLinputs, CheckInputs)
   }
 
-
   return(PdynPara)
-
 }
 
 #####################################################################################################
@@ -797,27 +694,26 @@ Outputs2exportMLE <- function(Label_Multi_Models, Economies, RiskFactors, Yields
 
   } else{
 
-    C <- length(Economies)
-    Output <- list()
-
-    for (i in 1:C) {
-      Output[[Economies[i]]] <- list(
-        mat = mat,
-        Wpca = ModelInputsGen[[Economies[i]]]$Wpca,
-        We = ModelInputsGen[[Economies[i]]]$We,
-        WpcaFull = ModelInputsGen[[Economies[i]]]$WpcaFull,
-        Yields = ModelInputsGen[[Economies[i]]]$Y,
-        SpaFact = ModelInputsGen[[Economies[i]]]$SpaFact,
-        RiskFactors = RiskFactors[[Economies[i]]],
-        Gy.0 = ModelInputsGen[[Economies[i]]]$Gy.0,
-        K1XQ = ModelInputsGen[[Economies[i]]]$K1XQ,
-        SSZ = PdynPara[[Economies[i]]]$SSZ,
-        K0Z = PdynPara[[Economies[i]]]$K0Z,
-        K1Z = PdynPara[[Economies[i]]]$K1Z,
-        JLLinputs = ModelInputsSpec$JLLinputs,
-        GVARinputs = ModelInputsSpec$GVARinputs
-      )
-    }
+    Output <- stats::setNames(
+      lapply(Economies, function(econ) {
+        list(
+          mat = mat,
+          Wpca = ModelInputsGen[[econ]]$Wpca,
+          We = ModelInputsGen[[econ]]$We,
+          WpcaFull = ModelInputsGen[[econ]]$WpcaFull,
+          Yields = ModelInputsGen[[econ]]$Y,
+          SpaFact = ModelInputsGen[[econ]]$SpaFact,
+          RiskFactors = RiskFactors[[econ]],
+          Gy.0 = ModelInputsGen[[econ]]$Gy.0,
+          K1XQ = ModelInputsGen[[econ]]$K1XQ,
+          SSZ = PdynPara[[econ]]$SSZ,
+          K0Z = PdynPara[[econ]]$K0Z,
+          K1Z = PdynPara[[econ]]$K1Z,
+          JLLinputs = ModelInputsSpec$JLLinputs,
+          GVARinputs = ModelInputsSpec$GVARinputs
+        )
+      }), Economies
+    )
 
   }
   return(Output)

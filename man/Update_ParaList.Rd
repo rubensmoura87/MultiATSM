@@ -35,7 +35,7 @@ contains @ to empty}
 \item{ListInputSet}{variable inputs used in the optimization (see "Optimization" function)}
 }
 \value{
-same form as varargin, except now the parameters are updated with the values provided by the auxiliary x.
+same form as the list of parameters, except now the parameters are updated with the values provided by the auxiliary x.
 Importantly, by construction, all the constraints on the underlying parameters are satisfied.
 }
 \description{

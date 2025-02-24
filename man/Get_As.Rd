@@ -11,7 +11,7 @@ Get_As(LoadBs, Wpca, r0, dt, Economies, ModelType)
 
 \item{Wpca}{matrix of weights of the portfolios observed without errors (N x J or CN x J)}
 
-\item{r0}{long-run interest rate  (scalar or vector with length C)}
+\item{r0}{long-run interest rate (scalar or vector with length C)}
 
 \item{dt}{time interval unit of the model (scalar). For instance, if data is (i) monthly, dt <- 12; (ii) quarterly, dt <- 4; (iii) yearly, dt <- 1}
 

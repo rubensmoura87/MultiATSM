@@ -25,14 +25,14 @@ MLEdensity(
   ModelType,
   GVARinputs = NULL,
   JLLinputs = NULL,
-  BS_outputs = F,
+  BS_outputs = FALSE,
   nargout
 )
 }
 \arguments{
 \item{K1XQ}{risk-neutral feedback matrix (N x N or CN x CN)}
 
-\item{r0}{long-run interest rate  (scalar or vector with length C)}
+\item{r0}{long-run interest rate (scalar or vector with length C)}
 
 \item{SSZ}{variance-covariance matrix (F x F)}
 
@@ -46,7 +46,7 @@ MLEdensity(
 
 \item{mat}{vector of maturities (in years) of yields used in estimation (J x 1)}
 
-\item{Y}{matrix of yields used in estimation  (J x T or CJ x T)}
+\item{Y}{matrix of yields used in estimation (J x T or CJ x T)}
 
 \item{Z}{complete set of spanned and unspanned factors (F x T)}
 
@@ -72,7 +72,7 @@ MLEdensity(
 
 \item{BS_outputs}{Generates simplified output list in the bootstrap setting. Default is set to FALSE.}
 
-\item{nargout}{if nargout== 1: provides only the values of the likelihood; if nargout== 2: complete ATSM outputs}
+\item{nargout}{if nargout == 1: provides only the values of the likelihood; if nargout == 2: complete ATSM outputs}
 }
 \description{
 Compute the maximum likelihood function of all models

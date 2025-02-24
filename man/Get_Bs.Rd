@@ -2,7 +2,7 @@
 % Please edit documentation in R/MLEdensity.R
 \name{Get_Bs}
 \alias{Get_Bs}
-\title{BUild the B loadings}
+\title{Build the B loadings}
 \usage{
 Get_Bs(mat, dt, K1XQ, SSZ, Wpca, FactorLabels, Economy, ModelType)
 }
@@ -24,6 +24,6 @@ Get_Bs(mat, dt, K1XQ, SSZ, Wpca, FactorLabels, Economy, ModelType)
 \item{ModelType}{string-vector containing the label of the model to be estimated}
 }
 \description{
-BUild the B loadings
+Build the B loadings
 }
 \keyword{internal}

@@ -32,7 +32,7 @@ ForecastYields <- function(ModelType, ModelPara, InputsForOutputs, FactorLabels,
 
   if (WishForecast ==0){ cat( "No bond yields forecasts were generated \n")} else{
 
-  Jmisc::tic()
+  start_time <- Sys.time()
   # 1) Redefine some general model outputs
   StatQ <- InputsForOutputs$StationaryQ
   UnitMatYields <- InputsForOutputs$UnitMatYields
@@ -97,7 +97,7 @@ ForecastYields <- function(ModelType, ModelPara, InputsForOutputs, FactorLabels,
   OutofSampleForecast <- append(OutofSampleForecast[[ModelType]], RMSE)
 
     saveRDS(OutofSampleForecast, paste(tempdir(),"/Forecast_", InputsForOutputs$'Label Outputs','.rds',sep=""))
-    Jmisc::toc()
+    Optimization_Time(start_time)
 
     return(OutofSampleForecast)
   }

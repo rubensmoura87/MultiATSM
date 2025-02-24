@@ -30,7 +30,7 @@ OptOutputs(
 )
 }
 \arguments{
-\item{Y}{matrix of yields used in estimation  (J x T or CJ x T)}
+\item{Y}{matrix of yields used in estimation (J x T or CJ x T)}
 
 \item{Z}{complete set of spanned and unspanned factors (F x T)}
 
@@ -50,7 +50,7 @@ OptOutputs(
 
 \item{LoadBs}{list containing the B loadings}
 
-\item{r0}{long-run interest rate  (scalar or vector with length C)}
+\item{r0}{long-run interest rate (scalar or vector with length C)}
 
 \item{se}{Variance of the portfolio of yields observed with error (scalar).}
 
@@ -72,7 +72,7 @@ OptOutputs(
 
 \item{ModelType}{string-vector containing the label of the model to be estimated}
 
-\item{BS_out}{}
+\item{BS_out}{Bootstrap output. Default is FALSE.}
 }
 \description{
 Prepare outputs to export after the model optimization

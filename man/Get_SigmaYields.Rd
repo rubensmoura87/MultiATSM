@@ -7,7 +7,7 @@
 Get_SigmaYields(YieldsTS, N, mat, WpcaFull, se, ModelType)
 }
 \arguments{
-\item{YieldsTS}{matrix of yields used in estimation  (J x T or CJ x T)}
+\item{YieldsTS}{matrix of yields used in estimation (J x T or CJ x T)}
 
 \item{N}{number of country-specific spanned factors}
 

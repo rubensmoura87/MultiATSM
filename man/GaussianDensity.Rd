@@ -9,15 +9,14 @@ GaussianDensity(res, SS, invSS, logabsdetSS)
 \arguments{
 \item{res}{matrix of residuals (N x T)}
 
-\item{SS}{covariance matrice or array of covariance matrices \cr
-(If dim(SS) > 3, then the model has a stochastic volatility) (N x N) or (N x N x T)}
+\item{SS}{covariance matrice or array of covariance matrices (N x N) or (N x N x T)}
 
 \item{invSS}{Inverse of SS (N x N) or (N x N x T) - optional input}
 
 \item{logabsdetSS}{log(abs(|SS|)) (1 x T) - optional input}
 }
 \value{
-y   - vector of density (1 x T)
+y vector of density (1 x T)
 }
 \description{
 computes the density function of a gaussian process

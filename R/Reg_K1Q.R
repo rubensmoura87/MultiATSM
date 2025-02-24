@@ -55,7 +55,9 @@ Reg_K1Q <- function(Y, mat, Z, dt,type){
   R <- b
 
   # Step 3: regress by OLS interpolated yields onto pricing factors to obtain B: Y_t = A +B*Z_t
-  Bn <- stats::lm( Jmisc::demean(t(R))~ Jmisc::demean(t(Z))-1)$coefficients
+  lhs <-  scale(t(R), center = TRUE, scale = FALSE)
+  rhs <- scale(t(Z), center = TRUE, scale = FALSE)
+  Bn <-stats::lm( lhs ~ rhs - 1)$coefficients
   Bn <- t(Bn)
 
   # Step 4: set h such that b_h will be obtained without the need of extrapolation beyond the current maturity range
@@ -108,7 +110,6 @@ Reg_K1Q <- function(Y, mat, Z, dt,type){
 #
 #'@param K1XQ  squared matrix in non-Jordan form
 #'
-#'@importFrom pracma numel
 #'
 #'@return squared matrix in Jordam form
 #'@details
@@ -126,7 +127,6 @@ Reg_K1Q <- function(Y, mat, Z, dt,type){
 
 Convert2JordanForm <- function(K1XQ) {
 
-
   x <- t(eigen(K1XQ)$values) # Extract the eigenvalues of matrix K1XQ.
 
   idx <- numeric(length(x))
@@ -139,8 +139,7 @@ Convert2JordanForm <- function(K1XQ) {
 
   realx <- Re(x[which(idx==1)]) # Select only the eigenvalues which are purely real
 
-
-  if (numel(realx)%%2==0){
+  if (length(realx)%%2==0){
     lQ <- as.numeric(vector())
   }else{
     lQ <- realx[1]
@@ -148,17 +147,17 @@ Convert2JordanForm <- function(K1XQ) {
   }
 
 
-  for (h in seq_len(numel(realx)/2)){
+  for (h in seq_len(length(realx)/2)){
     lQ <- rbind( lQ, 0.5*(realx[2*h-1]+realx[2*h]), (0.5*(realx[2*h-1]- realx[2*h]))^2)
   }
 
 
   imagx <- t(x[Im(x)!=0]) # Select only the eigenvalues with imaginary values
-  for (h in seq_len(numel(imagx)/2)){
+  for (h in seq_len(length(imagx)/2)){
     lQ <- rbind(lQ, Re(imagx[2*h-1]), -abs(Im(imagx[2*h-1]))^2)
   }
 
-  N <- numel(lQ)
+  N <- length(lQ)
   if (N==1){ K1Q <- 0  }else{ K1Q <- rbind(rep(0, N), diag(1, N - 1, N))  }
   i0 <- 0
 
@@ -169,7 +168,7 @@ Convert2JordanForm <- function(K1XQ) {
   }
 
 if (N > 1){
-  for (h in seq_len(numel(lQ)/2)){
+  for (h in seq_len(length(lQ)/2)){
     K1Q[i0+2*h-1,i0+2*h-1] <- lQ[2*h-1]
     K1Q[i0+2*h,i0+2*h] <- lQ[2*h-1]
     K1Q[i0+2*h-1,i0+2*h] <- lQ[2*h]

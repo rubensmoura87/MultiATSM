@@ -10,17 +10,13 @@ Description: Estimation routines for several classes of affine term structure of
 License: GPL-2 | GPL-3
 Encoding: UTF-8
 RoxygenNote: 7.2.3
-Imports: pracma, ggplot2
+Imports: ggplot2
 Suggests: 
     readxl,
-    readr,
-    magic,
-    Jmisc,
-    functional,
     cowplot,
+    magic,
     reshape2,
-    sjmisc,
-    stringr,
+    pracma,
     knitr,
     rmarkdown,
     bookdown,

@@ -12,9 +12,6 @@
 #'@param BRWlist  List of necessary inputs for performing the bias-corrected estimation (see \code{\link{Bias_Correc_VAR}} function).
 #'
 #'
-#'@importFrom pracma ceil rand strcmp num2str tril
-#'
-#'
 #'@examples
 #' # See an example of implementation in the vignette file of this package (Section 4).
 #'
@@ -70,10 +67,10 @@ Bootstrap <- function(ModelType, ModelParaPE, NumOutPE, Economies, InputsForOutp
      ## Loop over the number of draws
       tt <- 1 # numbers of accepted draws
       ww <- 1 # index for printing on screen
-      Jmisc::tic()
+      start_time <- Sys.time()
       while (tt<=ndraws){ # Display number of loops
           if (tt==10*ww){
-          cat(paste('Loop ', num2str(tt, fmt=0) , ' / ', num2str(ndraws, fmt=0), ' draws \n'))
+          cat(paste('Loop ', tt, ' / ', ndraws, ' draws \n'))
           ww <- ww +1
         }
 
@@ -107,7 +104,7 @@ Bootstrap <- function(ModelType, ModelParaPE, NumOutPE, Economies, InputsForOutp
       }
 
     cat('-- Done! \n')
-    Jmisc::toc()
+    Optimization_Time(start_time)
 
     # 4) Compute the numerical outputs from the bootstrap samples
     cat("3.2) Computing numerical outputs. \n")
@@ -182,28 +179,30 @@ ResampleResiduals_BS <- function(residPdynOriginal, residYieOriginal, InputsForO
   T <- nrow(residYieOriginal)
   K <- ncol(residPdynOriginal)
 
-
-  if (strcmp(methodBS,'bs')){
+  if (methodBS == "bs"){
     # Use the residuals to bootstrap: generate a random number bounded
-    # between 0 and the number of residuals, then use the ceil function to select
+    # between 0 and the number of residuals, then use the ceiling function to select
     # that row of the residuals (this is equivalent to sampling with replacement)
-    rr <- ceil((T-nlag)*rand(T,1)) # T x 1
+    Rand <- matrix(stats::runif(T, min = 0, max = 1), ncol = 1)
+    rr <- ceiling((T-nlag)*Rand) # T x 1
     uPdyn <- residPdynOriginal[rr[1:(T-nlag)], ] # (T-1) x K
     uYiel <- residYieOriginal[rr, ] # TxJ  or T x CJ
-  } else if (strcmp(methodBS,'wild')){
+  } else if ( methodBS == "wild"){
 
     # Wild bootstrap based on simple distribution (~Rademacher)
-    rr <- 1-2*(rand(T,1)>0.5)
+    Rand <- matrix(stats::runif(T, min = 0, max = 1), ncol = 1)
+    rr <- 1 - 2*(Rand > 0.5)
     uPdyn<- residPdynOriginal*(rr[1:(T-nlag)]%*%matrix(1,nrow=1, ncol=K))
     uYiel <- residYieOriginal*(rr%*%matrix(1,nrow=1, ncol= ncol(residYieOriginal)) )
 
-  } else if (strcmp(methodBS,'block')){
+  } else if (methodBS == "block"){
 
     # Blocks overlap and are drawn with replacement
     FullBlocksSet <- dim(residPdynOriginal)[1] - BlockLength + 1 # all possible blocks that can be drawn
-    SampleBlock <- ceil((T-nlag)/BlockLength) #
+    SampleBlock <- ceiling((T-nlag)/BlockLength) #
 
-    bb <- ceil(SampleBlock*rand(SampleBlock,1))
+    Rand <- matrix(stats::runif(SampleBlock, min = 0, max = 1), ncol = 1)
+    bb <- ceiling(SampleBlock*Rand)
     IdxBlocks <- matrix(NA, nrow= BlockLength, ncol= FullBlocksSet)
     for (mm in 1:FullBlocksSet){
       IdxBlocks[ , mm] <- mm:(mm + BlockLength-1)

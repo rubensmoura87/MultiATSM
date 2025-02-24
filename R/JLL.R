@@ -49,7 +49,7 @@ Labels_All <- GetLabels_JLL(NonOrthoFactors,JLLinputs, G)
   Fact_NonOrtho <- Factors_NonOrtho(NonOrthoFactors, JLLinputs, Labels_All, N)
 
   # 2) Get coefficients from the orthogonalized regressions
-  Ortho_RegSet <- OrthoReg_JLL(JLLinputs, Fact_NonOrtho, rownames(NonOrthoFactors), Labels_All$LabelsJLL)
+  Ortho_RegSet <- OrthoReg_JLL(JLLinputs, N, Fact_NonOrtho, rownames(NonOrthoFactors), Labels_All$LabelsJLL)
 
   # 3) VAR(1) with orthogonalized factors
   Para_VAR_Ortho <- OrthoVAR_JLL(NonOrthoFactors, JLLinputs, Ortho_RegSet, Labels_All, N)
@@ -336,13 +336,15 @@ CheckJLLinputs <- function(RiskFactorsNonOrtho, JLLinputs) {
 #' Get coefficients from the orthogonalized regressions
 #'
 #' @param JLLinputs List of necessary inputs to estimate JLL-based setups
+#' @param N number of country-specific spanned factors (scalar)
 #' @param FacSet Set of factors used in the estimation of JLL-based setups
 #' @param FactorLab_NonOrth Variable labels of the non-orthogonalized risk factors
 #' @param FactorLab_JLL Variable labels of the orthogonalized risk factors
 #'
 #' @keywords internal
 
-OrthoReg_JLL <- function(JLLinputs, FacSet, FactorLab_NonOrth, FactorLab_JLL) {
+OrthoReg_JLL <- function(JLLinputs, N, FacSet, FactorLab_NonOrth, FactorLab_JLL) {
+
   # Preliminary work
   FullFactorsSet <- FacSet$FullFactorsSet
   MacroGlobal <- FacSet$MacroGlobal
@@ -356,12 +358,27 @@ OrthoReg_JLL <- function(JLLinputs, FacSet, FactorLab_NonOrth, FactorLab_JLL) {
   G <- nrow(FacSet$MacroGlobal)
   C <- length(Economies)
   M <- nrow(FacSet$FullFactorsSet[[1]]$Macro)
-  N <- nrow(FacSet$FullFactorsSet[[1]]$Pricing)
   K <- (M + N) * C + G
 
+  # 1) Orthogonalization of the pricing factors
+  # Equation 6
   PricingRegressEQ6 <- lapply(JLLinputs$Economies, function(economy) {
-    stats::lm(t(FullFactorsSet[[economy]]$Pricing) ~ t(FullFactorsSet[[economy]]$Macro) - 1)
-  })
+      Pricing <- FullFactorsSet[[economy]]$Pricing
+      Macro <- FullFactorsSet[[economy]]$Macro
+
+      # Ensure Pricing is a matrix with the correct orientation
+      PricingMat <- if (is.null(dim(Pricing))) {
+        matrix(Pricing, ncol = length(Pricing))  # Convert to column vector if it's a numeric vector
+      } else {    Pricing     }
+
+      # Ensure Macro is a matrix with the correct orientation
+      MacroMat <- if (is.null(dim(Macro))) {
+        matrix(Macro, nrow = length(Macro), ncol = 1)  # Convert to column vector if it's a numeric vector
+      } else {  Macro      }
+
+      stats::lm(t(PricingMat) ~ t(MacroMat) - 1)
+    })
+
   b <- lapply(PricingRegressEQ6, function(model) t(model$coefficients))
   P_e <- lapply(PricingRegressEQ6, function(model) t(model$residuals))
 
@@ -382,11 +399,13 @@ OrthoReg_JLL <- function(JLLinputs, FacSet, FactorLab_NonOrth, FactorLab_JLL) {
     c <- lapply(PricingRegressEQ10, function(model) t(model$coefficients))
   }
 
+  if (Label_DU != "None") {
   names(PricingRegressEQ10) <- Economies[-IdxDomUnit]
   names(c) <- Economies[-IdxDomUnit]
   names(P_e_star) <- Economies[-IdxDomUnit]
+  }
 
-  # Orthogonalization of the macro factors
+  # 2) Orthogonalization of the macro factors
   MacroRegressEQ8 <- lapply(JLLinputs$Economies, function(economy) {
     stats::lm(t(FullFactorsSet[[economy]]$Macro) ~ t(MacroGlobal) - 1)
   })
@@ -470,6 +489,7 @@ OrthoReg_JLL <- function(JLLinputs, FacSet, FactorLab_NonOrth, FactorLab_JLL) {
   # 4) Output to export
   Times_Series <- list(P_e = P_e, P_e_star = P_e_star, M_e = M_e, M_e_CS = M_e_CS)
   Out <- list(a_W = a_W, a_DU_CS = a_DU_CS, b = b, c = c, PIb = PIb, PIac = PIac, PI = PI, TS_Factors = Times_Series)
+
   return(Out)
 }
 
@@ -731,10 +751,10 @@ EstimationSigma_Ye <- function(SigmaUnres, res, M, G, Economies, DomUnit) {
   IdxNONzeroSigmaJLL <- which(Se != 0)
   x <- Se[IdxNONzeroSigmaJLL] # vector containing the initial guesses
 
-  MLfunction <- functional::Curry(llk_JLL_Sigma, res = res, IdxNONzero = IdxNONzeroSigmaJLL, K = K)
+  MLfunction <-  function(...) llk_JLL_Sigma(..., res = res, IdxNONzero = IdxNONzeroSigmaJLL, K = K)
 
   iter <- "off" # hides the outputs of each iteration. If one wants to display these features then set 'iter'
-  options200 <- neldermead::optimset(MaxFunEvals = 200000 * numel(x), Display = iter,
+  options200 <- neldermead::optimset(MaxFunEvals = 200000 * length(x), Display = iter,
                                      MaxIter = 200000, GradObj = "off", TolFun = 10^-2, TolX = 10^-2)
 
   Xmax <- neldermead::fminsearch(MLfunction, x, options200)$optbase$xopt

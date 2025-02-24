@@ -65,6 +65,7 @@ Peform the minimization of mean(f)
 #' # See an example of implementation in the vignette file of this package (Section 4).
 
 
+
 }
 \references{
 This function is a conceptually based on the "LS__opt" function by Le and Singleton (2018). \cr

@@ -4,7 +4,7 @@
 \alias{Get_Gy1}
 \title{Compute the feedback matrix from a GVAR model with global factors}
 \usage{
-Get_Gy1(ParaVARX, GVARinputs, G1, Phi.w1)
+Get_Gy1(ParaVARX, GVARinputs, G1, Phi_w1)
 }
 \arguments{
 \item{ParaVARX}{List containing the set of VARX model parameters}
@@ -13,7 +13,7 @@ Get_Gy1(ParaVARX, GVARinputs, G1, Phi.w1)
 
 \item{G1}{feedback matrix from a GVAR without global variables}
 
-\item{Phi.w1}{feedback matrix from a marginal model}
+\item{Phi_w1}{feedback matrix from a marginal model}
 }
 \description{
 Compute the feedback matrix from a GVAR model with global factors

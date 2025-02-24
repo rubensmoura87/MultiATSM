@@ -31,9 +31,9 @@
 
 Transition_Matrix <- function(t_First, t_Last, Economies, type, DataConnectedness = NULL, DataPath = NULL) {
 
-  # 1) Load data if DataConnectedness is not provided
-  if (sjmisc::is_empty(DataConnectedness)) {
-    if (sjmisc::is_empty(DataPath)) {
+  # 1) Load data if Data Connectedness is not provided
+  if (is.null(DataConnectedness) || length(DataConnectedness) == 0) {
+    if (is.null(DataPath)) {
       DataPath <- system.file("extdata", "TradeData.xlsx", package = "MultiATSM")
     }
 

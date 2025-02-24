@@ -37,7 +37,6 @@
 #'#' # See an example of implementation in the vignette file of this package (Section 4).
 #'
 #'
-#'@importFrom pracma fminunc
 #'
 #'@references
 #' This function is a conceptually based on the "LS__opt" function by Le and Singleton (2018). \cr
@@ -55,22 +54,22 @@ Optimization_PE <- function(f, ListInputSet, FactorLabels, Economies, ModelType,
   AuxVec_0 <- Build_xvec(ListInputSet, Economies, FactorLabels, JLLinputs)
 
   # 2) Likelihood function:
-  FFvec <- functional::Curry(Functionf_vectorized, sizex= AuxVec_0$Dim_x , f, con = 'concentration',
-                             ListInputSet, ModelType, FactorLabels, Economies, JLLinputs, GVARinputs,
-                             WithEstimation = TRUE)
+  FFvec <- function(...) Functionf_vectorized(..., sizex= AuxVec_0$Dim_x , f, con = 'concentration', ListInputSet,
+                                              ModelType, FactorLabels, Economies, JLLinputs, GVARinputs,
+                                              WithEstimation = TRUE)
 
   # 3) Optimization of the llk
-  if (TimeCount) {Jmisc::tic()}
+  if (TimeCount) { start_time <- Sys.time() }
   AuxVec_opt <- OptimizationSetup_ATSM(AuxVec_0, FFvec, ListInputSet$OptRun, tol)
-  if (TimeCount) {Jmisc::toc()}
+  if (TimeCount) { Optimization_Time(start_time) }
 
   # 4) Build the full auxiliary vector, including concentrated parameters
   Up_Temp <- Update_ParaList(AuxVec_opt$x0, sizex= AuxVec_opt$Dim_x, con= 'concentration', FactorLabels,
                          Economies, JLLinputs, GVARinputs, ListInputSet) # update the parameter set which were NOT concentrated out after the optimization.
 
-  FF_opt <- functional::Curry(Functionf_vectorized, sizex= AuxVec_opt$Dim_x, f, con = 'concentration',
-                              ListInputSet = Up_Temp, ModelType, FactorLabels, Economies, JLLinputs, GVARinputs,
-                              WithEstimation = FALSE)
+  FF_opt <- function(...) Functionf_vectorized(..., sizex= AuxVec_opt$Dim_x, f, con = 'concentration',
+                                               ListInputSet = Up_Temp, ModelType, FactorLabels, Economies,
+                                               JLLinputs, GVARinputs, WithEstimation = FALSE)
 
   ParaLabels <- names(ListInputSet)
   Up_Temp_Full <- ParaATSM_opt_ALL(Up_Temp, FF_opt, AuxVec_opt, ParaLabels)
@@ -80,9 +79,9 @@ Optimization_PE <- function(f, ListInputSet, FactorLabels, Economies, ModelType,
   x0_opt <-   OutExport$x0
   sizex_AllPara <- OutExport$Dim_x
 
-  FF_export <- functional::Curry(Functionf_vectorized, sizex = sizex_AllPara, f=f, con='',
-                                 ListInputSet = Up_Temp_Full,  ModelType, FactorLabels, Economies,
-                                 JLLinputs, GVARinputs, WithEstimation = FALSE)
+  FF_export <- function(...) Functionf_vectorized(..., sizex = sizex_AllPara, f=f, con='', ListInputSet = Up_Temp_Full,
+                                                  ModelType, FactorLabels, Economies, JLLinputs, GVARinputs,
+                                                  WithEstimation = FALSE)
 
    out <- FF_export(x=x0_opt)$out
 
@@ -109,8 +108,7 @@ Optimization_PE <- function(f, ListInputSet, FactorLabels, Economies, ModelType,
 #' # See examples in the vignette file of this package (Section 4).
 #'
 #'@return
-#' An extensive list containing model outputs after the optimization of the chosen ATSM specification.
-#'
+#' An object of class 'ATSMModelOutputs' containing model outputs after the optimization of the chosen ATSM specification.
 #'
 #'@references
 #' This function is partially adapted from the \code{LS__opt} function by Le and Singleton (2018). \cr
@@ -142,7 +140,7 @@ if (any(ModelType ==c('JPS original', 'JPS global', "GVAR single"))){
     # 2) Set the optimization settings
     VarLab <- ParaLabelsOpt(ModelType, StatQ, MLEinputsCS, BS_outputs)
 
-cat(paste(" ... for country:", Economies[i], ". This may take several minutes. \n"))
+    cat(paste(" ... for country:", Economies[i], ". This may take several minutes. \n"))
      ModelParaList[[ModelType]][[Economies[i]]] <- Optimization_PE(f, VarLab, FactorLabels, Economies, ModelType,
                                                                 JLLinputs, GVARinputs, tol, TimeCount= TimeCount)}
 }else{
@@ -157,8 +155,11 @@ cat(paste(" ... for country:", Economies[i], ". This may take several minutes. \
                                               GVARinputs, tol, TimeCount= TimeCount)
 }
 
+# Store metadata inside the class without explicitly exporting it
+attr(ModelParaList, "ModelOutInfo") <- list( Outs = ModelParaList[[ModelType]], Economies = Economies,
+                                             ModelType = ModelType )
 
-return(ModelParaList)
+return(structure(ModelParaList, class = "ATSMModelOutputs"))
 }
 
 
@@ -167,7 +168,7 @@ return(ModelParaList)
 #' Create the variable labels used in the estimation
 #'
 #'@param ModelType a string-vector containing the label of the model to be estimated
-#'@param WishStationarityQ User must set "1" is she whises to impose the largest eigenvalue under the Q to be strictly
+#'@param WishStationarityQ User must set "1" is she wishes to impose the largest eigenvalue under the Q to be strictly
 #'                       smaller than 1. Otherwise set "0"
 #'@param MLEinputs Set of inputs that are necessary to the log-likelihood function
 #'@param BS_outputs Generates simplified output list in the bootstrap setting. Default is set to FALSE.
@@ -200,25 +201,21 @@ return(ModelParaList)
 #'
 #'@keywords internal
 
-
-
 ParaLabelsOpt <- function(ModelType, WishStationarityQ, MLEinputs, BS_outputs = FALSE){
 
   ParaLabelsList <- list()
-
 
   ParaLabelsList[[ModelType]][["r0"]] <- "@r0: bounded"
   ParaLabelsList[[ModelType]][["se"]] <- "@se: bounded"
   ParaLabelsList[[ModelType]][["K0Z"]] <- "@K0Z: bounded"
   ParaLabelsList[[ModelType]][["K1Z"]] <- "@K1Z: bounded"
 
-
   # K1XQ
   K1XQType <- K1XQStationary(WishStationarityQ)$SepQ
 
   if (any(ModelType == c("JPS original", "JPS global", 'GVAR single'))){
     ParaLabelsList[[ModelType]][["K1XQ"]] <- K1XQStationary(WishStationarityQ)$SepQ
-  } else{
+  } else {
     ParaLabelsList[[ModelType]][["K1XQ"]] <- K1XQStationary(WishStationarityQ)$JointQ
   }
 
@@ -291,7 +288,7 @@ OptimizationSetup_ATSM <- function(AuxVecSet, FFvec, EstType, tol= 1e-4){
   # 1) Optimization settings
   Max_AG_Iteration <- 1e4
   Previous_Optimal_Obj <-  -1e20
-  options200 <- neldermead::optimset(MaxFunEvals = 200*numel(AuxVecSet$x0), Display =  "off",
+  options200 <- neldermead::optimset(MaxFunEvals = 200*length(AuxVecSet$x0), Display =  "off",
                                      MaxIter = 200, GradObj='off', TolFun= 10^-8, TolX= 10^-8)
   options1000 <- options200
   options1000$MaxIter <- 1000
@@ -304,10 +301,10 @@ OptimizationSetup_ATSM <- function(AuxVecSet, FFvec, EstType, tol= 1e-4){
 
   # 3) Optimization loop
   while (!converged){
-    if (!contain('fminsearch only', EstType)){
+    if (!grepl('fminsearch only', EstType)){
 
-      if (!contain('no rescaling', EstType)){
-        if (isempty(scaling_vector)){
+      if (!grepl('no rescaling', EstType)){
+        if (length(scaling_vector) == 0){
           dFFvec <- df__dx(f=FFvec, x=AuxVecSet$x0) # first order derivative of the llK function for each point in time for the initial guess of the parameters which are NOT concentrated out of the llk.
 
           vv <- 1/rowMeans(abs(dFFvec))
@@ -316,21 +313,21 @@ OptimizationSetup_ATSM <- function(AuxVecSet, FFvec, EstType, tol= 1e-4){
           scaling_vector <- t(t(vv))
         }
 
-        FFtemp <- functional::Curry(FFtemporary, scaling_vector = scaling_vector, FFvectorized = FFvec)
-        x1 <- fminunc(x0=AuxVecSet$x0/scaling_vector, FFtemp , gr = NULL, tol = options200$TolFun,
+        FFtemp <- function(...) FFtemporary(..., scaling_vector = scaling_vector, FFvectorized = FFvec)
+        x1 <- pracma::fminunc(x0=AuxVecSet$x0/scaling_vector, FFtemp , gr = NULL, tol = options200$TolFun,
                       maxiter = options200$MaxIter , maxfeval = options200$MaxFunEvals )
 
         x1 <- x1$par*scaling_vector
 
       } else{
-        x1 <- fminunc(x0=AuxVecSet$x0, FF , gr = NULL, tol = options200$TolFun, maxiter = options200$MaxIter,
+        x1 <- pracma::fminunc(x0=AuxVecSet$x0, FF , gr = NULL, tol = options200$TolFun, maxiter = options200$MaxIter,
                       maxfeval = options200$MaxFunEvals)
         x1 <- x1$par
       }
 
       if (FF(x1, FFvec)<FF(AuxVecSet$x0, FFvec)){ AuxVecSet$x0 <- x1 }
     }
-    if (!contain('fminunc only', EstType)){
+    if (!grepl('fminunc only', EstType)){
       x1<- neldermead::fminsearch(function(x) FF(x, FFvectorized = FFvec), AuxVecSet$x0, options1000)$optbase$xopt
       if (FF(x1, FFvec)<FF(AuxVecSet$x0, FFvec)){ AuxVecSet$x0 <- x1 }
     }
@@ -368,26 +365,25 @@ return(AuxVecSet)
 
 Functionf <- function(MLEinputs, Economies, DataFrequency, FactorLabels, ModelType, BS_outType = FALSE){
 
-
   dt <- Getdt(DataFrequency)
   mat <- MLEinputs$mat
-
 
   # 1) If one choose models in which the estimation is done country-by-country
   if (any(ModelType == c("JPS original", 'JPS global', "JPS multi", "GVAR single", "GVAR multi", "JLL joint Sigma"))){
 
-    f <- functional::Curry(MLEdensity, r0 = NULL, MLEinputs$K0Z, MLEinputs$K1Z, se= NULL, MLEinputs$Gy.0, mat,
-                           MLEinputs$Y, MLEinputs$RiskFactors, MLEinputs$SpaFact, MLEinputs$Wpca, MLEinputs$We,
-                           MLEinputs$WpcaFull, dt, Economies, FactorLabels, ModelType, MLEinputs$GVARinputs,
-                           MLEinputs$JLLinputs, BS_outType)
+    f <- function(...) MLEdensity(..., r0 = NULL, MLEinputs$K0Z, MLEinputs$K1Z, se= NULL, MLEinputs$Gy.0, mat,
+                                  MLEinputs$Y, MLEinputs$RiskFactors, MLEinputs$SpaFact, MLEinputs$Wpca, MLEinputs$We,
+                                  MLEinputs$WpcaFull, dt, Economies, FactorLabels, ModelType, MLEinputs$GVARinputs,
+                                  MLEinputs$JLLinputs, BS_outType)
+
   } else{
     # 2) If one choose models in which the estimation is done jointly for all countries of the system with
     # the Sigma matrix estimated exclusively under the P-dynamics
 
-    f <- functional::Curry(MLEdensity, r0 = NULL, MLEinputs$SSZ, MLEinputs$K0Z, MLEinputs$K1Z, se= NULL, MLEinputs$Gy.0,
-                           mat, MLEinputs$Y, MLEinputs$RiskFactors, MLEinputs$SpaFact, MLEinputs$Wpca, MLEinputs$We,
-                           MLEinputs$WpcaFull, dt, Economies, FactorLabels, ModelType, MLEinputs$GVARinputs,
-                           MLEinputs$JLLinputs, BS_outType)
+    f <- function(...) MLEdensity(..., r0 = NULL, MLEinputs$SSZ, MLEinputs$K0Z, MLEinputs$K1Z, se= NULL,
+                                  MLEinputs$Gy.0, mat, MLEinputs$Y, MLEinputs$RiskFactors, MLEinputs$SpaFact,
+                                  MLEinputs$Wpca, MLEinputs$We, MLEinputs$WpcaFull, dt, Economies, FactorLabels,
+                                  ModelType, MLEinputs$GVARinputs, MLEinputs$JLLinputs, BS_outType)
   }
 
   return(f)
@@ -400,8 +396,8 @@ Functionf <- function(MLEinputs, Economies, DataFrequency, FactorLabels, ModelTy
 #'
 #'@keywords internal
 
-FF <- function(x0, FFvectorized){
-  out <- mean(FFvectorized(x=x0))
+FF <- function(x0, FFvectorized) {
+  out <- mean(FFvectorized(x = x0))
   return(out)
   }
 
@@ -435,17 +431,24 @@ ParaATSM_opt_ALL <- function(Update_Temp, FF_opt, AuxVecSet_opt, ParaLabels){
   OptimalPara <- FF_opt(x=AuxVecSet_opt$x0)$out # computes the estimates of all parameters after the optimization.
   VarLabInt <- intersect(ParaLabels, names(OptimalPara$ests))
 
-  for (i in 1:((length(Update_Temp) -1))){ # for loop: remove the @ from the parameters' labels.
-    if (contain('@', Update_Temp[[i]]$Label) ) {
-      namexi <- Remove_at(Update_Temp[[i]]$Label)
-      Update_Temp[[i]]$Label <- namexi
+  Update_Temp <- stats::setNames(lapply(Update_Temp, function(elem) {
 
-      si <- strfind(namexi, ':')
-      if (!isempty(si)){namexi <- substr(namexi, start = 1, stop = si-1 )}
+    if (is.list(elem) && grepl("@", elem$Label)) {
+      namexi <- sub(".*@", "", elem$Label)  # Remove everything before '@'
+      elem$Label <- namexi  # Update label
 
-      Update_Temp[[i]]$Value <- OptimalPara$ests[[VarLabInt[i]]]
+      si <- gregexpr(":", namexi)[[1]]
+      if (length(si) > 0 && si[1] != -1) {
+        namexi <- substr(namexi, 1, si - 1)  # Remove everything after ':'
+      }
+
+      if (namexi %in% VarLabInt) {
+        elem$Value <- OptimalPara$ests[[namexi]]  # Assign correct value based on label
+      }
     }
-  }
+
+    return(elem)  # Return modified element
+  }), names(Update_Temp))  # Preserve original names
 
   return(Update_Temp)
 }
@@ -456,7 +459,6 @@ ParaATSM_opt_ALL <- function(Update_Temp, FF_opt, AuxVecSet_opt, ParaLabels){
 #' @param f function which contains vector (J x T) valued function handle
 #' @param x parameter values
 #'
-#'
 #'@keywords internal
 #'
 #' @return
@@ -466,94 +468,96 @@ ParaATSM_opt_ALL <- function(Update_Temp, FF_opt, AuxVecSet_opt, ParaLabels){
 #'  "A Small Package of Matlab Routines for the Estimation of Some Term Structure Models." \cr
 #'  (Euro Area Business Cycle Network Training School - Term Structure Modelling).
 #'  Available at: https://cepr.org/40029
-#'
 
+df__dx <- function(f, x) {
 
+  h0 <- pmax(pmin(abs(x) * 1e-3, 1e-3), 1e-6) # delta
 
-df__dx <-function(f, x){
+  fx0_o <- f(x = x)  # Evaluate function at original x
+  fx0 <- fx0_o # Initialization
 
-  h0 <- array(NaN,c(dim(x)))
-  h0[] <- pmax(pmin(abs(x)*1e-3, 1e-3), 1e-6) # delta
-
-  fx0_o <- f(x=x) # f(x)
-  fis <- 0
-
-  if (is.list(fx0_o)){
-    fx0 <- f(x=x)
-    fis <- 1
-  }else{
-    fx0 <- fx0_o
-  }
-
-  # checking if f(x+h) and f(x-h) is admissible:
+  # Checking if f(x+h) and f(x-h) is admissible
   hxp <- h0; hxm <- h0
 
-  for (i in 1:numel(x) ){
-    fixed <- 0
-    count <- 1
-    while (!fixed && count<10){
-      xp <- x
-      xp[i] <- x[i]+hxp[i] # f(x+ delta)
-      fxp <- f(x=xp)
-      if (abs(mean((t(fxp)-t(fx0))/hxp[i]))>1e8){ # [f(x+ delta) - f(x)]/delta
-        hxp[i] <- hxp[i]/2
-        count <- count+1
-      }else{
-        fixed <- 1
-      }
-    }
-    if (!fixed){ hxp[i] <- 0}
-
-    fixed <- 0
-    count <- 1
-    while (!fixed && count<10){
-      xm <- x
-      xm[i] <- x[i]-hxm[i] # f(x-delta)
-      fxm <- f(x=xm)
-      if ( abs(mean((t(fx0) -t(fxm))/hxm[i]))>1e8){ # [f(x+ delta) - f(x)]/delta
-        hxm[i] <- hxm[i]/2
-        count <- count+1
-      }else{
-        fixed <- 1
-      }
-    }
-    if (!fixed){ hxm[i] <-0 }
+  for (i in seq_along(x)) {
+    hxp[i] <- adjust_delta(f, x, hxp[i], i, fx0, 1)
+    hxm[i] <- adjust_delta(f, x, hxm[i], i, fx0, -1)
   }
 
-  y <- matrix(NaN, nrow= numel(x), ncol= numel(f(x=x)) )
+  y <- matrix(NaN, nrow = length(x), ncol = length(f(x = x)))
 
-
-  for (i in 1:numel(x)){
-
+  for (i in seq_along(x)) {
     temp <- matrix(list(), 5, 5)
-    for (n in 1:5){
-      dxp <- matrix(0,dim(x))
-      dxm <- matrix(0,dim(x))
-      dxp[i] <- hxp[i]/(2^(n-1))
-      dxm[i] <- hxm[i]/(2^(n-1))
+    for (n in 1:5) {
+      dxp <- numeric(length(x))
+      dxm <- numeric(length(x))
+      dxp[i] <- hxp[i] / (2^(n - 1))
+      dxm[i] <- hxm[i] / (2^(n - 1))
 
-      temp[[n, 1]] = (f(x=x+dxp) - f(x=x-dxm))/(dxp[i]+dxm[i])
-      for (k in seq_len(max(0, n - 1)) + 1){
-        temp[[n,k]] = ((2^(k-1))*temp[[n,k-1]] - temp[[n-1, k-1]])/(2^(k-1)-1)
+      temp[[n, 1]] <- (f(x = x + dxp) - f(x = x - dxm)) / (dxp[i] + dxm[i])
+
+      if (n > 1) {  # Ensure `n - 1` is always valid
+        for (k in 2:n) {  # Ensure `k - 1` is valid
+          temp[[n, k]] <- ((2^(k - 1)) * temp[[n, k - 1]] - temp[[n - 1, k - 1]]) / (2^(k - 1) - 1)
+        }
       }
     }
 
-    y[i, ] = temp[[n,n]]
-
-  }
-
-
-  if (fis==1){ # This part is needed only if fx0_o is set in a list
-    fx0 <- fx0_o
-    tempy <- y
-    y <- NULL
-    fnames <- names(fx0)
-    count <- 0
-    for (i in 1:numel(fnames)){
-      ind <- (count+1:count+numel(fx0$fnames[i]))
-      y$fnames[i] <- tempy[, ind]
+    y[i, ] = temp[[5,5]]
     }
-  }
 
   return(y)
+}
+
+############################################################################################################
+#' Adjust delta for numerical differentiation
+#'
+#' @param f function which contains vector (J x T) valued function handle
+#' @param x parameter values
+#' @param delta initial delta value
+#' @param i index of the parameter being adjusted
+#' @param fx0 initial function value
+#' @param direction direction of adjustment (1 for positive, -1 for negative)
+#'
+#' @return adjusted delta value
+#' @keywords internal
+
+adjust_delta <- function(f, x, delta, i, fx0, direction) {
+
+  fixed <- FALSE
+  count <- 1
+  while (!fixed && count < 10) {
+    x_temp <- x
+    x_temp[i] <- x[i] + direction * delta
+    fx_temp <- f(x = x_temp)
+
+    if (abs(mean((fx_temp - fx0) / delta)) > 1e8) {
+      delta <- delta / 2
+      count <- count + 1
+    } else {
+      fixed <- TRUE
+    }
+  }
+
+  if (!fixed) {
+    delta <- 0
+  }
+
+  return(delta)
+}
+
+############################################################################################################
+#'Compute the time elapsed in the numerical optimization
+#'
+#'@param start_time Starting time
+#'
+#'@keywords internal
+
+Optimization_Time <- function(start_time){
+
+elapsed <- as.numeric(difftime(Sys.time(), start_time, units = "secs"))
+units <- c("seconds", "minutes", "hours")
+scale <- c(1, 60, 3600)
+idx <- max(which(elapsed >= scale))
+cat(sprintf("Elapsed time: %.2f %s\n", elapsed / scale[idx], units[idx]))
 }

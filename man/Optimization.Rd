@@ -38,7 +38,7 @@ smaller than 1. Set to 1 to impose the restriction, or 0 otherwise.}
 \item{BS_outputs}{Logical. If TRUE, generates a simplified output list in the bootstrap setting. Default is FALSE.}
 }
 \value{
-An extensive list containing model outputs after the optimization of the chosen ATSM specification.
+An object of class 'ATSMModelOutputs' containing model outputs after the optimization of the chosen ATSM specification.
 }
 \description{
 Perform the optimization of the log-likelihood function of the chosen ATSM

@@ -4,10 +4,12 @@
 \alias{OrthoReg_JLL}
 \title{Get coefficients from the orthogonalized regressions}
 \usage{
-OrthoReg_JLL(JLLinputs, FacSet, FactorLab_NonOrth, FactorLab_JLL)
+OrthoReg_JLL(JLLinputs, N, FacSet, FactorLab_NonOrth, FactorLab_JLL)
 }
 \arguments{
 \item{JLLinputs}{List of necessary inputs to estimate JLL-based setups}
+
+\item{N}{number of country-specific spanned factors (scalar)}
 
 \item{FacSet}{Set of factors used in the estimation of JLL-based setups}
 

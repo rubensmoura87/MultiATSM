@@ -7,7 +7,7 @@
 Get_r0(Y, P, N, mat, dt, B_list, Wpca, We, Economies, ModelType)
 }
 \arguments{
-\item{Y}{matrix of yields used in estimation  (J x T or CJ x T)}
+\item{Y}{matrix of yields used in estimation (J x T or CJ x T)}
 
 \item{P}{complete set of spanned factors (N x T or CN x T)}
 

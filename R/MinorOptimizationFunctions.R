@@ -1,24 +1,3 @@
-####################################################################################
-#' Check whether one element is a subset of another element
-#'
-#' @param s1 smaller subset
-#' @param s2 complete set
-#'@references
-#' This function is based on the "contain" function by Le and Singleton (2018). \cr
-#'  "A Small Package of Matlab Routines for the Estimation of Some Term Structure Models." \cr
-#'  (Euro Area Business Cycle Network Training School - Term Structure Modelling).
-#'  Available at: https://cepr.org/40029
-#'
-#'@keywords internal
-#'
-
-contain <- function(s1, s2){
-  y <- grepl(s1, s2)
-  return(y)
-}
-
-
-
 ###################################################################################
 #' Transform a number bounded between a lower bound and upper bound to x by:
 #'
@@ -74,8 +53,6 @@ pos2x <- function(y){
 
 x2pos<- function(x,nargout){
 
-
-
   if (is.null(x) ) {
     y <- matrix(,nrow = 0, ncol=0)
   }else if (!is.null(x) & is.null(dim(x)) ) {
@@ -119,7 +96,6 @@ x2pos<- function(x,nargout){
     }else{
       dy[x>=0] <- 1/(2+expm1(-x[x>=0]))
     }
-
   }
 
   if (nargout ==1){
@@ -179,7 +155,7 @@ x2bound <-function(x, lb, ub, nargout){
 #'
 #'@param m squared matrix (KxK)
 #'
-#'@return squred matrix x (KxK) such that x%*%x = m
+#'@return squared matrix x (KxK) such that x%*%x = m
 #'
 #'@references
 #' #' This function is a modified version of the "sqrtm_robust" function by Le and Singleton (2018). \cr
@@ -188,8 +164,6 @@ x2bound <-function(x, lb, ub, nargout){
 #'  Available at: https://cepr.org/40029
 #'
 #'@keywords internal
-
-
 
 sqrtm_robust <- function(m){
 
@@ -201,9 +175,8 @@ sqrtm_robust <- function(m){
 
   y <-pracma::sqrtm(m)$B
    if ( any(Im(y)!=0) || any(is.infinite(y))|| any(is.nan(y)) ){
-    y <- mrdivide(vv%*%diag(sqrt(abs(diag(dd)))), vv ) # the y computed in this line is algebrically identical to y <- sqrtm(m).
+    y <- vv%*%diag(sqrt(abs(diag(dd))))%*%solve(vv) # the y computed in this line is algebrically identical to y <- sqrtm(m).
   }
-
 
   return(y)
 }
