@@ -15,19 +15,19 @@ OOS_Forecast(
 )
 }
 \arguments{
-\item{ForHoriz}{forecast horizon-ahead (scalar)}
+\item{ForHoriz}{Forecast horizon-ahead (scalar)}
 
 \item{t_Last}{Index of the last set of observations in the information set at a given forecasting round}
 
 \item{ModelParaList}{List of model parameter estimates}
 
-\item{FactorLabels}{a string-list based which contains all the labels of all the variables present in the model}
+\item{FactorLabels}{A string-list based which contains all the labels of all the variables present in the model}
 
 \item{Yields_FullSample}{Time-series of bond yields, complete set (J x T or CJ x T)}
 
-\item{Economies}{string-vector containing the names of the economies which are part of the economic system}
+\item{Economies}{String-vector containing the names of the economies which are part of the economic system}
 
-\item{ModelType}{a string-vector containing the label of the model to be estimated}
+\item{ModelType}{A string-vector containing the label of the model to be estimated}
 }
 \description{
 Perform out-of-sample forecast of bond yields

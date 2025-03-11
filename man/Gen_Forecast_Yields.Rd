@@ -2,7 +2,7 @@
 % Please edit documentation in R/ForecastYields.R
 \name{Gen_Forecast_Yields}
 \alias{Gen_Forecast_Yields}
-\title{compute the bond yield forecast for any model type}
+\title{Compute the bond yield forecast for any model type}
 \usage{
 Gen_Forecast_Yields(
   K0Z,
@@ -27,7 +27,7 @@ Gen_Forecast_Yields(
 
 \item{Bfull}{Slope of model-implied yields model (J x N or CJ x CN)}
 
-\item{ZZsubsample}{Sub-sample of risk factors (F X t)}
+\item{ZZsubsample}{Sub-sample of risk factors (F x t)}
 
 \item{C}{Number of countries in the economic cohort (scalar)}
 
@@ -37,11 +37,11 @@ Gen_Forecast_Yields(
 
 \item{ForLabels}{Forecast labels (string-based vector)}
 
-\item{ForHoriz}{forecast horizon (scalar)}
+\item{ForHoriz}{Forecast horizon (scalar)}
 
-\item{ModelType}{a string-vector containing the label of the model to be estimated}
+\item{ModelType}{A string-vector containing the label of the model to be estimated}
 }
 \description{
-compute the bond yield forecast for any model type
+Compute the bond yield forecast for any model type
 }
 \keyword{internal}

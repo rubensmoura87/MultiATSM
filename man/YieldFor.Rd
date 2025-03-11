@@ -16,15 +16,15 @@ YieldFor(
 \arguments{
 \item{ModelParaList}{List of model parameter estimates}
 
-\item{ForHoriz}{forecast horizon (scalar)}
+\item{ForHoriz}{Forecast horizon (scalar)}
 
-\item{Economies}{string-vector containing the names of the economies which are part of the economic system}
+\item{Economies}{String-vector containing the names of the economies which are part of the economic system}
 
-\item{FactorLabels}{a string-list based which contains all the labels of all the variables present in the model}
+\item{FactorLabels}{A string-list based which contains all the labels of all the variables present in the model}
 
 \item{ForLabels}{Forecast labels (string-based vector)}
 
-\item{ModelType}{a string-vector containing the label of the model to be estimated}
+\item{ModelType}{A string-vector containing the label of the model to be estimated}
 }
 \description{
 Compile the bond yield forecast for any model type

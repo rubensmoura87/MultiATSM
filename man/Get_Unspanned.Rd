@@ -9,11 +9,11 @@ Get_Unspanned(ModelPara, FactorLabels, Economies, ModelType)
 \arguments{
 \item{ModelPara}{List of model parameter estimates}
 
-\item{FactorLabels}{a string-list based which contains all the labels of all the variables present in the model}
+\item{FactorLabels}{A string-list based which contains all the labels of all the variables present in the model}
 
-\item{Economies}{string-vector containing the names of the economies which are part of the economic system}
+\item{Economies}{String-vector containing the names of the economies which are part of the economic system}
 
-\item{ModelType}{a string-vector containing the label of the model to be estimated}
+\item{ModelType}{A string-vector containing the label of the model to be estimated}
 }
 \description{
 Collect both the domestic and global unspanned factors of all countries in single matrices

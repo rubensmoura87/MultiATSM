@@ -43,6 +43,11 @@ An object of class 'ATSMModelOutputs' containing model outputs after the optimiz
 \description{
 Perform the optimization of the log-likelihood function of the chosen ATSM
 }
+\section{Available Methods}{
+
+- `summary(object)`
+}
+
 \examples{
 # See examples in the vignette file of this package (Section 4).
 

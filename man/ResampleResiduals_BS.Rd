@@ -17,7 +17,7 @@ ResampleResiduals_BS(
 
 \item{residYieOriginal}{Time-series of the residuals from the observational equation (T x J or T x CJ)}
 
-\item{InputsForOutputs}{list containing the desired inputs for the construction of the numerical outputs.}
+\item{InputsForOutputs}{List containing the desired inputs for the construction of the numerical outputs.}
 
 \item{ModelType}{A character vector indicating the model type to be estimated}
 

@@ -36,7 +36,7 @@ ForecastYields(
 \item{BRWlist}{List of necessary inputs for performing the bias-corrected estimation (see \code{\link{Bias_Correc_VAR}} function).}
 }
 \value{
-List containing the following elements
+An object of class 'ATSMModelForecast' containing the following elements:
 \enumerate{
 \item Out-of-sample forecasts of bond yields per forecast horizon
 \item Out-of-sample forecast errors of bond yields per forecast horizon
@@ -46,8 +46,12 @@ List containing the following elements
 \description{
 Generates forecasts of bond yields for all model types
 }
+\section{Available Methods}{
+
+- `plot(object)`
+}
+
 \examples{
 # See an example of implementation in the vignette file of this package (Section 4).
-
 
 }

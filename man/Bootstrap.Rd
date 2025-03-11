@@ -39,11 +39,11 @@ Bootstrap(
 \item{BRWlist}{List of necessary inputs for performing the bias-corrected estimation (see \code{\link{Bias_Correc_VAR}} function).}
 }
 \value{
-list containing the following elements:
+List containing the following elements:
 \itemize{
-\item list of model parameters for one each one the draws;
-\item list of numerical outputs (IRFs, GIRFs, FEVDs, GFEVDs and Term Premia) for each one of the draws;
-\item Confidence bounds for the chosen level of significance.
+\item List of model parameters for each draw
+\item List of numerical outputs (IRFs, GIRFs, FEVDs, GFEVDs and Term Premia) for each draw
+\item Confidence bounds for the chosen level of significance
 }
 }
 \description{

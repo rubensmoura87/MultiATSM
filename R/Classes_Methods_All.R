@@ -212,3 +212,60 @@ summary.ATSMModelOutputs <- function(object, ...) {
 
   invisible(object)
 }
+#######################################################################################################
+#' Plot method for ATSMModelForecast objects
+#'
+#' @param x An object of class \code{ATSMModelForecast}
+#' @param ... Additional arguments (not used)
+#'
+#' @method plot ATSMModelForecast
+#' @usage \method{plot}{ATSMModelForecast}(x, ...)
+#'
+#' @export
+
+
+  plot.ATSMModelForecast <- function(x, ...) {
+
+  info <- attr(x, "ModelForecast")
+
+# Preliminary work
+SeQ_Lab <- c("JPS original", "JPS global", "GVAR single")
+ModelType <- info$ModelType
+Economies <- info$Economies
+
+C <- length(Economies)
+H <- info$ForHoriz
+J <- if (ModelType %in% SeQ_Lab) {  nrow(x$RMSE[[Economies[1]]]) } else { nrow(x$RMSE[[ModelType]]) / C }
+
+# Set up the plot layout to have two columns
+graphics::par(mfrow = c(ceiling(J / 2), 2), mar = c(4, 4, 2, 1) + 0.1)
+
+
+# Format the y-axis labels to show only two decimal places
+format_y_axis <- function(x) {
+  sprintf("%.2f", x)
+}
+
+# Plot the bar charts
+for (i in 1:C){
+
+  if( ModelType %in% SeQ_Lab){
+  DataGraph_CS <- x$RMSE[[Economies[i]]]
+  } else {
+    Idx0 <- 1 + (i-1)*J
+    IdxF <- Idx0 + J - 1
+    DataGraph_CS <- x$RMSE[[ModelType]][Idx0:IdxF, ]
+  }
+
+  MatLab <- row.names(DataGraph_CS)
+
+  for (j in 1:J) {
+  DataGraph <- 100*DataGraph_CS[j, ]
+
+  ylim_range <- range(0, max(DataGraph))
+  graphics::barplot(DataGraph, xlab = "", ylab = "RMSE (%)", col = "lightblue", names.arg = 1:H, cex.names = 0.7, yaxt = "n", ylim = ylim_range)
+  graphics::axis(2, at = pretty(ylim_range), labels = format_y_axis(pretty(ylim_range)))
+  graphics::mtext(MatLab[j], side = 1, line = 2, cex = 0.8)
+  }
+  }
+}

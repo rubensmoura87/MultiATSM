@@ -7,13 +7,13 @@
 Get_BFull(ModelParaPE, FactorLabels, mat, Economies, ModelType)
 }
 \arguments{
-\item{ModelParaPE}{list of point estimates of the model parameter}
+\item{ModelParaPE}{List of point estimates of the model parameter}
 
-\item{FactorLabels}{string-list based which contains the labels of all the variables present in the model}
+\item{FactorLabels}{String-list based which contains the labels of all the variables present in the model}
 
-\item{mat}{vector of bond yield maturities}
+\item{mat}{Vector of bond yield maturities}
 
-\item{Economies}{string-vector containing the names of the economies which are part of the economic system}
+\item{Economies}{String-vector containing the names of the economies which are part of the economic system}
 
 \item{ModelType}{A character vector indicating the model type to be estimated}
 }

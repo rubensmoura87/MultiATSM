@@ -16,22 +16,21 @@ FeedbackMat_BS(
 )
 }
 \arguments{
-\item{ModelType}{string-vector containing the label of the model to be estimated}
+\item{ModelType}{String-vector containing the label of the model to be estimated}
 
 \item{RiskFactors_TS}{Time-series of risk factors of the bootstrap (F x T)}
 
-\item{FactorLabels}{string-list based which contains the labels of all the variables present in the model}
+\item{FactorLabels}{String-list based which contains the labels of all the variables present in the model}
 
-\item{Economies}{string-vector containing the names of the economies which are part of the economic system}
+\item{Economies}{String-vector containing the names of the economies which are part of the economic system}
 
-\item{GVARlist}{list of necessary inputs for the estimation of GVAR-based models}
+\item{GVARlist}{List of necessary inputs for the estimation of GVAR-based models}
 
-\item{JLLlist}{list of necessary inputs for the estimation of JLL-based models}
+\item{JLLlist}{List of necessary inputs for the estimation of JLL-based models}
 
-\item{WishBRW}{Whether the user wishes to estimate the physical parameter model with the Bias correction model from BRW (2012) (see "Bias_Correc_VAR" function).\cr
-Default is set to 0.}
+\item{WishBRW}{Whether the user wishes to estimate the physical parameter model with the Bias correction model from BRW (2012) (see "Bias_Correc_VAR" function). Default is set to 0.}
 
-\item{BRWlist}{list of necessary inputs for performing the bias-corrected estimation (see \code{\link{Bias_Correc_VAR}} function)}
+\item{BRWlist}{List of necessary inputs for performing the bias-corrected estimation (see \code{\link{Bias_Correc_VAR}} function)}
 }
 \description{
 Compute the Feedback matrix of each bootstrap draw

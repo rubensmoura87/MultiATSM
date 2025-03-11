@@ -1,52 +1,61 @@
 #' Generates forecasts of bond yields for all model types
 #'
-#'@param ModelType A character vector indicating the model type to be estimated.
-#'@param ModelPara  A list containing the point estimates of the model parameters. For details, refer to the outputs from the \code{\link{Optimization}} function.
-#'@param InputsForOutputs  A list containing the necessary inputs for generating IRFs, GIRFs, FEVDs, GFEVDs and Term Premia.
-#'@param FactorLabels  A list of character vectors with labels for all variables in the model.
-#'@param Economies A character vector containing the names of the economies included in the system.
-#'@param JLLlist A list of necessary inputs for the estimation of JLL-based models (see the \code{\link{JLL}} function).
-#'@param GVARlist A list containing the necessary inputs for the estimation of GVAR-based models (see the \code{\link{GVAR}} function).
-#'@param WishBRW Whether to estimate the physical parameter model with bias correction, based on the method by Bauer, Rudebusch and Wu (2012) (see \code{\link{Bias_Correc_VAR}} function). Default is set to 0.
-#'@param BRWlist  List of necessary inputs for performing the bias-corrected estimation (see \code{\link{Bias_Correc_VAR}} function).
+#' @param ModelType A character vector indicating the model type to be estimated.
+#' @param ModelPara A list containing the point estimates of the model parameters. For details, refer to the outputs from the \code{\link{Optimization}} function.
+#' @param InputsForOutputs A list containing the necessary inputs for generating IRFs, GIRFs, FEVDs, GFEVDs and Term Premia.
+#' @param FactorLabels A list of character vectors with labels for all variables in the model.
+#' @param Economies A character vector containing the names of the economies included in the system.
+#' @param JLLlist A list of necessary inputs for the estimation of JLL-based models (see the \code{\link{JLL}} function).
+#' @param GVARlist A list containing the necessary inputs for the estimation of GVAR-based models (see the \code{\link{GVAR}} function).
+#' @param WishBRW Whether to estimate the physical parameter model with bias correction, based on the method by Bauer, Rudebusch and Wu (2012) (see \code{\link{Bias_Correc_VAR}} function). Default is set to 0.
+#' @param BRWlist List of necessary inputs for performing the bias-corrected estimation (see \code{\link{Bias_Correc_VAR}} function).
 #'
-#'@examples
+#' @examples
 #' # See an example of implementation in the vignette file of this package (Section 4).
 #'
-#'
-#'@returns
-#' List containing the following elements
+#' @return
+#' An object of class 'ATSMModelForecast' containing the following elements:
 #' \enumerate{
 #' \item Out-of-sample forecasts of bond yields per forecast horizon
 #' \item Out-of-sample forecast errors of bond yields per forecast horizon
 #' \item Root mean square errors per forecast horizon
-#'}
+#' }
 #'
-#'@export
+#' @section Available Methods:
+#' - `plot(object)`
+#'
+#'
+#' @export
 
 ForecastYields <- function(ModelType, ModelPara, InputsForOutputs, FactorLabels, Economies, JLLlist = NULL,
-                            GVARlist= NULL, WishBRW, BRWlist = NULL){
+                           GVARlist = NULL, WishBRW, BRWlist = NULL) {
 
   cat("4) OUT-OF-SAMPLE FORECASTING ANALYSIS \n")
-  WishForecast <- InputsForOutputs[[ModelType]]$Forecasting$WishForecast
+  forecast_info <- InputsForOutputs[[ModelType]]$Forecasting
 
-  if (WishForecast ==0){ cat( "No bond yields forecasts were generated \n")} else{
+  if (!forecast_info$WishForecast) {
+    cat("No bond yields forecasts were generated \n")
+    return(NULL)
+  }
 
   start_time <- Sys.time()
+
   # 1) Redefine some general model outputs
   StatQ <- InputsForOutputs$StationaryQ
   UnitMatYields <- InputsForOutputs$UnitMatYields
   DataFreq <- InputsForOutputs$DataFreq
 
-  ForecastType <- InputsForOutputs[[ModelType]]$Forecasting$ForType
-  t0Sample <- InputsForOutputs[[ModelType]]$Forecasting$t0Sample
-  t0Forecast <- InputsForOutputs[[ModelType]]$Forecasting$t0Forecast
-  H <- InputsForOutputs[[ModelType]]$Forecasting$ForHoriz
+  ForecastType <- forecast_info$ForType
+  t0Sample <- forecast_info$t0Sample
+  t0Forecast <- forecast_info$t0Forecast
+  H <- forecast_info$ForHoriz
   T <- ncol(if (any(ModelType %in% c("JPS original", "JPS global", "GVAR single"))) {
     ModelPara[[ModelType]][[Economies[1]]]$inputs$Y
-  } else {ModelPara[[ModelType]]$inputs$Y })
+  } else {
+    ModelPara[[ModelType]]$inputs$Y
+  })
 
-  nForecasts <- T - t0Forecast- H + 1 # Number of times that the model will be re-estimated
+  nForecasts <- T - t0Forecast - H + 1 # Number of times that the model will be re-estimated
 
   # 2) Perform preliminary consistency checks
   ChecksOOS(t0Forecast, t0Sample, nForecasts, ForecastType, T)
@@ -58,60 +67,64 @@ ForecastYields <- function(ModelType, ModelPara, InputsForOutputs, FactorLabels,
 
   # 4) Model Estimation
   Forecast_AllDates <- list()
+  t_last_forecast <- t0Forecast
 
-  for (tt in 1:nForecasts){
+  for (tt in 1:nForecasts) {
     # First observation of the information set
-    if(ForecastType == "Rolling" & tt >= 2 ){t0Sample <- t0Sample + 1}
+    if (ForecastType == "Rolling" & tt >= 2) {
+      t0Sample <- t0Sample + 1
+    }
     # Last observation of the information set
-    if (tt ==1){t_last_forecast <- t0Forecast }else{t_last_forecast <- t_last_forecast + 1}
+    if (tt > 1) t_last_forecast <- t_last_forecast + 1
 
     # Redefine the dataset used in the estimation
     T0_SubSample <- TimeSeries_Labels_Full[t0Sample]
     TF_SubSample <- TimeSeries_Labels_Full[t_last_forecast]
 
     # 4.1) Prepare the inputs of the likelihood function
-    invisible(utils::capture.output(ATSMInputs <- InputsForOpt(T0_SubSample, TF_SubSample, ModelType, YieldsFull, Facts$Glob, Facts$Dom,
-                              FactorLabels, Economies, DataFreq, GVARlist, JLLlist, WishBRW, BRWlist,
-                              UnitMatYields, CheckInputs= FALSE)))
+    invisible(utils::capture.output(ATSMInputs <- InputsForOpt(T0_SubSample, TF_SubSample, ModelType, YieldsFull, Facts$Glob,
+                                                               Facts$Dom, FactorLabels, Economies, DataFreq, GVARlist, JLLlist,
+                                                               WishBRW, BRWlist, UnitMatYields, CheckInputs = FALSE)))
 
     # 4.2) Optimization of the ATSM
-    invisible(utils::capture.output(FullModelParaList <- Optimization(ATSMInputs, StatQ, DataFreq,
-                                                                      FactorLabels, Economies, ModelType,
-                                                                      TimeCount=F)))
+    invisible(utils::capture.output(FullModelParaList <- Optimization(ATSMInputs, StatQ, DataFreq, FactorLabels,
+                                                                      Economies, ModelType, TimeCount = FALSE)))
+
+
     # 5) Forecasting bond yields
     Forecast_OneDate <- OOS_Forecast(H, t_last_forecast, FullModelParaList, FactorLabels, YieldsFull,
                                      Economies, ModelType)
     Forecast_AllDates <- Gather_Forecasts(Forecast_OneDate, Forecast_AllDates, Economies, ModelType)
 
-    cat(paste("Out-of-sample forecast for the information set:", T0_SubSample, "||", TF_SubSample, "\n"))
-    saveRDS(Forecast_AllDates, paste(tempdir(),"/Forecast_", InputsForOutputs$'Label Outputs','.rds',sep=""))
+    cat(sprintf("Out-of-sample forecast for the information set: %s || %s \n",
+                T0_SubSample, TF_SubSample))
+    saveRDS(Forecast_AllDates, paste(tempdir(), "/Forecast_", InputsForOutputs$'Label Outputs', '.rds', sep = ""))
   }
 
   # 6) RMSE
   OutofSampleForecast <- stats::setNames(list(Forecast_AllDates), ModelType)
-  RMSE <- list(RMSE =if (any(ModelType %in% c("JPS original", "JPS global", "GVAR single"))) {
-    RMSEsep(OutofSampleForecast)
-  } else{
-    RMSEjoint(OutofSampleForecast)})
+  RMSEs <- RMSE(OutofSampleForecast)
 
-  OutofSampleForecast <- append(OutofSampleForecast[[ModelType]], RMSE)
+  OutofSampleForecast <- append(OutofSampleForecast[[ModelType]], list(RMSE = RMSEs))
 
-    saveRDS(OutofSampleForecast, paste(tempdir(),"/Forecast_", InputsForOutputs$'Label Outputs','.rds',sep=""))
-    Optimization_Time(start_time)
+  saveRDS(OutofSampleForecast, paste(tempdir(), "/Forecast_", InputsForOutputs$'Label Outputs', '.rds', sep = ""))
+  Optimization_Time(start_time)
 
-    return(OutofSampleForecast)
-  }
+  # Store metadata inside the class without explicitly exporting it
+  attr(OutofSampleForecast, "ModelForecast") <- list(Economies = Economies, ModelType = ModelType, ForHoriz = H)
+
+  return(structure(OutofSampleForecast, class = "ATSMModelForecast"))
 }
 #############################################################################################################
-#'Preliminary checks for inputs provided for the performing out-of-sample forecasting
+#' Preliminary checks for inputs provided for the performing out-of-sample forecasting
 #'
-#'@param t0Forecast Index of the last set of observations in the information set at the first forecasting round
-#'@param t0Sample Index of the first set of observations in the information set at the first forecasting round
-#'@param nForecasts number of forecasting sets generated
-#'@param ForecastType Forecast type. Available options are "Rolling" and "Expanding".
-#'@param TimeLength time-series dimension of the model
+#' @param t0Forecast Index of the last set of observations in the information set at the first forecasting round
+#' @param t0Sample Index of the first set of observations in the information set at the first forecasting round
+#' @param nForecasts Number of forecasting sets generated
+#' @param ForecastType Forecast type. Available options are "Rolling" and "Expanding".
+#' @param TimeLength Time-series dimension of the model
 #'
-#'@keywords internal
+#' @keywords internal
 
 ChecksOOS <- function(t0Forecast, t0Sample, nForecasts, ForecastType, TimeLength){
   # CHECK 1: consistency  of the initial forecasting date
@@ -125,13 +138,13 @@ ChecksOOS <- function(t0Forecast, t0Sample, nForecasts, ForecastType, TimeLength
 }
 
 ##############################################################################################################
-#'Gather all country-specific yields in a single matrix of dimension CJ x T
+#' Gather all country-specific yields in a single matrix of dimension CJ x T
 #'
-#'@param ModelPara List of model parameter estimates
-#'@param Economies string-vector containing the names of the economies which are part of the economic system
-#'@param ModelType a string-vector containing the label of the model to be estimated
+#' @param ModelPara List of model parameter estimates
+#' @param Economies String-vector containing the names of the economies which are part of the economic system
+#' @param ModelType A string-vector containing the label of the model to be estimated
 #'
-#'@keywords internal
+#' @keywords internal
 
 GetYields_AllCountries <- function(ModelPara, Economies, ModelType){
 
@@ -149,13 +162,13 @@ GetYields_AllCountries <- function(ModelPara, Economies, ModelType){
 }
 
 #############################################################################################################
-#'Obtain the indexes of both the domestic and global unspanned factors
+#' Obtain the indexes of both the domestic and global unspanned factors
 #'
-#'@param RiskFactors_TS time series of risk factors for the jointly estimated models (CJ x T)
-#'@param FactorLabels a string-list based which contains all the labels of all the variables present in the model
-#'@param Economies string-vector containing the names of the economies which are part of the economic system
+#' @param RiskFactors_TS Time series of risk factors for the jointly estimated models (CJ x T)
+#' @param FactorLabels A string-list based which contains all the labels of all the variables present in the model
+#' @param Economies String-vector containing the names of the economies which are part of the economic system
 #'
-#'@keywords internal
+#' @keywords internal
 
 Idx_UnspanFact <- function(RiskFactors_TS, FactorLabels, Economies){
 
@@ -172,14 +185,14 @@ Idx_UnspanFact <- function(RiskFactors_TS, FactorLabels, Economies){
   return(list(IdxunSpa = IdxunSpa, IdxGlobal= IdxGlobal))
 }
 ########################################################################################################
-#'Collect both the domestic and global unspanned factors of all countries in single matrices
+#' Collect both the domestic and global unspanned factors of all countries in single matrices
 #'
-#'@param ModelPara List of model parameter estimates
-#'@param FactorLabels a string-list based which contains all the labels of all the variables present in the model
-#'@param Economies string-vector containing the names of the economies which are part of the economic system
-#'@param ModelType a string-vector containing the label of the model to be estimated
+#' @param ModelPara List of model parameter estimates
+#' @param FactorLabels A string-list based which contains all the labels of all the variables present in the model
+#' @param Economies String-vector containing the names of the economies which are part of the economic system
+#' @param ModelType A string-vector containing the label of the model to be estimated
 #'
-#'@keywords internal
+#' @keywords internal
 
 Get_Unspanned <- function(ModelPara, FactorLabels, Economies, ModelType){
 
@@ -206,17 +219,17 @@ Get_Unspanned <- function(ModelPara, FactorLabels, Economies, ModelType){
 }
 
 #############################################################################################################
-#'Perform out-of-sample forecast of bond yields
+#' Perform out-of-sample forecast of bond yields
 #'
-#'@param ForHoriz forecast horizon-ahead (scalar)
-#'@param t_Last Index of the last set of observations in the information set at a given forecasting round
-#'@param ModelParaList List of model parameter estimates
-#'@param FactorLabels a string-list based which contains all the labels of all the variables present in the model
-#'@param Yields_FullSample Time-series of bond yields, complete set (J x T or CJ x T)
-#'@param Economies string-vector containing the names of the economies which are part of the economic system
-#'@param ModelType a string-vector containing the label of the model to be estimated
+#' @param ForHoriz Forecast horizon-ahead (scalar)
+#' @param t_Last Index of the last set of observations in the information set at a given forecasting round
+#' @param ModelParaList List of model parameter estimates
+#' @param FactorLabels A string-list based which contains all the labels of all the variables present in the model
+#' @param Yields_FullSample Time-series of bond yields, complete set (J x T or CJ x T)
+#' @param Economies String-vector containing the names of the economies which are part of the economic system
+#' @param ModelType A string-vector containing the label of the model to be estimated
 #'
-#'@keywords internal
+#' @keywords internal
 
 OOS_Forecast <- function(ForHoriz, t_Last, ModelParaList, FactorLabels, Yields_FullSample, Economies, ModelType){
 
@@ -238,7 +251,7 @@ OOS_Forecast <- function(ForHoriz, t_Last, ModelParaList, FactorLabels, Yields_F
   ForOut[[ForecastDate]]$Forcast <- ForecastYields
   ForOut[[ForecastDate]]$Error <- ForecastError
 
-  }else{
+  } else {
 
     for (i in 1:length(Economies)){
     YieldsObsForPer <- Yields_FullSample[ grep(Economies[i], rownames(Yields_FullSample)) ,(t_Last+1):(t_Last+ForHoriz)]
@@ -252,16 +265,16 @@ OOS_Forecast <- function(ForHoriz, t_Last, ModelParaList, FactorLabels, Yields_F
   return(ForOut)
 }
 ##############################################################################################################
-#'Compile the bond yield forecast for any model type
+#' Compile the bond yield forecast for any model type
 #'
-#'@param ModelParaList List of model parameter estimates
-#'@param ForHoriz forecast horizon (scalar)
-#'@param Economies string-vector containing the names of the economies which are part of the economic system
-#'@param FactorLabels a string-list based which contains all the labels of all the variables present in the model
-#'@param ForLabels Forecast labels (string-based vector)
-#'@param ModelType a string-vector containing the label of the model to be estimated
+#' @param ModelParaList List of model parameter estimates
+#' @param ForHoriz Forecast horizon (scalar)
+#' @param Economies String-vector containing the names of the economies which are part of the economic system
+#' @param FactorLabels A string-list based which contains all the labels of all the variables present in the model
+#' @param ForLabels Forecast labels (string-based vector)
+#' @param ModelType A string-vector containing the label of the model to be estimated
 #'
-#'@keywords internal
+#' @keywords internal
 
 YieldFor <- function(ModelParaList, ForHoriz, Economies, FactorLabels, ForLabels, ModelType){
 
@@ -285,7 +298,7 @@ YieldFor <- function(ModelParaList, ForHoriz, Economies, FactorLabels, ForLabels
 
     YiedlsLab <- rownames(ModelParaList[[ModelType]]$inputs$Y)
     ForecastYields <- Gen_Forecast_Yields(K0Z, K1Z, A, Bfull, ZZtemp, C, J, YiedlsLab, ForLabels, ForHoriz, ModelType)
-  }else{
+  } else {
 
     J <- length(ModelParaList[[ModelType]][[Economies[1]]]$inputs$mat)
     ForecastYields <- list()
@@ -299,28 +312,27 @@ YieldFor <- function(ModelParaList, ForHoriz, Economies, FactorLabels, ForLabels
     YiedlsLab <- rownames(ModelParaList[[ModelType]][[Economies[i]]]$inputs$Y)
     ForecastYields[[Economies[i]]] <- Gen_Forecast_Yields(K0Z, K1Z, A, Bfull, ZZtemp, C, J, YiedlsLab,
                                                           ForLabels, ForHoriz, ModelType)
-
     }
     }
 
   return(ForecastYields)
 }
 ###############################################################################################################
-#'compute the bond yield forecast for any model type
+#' Compute the bond yield forecast for any model type
 #'
-#'@param K0Z Intercept from the P-dynamics (F x 1)
-#'@param K1Z Feedback matrix from the P-dynamics (F x F)
-#'@param A Intercept of model-implied yields model (J x 1)
-#'@param Bfull Slope of model-implied yields model (J x N or CJ x CN)
-#'@param ZZsubsample Sub-sample of risk factors (F X t)
-#'@param C Number of countries in the economic cohort (scalar)
-#'@param J Number of country-specific bond yields
-#'@param YieldsLabels Labels of bond yields
-#'@param ForLabels Forecast labels (string-based vector)
-#'@param ForHoriz forecast horizon (scalar)
-#'@param ModelType a string-vector containing the label of the model to be estimated
+#' @param K0Z Intercept from the P-dynamics (F x 1)
+#' @param K1Z Feedback matrix from the P-dynamics (F x F)
+#' @param A Intercept of model-implied yields model (J x 1)
+#' @param Bfull Slope of model-implied yields model (J x N or CJ x CN)
+#' @param ZZsubsample Sub-sample of risk factors (F x t)
+#' @param C Number of countries in the economic cohort (scalar)
+#' @param J Number of country-specific bond yields
+#' @param YieldsLabels Labels of bond yields
+#' @param ForLabels Forecast labels (string-based vector)
+#' @param ForHoriz Forecast horizon (scalar)
+#' @param ModelType A string-vector containing the label of the model to be estimated
 #'
-#'@keywords internal
+#' @keywords internal
 
 Gen_Forecast_Yields <- function(K0Z, K1Z, A, Bfull, ZZsubsample, C, J, YieldsLabels, ForLabels, ForHoriz, ModelType){
 
@@ -328,14 +340,14 @@ Gen_Forecast_Yields <- function(K0Z, K1Z, A, Bfull, ZZsubsample, C, J, YieldsLab
     ForecastYields <- matrix(NA, nrow = C*J, ncol = ForHoriz)
   }else{
     ForecastYields <- matrix(NA, nrow = J, ncol = ForHoriz)
-    }
+  }
   dimnames(ForecastYields) <- list(YieldsLabels, ForLabels)
 
   ZZtt <- ZZsubsample[ , ncol(ZZsubsample)]
   K1ZsumOld <- 0
 
   for (hh in 1:ForHoriz){
-    if(hh==1){
+    if(hh == 1) {
       K1Znew <- diag(nrow(K1Z))
       K1Zhh <- K1Z
     }else{
@@ -349,202 +361,79 @@ Gen_Forecast_Yields <- function(K0Z, K1Z, A, Bfull, ZZsubsample, C, J, YieldsLab
     K1ZsumOld <- K1ZsumOld + K1Znew
   }
 
-
   return(ForecastYields)
 }
-#######################################################################################################
+
 ###############################################################################################################
-#' Compute the root mean square error ("sep Q" models)
+#' Compute the root mean square error for all models
 #'
-#'@param ForecastOutputs  List of country-specific forecasts (see "ForecastYieldsSepQ" function)
+#' @param ForecastOutputs List of country-specific forecasts
 #'
-#'@keywords internal
+#' @keywords internal
 
+RMSE <- function(ForecastOutputs){
 
-RMSEsep <- function(ForecastOutputs){
-
-  nfor <- length(ForecastOutputs[[1]][[1]])
-  Economies <- names(ForecastOutputs[[1]])
   ModelType <- names(ForecastOutputs)
+  SepQ_Labels <- c("JPS original", "JPS global", "GVAR single")
 
-  H <- ncol(ForecastOutputs[[1]][[1]][[1]][[1]])
-  C <- length(Economies)
+  # 1) SepQ models
+  if (ModelType %in% SepQ_Labels) {
 
+    nfor <- length(ForecastOutputs[[1]][[1]])
+    Economies <- names(ForecastOutputs[[1]])
+    H <- ncol(ForecastOutputs[[1]][[1]][[1]][[1]])
+    C <- length(Economies)
 
-  FElist <- list()
-  for (i in 1:C){
-    for (h in 1:nfor){
-      FElist[[Economies[i]]][[h]] <- ForecastOutputs[[ModelType]][[Economies[i]]][[h]]$Error
+    FElist <- vector("list", C)
+    names(FElist) <- Economies
+
+    ForecastData <- ForecastOutputs[[ModelType]]
+
+    # Extract forecast errors
+    for (i in seq_along(Economies)) {
+      FElist[[Economies[i]]] <- lapply(seq_len(nfor), function(h) ForecastData[[Economies[i]]][[h]]$Error)
     }
-  }
 
+    # Compute RMSE
+    rmse <- lapply(FElist, function(errors) {
+      result <- sqrt(Reduce("+", lapply(errors, function(x) x^2 / nfor)))
+      colnames(result) <- seq_len(H)
+      return(result)
+    })
 
-  rmse <- list()
-  for (i in 1:C){
-    rmse[[Economies[i]]] <- sqrt(Reduce("+", lapply(FElist[[Economies[i]]],
-                                                    function(x, N= nfor) x^2/N)))
-    colnames(rmse[[Economies[i]]]) <- 1:H
+  } else {
+    # 2) JointQ models
+    nfor <- length(ForecastOutputs[[1]])
+    Modeljoint <- ModelType
+    H <- ncol(ForecastOutputs[[1]][[1]][[1]])
+
+    FElist <- lapply(seq_len(nfor), function(h) ForecastOutputs[[Modeljoint]][[h]]$Error)
+
+    rmse <- list()
+    rmse[[Modeljoint]] <- sqrt(Reduce("+", lapply(FElist, function(x) x^2 / nfor)))
+    colnames(rmse[[Modeljoint]]) <- seq_len(H)
   }
 
   return(rmse)
 }
 
-
-##############################################################################################################
-#' Compute the root mean square error ("joint Q" models)
-#'
-#'@param ForecastOutputs  List of country-specific forecasts
-#'
-#'@keywords internal
-
-
-RMSEjoint <- function(ForecastOutputs){
-
-  nfor <- length(ForecastOutputs[[1]])
-  Modeljoint <- names(ForecastOutputs)
-
-  H <- ncol(ForecastOutputs[[1]][[1]][[1]])
-
-  FElist <- list()
-  for (h in 1:nfor){
-    FElist[[Modeljoint]][[h]] <- ForecastOutputs[[Modeljoint]][[h]]$Error
-  }
-
-  rmse <- list()
-  rmse[[Modeljoint]] <- sqrt(Reduce("+", lapply(FElist[[Modeljoint]], function(x, N= nfor) x^2/N)))
-  colnames(rmse[[Modeljoint]]) <- 1:H
-
-
-  return(rmse)
-}
-
-
-################################################################################################################
-#' Find the indexes of the spanned factors
-#'
-#'@param ModelType string-vector containing the label of the model to be estimated
-#'@param FactorLabels string-list based which contains the labels of all the variables present in the model
-#'@param Economies  string-vector containing the names of the economies which are part of the economic system
-#'
-#'@keywords internal
-
-IdxAllSpanned <- function(ModelType, FactorLabels, Economies){
-
-  G <- length(FactorLabels$Global)
-  N <- length(FactorLabels$Spanned)
-  M <- length(FactorLabels$Domestic) - N
-  C <- length(Economies)
-
-  IdxSpanned <- c()
-
-  if (ModelType== "JPS original"){ IdxSpanned <- (G+M+1):(G+M+N) } else{
-    idxSpa0 <- G + M
-    for (j in 1:C){
-      idxSpa1 <- idxSpa0 + N
-
-      if (j ==1){ IdxSpanned <- (idxSpa0+1):idxSpa1
-      }  else{
-        IdxSpanned <- c(IdxSpanned, (idxSpa0+1):idxSpa1)
-      }
-      idxSpa0 <- idxSpa1 + M
-    }
-  }
-
-  return(IdxSpanned)
-}
 #################################################################################################################
-#'Gather several forecast dates
+#' Gather several forecast dates
 #'
-#'@param Forecast_OneDate Bond yield forecasts for a single date
-#'@param Forecast_AllDates Bond yield forecasts for multiple dates
-#'@param Economies string-vector containing the names of the economies which are part of the economic system
-#'@param ModelType string-vector containing the label of the model to be estimated
+#' @param Forecast_OneDate Bond yield forecasts for a single date
+#' @param Forecast_AllDates Bond yield forecasts for multiple dates
+#' @param Economies String-vector containing the names of the economies which are part of the economic system
+#' @param ModelType String-vector containing the label of the model to be estimated
 #'
-#'@keywords internal
+#' @keywords internal
 
 Gather_Forecasts <- function(Forecast_OneDate, Forecast_AllDates, Economies, ModelType){
 
-  if( any(ModelType %in% c("JPS original", "JPS global", "GVAR single"))){
-    for (i in 1:length(Economies)){
-      Forecast_AllDates[[Economies[i]]] <- append(Forecast_AllDates[[Economies[i]]], Forecast_OneDate[[Economies[i]]])
-    }
-
-  }else{
+  if( ModelType %in% c("JPS original", "JPS global", "GVAR single")){
+    Forecast_AllDates <- utils::modifyList(Forecast_AllDates, Forecast_OneDate)
+  } else {
     Forecast_AllDates <- append(Forecast_AllDates, Forecast_OneDate)
   }
+
   return(Forecast_AllDates)
-}
-
-#################################################################################################################
-#' Gather all spanned factors ("sep Q" models)
-#'
-#'@param ModelType  string-vector containing the label of the model to be estimated
-#'@param ModelPara  set of model parameters
-#'@param Economies  string-vector containing the names of the economies which are part of the economic system
-#'@param t0Sample   index for the initial sample date
-#'@param tlastObserved index for the last observation of the information set
-#'
-#'@keywords internal
-
-SpannedFactorsSepQ <- function(ModelType, ModelPara, Economies, t0Sample, tlastObserved){
-
-  C <- length(Economies)
-  N <- ModelPara[[ModelType]][[Economies[1]]]$inputs$N
-
-  PPALL <- matrix()
-
-  if (ModelType== "JPS original"){
-    i <- get("i", globalenv())
-    YCS <- ModelPara[[ModelType]][[Economies[i]]]$inputs$Y[, t0Sample:tlastObserved]
-    PPALL <- Spanned_Factors(YCS, Economies = Economies[i], N)
-  } else {
-    for (i in 1:C){
-      YCS <- ModelPara[[ModelType]][[Economies[i]]]$inputs$Y[,t0Sample:tlastObserved]
-      if (i==1 ){PPALL <- Spanned_Factors(YCS, Economies = Economies[i], N)
-      } else{
-        PPtemp <- Spanned_Factors(YCS, Economies = Economies[i], N)
-        PPALL <- rbind(PPALL, PPtemp)
-      }
-    }
-  }
-
-  return(PPALL)
-}
-
-#######################################################################################################
-#' Gather all spanned factors ("joint Q" models)
-#'
-#'@param ModelType string-vector containing the label of the model to be estimated
-#'@param ModelPara  set of model parameters
-#'@param Economies string-vector containing the names of the economies which are part of the economic system
-#'@param t0Sample   index for the initial sample date
-#'@param tlastObserved index for the last observation of the information set
-#'
-#'@keywords internal
-
-SpannedFactorsjointQ <- function(ModelType, ModelPara, Economies, t0Sample, tlastObserved){
-
-  C <- length(Economies)
-  N <- ModelPara[[ModelType]]$inputs$N
-  J <- length(ModelPara[[ModelType]]$inputs$mat)
-
-  PPALL <- matrix()
-
-  idxJ0 <- 0
-
-  for (i in 1:C){ # Country-specific inputs
-    idxJ1 <- idxJ0 + J
-
-    YCS <- ModelPara[[ModelType]]$inputs$Y[(idxJ0+1):idxJ1, t0Sample:tlastObserved][,]
-
-    if (i==1 ){PPALL <- Spanned_Factors(YCS, Economies = Economies[i], N)
-    }else{
-      PPtemp <- Spanned_Factors(YCS, Economies = Economies[i], N)
-      PPALL <- rbind(PPALL, PPtemp)
-    }
-
-    idxJ0<- idxJ1
-  }
-
-  return(PPALL)
 }

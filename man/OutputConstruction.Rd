@@ -18,7 +18,7 @@ OutputConstruction(
 
 \item{ModelPara}{list of model parameter estimates (See the "Optimization" function)}
 
-\item{InputsForOutputs}{list conataining the desired horizon of analysis for the model fit, IRFs, GIRFs, FEVDs, GFEVDs,
+\item{InputsForOutputs}{list containing the desired horizon of analysis for the model fit, IRFs, GIRFs, FEVDs, GFEVDs,
 and risk premia decomposition}
 
 \item{FactorLabels}{string-list based which contains all the labels of all the variables present in the model}

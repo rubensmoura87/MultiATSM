@@ -17,7 +17,13 @@
 #' @param CheckInputs Logical. Whether to perform a prior check on the consistency of the provided input list. Default is TRUE.
 #' @param BS_Adj Logical. Whether to adjust the global series for the sepQ models in the Bootstrap setting. Default is FALSE.
 #'
+#'
 #' @return An object of class 'ATSMModelInputs' containing the necessary inputs for performing the model optimization.
+#'
+#' @section Available Methods:
+#' - `print(object)`
+#' - `summary(object)`
+#'
 #' @examples
 #' \donttest{
 #' # Example 1:
@@ -102,7 +108,6 @@ InputsForOpt <- function(InitialSampleDate, FinalSampleDate, ModelType, Yields, 
   if (isTRUE(CheckInputs)) {
   CheckInputsForMLE(InitialSampleDate, FinalSampleDate, Economies, DomMacro, GlobalMacro, UnitYields,
                     DataFrequency, Label_Single_Models, Label_Multi_Models, FactorLabels, GVARlist, ModelType) }
-
 
   # Construct the time-series of the risk factors
   cat("1.1) Constructing the time-series of the risk factors \n")
@@ -221,7 +226,7 @@ Maturities <- function(DataYields, Economies, UnitYields){
 SpecificMLEInputs <-function(ModelType, Economies, RiskFactors, FactorLabels, GVARlist = NULL, JLLlist = NULL,
                              WishBRW=0, BRWlist= NULL, DataPathTrade = NULL){
 
-  if (any(ModelType == c("GVAR single", "GVAR multi"))){
+  if (ModelType %in% c("GVAR single", "GVAR multi")){
     # Compute the transition matrix and the
     # PRELIMINARY CHECK:  Makes sure that link matrices are correctly imputed in a model with time-varying interdependence
     if (GVARlist$W_type == "Time-varying" & GVARlist$t_First_Wgvar != GVARlist$t_Last_Wgvar){
@@ -249,7 +254,7 @@ SpecificMLEInputs <-function(ModelType, Economies, RiskFactors, FactorLabels, GV
 
 
 
-  if (any(ModelType == c("JLL original", "JLL No DomUnit","JLL joint Sigma"))){
+  if (ModelType %in% c("JLL original", "JLL No DomUnit","JLL joint Sigma")){
     JLLinputs <- list(
       Economies = Economies,
       DomUnit = JLLlist$DomUnit,
@@ -390,8 +395,8 @@ BuildATSM_RiskFactors <- function(InitialSampleDate, FinalSampleDate, Yields, Gl
   rownames(RiskFactors) <- AllFactorLabels
 
   # Input the global factors
-  if (BS_Adj == FALSE || (any(ModelType == c("JPS multi", "GVAR multi", "JLL original", "JLL No DomUnit",
-                                             "JLL joint Sigma")))){
+  if (BS_Adj == FALSE || (ModelType %in% c("JPS multi", "GVAR multi", "JLL original", "JLL No DomUnit",
+                                             "JLL joint Sigma"))){
     IdxGlobal <- match(FactorLabels$Global, rownames(GlobalMacroFactors))
     IdxGlobalRF <- IdxGlobal[!is.na(IdxGlobal)]
 
@@ -421,7 +426,7 @@ BuildATSM_RiskFactors <- function(InitialSampleDate, FinalSampleDate, Yields, Gl
   RiskFactors <- RiskFactors[, Idx0:IdxF]
 
   # Adapt to the specifies of the single-country-based models
-  if (any(ModelType == c("JPS original", "JPS global", "GVAR single"))) {
+  if (ModelType %in% c("JPS original", "JPS global", "GVAR single")) {
     RiskFactorsList <- list()
 
     for (i in 1:C){
@@ -610,12 +615,13 @@ GeneralMLEInputs <- function(Yields, RiskFactors, FactorLabels, mat, DataFrequen
 #'@param BRWinputs list of necessary inputs for performing the bias-corrected estimation (see "Bias_Correc_VAR" function)
 #'@param GVARinputs list of necessary inputs for the estimation of GVAR-based models (see "GVAR" function)
 #'@param JLLinputs list of necessary inputs for the estimation of JLL-based models (see "JLL" function)
+#'@param CheckInputs Logical. Whether to perform a prior check on the consistency of the provided input list. Default is FALSE.
 #'
 #'
 #'@keywords internal
 
 
-GetPdynPara <- function(RiskFactors, FactorLabels, Economies,  ModelType, BRWinputs, GVARinputs,
+GetPdynPara <- function(RiskFactors, FactorLabels, Economies, ModelType, BRWinputs, GVARinputs,
                         JLLinputs, CheckInputs = F){
 
   N <- length(FactorLabels$Spanned)
@@ -634,7 +640,7 @@ GetPdynPara <- function(RiskFactors, FactorLabels, Economies,  ModelType, BRWinp
     }
 
     tryCatch({
-    PdynPara <- GetPdynPara_BC(ModelType, BRWinputs, RiskFactors, Economies, FactorLabels, GVARinputs, JLLinputs)
+    PdynPara <- GetPdynPara_BC(ModelType, BRWinputs, RiskFactors, Economies, FactorLabels,                                   GVARinputs, JLLinputs)
     }, error = function(err) {
       stop("BRW procedure leads to a highly collinear system. Please choose another combination of BRW parameters.")})
 
@@ -817,10 +823,10 @@ else if (any(ModelType == c("JLL original", "JLL No DomUnit", "JLL joint Sigma")
 
   if (any(ModelType == c("JLL original", "JLL No DomUnit"))){  SSZ <- JLLPara$Sigmas$VarCov_NonOrtho }
   else{ SSZ <- JLLPara$Sigmas$VarCov_Ortho
-  # NOTE: the required vectorization that preceeds the numerical optimization of the variance-covariance matrix
+  # NOTE: the required vectorization that precedes the numerical optimization of the variance-covariance matrix
   # is done on the orthogonalized variance-covariance matrix because we want to preserve the restrictions imposed in this matrix.
   # However, to compute the loadings A and B from Y= A + B*P we have to use the non-orthogonalized variance-covariance
-  # matrix. We make this adjustment in the function 'A0N_MLEdensity_WOE...' by redefining SSZ before computing A and B.
+  # matrix. We make this adjustment in the function 'MLEdensity" by redefining SSZ before computing A and B.
   # (this avoids overcomplicating the overall structure of the code")
   }
 

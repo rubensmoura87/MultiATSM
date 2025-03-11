@@ -7,13 +7,13 @@
 residY_original(ModelParaPE, BFull, ModelType, Economies)
 }
 \arguments{
-\item{ModelParaPE}{list of point estimates of the model parameter}
+\item{ModelParaPE}{List of point estimates of the model parameter}
 
-\item{BFull}{matrix B of loadings (CJ x F or J x F)}
+\item{BFull}{Matrix B of loadings (CJ x F or J x F)}
 
 \item{ModelType}{A character vector indicating the model type to be estimated}
 
-\item{Economies}{string-vector containing the names of the economies which are part of the economic system}
+\item{Economies}{String-vector containing the names of the economies which are part of the economic system}
 }
 \description{
 Compute the residuals from the observational equation

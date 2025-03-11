@@ -11,7 +11,7 @@ FEVDandGFEVD_BS(ModelType, ModelParaBoot, FEVDhoriz, FactorLabels, Economies)
 
 \item{ModelParaBoot}{list of model parameter estimates (see the "Optimization" function) after a bootstrap draw}
 
-\item{FEVDhoriz}{single numerical vector conataining the desired horizon of analysis for the FEVDs}
+\item{FEVDhoriz}{single numerical vector containing the desired horizon of analysis for the FEVDs}
 
 \item{FactorLabels}{string-list based which contains all the labels of all the variables present in the model}
 

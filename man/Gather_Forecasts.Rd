@@ -11,9 +11,9 @@ Gather_Forecasts(Forecast_OneDate, Forecast_AllDates, Economies, ModelType)
 
 \item{Forecast_AllDates}{Bond yield forecasts for multiple dates}
 
-\item{Economies}{string-vector containing the names of the economies which are part of the economic system}
+\item{Economies}{String-vector containing the names of the economies which are part of the economic system}
 
-\item{ModelType}{string-vector containing the label of the model to be estimated}
+\item{ModelType}{String-vector containing the label of the model to be estimated}
 }
 \description{
 Gather several forecast dates

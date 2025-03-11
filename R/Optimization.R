@@ -110,6 +110,9 @@ Optimization_PE <- function(f, ListInputSet, FactorLabels, Economies, ModelType,
 #'@return
 #' An object of class 'ATSMModelOutputs' containing model outputs after the optimization of the chosen ATSM specification.
 #'
+#' @section Available Methods:
+#' - `summary(object)`
+#'
 #'@references
 #' This function is partially adapted from the \code{LS__opt} function by Le and Singleton (2018). \cr
 #'  "A Small Package of Matlab Routines for the Estimation of Some Term Structure Models." \cr

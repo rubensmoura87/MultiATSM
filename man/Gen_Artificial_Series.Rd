@@ -21,7 +21,7 @@ Gen_Artificial_Series(
 )
 }
 \arguments{
-\item{ModelParaPE}{list of point estimates of the model parameter}
+\item{ModelParaPE}{List of point estimates of the model parameter}
 
 \item{residPdynOriginal}{Time-series of the residuals from the P-dynamics equation (T x F)}
 
@@ -29,22 +29,21 @@ Gen_Artificial_Series(
 
 \item{ModelType}{Desired model to be estimated}
 
-\item{BFull}{matrix B of loadings (CJ x F or J x F)}
+\item{BFull}{Matrix B of loadings (CJ x F or J x F)}
 
-\item{InputsForOutputs}{list containing the desired inputs for the construction}
+\item{InputsForOutputs}{List containing the desired inputs for the construction}
 
-\item{Economies}{string-vector containing the names of the economies which are part of the economic system}
+\item{Economies}{String-vector containing the names of the economies which are part of the economic system}
 
-\item{FactorLabels}{string-list based which contains the labels of all the variables present in the model}
+\item{FactorLabels}{String-list based which contains the labels of all the variables present in the model}
 
-\item{GVARlist}{list of necessary inputs for the estimation of GVAR-based models}
+\item{GVARlist}{List of necessary inputs for the estimation of GVAR-based models}
 
-\item{JLLlist}{list of necessary inputs for the estimation of JLL-based models}
+\item{JLLlist}{List of necessary inputs for the estimation of JLL-based models}
 
-\item{WishBRW}{Whether the user wishes to estimate the physical parameter model with the Bias correction model from BRW (2012) (see "Bias_Correc_VAR" function).\cr
-Default is set to 0.}
+\item{WishBRW}{Whether the user wishes to estimate the physical parameter model with the Bias correction model from BRW (2012) (see "Bias_Correc_VAR" function). Default is set to 0.}
 
-\item{BRWlist}{list of necessary inputs for performing the bias-corrected estimation (see "Bias_Correc_VAR" function)}
+\item{BRWlist}{List of necessary inputs for performing the bias-corrected estimation (see "Bias_Correc_VAR" function)}
 
 \item{nlag}{Number of lags in the P-dynamics. Default is set to 1.}
 }

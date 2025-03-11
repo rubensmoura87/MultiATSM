@@ -14,9 +14,9 @@ BuildYields_BS(
 )
 }
 \arguments{
-\item{ModelParaPE}{list of point estimates of the model parameter}
+\item{ModelParaPE}{List of point estimates of the model parameter}
 
-\item{ModelType}{string-vector containing the label of the model to be estimated}
+\item{ModelType}{String-vector containing the label of the model to be estimated}
 
 \item{RiskFactors_BS}{Time-series of the risk factors (F x T)}
 
@@ -24,7 +24,7 @@ BuildYields_BS(
 
 \item{BS_Set}{Set of bootstrap inputs}
 
-\item{Economies}{string-vector containing the names of the economies which are part of the economic system}
+\item{Economies}{String-vector containing the names of the economies which are part of the economic system}
 }
 \description{
 Build the time-series of bond yields for each bootstrap draw

@@ -7,15 +7,15 @@
 AdjustOptm_BS(ModelType, ModelBootstrap, Draw_Opt, Economies, tt)
 }
 \arguments{
-\item{ModelType}{string-vector containing the label of the model to be estimated}
+\item{ModelType}{String-vector containing the label of the model to be estimated}
 
 \item{ModelBootstrap}{List to store the bootstrap set}
 
 \item{Draw_Opt}{List of model estimated parameters}
 
-\item{Economies}{string-vector containing the names of the economies which are part of the economic system}
+\item{Economies}{String-vector containing the names of the economies which are part of the economic system}
 
-\item{tt}{number of the bootstrap draw}
+\item{tt}{Number of the bootstrap draw}
 }
 \description{
 Gathers the estimate of the bootstrap draws

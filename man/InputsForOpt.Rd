@@ -62,6 +62,12 @@ An object of class 'ATSMModelInputs' containing the necessary inputs for perform
 \description{
 Generates inputs necessary to build the likelihood function for the ATSM model
 }
+\section{Available Methods}{
+
+- `print(object)`
+- `summary(object)`
+}
+
 \examples{
 \donttest{
 # Example 1:

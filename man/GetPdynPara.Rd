@@ -29,6 +29,8 @@ GetPdynPara(
 \item{GVARinputs}{list of necessary inputs for the estimation of GVAR-based models (see "GVAR" function)}
 
 \item{JLLinputs}{list of necessary inputs for the estimation of JLL-based models (see "JLL" function)}
+
+\item{CheckInputs}{Logical. Whether to perform a prior check on the consistency of the provided input list. Default is FALSE.}
 }
 \description{
 Compute the parameters used in the P-dynamics of the model

@@ -11,11 +11,11 @@ ChecksOOS(t0Forecast, t0Sample, nForecasts, ForecastType, TimeLength)
 
 \item{t0Sample}{Index of the first set of observations in the information set at the first forecasting round}
 
-\item{nForecasts}{number of forecasting sets generated}
+\item{nForecasts}{Number of forecasting sets generated}
 
 \item{ForecastType}{Forecast type. Available options are "Rolling" and "Expanding".}
 
-\item{TimeLength}{time-series dimension of the model}
+\item{TimeLength}{Time-series dimension of the model}
 }
 \description{
 Preliminary checks for inputs provided for the performing out-of-sample forecasting

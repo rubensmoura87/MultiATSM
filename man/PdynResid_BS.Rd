@@ -7,11 +7,11 @@
 PdynResid_BS(ModelType, Economies, ModelPara_PE)
 }
 \arguments{
-\item{ModelType}{string-vector containing the label of the model to be estimated}
+\item{ModelType}{A character vector containing the label of the model to be estimated}
 
 \item{Economies}{A character vector containing the names of the economies included in the system.}
 
-\item{ModelPara_PE}{point estimate from the model parameters}
+\item{ModelPara_PE}{Point estimate from the model parameters}
 }
 \description{
 Compute some key parameters from the P-dynamics (Bootstrap set)

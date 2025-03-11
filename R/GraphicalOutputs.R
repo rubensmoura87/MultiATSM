@@ -13,11 +13,8 @@
 GraphicalOutputs <- function(ModelType, ModelPara, NumOut, InputsForOutputs, Economies, FactorLabels){
 
 # Generate the graph paths and the graph folders
-  # Create the folder output folder in which the outputs will be stored
-  dir.create(paste(tempdir(), "/Outputs", sep=""))
-  dir.create(paste(tempdir(), "/Outputs/",  ModelType, sep=""))
-  dir.create(paste(tempdir(), "/Outputs/",  ModelType, "/Point Estimate", sep=""))
-
+  dirs <- c("Outputs", paste0("Outputs/", ModelType), paste0("Outputs/", ModelType, "/Point Estimate"))
+  lapply(file.path(tempdir(), dirs), dir.create, recursive = TRUE, showWarnings = FALSE)
 
   PathsGraphs <- FolderCreationPoint(ModelType, Economies)
 
@@ -26,11 +23,11 @@ GraphicalOutputs <- function(ModelType, ModelPara, NumOut, InputsForOutputs, Eco
 
   cat(" 2.3) Generating the graphs of interest \n")
 
+  if (ModelType %in% c("JPS original", "JPS global",  "GVAR single")){
+    for (i in 1:length(Economies)){dir.create(paste(tempdir(),"/Outputs/", ModelType, "/Point Estimate/Model ", Economies[i], sep=""))}}
+
   # 2) Model fit
   Fitgraphs(ModelType, InputsForOutputs[[ModelType]]$Fit$WishGraphs, ModelPara, NumOut, Economies, PathsGraphs)
-
-  if (any(ModelType == c("JPS original", "JPS global",  "GVAR single"))){
-  for (i in 1:length(Economies)){dir.create(paste(tempdir(),"/Outputs/", ModelType, "/Point Estimate/Model ", Economies[i], sep=""))}}
 
   # 3) IRF and GIRF
   if (any(ModelType == c("JLL original",  "JLL No DomUnit",  "JLL joint Sigma"))){
@@ -197,14 +194,14 @@ Fitgraphs  <- function(ModelType, WishFitgraphs, ModelPara, NumOut, Economies, P
   if (WishFitgraphs== 0){cat("No graphs for bond yields fit were generated \n")
   }else{
 
-    cat(' ** Bond yields Fit \n' )
+    cat(' ** Fit of bond yields \n' )
 
     C <- length(Economies)
 
     # 1) Models estimated individually
     if ( any(ModelType == c("JPS original", "JPS global", "GVAR single"))){
     for( i in 1:C){
-      dir.create( paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/Model ", Economies[i], "/Fit", sep=""))
+    dir.create( paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/Model ", Economies[i], "/Fit", sep=""))
 
 
     mat <- (ModelPara[[ModelType]][[Economies[i]]]$inputs$mat)*12
@@ -278,7 +275,7 @@ IRFandGIRFgraphs <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsg
       Lab_Fac <-  "GIRFFactors_shock_to_"; Lab_Yield <- "GIRFYields_shock_to_"
     } else if(OutputType == "IRF Ortho"){  cat(' ** IRFs-Ortho \n')
       Lab_Fac <-  "IRFFactors_shock_to_"; Lab_Yield <- "IRFYields_shock_to_"
-    } else{ cat(' ** GIRF Ortho \n')
+    } else{ cat(' ** GIRFs-Ortho \n')
       Lab_Fac <-  "GIRFFactors_shock_to_" ; Lab_Yield <- "GIRFYields_shock_to_"}
 
 
@@ -434,7 +431,7 @@ FEVDandGFEVDgraphs <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYield
       Lab_Fac <-  "GFEVDFactors_"; Lab_Yield <- "GFEVDYields_"
     } else if(OutputType == "FEVD Ortho"){  cat(' ** FEVDs-Ortho \n')
       Lab_Fac <-  "FEVDFactors_ORTHO_"; Lab_Yield <- "FEVDYields_ORTHO_"
-    } else{ cat(' ** GFEVD Ortho \n')
+    } else{ cat(' ** GFEVDs-Ortho \n')
       Lab_Fac <-  "GFEVDFactors_ORTHO_" ; Lab_Yield <- "GFEVDYields_ORTHO_"}
 
 
@@ -1447,7 +1444,7 @@ Wished_Graphs_FEVDandGFEVD <- function(InputsForOutputs, OutType, ModelType){
       RiskGraphs <- InputsForOutputs[[ModelType]]$FEVD$WishGraphs$RiskFactors
       YieldGraphs <- InputsForOutputs[[ModelType]]$FEVD$WishGraphs$Yields
 
-    }else if(OutType == "GFEVD"){
+    } else if (OutType == "GFEVD"){
       RiskGraphs <- InputsForOutputs[[ModelType]]$GFEVD$WishGraphs$RiskFactors
       YieldGraphs <- InputsForOutputs[[ModelType]]$GFEVD$WishGraphs$Yields
 

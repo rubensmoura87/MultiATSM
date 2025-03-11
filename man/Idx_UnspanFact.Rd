@@ -7,11 +7,11 @@
 Idx_UnspanFact(RiskFactors_TS, FactorLabels, Economies)
 }
 \arguments{
-\item{RiskFactors_TS}{time series of risk factors for the jointly estimated models (CJ x T)}
+\item{RiskFactors_TS}{Time series of risk factors for the jointly estimated models (CJ x T)}
 
-\item{FactorLabels}{a string-list based which contains all the labels of all the variables present in the model}
+\item{FactorLabels}{A string-list based which contains all the labels of all the variables present in the model}
 
-\item{Economies}{string-vector containing the names of the economies which are part of the economic system}
+\item{Economies}{String-vector containing the names of the economies which are part of the economic system}
 }
 \description{
 Obtain the indexes of both the domestic and global unspanned factors

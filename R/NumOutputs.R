@@ -44,6 +44,7 @@ NumOutputs <- function(ModelType, ModelPara, InputsForOutputs, FactorLabels, Eco
 
   # Generate graphs, if previously selected
   GraphicalOutputs(ModelType, ModelPara, AllNumOutputs, InputsForOutputs, Economies, FactorLabels)
+
   return(AllNumOutputs)
 }
 
@@ -54,7 +55,7 @@ NumOutputs <- function(ModelType, ModelPara, InputsForOutputs, FactorLabels, Eco
 #'
 #'@param ModelType string-vector containing the label of the model to be estimated
 #'@param ModelPara list of model parameter estimates (See the "Optimization" function)
-#'@param InputsForOutputs list conataining the desired horizon of analysis for the model fit, IRFs, GIRFs, FEVDs, GFEVDs,
+#'@param InputsForOutputs list containing the desired horizon of analysis for the model fit, IRFs, GIRFs, FEVDs, GFEVDs,
 #'                        and risk premia decomposition
 #'@param FactorLabels string-list based which contains all the labels of all the variables present in the model
 #'@param Economies string-vector containing the names of the economies which are part of the economic system
@@ -102,15 +103,13 @@ OutputConstruction <- function(ModelType, ModelPara, InputsForOutputs, FactorLab
 
 VarianceExplained <- function(ModelType, ModelPara, FactorLabels, Economies){
 
-C <- length(Economies)
 N <- length(FactorLabels$Spanned)
 
 Total_Var_exp <- list()
 
-
 # Models estimated individually
 if ( any(ModelType == c("JPS original", "JPS global", "GVAR single"))){
-  for (i in 1:C){
+  for (i in 1:length(Economies)){
     H <- eigen(stats::cov(t(ModelPara[[ModelType]][[Economies[i]]]$inputs$Y)))$values
     percentages_explained <- cumsum(H)/sum(H)
     Total_Var_exp[[i]] <-percentages_explained[1:N]
@@ -120,7 +119,7 @@ if ( any(ModelType == c("JPS original", "JPS global", "GVAR single"))){
   # Models estimated jointly
   J <- length(ModelPara[[ModelType]]$inputs$mat)
   idx0 <- 0
-  for (i in 1:C){
+  for (i in 1:length(Economies)){
     idx1 <- idx0 + J
     H <- eigen(stats::cov(t(ModelPara[[ModelType]]$inputs$Y[(idx0+1):idx1,])))$values
     percentages_explained <- cumsum(H)/sum(H)
@@ -312,12 +311,13 @@ IRFandGIRF <- function(ModelType, ModelPara, IRFhoriz, FactorLabels, Economies){
   } else{
 
   # 2) JOINT COUNTRY MODELS
+    JLL_Label <- c("JLL original", "JLL No DomUnit", "JLL joint Sigma")
     J <- length(ModelPara[[ModelType]]$inputs$mat)
     K <- nrow(ModelPara[[ModelType]]$inputs$AllFactors)
     YieldsLabel<- rownames(ModelPara[[ModelType]]$inputs$Y) # Yield labels
 
     # a) Summarize inputs for the IRFs
-    if ( any(ModelType ==c("JLL original", "JLL No DomUnit", "JLL joint Sigma"))){
+    if ( ModelType %in% JLL_Label){
       SIGMA <- ModelPara[[ModelType]]$ests$JLLoutcomes$Sigmas$Sigma_Y # For JLL models, we selected the cholesky factor, which won't be compute inside "the"ComputeIRFs"
     }else{  SIGMA <- ModelPara[[ModelType]]$ests$SSZ} # KxK (variance-covariance matrix)
 
@@ -330,17 +330,19 @@ IRFandGIRF <- function(ModelType, ModelPara, IRFhoriz, FactorLabels, Economies){
 
     # c) Compute GIRFs
     G0.y <- ModelPara[[ModelType]]$ests$Gy.0
+    if ( ModelType %in% JLL_Label){ SIGMA <- ModelPara[[ModelType]]$ests$JLLoutcomes$Sigmas$VarCov_NonOrtho }
     GIRFs <- ComputeGIRFs(SIGMA, K1Z, B, G0.y, FactorLabels, K, C*J, IRFhoriz, YieldsLabel, ModelType)
     GIRFoutputs[[ModelType]] <- GIRFs # Store Country specific GIRFs
 
 
     # 3) JLL-BASED MODELS (orthogonalized outputs)
-    if (any(ModelType == c("JLL original", "JLL No DomUnit", "JLL joint Sigma"))){
+    if (ModelType %in% JLL_Label){
 
       # Summarize inputs for the IRFs
       K1Ze <- ModelPara[[ModelType]]$ests$JLLoutcomes$k1_e # KxK (feedback matrix)
       PI <- ModelPara[[ModelType]]$ests$JLLoutcomes$PI
       Se <- ModelPara[[ModelType]]$ests$JLLoutcomes$Sigmas$Sigma_Ye
+      SIGMA_e <- ModelPara[[ModelType]]$ests$JLLoutcomes$Sigmas$VarCov_Ortho
 
       # a) Compute IRFs orthogonalized
       IRFOrtho <- list()
@@ -355,7 +357,7 @@ IRFandGIRF <- function(ModelType, ModelPara, IRFhoriz, FactorLabels, Economies){
 
       # b) Compute GIRFs orthogonalized
       GIRFsOrtho <- list()
-      GIRFsOrtho[[ModelType]] <- ComputeGIRFs(SIGMA, K1Z, B, G0.y, FactorLabels, K, C*J, IRFhoriz, YieldsLabel,
+      GIRFsOrtho[[ModelType]] <- ComputeGIRFs(SIGMA_e, K1Ze, B, G0.y, FactorLabels, K, C*J, IRFhoriz, YieldsLabel,
                                               ModelType, PI = PI, Mode = "Ortho")
 
       # Gather Outputs
@@ -573,10 +575,8 @@ Y_ModImp <- function(ALoad, BLoad, K0Z, K1Z, PdynFact, MatLength, TDim, YieldLab
   }
   dimnames(YieldModelImplied) <- YieldLab
 
-
   return(YieldModelImplied)
 }
-
 
 #####################################################################################################
 #' Transform B_spanned into B_unspanned for jointQ models
@@ -594,7 +594,7 @@ Y_ModImp <- function(ALoad, BLoad, K0Z, K1Z, PdynFact, MatLength, TDim, YieldLab
 
 BUnspannedAdapJoint <- function(G,M,N,C, J, BSpanned){
 
-  K <- C*(N+M) +G
+  K <- C*(N+M) + G
   CJ <- C*J
 
   BUnspanned <- matrix(0, nrow=CJ, ncol= K)
@@ -612,7 +612,6 @@ BUnspannedAdapJoint <- function(G,M,N,C, J, BSpanned){
     idxB <- idxBB +M
     idxC <- idxCC
   }
-
 
   return(BUnspanned)
 }
@@ -642,11 +641,8 @@ BUnspannedAdapSep <- function(G,M, ModelPara, Economies, Economy, ModelType){
     BUnspanned <- matrix(0, nrow=J, ncol= K)
     BSpanned <- ModelPara[[ModelType]][[Economies[i]]]$rot$P$B
     BUnspanned[ , (K-N+1):K] <-  BSpanned
-  }
 
-
-
-  else if( any(ModelType == c("JPS global","GVAR single" ))){
+  } else if ( ModelType %in% c("JPS global","GVAR single" )){
     K <- C*(N+M) + G
     BUnspanned <- matrix(0, nrow=J, ncol= K)
     BSpanned <- ModelPara[[ModelType]][[Economies[i]]]$rot$P$B
@@ -661,7 +657,6 @@ BUnspannedAdapSep <- function(G,M, ModelPara, Economies, Economy, ModelType){
 
     BUnspanned[ , IDX[[i]]] <-  BSpanned
   }
-
 
   return(BUnspanned)
 }
@@ -714,7 +709,6 @@ ComputeIRFs <- function(SIGMA, K1Z, BLoad, FactorLabels, FacDim, MatLength, IRFh
 
   Horiz <- t(t(0:(IRFhoriz-1))) #Add a column for horizon of interest
 
-
   # 3) Adjust the variable labels
   # Factor Labels
   if ( ModelType == "JPS original") {AllFactorsLabels <- c(FactorLabels$Global, FactorLabels$Tables[[Economy]])}
@@ -729,7 +723,7 @@ ComputeIRFs <- function(SIGMA, K1Z, BLoad, FactorLabels, FacDim, MatLength, IRFh
 
   return(Out)
 }
-##########################################################################################################
+
 ##########################################################################################################
 #'Compute GIRFs for all models
 #'
@@ -808,16 +802,14 @@ ComputeGIRFs <- function(Sigma.y, F1, BLoad, G0.y, FactorLabels,  FacDim, MatLen
     labelsGIRF <-  c(FactorLabels$Global, FactorLabels$Tables$AllCountries)
   }else{ labelsGIRF <-  c(FactorLabels$Global, FactorLabels$Tables$AllCountries)}
 
-  # 4.1) Add columns containig the horizons
+  # 4.1) Add columns containing the horizons
   Horiz <- t(t(0:(GIRFhoriz-1))) #Add a column for horizon of interest
 
   # 4.2) Labels
   dimnames(GIRFFactors) <- list(Horiz, labelsGIRF, labelsGIRF)
   dimnames(GIRFYields) <- list(Horiz, YieldsLabel, labelsGIRF)
 
-
   GIRFoutputs <- list(Factors = GIRFFactors, Yields = GIRFYields)
-
 
   return(GIRFoutputs)
 }
@@ -1062,7 +1054,7 @@ ComputeGFEVDs <- function(SIGMA, K1Z, G0, BLoad, FactorLabels, FacDim, MatLength
 
   return(Out)
 }
-########################################################################################################
+
 ########################################################################################################
 #' Fit yields for all maturities of interest
 #'
@@ -1145,7 +1137,6 @@ else if (any(ModelType == c("JPS global", 'GVAR single'))){ AllLabels <- c(Facto
 }
 
 
-########################################################################################################
 ########################################################################################################
 #' Fit yields for all maturities of interest
 #'
@@ -1274,7 +1265,7 @@ ExpectedComponent <- function(ModelPara, InputsForOutputs, ModelType, Economies,
     matMAX <- InputsForOutputs[[ModelType]]$ForwardPremia$Limits[2]
   }
 
-  #1) Compute risk-neutral parameters
+  # 1) Compute risk-neutral parameters
   rhos <- rhoParas(ModelPara, N, ModelType, Economies)
 
   # 2) Compute the expectation component
@@ -1619,4 +1610,38 @@ ForwardPremia <- function(ModelPara, avexpFP, ModelType, FactorLabels, InputsFor
   names(OutputFP) <- c("Forward Premia","Expected Component", "Forward Rate")
 
   return(OutputFP)
+}
+
+################################################################################################################
+#' Find the indexes of the spanned factors
+#'
+#'@param ModelType string-vector containing the label of the model to be estimated
+#'@param FactorLabels string-list based which contains the labels of all the variables present in the model
+#'@param Economies  string-vector containing the names of the economies which are part of the economic system
+#'
+#'@keywords internal
+
+IdxAllSpanned <- function(ModelType, FactorLabels, Economies){
+
+  G <- length(FactorLabels$Global)
+  N <- length(FactorLabels$Spanned)
+  M <- length(FactorLabels$Domestic) - N
+  C <- length(Economies)
+
+  IdxSpanned <- c()
+
+  if (ModelType== "JPS original"){ IdxSpanned <- (G+M+1):(G+M+N) } else{
+    idxSpa0 <- G + M
+    for (j in 1:C){
+      idxSpa1 <- idxSpa0 + N
+
+      if (j ==1){ IdxSpanned <- (idxSpa0+1):idxSpa1
+      }  else{
+        IdxSpanned <- c(IdxSpanned, (idxSpa0+1):idxSpa1)
+      }
+      idxSpa0 <- idxSpa1 + M
+    }
+  }
+
+  return(IdxSpanned)
 }
