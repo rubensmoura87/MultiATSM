@@ -1,8 +1,8 @@
 Package: MultiATSM
 Type: Package
 Title: Multicountry Term Structure of Interest Rates Models
-Version: 1.2.0
-Date: 2025-01-27
+Version: 1.3.0
+Date: 2025-03-24
 Authors@R: 
     person("Rubens", "Moura", , "rubens.gtmoura@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0001-8105-4729"))
