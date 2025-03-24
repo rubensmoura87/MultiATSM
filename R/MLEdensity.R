@@ -528,9 +528,9 @@ OptOutputs <- function(Y, Z, mat, N, dt, Wpca, K1XQ, SSZ, LoadAs, LoadBs, r0, se
   # a) Build LIST 1
   # a.1) List "input"
   inputs <- list(Y = Y, AllFactors = Z, mat = mat, N = N, dt = dt, Wpca = Wpca)
-  if (any(ModelType == c("GVAR single", "GVAR multi"))) {
+  if (ModelType  %in% c("GVAR single", "GVAR multi")) {
     inputs$Wgvar <- GVARinputs$Wgvar
-  } else if (any(ModelType == c("JLL original", "JLL No DomUnit", "JLL joint Sigma"))) {
+  } else if (ModelType %in% c("JLL original", "JLL No DomUnit", "JLL joint Sigma")) {
     inputs$DomUnit <- JLLinputs$DomUnit
   }
 

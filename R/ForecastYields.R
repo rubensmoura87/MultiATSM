@@ -304,7 +304,7 @@ YieldFor <- function(ModelParaList, ForHoriz, Economies, FactorLabels, ForLabels
     ForecastYields <- list()
     for (i in 1:length(Economies)){
     A <- ModelParaList[[ModelType]][[Economies[i]]]$rot$P$A
-    Bfull <- BUnspannedAdapSep(G, M, ModelParaList, Economies, Economy = Economies[i], ModelType)
+    Bfull <- BUnspannedAdapSep(G, M, ModelParaList[[ModelType]], Economies, Economy = Economies[i], ModelType)
     K0Z <- ModelParaList[[ModelType]][[Economies[i]]]$ests$K0Z
     K1Z <- ModelParaList[[ModelType]][[Economies[i]]]$ests$K1Z
 

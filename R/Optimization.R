@@ -146,7 +146,7 @@ if (any(ModelType ==c('JPS original', 'JPS global', "GVAR single"))){
     cat(paste(" ... for country:", Economies[i], ". This may take several minutes. \n"))
      ModelParaList[[ModelType]][[Economies[i]]] <- Optimization_PE(f, VarLab, FactorLabels, Economies, ModelType,
                                                                 JLLinputs, GVARinputs, tol, TimeCount= TimeCount)}
-}else{
+} else {
 
   # 1) Build the objective function
   f <- Functionf(MLEinputs, Economies, DataFreq, FactorLabels, ModelType, BS_outputs)
@@ -208,47 +208,45 @@ ParaLabelsOpt <- function(ModelType, WishStationarityQ, MLEinputs, BS_outputs = 
 
   ParaLabelsList <- list()
 
-  ParaLabelsList[[ModelType]][["r0"]] <- "@r0: bounded"
-  ParaLabelsList[[ModelType]][["se"]] <- "@se: bounded"
-  ParaLabelsList[[ModelType]][["K0Z"]] <- "@K0Z: bounded"
-  ParaLabelsList[[ModelType]][["K1Z"]] <- "@K1Z: bounded"
+  ParaLabelsList[[ModelType]]$r0 <- "@r0: bounded"
+  ParaLabelsList[[ModelType]]$se <- "@se: bounded"
+  ParaLabelsList[[ModelType]]$K0Z <- "@K0Z: bounded"
+  ParaLabelsList[[ModelType]]$K1Z <- "@K1Z: bounded"
 
   # K1XQ
   K1XQType <- K1XQStationary(WishStationarityQ)$SepQ
 
-  if (any(ModelType == c("JPS original", "JPS global", 'GVAR single'))){
-    ParaLabelsList[[ModelType]][["K1XQ"]] <- K1XQStationary(WishStationarityQ)$SepQ
+  if (ModelType %in% c("JPS original", "JPS global", 'GVAR single')) {
+    ParaLabelsList[[ModelType]]$K1XQ <- K1XQStationary(WishStationarityQ)$SepQ
   } else {
-    ParaLabelsList[[ModelType]][["K1XQ"]] <- K1XQStationary(WishStationarityQ)$JointQ
+    ParaLabelsList[[ModelType]]$K1XQ <- K1XQStationary(WishStationarityQ)$JointQ
   }
 
 
   # SSZ
-  if (any(ModelType == c("JPS original", "JPS global", 'JPS multi'))){ ParaLabelsList[[ModelType]][["SSZ"]] <- "SSZ: psd" }
-  else if (any(ModelType == c("GVAR single", 'GVAR multi'))){  ParaLabelsList[[ModelType]][["SSZ"]] <- "SSZ: BlockDiag" }
-  else if (any(ModelType == c("JLL original", "JLL No DomUnit"))){ ParaLabelsList[[ModelType]][["SSZ"]] <- "@SSZ: bounded" } # Variance-covariance matrix is not estimated under Q
-  else if (ModelType == "JLL joint Sigma"){ ParaLabelsList[[ModelType]][["SSZ"]] <- "SSZ: JLLstructure" }
+  if (ModelType %in% c("JPS original", "JPS global", 'JPS multi')){ ParaLabelsList[[ModelType]]$SSZ <- "SSZ: psd" }
+  else if (ModelType %in% c("GVAR single", 'GVAR multi')){  ParaLabelsList[[ModelType]]$SSZ <- "SSZ: BlockDiag" }
+  else if (ModelType %in% c("JLL original", "JLL No DomUnit")){ ParaLabelsList[[ModelType]]$SSZ <- "@SSZ: bounded" } # Variance-covariance matrix is not estimated under Q
+  else if (ModelType == "JLL joint Sigma"){ ParaLabelsList[[ModelType]]$SSZ <- "SSZ: JLLstructure" }
   # Ensures that the structure of the Variance-covariance matrix of the JLL is preserved
-
 
   # 3.2) Initial guesses for Variables that will be concentrated out of from the log-likelihood function
   K1XQ <- MLEinputs$K1XQ
-  if (any(ModelType == c("JLL original", "JLL No DomUnit"))){ SSZ <- NULL} else{SSZ <- MLEinputs$SSZ}
+  if (ModelType  %in% c("JLL original", "JLL No DomUnit")){ SSZ <- NULL} else{SSZ <- MLEinputs$SSZ}
 
   # Prepare list for optimization
   VarArgList <- list()
-  VarArgList$K1XQ <- list(K1XQ, ParaLabelsList[[ModelType]][["K1XQ"]] , NULL , NULL)
-  VarArgList$SSZ <- list(SSZ, ParaLabelsList[[ModelType]][["SSZ"]], NULL, NULL)
-  VarArgList$r0 <- list(NULL, ParaLabelsList[[ModelType]][["r0"]], NULL, NULL)
-  VarArgList$se <- list(NULL, ParaLabelsList[[ModelType]][["se"]], 1e-6, NULL)
-  VarArgList$K0Z <- list(NULL, ParaLabelsList[[ModelType]][["K0Z"]], NULL, NULL)
-  VarArgList$K1Z <- list(NULL, ParaLabelsList[[ModelType]][["K1Z"]], NULL, NULL)
+  VarArgList$K1XQ <- list(K1XQ, ParaLabelsList[[ModelType]]$K1XQ , NULL , NULL)
+  VarArgList$SSZ <- list(SSZ, ParaLabelsList[[ModelType]]$SSZ, NULL, NULL)
+  VarArgList$r0 <- list(NULL, ParaLabelsList[[ModelType]]$r0, NULL, NULL)
+  VarArgList$se <- list(NULL, ParaLabelsList[[ModelType]]$se, 1e-6, NULL)
+  VarArgList$K0Z <- list(NULL, ParaLabelsList[[ModelType]]$K0Z, NULL, NULL)
+  VarArgList$K1Z <- list(NULL, ParaLabelsList[[ModelType]]$K1Z, NULL, NULL)
 
-  if (BS_outputs){VarArgList$OptRun <- "fminunc only"} else{  VarArgList$OptRun <- "iter off"}
+  if (BS_outputs){VarArgList$OptRun <- "fminunc only"} else {  VarArgList$OptRun <- "iter off"}
 
   LabelVar <- c('Value', 'Label', 'LB', 'UB') # Elements of each parameter
   for (d in 1:(length(VarArgList)-1)){ names(VarArgList[[d]]) <-  LabelVar}
-
 
   return(VarArgList)
 }
@@ -345,26 +343,26 @@ OptimizationSetup_ATSM <- function(AuxVecSet, FFvec, EstType, tol= 1e-4){
 
   }
   cat('-- Done! \n')
-return(AuxVecSet)
+
+  return(AuxVecSet)
   }
 #######################################################################################################
 #' Set up the vector-valued objective function (Point estimate)
-
-#'@param MLEinputs Set of inputs that are necessary to the log-likelihood function
-#'@param Economies string-vector containing the names of the economies which are part of the economic system
-#'@param DataFrequency  character-based vector: "Daily All Days", "Daily Business Days", "Weekly", "Monthly", "Quarterly", "Annually"
-#'@param FactorLabels string-list based which contains the labels of all the variables present in the model
-#'@param ModelType string-vector containing the label of the model to be estimated
-#'@param BS_outType Generates simplified output list in the bootstrap setting. Default is set to FALSE.
 #'
+#' @param MLEinputs Set of inputs that are necessary to the log-likelihood function
+#' @param Economies string-vector containing the names of the economies which are part of the economic system
+#' @param DataFrequency  character-based vector: "Daily All Days", "Daily Business Days", "Weekly", "Monthly", "Quarterly", "Annually"
+#' @param FactorLabels string-list based which contains the labels of all the variables present in the model
+#' @param ModelType string-vector containing the label of the model to be estimated
+#' @param BS_outType Generates simplified output list in the bootstrap setting. Default is set to FALSE.
 #'
-#'@examples
+#' @examples
 #' # See examples in the vignette file of this package (Section 4).
 #'
-#'@returns
+#' @returns
 #'objective function
 #'
-#'@keywords internal
+#' @keywords internal
 
 Functionf <- function(MLEinputs, Economies, DataFrequency, FactorLabels, ModelType, BS_outType = FALSE){
 
@@ -379,7 +377,7 @@ Functionf <- function(MLEinputs, Economies, DataFrequency, FactorLabels, ModelTy
                                   MLEinputs$WpcaFull, dt, Economies, FactorLabels, ModelType, MLEinputs$GVARinputs,
                                   MLEinputs$JLLinputs, BS_outType)
 
-  } else{
+  } else {
     # 2) If one choose models in which the estimation is done jointly for all countries of the system with
     # the Sigma matrix estimated exclusively under the P-dynamics
 
@@ -415,9 +413,9 @@ FF <- function(x0, FFvectorized) {
 
 FFtemporary <- function(xtemp, scaling_vector, FFvectorized){
     scaled_xtemp <- scaling_vector * xtemp
-    return(FF(x0 = scaled_xtemp, FFvectorized = FFvectorized))  # Call FF with the scaled version
-  }
 
+  return(FF(x0 = scaled_xtemp, FFvectorized = FFvectorized))  # Call FF with the scaled version
+  }
 
 ####################################################################################################
 #' Update the list of parameters
@@ -462,7 +460,7 @@ ParaATSM_opt_ALL <- function(Update_Temp, FF_opt, AuxVecSet_opt, ParaLabels){
 #' @param f function which contains vector (J x T) valued function handle
 #' @param x parameter values
 #'
-#'@keywords internal
+#' @keywords internal
 #'
 #' @return
 #' transformed matrix (MN x JT)

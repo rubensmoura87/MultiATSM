@@ -320,15 +320,8 @@ ImposeStat_True <- function(x, K1Q){
 
 True_PSD <- function(ParaValue, Const_Type){
 
-  # Preliminary work
-  i <- unlist(gregexpr("psd", Const_Type))
-  i <- i[1]
-  M <- as.numeric(substr(Const_Type, start = i + 3, stop = nchar(Const_Type)))
-  if (is.na(M)) { M <- 1 }
-
   # Rebuild true PSD matrix
-  N <- floor(sqrt(2 * length(ParaValue) / M))
-  k <- round(N * (N + 1) / 2)
+  N <- floor(sqrt(2 * length(ParaValue)))
 
   MatOnes <- matrix(1, nrow = N, ncol = N)
   idx <- matrix(1:(N * N), c(N, N))
@@ -339,12 +332,8 @@ True_PSD <- function(ParaValue, Const_Type){
   convt[index1, ] <- diag(N * (N + 1) / 2)
   convt[index2, ] <- diag(N * (N + 1) / 2) # creates indexes to ensure that variance-covariance matrix is symmetric.
 
-  Mat_psd <- NULL
-
-  for (i in 1:M){
-    m <- matrix(convt %*% ParaValue[((i - 1) * k + 1):(k * i)], N, N)
-    Mat_psd <- cbind(Mat_psd, m %*% t(m)) # Note: the maximization is made with parameters of SSP^(1/2)
-  }
+  m <- matrix(convt %*% ParaValue, N, N)
+  Mat_psd <-  m %*% t(m) # Note: the maximization is made with parameters of SSP^(1/2)
 
   return(Mat_psd)
 }
@@ -414,13 +403,11 @@ True_BlockDiag <- function(ParaValue, Const_Type, FactorLabels, Economies, GVARi
   idx0 <- 0
   b <- NULL
 
-  AAAA <- list() # DELETE!
   for (j in 1:(C + 1)){
     idx1 <- idx0 + step[j]
 
     if (idx0 < idx1) { seq_indices <- seq(idx0 + 1, idx1) } else { seq_indices <- integer(0) }
     d <- ParaValue[seq_indices]
-    AAAA[[j]] <- d
 
     if (length(d) == 0) { btemp <- matrix(, nrow = 0, ncol = 0) } else {
       N <- floor(sqrt(2 * length(d) / M))
@@ -463,49 +450,24 @@ True_BlockDiag <- function(ParaValue, Const_Type, FactorLabels, Economies, GVARi
 
 True_JLLstruct <- function(ParaValue, Const_Type, FactorLabels, Economies, JLLinputs){
 
-  # Preliminary work
-  i <- unlist(gregexpr("JLLstructure", Const_Type))
-  i <- i[1]
-  M <- as.numeric(substr(Const_Type, start = i + 13, stop = nchar(Const_Type)))
-  if (is.na(M)) { M <- 1 }
-
   # Rebuild the true parameter
   G <- length(FactorLabels$Global)
   K <- length(FactorLabels$Domestic)
   C <- length(Economies)
   Nspa <- length(FactorLabels$Spanned)
   Macro <- K - Nspa
-  N <- C * K + G # Total number of factors of the model
+  R <- C * K + G # Total number of factors of the model
 
-  ZeroIdxSigmaJLL <- IDXZeroRestrictionsJLLVarCovOrtho(Macro, Nspa, G, Economies, JLLinputs$DomUnit)$VarCovOrtho
-  MatOnes <- matrix(1, nrow = N, ncol = N)
+  ZeroIdxSigmaJLL <- IDXZeroRestrictionsJLLVarCovOrtho(Macro, Nspa, G, Economies, JLLinputs$DomUnit)$Sigma_Ye
+  MatOnes <- matrix(1, nrow = R, ncol = R)
   MatOnes[ZeroIdxSigmaJLL] <- 0
   IdxNONzeroSigmaJLL <- which(MatOnes != 0 & MatOnes == 1 & lower.tri(MatOnes, diag = TRUE))
 
-  k <- round(N * (N + 1) / 2)
-
   # Redefine the vector of parameters to be maximized to include also the zeros restrictions
-  abc <- matrix(0, N, N)
+  abc <- matrix(0, R, R)
   abc[IdxNONzeroSigmaJLL] <- ParaValue # include the non-zero elements
-  abc <- abc[lower.tri(abc, diag = TRUE)] # vector including the zero restrictions
 
-  # Collect the indexes to ensure that the matrix is symmetric
-  idx <- matrix(1:(N * N), c(N, N))
-  Mat1s <- matrix(1, nrow = N, ncol = N)
-
-  index1 <- t(t(idx[which(Mat1s == 1 & lower.tri(Mat1s, diag = TRUE))]))
-  idx <- t(idx)
-  index2 <- t(t(idx[which(Mat1s == 1 & lower.tri(Mat1s, diag = TRUE))]))
-  convt <- matrix(0, nrow = N * N, ncol = N * (N + 1) / 2)
-  convt[index1, ] <- diag(N * (N + 1) / 2)
-  convt[index2, ] <- diag(N * (N + 1) / 2)
-
-  b <- NULL
-
-  for (i in 1:M){
-    m <- matrix(convt %*% abc[((i - 1) * k + 1):(k * i)], N, N)
-    b <- cbind(b, m %*% t(m)) # Recall that the maximization is made with parameters of SSP^(1/2)
-  }
+  b <- abc %*% t(abc)  # NOTE: b is not identical to SSZ, but this doesn't impact the optimization
 
   return(b)
 }

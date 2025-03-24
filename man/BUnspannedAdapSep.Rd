@@ -4,14 +4,14 @@
 \alias{BUnspannedAdapSep}
 \title{Transform B_spanned into B_unspanned for sepQ models}
 \usage{
-BUnspannedAdapSep(G, M, ModelPara, Economies, Economy, ModelType)
+BUnspannedAdapSep(G, M, ModelPara_Short, Economies, Economy, ModelType)
 }
 \arguments{
 \item{G}{number of global unspanned factors}
 
 \item{M}{number of domestic unspanned factors per country}
 
-\item{ModelPara}{list of model parameter estimates (See the "Optimization" function)}
+\item{ModelPara_Short}{list of model parameter estimates (See the "Optimization" function)}
 
 \item{Economies}{complet set of economies of the economic system}
 

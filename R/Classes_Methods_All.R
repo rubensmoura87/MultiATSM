@@ -172,7 +172,7 @@ summary.ATSMModelOutputs <- function(object, ...) {
       print(round(info$Outs[[Economies[i]]]$rot$P$B, 6))
 
       cat("\n 3) Key Features from the P-measure: \n")
-      cat(" - Number of physical-measure eigenvalues:", Max_Eigen(K1Z), "\n")
+      cat(" - Number of physical-measure eigenvalues greater than one:", Max_Eigen(K1Z), "\n")
 
       if (Max_Eigen(K1Z) > 1){
         cat(" - Some (Generalized) Impulse Response Functions may exhibit explosive behaviour. \n")
@@ -202,7 +202,7 @@ summary.ATSMModelOutputs <- function(object, ...) {
   print(round(info$Outs$rot$P$B, 6))
 
   cat("\n 3) Key Features from the P-measure: \n")
-  cat(" - Number of physical-measure eigenvalues:", Max_Eigen(K1Z), "\n")
+  cat(" - Number of physical-measure eigenvalues greater than one:", Max_Eigen(K1Z), "\n")
 
   if (Max_Eigen(K1Z) > 1){
     cat(" - Some (Generalized) Impulse Response Functions may exhibit explosive behaviour. \n")
@@ -224,7 +224,7 @@ summary.ATSMModelOutputs <- function(object, ...) {
 #' @export
 
 
-  plot.ATSMModelForecast <- function(x, ...) {
+plot.ATSMModelForecast <- function(x, ...) {
 
   info <- attr(x, "ModelForecast")
 

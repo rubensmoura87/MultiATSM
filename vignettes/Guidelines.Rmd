@@ -31,11 +31,11 @@ library(MultiATSM)
 The *MultiATSM* package offers estimation routines and various outputs
 for single and multi-country affine term structure models (ATSMs). All
 the frameworks of this package are based on the unspanned economic risk
-framework from **(JPS, 2014)**. In essence, these models assume the
-absence of arbitrage opportunities, consider a linear state space
-representation of the yield curve dynamics and offer a tractable
-approach to simultaneously combine the traditional yield curve factors
-(spanned factors) along with macroeconomic and financial variables
+framework from @JoslinPriebschSingleton2014  **(JPS, 2014)**. In essence, 
+these models assume the absence of arbitrage opportunities, consider a 
+linear state space representation of the yield curve dynamics and offer 
+a tractable approach to simultaneously combine the traditional yield curve 
+factors (spanned factors) along with macroeconomic variables
 (unspanned factors).
 
 The *MultiATSM* package currently supports the generation of outputs for
@@ -137,11 +137,11 @@ estimate ATSMs from scratch.
 
 The *MultiATSM* package includes modified datasets compared to those
 originally used in @CandelonMoura2023 (CM, 2023) and @CandelonMoura2024
-(CM, 2024) due to limited availability of certain data sources. In some
-cases, simulated data replicating the original methodology is employed.
-To simplify the exposition, the database of CM (2024) is used throughout
-the following sections to demonstrate the package's functions. These
-datasets can be accessed using the `LoadData()` function with the
+(CM, 2024) due to limited availability of certain data sources. As such, 
+in some cases, simulated data replicating the original methodology is 
+employed. To simplify the exposition, the database of CM (2024) is used 
+throughout the following sections to demonstrate the package's functions.
+These datasets can be accessed using the `LoadData()` function with the
 argument *CM_2024*, and similarly, the CM (2023) data with *CM_2023*.
 
 ```{r}
@@ -169,8 +169,9 @@ terminology of JPS (2014), this dataset includes *(i)* country-specific
 **spanned factors** (commonly represented by level, slope, and curvature
 -- see Section \@ref(S:SpaFac) for an intuitive explanation of these
 factors) and *(ii)* a set of country-specific and global **unspanned
-factors**, such as economic growth and inflation. Similar to the bond
-yield data, these economic indicators must be constructed by the user.
+factors**, namely macroeconomic variables such as economic growth and 
+inflation. Similar to the bond yield data, these economic indicators 
+must be constructed by the user.
 
 ```{r}
 data('CM_Factors')
@@ -238,7 +239,7 @@ RiskFac_TS <- DataForEstimation(Initial_Date, Final_Date, Economies, N, FactorLa
 ## Fundamental inputs required for estimation
 
 In order to estimate any ATSM of this package, the user needs to specify
-several general model inputs, namely:
+several general inputs, namely:
 
 **1. Desired ATSM class**
 
@@ -339,13 +340,14 @@ inputs is
 W_type <- 'Sample Mean' # Method to compute the transition matrix
 t_First_Wgvar <- "2000" # First year of the sample
 t_Last_Wgvar <-  "2015" # Last year of the sample
+DataConnectedness <- TradeFlows # Measure of connectedness across countries
 ```
 
 Therefore, a complete *GVARlist* is
 
 ```{r}
-GVARlist <- list( VARXtype = "unconstrained", W_type = "Sample Mean",
-                  t_First_Wgvar = "2000", t_Last_Wgvar = "2015") 
+GVARlist <- list( VARXtype = "unconstrained", W_type = "Sample Mean", t_First_Wgvar = "2000",
+                   t_Last_Wgvar = "2015", DataConnectedness = TradeFlows) 
 ```
 
 Regarding the JLL-ATSM frameworks, it is sufficient to specify the name
@@ -414,10 +416,8 @@ based on the user-provided inputs described in the previous sections,
 which are then directly utilized in the model optimization process. One
 possible use of `InputsForOpt()` is:
 
-```{r,, eval=FALSE}
-data(CM_GlobalMacroFactors)
-data(CM_DomMacroFactors)
-data(CM_Yields)
+```{r, eval=FALSE} 
+LoadData("CM_2024") 
 
 ModelType <- "JPS original"
 Economies <- "Mexico"
@@ -430,8 +430,8 @@ FactorLabels <- LabFac(N, DomVar, GlobalVar, Economies, ModelType)
 
 DataFreq <- "Monthly"
 
-ATSMInputs <- InputsForOpt(t0, tF, ModelType, Yields, GlobalMacroVar, DomesticMacroVar,
-                         FactorLabels, Economies, DataFreq,CheckInputs = FALSE)
+ATSMInputs <- InputsForOpt(t0, tF, ModelType, Yields, GlobalMacroVar, DomesticMacroVar,  
+                           FactorLabels, Economies, DataFreq, CheckInputs = FALSE)
 ```
 
 ## Additional inputs for numerical and graphical outputs
@@ -489,7 +489,8 @@ different types of the desired graphical outputs.
 In its current form, the *MultiATSM* package allows for the calculation
 of two risk compensation measures: term premia and forward premia. In
 particular, a $n$-maturity bond yield can be decomposed as the sum of
-its expected ($Exp_t^{(n)}$) and term premia ($TP_t^{(n)}$) components.
+its expected short-rate ($Exp_t^{(n)}$) and term premia 
+($TP_t^{(n)}$) components.
 Technically: $$
 y_t^{(n)} = Exp_t^{(n)} + TP_t^{(n)}
 $$ In the package's standard form, the expected short rate term is
@@ -507,15 +508,15 @@ Example:
 
 ```{r}
     WishFPremia <- 1 # Wish to estimate the forward premia: YES: 1, NO:0 
-    FPmatLim <- c(60,120)
+    FPmatLim <- c(60, 120)
 ```
 
 ### Bootstrap settings
 
-If the user intends to generate confidence bands around the point
-estimates of the numerical outputs previously described using a
-bootstrap procedure, an additional list of inputs is required.
-Specifically:
+An additional list of inputs is required if the user intends to 
+generate confidence bands around the point estimates of the numerical 
+outputs. These results are achieved using a bootstrap procedure.
+Specifically, the list of inputs include:
 
 -   The desired bootstrap procedure (*methodBS*): Available options are
     *(i)* standard residual bootstrap (*bs*); *(ii)* wild bootstrap
@@ -553,12 +554,12 @@ ForecastList <- list(ForHoriz = 12, t0Sample = 1, t0Forecast = 70, ForType = "Ro
 
 # Model Estimation {#S:SectionEstimation}
 
-Once bond yields and economic time series data are gathered and model
-features are selected, ATSM estimation proceeds in three steps. First,
-estimate the country-specific spanned factors for inclusion in the
-global ATSM. Next, estimate the parameters governing risk factor
-dynamics under the $P-$measure. Finally, optimize the entire selected
-ATSM, including the $Q-$measure parameters.
+Once bond yields and other (macro)economic time series data are gathered 
+and model features are selected, ATSM estimation proceeds in three steps. 
+First, the package estimates the country-specific spanned factors for 
+inclusion in the global ATSM. Next, it estimates the parameters governing 
+risk factor dynamics under the $P-$measure. Finally, it optimizes the 
+entire selected ATSM, including the $Q-$measure parameters.
 
 ## Spanned Factors {#S:SpaFac}
 
@@ -570,9 +571,9 @@ $P_{i,t}$ is constructed as $P_{i,t} = w_i Y_{i,t}$ where $w_i$ is the
 PC weight matrix and $Y_{i,t}$ is a country-specific column-vector of
 yields with increasing maturities.
 
-For *N=3*, the spanned factors are traditionally interpreted as level,
-slope, and curvature. The nature of such interpretability results from
-the features of the PC weight matrix as illustrated below:
+For $N = 3$, the spanned factors are traditionally interpreted as level,
+slope, and curvature.  This interpretation arises from the structure of 
+the principal component (PC) weight matrix, as shown below :
 
 ```{r}
 w <- pca_weights_one_country(Yields, Economy = "Uruguay") 
@@ -615,7 +616,7 @@ print(g)
 ```
 
 To directly obtain the time series of the country-specific spanned
-factors, the user can simply use the `Spanned_Factors()` function as
+factors, the user can use the `Spanned_Factors()` function as
 follows:
 
 ```{r}
@@ -650,7 +651,7 @@ PdynPara <- VAR(RiskFactors, VARtype= "unconstrained")
 whereas the estimation of a *JPS original* model for China is
 
 ```{r}
-FactorsChina <- RiskFactors[1:7,]
+FactorsChina <- RiskFactors[1:7, ]
 PdynPara <- VAR(FactorsChina, VARtype= "unconstrained")
 ```
 
@@ -662,7 +663,7 @@ VAR model.
 
 The `GVAR()` function is designed to estimate a first-order GVAR which
 is built from country-specific VARX(1,1,1) models. For a comprehensive
-discussion of GVAR models, see @ChudikPesaran2016.
+discussion of GVAR models, see, for instance, @ChudikPesaran2016.
 
 The `GVAR()` function requires two key inputs: the number of
 country-specific spanned factors (N) and a set of supplementary inputs
@@ -819,7 +820,7 @@ The parameters *K0Z* and *K1Z* are estimated as part of the model's
 $P-$dynamics and are known in closed form. Likewise, *r0* and *se* have
 analytical solutions and can be factored out of the log-likelihood
 function. However, the remaining parameters (*K1XQ* and *SSZ*) require
-numerical estimation. @LeSingleton2018 provides standardized routines
+numerical estimation. @LeSingleton2018 provide standardized routines
 (integrated into this package) to set effective initial values,
 facilitating the optimization process.
 
@@ -838,7 +839,7 @@ results presented in the original papers of JPS (2014), CM (2023) and CM
 (2024). See the [Paper Replication Vignette](Paper-Replications.html) of
 this package for a detailed reproduction.
 
-## General template
+## General template {#S:SectionTemplate}
 
 ```{r, eval=FALSE}
 ########################################################################################################
@@ -867,11 +868,12 @@ StatQ <- 0 # Wish to impose stationary condition for the eigenvalues of each cou
 # B.1) SPECIFIC model inputs
 #################################### GVAR-based models ##################################################
 GVARlist <- list( VARXtype = "unconstrained", W_type = "Sample Mean", t_First_Wgvar = "2005",
-                  t_Last_Wgvar = "2019")
+                  t_Last_Wgvar = "2019", DataConnectedness <- TradeFlows ) 
 # VARXtype: Available options "unconstrained" or "constrained" (VARX)
 # W_type: Method to compute the transition matrix. Options:"Time-varying" or "Sample Mean"
 # t_First_Wgvar: First year of the sample (transition matrix)
 # t_Last_Wgvar:  Last year of the sample (transition matrix)
+# DataConnectedness: measure of connectedness across countries
 #################################### JLL-based models ###################################################
 JLLlist <- list(DomUnit =  "China")
 # DomUnit: name of the economy of the economic system, or "None" for the model "JLL No DomUnit"
@@ -919,7 +921,6 @@ ForecastList <- list(ForHoriz = 12,  t0Sample = 1, t0Forecast = 162, ForType = "
 
 # 2) Minor preliminary work: get the sets of factor labels and  a vector of common maturities
 FactorLabels <- LabFac(N, DomVar, GlobalVar, Economies, ModelType)
-if(any(ModelType == c("GVAR single", "GVAR multi"))){ GVARlist$DataConnectedness <- TradeFlows}
 
 # 3) Prepare the inputs of the likelihood function
 ATSMInputs <- InputsForOpt(t0_sample, tF_sample, ModelType, Yields, GlobalMacroVar, DomesticMacroVar,
@@ -946,4 +947,38 @@ Forecasts <- ForecastYields(ModelType, ModelParaList, InputsForOutputs, FactorLa
                             JLLlist, GVARlist, WishBC, BRWlist)
 ```
 
+## User-Friendly Inspection of Key Elements in the Selected ATSM Specification 
+
+Starting from version $1.3.0$, the *MultiATSM* package provides additional ways to concisely inspect key elements of the selected ATSM. In particular, users can now gain an alternative perspective on the general model inputs, optimized model parameters, and root mean square error (RMSE) from the forecast analysis. For clarity, the variable names used hereafter align with those presented in Section \@ref(S:SectionTemplate).
+
+
+### ATSM inputs
+The *ATSMInputs* variable is an object of class *ATSMModelInputs* that includes the $S3$ methods `print()` and `summary()`. The `print()` method provides an overview of both the model inputs and the economic system's general features, while the `summary()` method offers statistical summaries of the risk factors and bond yields.
+
+```{r}
+data("Out_Example")
+print(Out$ATSMInputs)
+```
+
+```{r}
+summary(Out$ATSMInputs) 
+```
+
+### ATSM parameters
+The `Optimization()` function returns an object of class *'ATSMModelOutputs'*, which includes the `summary()` $S3$ method. This method offers a parsimonious summary of key model outputs following 
+optimization process, including the maximum log-likelihood value, the intercept and slope coefficients from the model’s cross-sectional dimension, and the count of physical-measure eigenvalues greater than one—an indicator of potential explosive behavior in the model’s time series dimension. 
+
+```{r}
+summary(Out$ModelParaList) 
+```
+
+
+### Forecasts
+The `ForecastYields()` function returns an object of class *'ATSMModelForecast'*, which can be visualized using the `plot()` $S3$ method. This method generates a graphical representation of the RMSEs across different countries and forecast horizons.
+
+```{r}
+plot(Out$Forecasts) 
+```
+
 # References
+

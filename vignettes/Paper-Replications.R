@@ -8,7 +8,7 @@ library(MultiATSM)
 #  # B) GENERAL model inputs
 #  ModelType <- "JPS original"
 #  
-#  Economies <- c("U.S.") # Names of the economies from the economic system
+#  Economies <- c("US") # Names of the economies from the economic system
 #  GlobalVar <- c() # Global Variables
 #  DomVar <- c("GRO", "INF") # Country-specific variables
 #  N <- 3 # Number of spanned factors per country
@@ -138,7 +138,7 @@ kableExtra::kbl(se, align = "c", caption ="Portfolio of yields with errors") %>%
 #  # B.1) SPECIFIC model inputs
 #  #################################### GVAR-based models ##################################################
 #  GVARlist <- list( VARXtype = "unconstrained", W_type = "Sample Mean", t_First_Wgvar = "2004",
-#                    t_Last_Wgvar = "2019")
+#                    t_Last_Wgvar = "2019", DataConnectedness <- TradeFlows )
 #  #################################### JLL-based models ###################################################
 #  JLLlist <- list(DomUnit =  "China")
 #  ###################################### BRW inputs  ######################################################
@@ -158,7 +158,7 @@ kableExtra::kbl(se, align = "c", caption ="Portfolio of yields with errors") %>%
 #  
 #  # D) Bootstrap settings
 #  WishBootstrap <- 0 #  Set it to 1, if bootstrap is desired
-#  BootList <- list(methodBS = 'bs', BlockLength = 4, ndraws = 3, pctg =  95)
+#  BootList <- list(methodBS = 'bs', BlockLength = 4, ndraws = 1000, pctg =  95)
 #  
 #  # E) Out-of-sample forecast
 #  WishForecast <- 1
@@ -170,7 +170,6 @@ kableExtra::kbl(se, align = "c", caption ="Portfolio of yields with errors") %>%
 #  
 #  # 2) Minor preliminary work: get the sets of factor labels and  a vector of common maturities
 #  FactorLabels <- LabFac(N, DomVar, GlobalVar, Economies, ModelType)
-#  if(any(ModelType == c("GVAR single", "GVAR multi"))){ GVARlist$DataConnectedness <- TradeFlows}
 #  
 #  # 3) Prepare the inputs of the likelihood function
 #  ATSMInputs <- InputsForOpt(t0_sample, tF_sample, ModelType, Yields, GlobalMacroVar, DomesticMacroVar,
@@ -219,7 +218,7 @@ kableExtra::kbl(se, align = "c", caption ="Portfolio of yields with errors") %>%
 #  # B.1) SPECIFIC model inputs
 #  #################################### GVAR-based models ##################################################
 #  GVARlist <- list( VARXtype = "constrained: COVID", W_type = "Sample Mean", t_First_Wgvar = "2015",
-#                    t_Last_Wgvar = "2020")
+#                    t_Last_Wgvar = "2020", DataConnectedness = Trade_Flows)
 #  ###################################### BRW inputs  ######################################################
 #  WishBC <- 0
 #  
@@ -243,7 +242,6 @@ kableExtra::kbl(se, align = "c", caption ="Portfolio of yields with errors") %>%
 #  
 #  # 2) Minor preliminary work: get the sets of factor labels and  a vector of common maturities
 #  FactorLabels <- LabFac(N, DomVar, GlobalVar, Economies, ModelType)
-#  GVARlist$DataConnectedness <- Trade_Flows
 #  
 #  # 3) Prepare the inputs of the likelihood function
 #  ATSMInputs <- InputsForOpt(t0_sample, tF_sample, ModelType, Yields, GlobalMacro, DomMacro, FactorLabels,

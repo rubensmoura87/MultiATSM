@@ -20,7 +20,7 @@ Computes two measures of model fit for bond yields (all models)
 }
 \details{
 "Model-implied yields" is the measure of fit based exclusively on the risk-neutral parameters, whereas the
-"Model-Fit" takes into account both the risk-neutral and the physical paameters.
+"Model-Fit" takes into account both the risk-neutral and the physical parameters.
 }
 \references{
 See, for instance, Jotiskhatira, Le and Lundblad (2015). "Why do interest rates in different currencies co-move?" (Journal of Financial Economics)

@@ -31,6 +31,7 @@
 #' @export
 
 JLL <- function(NonOrthoFactors, N, JLLinputs, CheckInputs = FALSE) {
+
   # 0. Preliminary works/checks
   if (isTRUE(CheckInputs)) {
     CheckJLLinputs(NonOrthoFactors, JLLinputs)
@@ -58,12 +59,12 @@ Labels_All <- GetLabels_JLL(NonOrthoFactors,JLLinputs, G)
   Para_VAR_NoOrtho <- NoOrthoVAR_JLL(Ortho_RegSet, Para_VAR_Ortho)
 
   # 5) Obtain sigmas/Cholesky factorizations
-  Sigmas <- Get_Sigama_JLL(JLLinputs, Labels_All, Ortho_RegSet, Para_VAR_Ortho, N)
+  Sigmas <- Get_Sigma_JLL(JLLinputs, Labels_All, Ortho_RegSet, Para_VAR_Ortho, N)
 
   # 6) Prepare the outputs
   outputs <- list(
     a_W = Ortho_RegSet$a_W, a_DU_CS = Ortho_RegSet$a_DU_CS, b = Ortho_RegSet$b, c = Ortho_RegSet$c,
-    PIb = Ortho_RegSet$PIb, PIac = Ortho_RegSet$PIac, PI = Ortho_RegSet$PI, Ye = Ortho_RegSet$Ye,
+    PIb = Ortho_RegSet$PIb, PIac = Ortho_RegSet$PIac, PI = Ortho_RegSet$PI, Ye = Para_VAR_Ortho$Ye,
     k0_e = Para_VAR_Ortho$k0_e, k1_e = Para_VAR_Ortho$k1_e, k0 = Para_VAR_NoOrtho$k0,
     k1 = Para_VAR_NoOrtho$k1, Sigmas = Sigmas
   )
@@ -85,6 +86,7 @@ Labels_All <- GetLabels_JLL(NonOrthoFactors,JLLinputs, G)
 #' @return restricted version of the JLL of the Cholesky factorization (F x F)
 
 IDXZeroRestrictionsJLLVarCovOrtho <- function(M, N, G, Economies, DomUnit) {
+
   C <- length(Economies)
   K <- (M + N) * C + G
 
@@ -109,9 +111,17 @@ IDXZeroRestrictionsJLLVarCovOrtho <- function(M, N, G, Economies, DomUnit) {
     idx0RowMacroSpanned <- G + M
     idx0ColMacroSpanned <- G + (i - 1) * (M + N)
     idx1ColMacroSpanned <- idx0ColMacroSpanned + M
+    # a) For Dominant Unit
+    if (DomUnit != "None") {
     for (h in 1:C) { # Fix the columns and loop through the rows
       idx1RowMacroSpanned <- idx0RowMacroSpanned + N
       CholOrtho[(idx0RowMacroSpanned + 1):idx1RowMacroSpanned, (idx0ColMacroSpanned + 1):idx1ColMacroSpanned] <- 0
+      idx0RowMacroSpanned <- idx1RowMacroSpanned + M
+    }
+    } else {
+    # b) For Non-dominant Unit
+      idx1RowMacroSpanned <- idx0RowMacroSpanned + N
+      CholOrtho[-((idx0ColMacroSpanned + 1):idx1ColMacroSpanned), (idx0ColMacroSpanned + 1):idx1ColMacroSpanned] <- 0
       idx0RowMacroSpanned <- idx1RowMacroSpanned + M
     }
   }
@@ -121,12 +131,19 @@ IDXZeroRestrictionsJLLVarCovOrtho <- function(M, N, G, Economies, DomUnit) {
     idx0RowSpannedMacro <- G
     idx0ColSpannedMacro <- G + M + (i - 1) * (M + N)
     idx1ColSpannedMacro <- idx0ColSpannedMacro + N
+    # a) For Dominant Unit
+    if (DomUnit != "None") {
     for (h in 1:C) { # Fix the columns and loop through the rows
       idx1RowSpannedMacro <- idx0RowSpannedMacro + M
       CholOrtho[(idx0RowSpannedMacro + 1):idx1RowSpannedMacro, (idx0ColSpannedMacro + 1):idx1ColSpannedMacro] <- 0
       idx0RowSpannedMacro <- idx1RowSpannedMacro + N
     }
+    } else {
+      idx1RowSpannedMacro <- idx0RowSpannedMacro + M
+      CholOrtho[- ((idx0ColSpannedMacro + 1):idx1ColSpannedMacro), (idx0ColSpannedMacro + 1):idx1ColSpannedMacro] <- 0
+      idx0RowSpannedMacro <- idx1RowSpannedMacro + N
   }
+}
 
   # Zero restrictions of Macro country i on Macro country j
   if (DomUnit != "None") {
@@ -182,6 +199,7 @@ IDXZeroRestrictionsJLLVarCovOrtho <- function(M, N, G, Economies, DomUnit) {
 #' @keywords internal
 
 GetLabels_JLL <- function(NonOrthoFactors, JLLinputs, G) {
+
   C <- length(JLLinputs$Economies)
 
   FactorsJLL <- unlist(lapply(JLLinputs$Economies, function(economy) {
@@ -210,6 +228,7 @@ GetLabels_JLL <- function(NonOrthoFactors, JLLinputs, G) {
 #' @keywords internal
 
 Factors_NonOrtho <- function(NonOrthoFactors, JLLinputs, FactorLab, N) {
+
   M <- length(FactorLab$FactorLabels[[1]]) - N
 
   # Domestic factors
@@ -242,7 +261,7 @@ Factors_NonOrtho <- function(NonOrthoFactors, JLLinputs, FactorLab, N) {
 #'
 #' @keywords internal
 
-Get_Sigama_JLL <- function(JLLinputs, FacSet, Para_Ortho_Reg, Para_Ortho_VAR, N) {
+Get_Sigma_JLL <- function(JLLinputs, FacSet, Para_Ortho_Reg, Para_Ortho_VAR, N) {
 
   M <- length(FacSet$FactorLabels[[1]]) - N
   G <- length(FacSet$FactorLabels$Global)
@@ -284,7 +303,7 @@ Get_Sigama_JLL <- function(JLLinputs, FacSet, Para_Ortho_Reg, Para_Ortho_VAR, N)
     }
 
     ZeroIdxSigmaJLL <- IDXZeroRestrictionsJLLVarCovOrtho(M, N, G, JLLinputs$Economies, JLLinputs$DomUnit) # Identify the zero elements of the orthogonalized variance-covariance matrix
-    # (useful for distinguishing real zeros from nearly zero elements, later on in the code)
+    # (useful for distinguishing real zeros from nearly zero elements later on in the code)
     Sigmas <- list(Sigma_Res_Ortho, Sigma_Res_NonOrtho, Sigma_Y, Sigma_Ye, ZeroIdxSigmaJLL)
     names(Sigmas) <- c("VarCov_Ortho", "VarCov_NonOrtho", "Sigma_Y", "Sigma_Ye", "ZeroIdxSigmaJLLOrtho")
   } else {
@@ -303,6 +322,7 @@ Get_Sigama_JLL <- function(JLLinputs, FacSet, Para_Ortho_Reg, Para_Ortho_VAR, N)
 #' @keywords internal
 
 CheckJLLinputs <- function(RiskFactorsNonOrtho, JLLinputs) {
+
   # CHECK 1: Check whether the model type is correctly specified
   if (!JLLinputs$JLLModelType %in% c("JLL original", "JLL No DomUnit", "JLL joint Sigma")) {
     stop("JLLModelType input must be one of the following inputs: 'JLL original', 'JLL No DomUnit', 'JLL joint Sigma'.")
@@ -505,6 +525,7 @@ OrthoReg_JLL <- function(JLLinputs, N, FacSet, FactorLab_NonOrth, FactorLab_JLL)
 #' @keywords internal
 
 OrthoVAR_JLL <- function(NonOrthoFactors, JLLinputs, Ortho_Set, FactLabels, N) {
+
   # 1) Preliminary work
   LabelsJLL <- FactLabels$LabelsJLL
   Label_DU <- JLLinputs$DomUnit
@@ -589,6 +610,7 @@ OrthoVAR_JLL <- function(NonOrthoFactors, JLLinputs, Ortho_Set, FactLabels, N) {
 #' @keywords internal
 
 NoOrthoVAR_JLL <- function(Para_Ortho_Reg, Para_Ortho_VAR) {
+
   PI <- Para_Ortho_Reg$PI
   k0_e <- Para_Ortho_VAR$k0_e
   k1_e <- Para_Ortho_VAR$k1_e
@@ -619,6 +641,7 @@ NoOrthoVAR_JLL <- function(Para_Ortho_Reg, Para_Ortho_VAR) {
 #' @return value of the log-likelihood function (scalar)
 
 llk_JLL_Sigma <- function(VecPara, res, IdxNONzero, K) {
+
   Se <- matrix(0, K, K)
   Se[IdxNONzero] <- VecPara # restricted Se matrix
   Sigma_Res <- Se %*% t(Se)
@@ -644,8 +667,8 @@ llk_JLL_Sigma <- function(VecPara, res, IdxNONzero, K) {
 #' @return restricted version the Cholesky factorization matrix from JLL-based models (K x K)
 
 CholRestrictionsJLL <- function(SigmaUnres, M, G, N, Economies, DomUnit) {
-  C <- length(Economies)
 
+  C <- length(Economies)
   if (DomUnit != "None") {
     IdxDomUnit <- which(DomUnit == Economies) # Index of the dominant country
   }
@@ -666,25 +689,40 @@ CholRestrictionsJLL <- function(SigmaUnres, M, G, N, Economies, DomUnit) {
     idx0RowMacroSpanned <- G + M
     idx0ColMacroSpanned <- G + (i - 1) * (M + N)
     idx1ColMacroSpanned <- idx0ColMacroSpanned + M
+    # a) With a dominant unit
+    if (DomUnit != "None") {
     for (h in 1:C) { # Fix the columns and loop through the rows
       idx1RowMacroSpanned <- idx0RowMacroSpanned + N
       SigmaUnres[(idx0RowMacroSpanned + 1):idx1RowMacroSpanned, (idx0ColMacroSpanned + 1):idx1ColMacroSpanned] <- 0
       idx0RowMacroSpanned <- idx1RowMacroSpanned + M
     }
-  }
+    } else {
+    # b) No dominant unit
+    idx1RowMacroSpanned <- idx0RowMacroSpanned + N
+    SigmaUnres[ -((idx0ColMacroSpanned + 1):idx1ColMacroSpanned) , (idx0ColMacroSpanned + 1):idx1ColMacroSpanned] <- 0
+    idx0RowMacroSpanned <- idx1RowMacroSpanned + M
+    }
+   }
 
   # iii) Zero restrictions of spanned factors on macro domestic variables
   for (i in 1:C) {
     idx0RowSpannedMacro <- G
     idx0ColSpannedMacro <- G + M + (i - 1) * (M + N)
     idx1ColSpannedMacro <- idx0ColSpannedMacro + N
+    # a) With a dominant unit
+    if (DomUnit != "None") {
     for (h in 1:C) { # Fix the columns and loop through the rows
       idx1RowSpannedMacro <- idx0RowSpannedMacro + M
       SigmaUnres[(idx0RowSpannedMacro + 1):idx1RowSpannedMacro, (idx0ColSpannedMacro + 1):idx1ColSpannedMacro] <- 0
       idx0RowSpannedMacro <- idx1RowSpannedMacro + N
     }
+    } else {
+    # b) No dominant unit
+    idx1RowSpannedMacro <- idx0RowSpannedMacro + M
+    SigmaUnres[-((idx0ColSpannedMacro + 1):idx1ColSpannedMacro), (idx0ColSpannedMacro + 1):idx1ColSpannedMacro] <- 0
+    idx0RowSpannedMacro <- idx1RowSpannedMacro + N
   }
-
+}
   # iv) Zero restrictions of Macro country i on Macro country j
   if (DomUnit != "None") {
     for (i in 1:C) {
@@ -741,6 +779,7 @@ CholRestrictionsJLL <- function(SigmaUnres, M, G, N, Economies, DomUnit) {
 #' @return Cholesky-factorization after the maximization (K x K)
 
 EstimationSigma_Ye <- function(SigmaUnres, res, M, G, Economies, DomUnit) {
+
   # SIGMA_Ye
   K <- nrow(SigmaUnres)
   C <- length(Economies)

@@ -37,7 +37,6 @@ Both IRFs and FEVDs are computed using the Cholesky decomposition method. The ri
 \examples{
 # See an example of implementation in the vignette file of this package (Section 4).
 
-
 }
 \references{
 Pesaran, H. Hashem, and Shin, Yongcheol. "Generalized impulse response analysis in linear multivariate models." Economics letters 58.1 (1998): 17-29.

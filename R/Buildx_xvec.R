@@ -105,6 +105,7 @@ GetAuxPara <- function(ParaValue, Const_Type_Full, lb, ub, Economies, FactorLabe
 #'@keywords internal
 
 Adjust_Const_Type<- function(Const_Type_Full){
+
   constraints <- c('Jordan MultiCountry; stationary', 'Jordan MultiCountry', 'Jordan; stationary', 'Jordan',
                    'psd', 'BlockDiag', 'JLLstructure', 'bounded', 'diag')
   for (constraint in constraints) {
@@ -153,7 +154,6 @@ Aux_Jordan <- function(ParaValue, Const_Type, FactorLabels, Economies, JLLinputs
       realx <- realx[seq_len(max(0, length(realx) - 1)) + 1]
     }
 
-
     for (h in seq_len(length(realx)/2)){
       lQ <- rbind(lQ, 0.5*(realx[2*h-1]+realx[2*h]), (0.5*(realx[2*h-1]- realx[2*h]))^2)
     }
@@ -198,10 +198,8 @@ Aux_Jordan <- function(ParaValue, Const_Type, FactorLabels, Economies, JLLinputs
         realx <- realx[seq_len(max(0, length(realx) - 1)) + 1]
       }
 
-
       for (h in seq_len(length(realx)/2)){
         lQ <- rbind(lQ, 0.5*(realx[2*h-1]+realx[2*h]), (0.5*(realx[2*h-1]- realx[2*h]))^2)
-
       }
 
       imagx <- t(x[Im(x)!=0]) # Select only the eignenvalues with imaginary values
@@ -226,6 +224,7 @@ Aux_Jordan <- function(ParaValue, Const_Type, FactorLabels, Economies, JLLinputs
 #'@keywords internal
 
 ImposeStat_Aux <- function(yy){
+
   dd <- max(abs(yy))
   ub <- 0.9999
   lb <- 0.0001
@@ -251,6 +250,7 @@ ImposeStat_Aux <- function(yy){
 #'@keywords internal
 
 Jordan_JLL <- function(ParaValue, C, N){
+
   IDXMaxeigen <- seq(1, N * C, by = N) # identify the indexes of the largest eigenvalue of each country
   MaxeigenCS <- diag(ParaValue)[IDXMaxeigen]
 
@@ -271,21 +271,12 @@ Jordan_JLL <- function(ParaValue, C, N){
 
 Aux_PSD <- function(ParaValue, Const_Type){
 
-  # Preliminary work
-  i <- unlist(gregexpr("psd", Const_Type))
-  i <- i[1]
-  M <- as.numeric(substr(Const_Type, start= i+3, stop= nchar(Const_Type) ) )
-  if (is.na(M)) { M <- 1 }
-
   # Compute auxiliary PSD matrix
   N <- dim(ParaValue)[1]
-  mat_psd <- c()
 
-  for (i in 1:M){
-    halfm <- sqrtm_robust(ParaValue[ ,(N*(i-1)+1):(N*i)]) # sqrtm (): computes a matrix square root such that Y=X^(1/2)*X^(1/2).
-    MatOnes<- matrix(1 , nrow= N, ncol = N)
-    mat_psd <- rbind(mat_psd, t(t(halfm[which(MatOnes == 1 & lower.tri(MatOnes, diag = TRUE))])))
-  }
+  halfm <- sqrtm_robust(ParaValue) # sqrtm (): computes a matrix square root such that Y=X^(1/2)*X^(1/2).
+  MatOnes<- matrix(1 , nrow= N, ncol = N)
+  mat_psd <- t(t(halfm[which(MatOnes == 1 & lower.tri(MatOnes, diag = TRUE))]))
 
   return(mat_psd)
 }
@@ -303,32 +294,20 @@ Aux_PSD <- function(ParaValue, Const_Type){
 
 Aux_JLLstruct <- function(ParaValue, Const_Type, FactorLabels, Economies, JLLinputs){
 
-  # Preliminary work
-  i <- unlist(gregexpr("JLLstructure", Const_Type))
-  i <- i[1]
-  M <-as.numeric(substr(Const_Type, start= i+13, stop= nchar(Const_Type) ) )
-  if (is.na(M)) { M<-1 }
-
   # Transform JLL parameters
-  N <- dim(ParaValue)[1]
-  a <- c()
-
   C <- length(Economies)
   Nspa <- length(FactorLabels$Spanned)
   Macro <- length(FactorLabels$Domestic) - Nspa
   G <- length(FactorLabels$Global)
-  K <- C*(Macro+Nspa) + G
+  K <- C*(Macro + Nspa) + G
 
-  ZeroIdxSigmaJLL <- IDXZeroRestrictionsJLLVarCovOrtho(Macro, Nspa, G, Economies, JLLinputs$DomUnit)$VarCovOrtho
+  ZeroIdxSigmaJLL <- IDXZeroRestrictionsJLLVarCovOrtho(Macro, Nspa, G, Economies, JLLinputs$DomUnit)$Sigma_Ye
   MatOnes <- matrix(1, ncol= K, nrow = K)
   MatOnes[ZeroIdxSigmaJLL] <- 0
   IdxNONzeroSigmaJLL <- which(MatOnes!=0 & MatOnes == 1 & lower.tri(MatOnes, diag = TRUE))
 
-
-  for (i in 1:M){
-    halfm <- sqrtm_robust(ParaValue[ , (N*(i-1)+1):(N * i)]) # sqrtm (): computes a matrix square root such that Y=X^(1/2)*X^(1/2).
-    a <- rbind(a, t(t(halfm[IdxNONzeroSigmaJLL])))
-  }
+  halfm <- sqrtm_robust(ParaValue) # sqrtm (): computes a matrix square root such that Y=X^(1/2)*X^(1/2).
+  a <- t(t(halfm[IdxNONzeroSigmaJLL]))
 
   return(a)
 }
@@ -421,7 +400,6 @@ Aux_BoundDiag <- function(ParaValue, Const_Type, lb, ub){
   # Ensures that the constraints are preserved
   if (!exists("lb") || is.null(lb) ){ lb <- -Inf }
   if (!exists("ub") || is.null(ub) ){ ub <- Inf }
-
 
   temp <- ParaValue
   temp[] <- lb[]

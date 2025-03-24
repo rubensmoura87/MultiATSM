@@ -47,8 +47,7 @@ ComputeGIRFs(
 
 \item{Mode}{allows for the orthogonalized version in the case of JLL-based models
 
-
-#'#' @references
+#' @references
 \itemize{
 \item This function is a partially based on the version of the "irf" function from
 Smith, L.V. and A. Galesi (2014). GVAR Toolbox 2.0, available at https://sites.google.com/site/gvarmodelling/gvar-toolbox.

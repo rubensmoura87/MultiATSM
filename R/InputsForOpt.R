@@ -106,13 +106,13 @@ InputsForOpt <- function(InitialSampleDate, FinalSampleDate, ModelType, Yields, 
 
   # Check consistency of inputs across models if CheckInputs is TRUE
   if (isTRUE(CheckInputs)) {
-  CheckInputsForMLE(InitialSampleDate, FinalSampleDate, Economies, DomMacro, GlobalMacro, UnitYields,
-                    DataFrequency, Label_Single_Models, Label_Multi_Models, FactorLabels, GVARlist, ModelType) }
+    CheckInputsForMLE(InitialSampleDate, FinalSampleDate, Economies, DomMacro, GlobalMacro, UnitYields,
+                      DataFrequency, Label_Single_Models, Label_Multi_Models, FactorLabels, GVARlist, ModelType) }
 
   # Construct the time-series of the risk factors
   cat("1.1) Constructing the time-series of the risk factors \n")
   RiskFactors <-  BuildATSM_RiskFactors(InitialSampleDate, FinalSampleDate, Yields, GlobalMacro, DomMacro,
-                                       Economies, FactorLabels, ModelType, BS_Adj)
+                                        Economies, FactorLabels, ModelType, BS_Adj)
 
   Yields <- AdjustYieldsDates(Yields, RiskFactors, Economies)
 
@@ -134,7 +134,7 @@ InputsForOpt <- function(InitialSampleDate, FinalSampleDate, ModelType, Yields, 
 
   # Gather outputs to export
   Outputs <- Outputs2exportMLE(Label_Multi_Models, Economies, RiskFactors, Yields, mat, ModelInputsGen,
-                              ModelInputsSpe, PdynPara, ModelType)
+                               ModelInputsSpe, PdynPara, ModelType)
 
   # Store metadata inside the class without explicitly exporting it
   attr(Outputs, "ModelInfo") <- list(
@@ -149,7 +149,7 @@ InputsForOpt <- function(InitialSampleDate, FinalSampleDate, ModelType, Yields, 
     G = length(FactorLabels$Global),
     NC = length(FactorLabels$Spanned)*length(Economies),
     MC = (length(FactorLabels$Domestic) - length(FactorLabels$Spanned))*length(Economies)
-    )
+  )
 
   # Return the structured Outputs object
   return(structure(Outputs, class = "ATSMModelInputs"))
@@ -251,7 +251,6 @@ SpecificMLEInputs <-function(ModelType, Economies, RiskFactors, FactorLabels, GV
     }else{  GVARinputs$Wgvar <- Wgvar} # constant interdependence
 
     } else { GVARinputs <- NULL }
-
 
 
   if (ModelType %in% c("JLL original", "JLL No DomUnit","JLL joint Sigma")){
@@ -469,22 +468,20 @@ Getdt <- function(DataFrequency){
 #############################################################################################################
 #' Check consistence of inputs
 #'
-#'
-#'@param t0 Sample starting date
-#'@param tF Sample last date
-#'@param Economies string-vector containing the names of the economies of the system.
-#'@param DomesticMacroFac time series of the country-specific macroeconomic risk factors for all C countries (CM x T)
-#'@param GlobalMacroFac time series of the global macroeconomic risk factors (G x T)
-#'@param UnitYields (i) "Month": if maturity of yields are expressed in months or
+#' @param t0 Sample starting date
+#' @param tF Sample last date
+#' @param Economies string-vector containing the names of the economies of the system.
+#' @param DomesticMacroFac time series of the country-specific macroeconomic risk factors for all C countries (CM x T)
+#' @param GlobalMacroFac time series of the global macroeconomic risk factors (G x T)
+#' @param UnitYields (i) "Month": if maturity of yields are expressed in months or
 #'                  (ii) "Year": if maturity of yields are expressed in years
-#'@param DataFreq single element character-based vector. Available options are: "Daily All Days", \cr
+#' @param DataFreq single element character-based vector. Available options are: "Daily All Days", \cr
 #'                      "Daily Business Days", "Weekly", "Monthly",  "Quarterly", "Annually"
-#'@param Label_Single_Models string-vector containing the names of the single country setups
-#'@param Label_Multi_Models string-vector containing the names of the multicountry setups
-#'@param FactorLabels string-list based which contains the labels of all variables present in the model
-#'@param GVARlist list of necessary inputs for the estimation of GVAR-based models (see "GVAR" function)
-#'@param ModelType string-vector containing the label of the model to be estimated
-#'
+#' @param Label_Single_Models string-vector containing the names of the single country setups
+#' @param Label_Multi_Models string-vector containing the names of the multicountry setups
+#' @param FactorLabels string-list based which contains the labels of all variables present in the model
+#' @param GVARlist list of necessary inputs for the estimation of GVAR-based models (see "GVAR" function)
+#' @param ModelType string-vector containing the label of the model to be estimated
 #'
 #'@keywords internal
 
@@ -644,8 +641,7 @@ GetPdynPara <- function(RiskFactors, FactorLabels, Economies, ModelType, BRWinpu
     }, error = function(err) {
       stop("BRW procedure leads to a highly collinear system. Please choose another combination of BRW parameters.")})
 
-
-  } else{
+  } else {
 
     cat("- Without the bias-correction procedure \n\n")
     if (any(ModelType == c("JLL original", "JLL No DomUnit", "JLL joint Sigma"))){
@@ -810,11 +806,11 @@ else if (any(ModelType == c('GVAR single', 'GVAR multi'))){
   if (ModelType =='GVAR single'){
     PdynPara <- list()
     for (i in 1:length(Economies)){  PdynPara[[Economies[i]]] <- list(K0Z = K0Z, K1Z = K1Z, SSZ = SSZ)}
-
   }
 }
+
 # JLL-related models
-else if (any(ModelType == c("JLL original", "JLL No DomUnit", "JLL joint Sigma"))){
+else if (ModelType %in% c("JLL original", "JLL No DomUnit", "JLL joint Sigma")) {
   JLLinputs$WishSigmas <- 1
   JLLPara <- JLL(RiskFactors, N, JLLinputs, CheckInpts)
   K0Z <-JLLPara$k0
@@ -841,14 +837,13 @@ else if (any(ModelType == c("JLL original", "JLL No DomUnit", "JLL joint Sigma")
 ###################################################################################################################
 #' Check consistency of labels (economies, domestic and global variables)
 #'
+#' @param Economies string-vector containing the names of the economies which are part of the economic system
+#' @param DomesticMacroFac time series of the country-specific domestic risk factors (C(M+N) x T)
+#' @param GlobalMacroFac time series of the global risk factors (G X T)
+#' @param DomVarLab string-vector containing the names of the desired domestic risk factors
+#' @param GloVarLab string-vector containing the names of the desired global risk factors
 #'
-#'@param Economies string-vector containing the names of the economies which are part of the economic system
-#'@param DomesticMacroFac time series of the country-specific domestic risk factors (C(M+N) x T)
-#'@param GlobalMacroFac time series of the global risk factors (G X T)
-#'@param DomVarLab string-vector containing the names of the desired domestic risk factors
-#'@param GloVarLab string-vector containing the names of the desired global risk factors
-#'
-#'@keywords internal
+#' @keywords internal
 
 
 Check_label_consistency <- function(Economies, DomesticMacroFac, GlobalMacroFac, DomVarLab, GloVarLab){

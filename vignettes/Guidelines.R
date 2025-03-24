@@ -112,10 +112,11 @@ VARXtype <- "unconstrained"
 W_type <- 'Sample Mean' # Method to compute the transition matrix
 t_First_Wgvar <- "2000" # First year of the sample
 t_Last_Wgvar <-  "2015" # Last year of the sample
+DataConnectedness <- TradeFlows # Measure of connectedness across countries
 
 ## -----------------------------------------------------------------------------
-GVARlist <- list( VARXtype = "unconstrained", W_type = "Sample Mean",
-                  t_First_Wgvar = "2000", t_Last_Wgvar = "2015") 
+GVARlist <- list( VARXtype = "unconstrained", W_type = "Sample Mean", t_First_Wgvar = "2000",
+                   t_Last_Wgvar = "2015", DataConnectedness = TradeFlows) 
 
 ## -----------------------------------------------------------------------------
 JLLlist <- list(DomUnit =  "China")
@@ -125,9 +126,7 @@ BRWlist <- within(list(flag_mean = TRUE, gamma = 0.2, N_iter = 500, B = 50,
                        checkBRW = TRUE, B_check = 1000), N_burn <- round(N_iter * 0.15))
 
 ## ----eval=FALSE---------------------------------------------------------------
-#  data(CM_GlobalMacroFactors)
-#  data(CM_DomMacroFactors)
-#  data(CM_Yields)
+#  LoadData("CM_2024")
 #  
 #  ModelType <- "JPS original"
 #  Economies <- "Mexico"
@@ -141,7 +140,7 @@ BRWlist <- within(list(flag_mean = TRUE, gamma = 0.2, N_iter = 500, B = 50,
 #  DataFreq <- "Monthly"
 #  
 #  ATSMInputs <- InputsForOpt(t0, tF, ModelType, Yields, GlobalMacroVar, DomesticMacroVar,
-#                           FactorLabels, Economies, DataFreq,CheckInputs = FALSE)
+#                             FactorLabels, Economies, DataFreq, CheckInputs = FALSE)
 
 ## -----------------------------------------------------------------------------
 Horiz <- 100
@@ -157,7 +156,7 @@ WishOrthoJLLgraphs <- 0 # YES: 1; No = 0.
 
 ## -----------------------------------------------------------------------------
     WishFPremia <- 1 # Wish to estimate the forward premia: YES: 1, NO:0 
-    FPmatLim <- c(60,120)
+    FPmatLim <- c(60, 120)
 
 ## -----------------------------------------------------------------------------
 Bootlist <- list(methodBS = 'block', BlockLength = 4, ndraws =  50, pctg   =  95)
@@ -200,7 +199,7 @@ data("CM_Factors")
 PdynPara <- VAR(RiskFactors, VARtype= "unconstrained")
 
 ## -----------------------------------------------------------------------------
-FactorsChina <- RiskFactors[1:7,]
+FactorsChina <- RiskFactors[1:7, ]
 PdynPara <- VAR(FactorsChina, VARtype= "unconstrained")
 
 ## -----------------------------------------------------------------------------
@@ -265,11 +264,12 @@ JLLinputs <- list(Economies = Economies, DomUnit = "China", WishSigmas = 1,  Sig
 #  # B.1) SPECIFIC model inputs
 #  #################################### GVAR-based models ##################################################
 #  GVARlist <- list( VARXtype = "unconstrained", W_type = "Sample Mean", t_First_Wgvar = "2005",
-#                    t_Last_Wgvar = "2019")
+#                    t_Last_Wgvar = "2019", DataConnectedness <- TradeFlows )
 #  # VARXtype: Available options "unconstrained" or "constrained" (VARX)
 #  # W_type: Method to compute the transition matrix. Options:"Time-varying" or "Sample Mean"
 #  # t_First_Wgvar: First year of the sample (transition matrix)
 #  # t_Last_Wgvar:  Last year of the sample (transition matrix)
+#  # DataConnectedness: measure of connectedness across countries
 #  #################################### JLL-based models ###################################################
 #  JLLlist <- list(DomUnit =  "China")
 #  # DomUnit: name of the economy of the economic system, or "None" for the model "JLL No DomUnit"
@@ -317,7 +317,6 @@ JLLinputs <- list(Economies = Economies, DomUnit = "China", WishSigmas = 1,  Sig
 #  
 #  # 2) Minor preliminary work: get the sets of factor labels and  a vector of common maturities
 #  FactorLabels <- LabFac(N, DomVar, GlobalVar, Economies, ModelType)
-#  if(any(ModelType == c("GVAR single", "GVAR multi"))){ GVARlist$DataConnectedness <- TradeFlows}
 #  
 #  # 3) Prepare the inputs of the likelihood function
 #  ATSMInputs <- InputsForOpt(t0_sample, tF_sample, ModelType, Yields, GlobalMacroVar, DomesticMacroVar,
@@ -342,4 +341,17 @@ JLLinputs <- list(Economies = Economies, DomUnit = "China", WishSigmas = 1,  Sig
 #  # 6) Out-of-sample forecasting
 #  Forecasts <- ForecastYields(ModelType, ModelParaList, InputsForOutputs, FactorLabels, Economies,
 #                              JLLlist, GVARlist, WishBC, BRWlist)
+
+## -----------------------------------------------------------------------------
+data("Out_Example")
+print(Out$ATSMInputs)
+
+## -----------------------------------------------------------------------------
+summary(Out$ATSMInputs) 
+
+## -----------------------------------------------------------------------------
+summary(Out$ModelParaList) 
+
+## -----------------------------------------------------------------------------
+plot(Out$Forecasts) 
 
