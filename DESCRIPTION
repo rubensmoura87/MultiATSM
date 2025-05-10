@@ -2,11 +2,11 @@ Package: MultiATSM
 Type: Package
 Title: Multicountry Term Structure of Interest Rates Models
 Version: 1.3.0
-Date: 2025-03-24
+Date: 2025-05-11
 Authors@R: 
     person("Rubens", "Moura", , "rubens.gtmoura@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0001-8105-4729"))
-Description: Estimation routines for several classes of affine term structure of interest rates models. All the models are based on the single-country unspanned macroeconomic risk framework from Joslin, Priebsch, and Singleton (2014, JF) <doi:10.1111/jofi.12131>. Multicountry extensions such as the ones of Jotikasthira, Le, and Lundblad (2015, JFE) <doi:10.1016/j.jfineco.2014.09.004>, Candelon and Moura (2023, EM) <doi:10.1016/j.econmod.2023.106453>, and Candelon and Moura (Forthcoming, JFEC) <doi:10.1093/jjfinec/nbae008> are also available. 
+Description: Estimation routines for several classes of affine term structure of interest rates models. All the models are based on the single-country unspanned macroeconomic risk framework from Joslin, Priebsch, and Singleton (2014, JF) <doi:10.1111/jofi.12131>. Multicountry extensions such as the ones of Jotikasthira, Le, and Lundblad (2015, JFE) <doi:10.1016/j.jfineco.2014.09.004>, Candelon and Moura (2023, EM) <doi:10.1016/j.econmod.2023.106453>, and Candelon and Moura (2024, JFEC) <doi:10.1093/jjfinec/nbae008> are also available. 
 License: GPL-2 | GPL-3
 Encoding: UTF-8
 RoxygenNote: 7.2.3

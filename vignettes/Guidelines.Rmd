@@ -148,56 +148,49 @@ argument *CM_2024*, and similarly, the CM (2023) data with *CM_2023*.
 LoadData("CM_2024")
 ```
 
-The previous function loads four types of datasets. The first dataset
+The previous function loads three types of datasets. The first dataset
 consists of time series for zero-coupon bond yields from four emerging
 markets: China, Brazil, Mexico, and Uruguay. For the purpose of the ATSM
 estimation, it is important to note two requirements: *(i)* the bond
 yield maturities must be consistent across all countries (although the
-`DataForEstimation()` function can take different maturities as inputs,
-it outputs bond yields with uniform maturities for all economies); and
-*(ii)* the bond yields should be expressed in percentage terms per
-annum, not in basis points. The *MultiATSM* package does not include
-routines for bootstrapping zero-coupon yields from coupon bonds, so
-users must handle this data manipulation themselves if needed.
+`DataForEstimation()` and `InputsForOpt()` functions can take different 
+maturities as inputs, it outputs bond yields with uniform maturities for 
+all economies); and *(ii)* the bond yields should be expressed in percentage 
+terms per annum, not in basis points. The *MultiATSM* package does not include 
+routines for bootstrapping zero-coupon yields from coupon bonds, so users must
+handle this data manipulation themselves if needed. The data can also be retrieved 
+using:
 
 ```{r}
 data('CM_Yields')
 ```
 
-The second dataset focuses on the time series of risk factors. Using the
-terminology of JPS (2014), this dataset includes *(i)* country-specific
-**spanned factors** (commonly represented by level, slope, and curvature
--- see Section \@ref(S:SpaFac) for an intuitive explanation of these
-factors) and *(ii)* a set of country-specific and global **unspanned
-factors**, namely macroeconomic variables such as economic growth and 
-inflation. Similar to the bond yield data, these economic indicators 
-must be constructed by the user.
+Bond yield data are also used to construct the country-specific **spanned** factors,
+according to the terminology of JPS (2014). These factors typically correspond to 
+the standard yield curve components, namely level, slope, and curvature. An intuitive 
+explanation of their statistical properties is provided in Section \@ref(S:SpaFac).
+
+The second dataset contains time series for macroeconomic risk factors — also 
+referred to as **unspanned** factors, following the classification of JPS (2014). 
+These include measures of economic growth and inflation for *(i)* each of the 
+four countries in the sample and *(ii)* the global economy. Similar to the bond 
+yield data, these economic indicators must be constructed by the user.
 
 ```{r}
-data('CM_Factors')
+data("CM_GlobalMacroFactors")
+data('CM_DomMacroFactors')
 ```
 
-The final two datasets are essential for estimating GVAR-based models.
-The trade flows data, sourced from the International Monetary Fund
-(IMF), presents the sum of the value of all goods imports and exports
-between any two countries of the sample on a yearly basis since 1948.
-All the values are free on board and are expressed in U.S. dollars.
-These data are used to construct the transition matrix of the GVARs
-models.
+The final dataset captures cross-country interconnectedness measures, proxied by 
+bilateral trade flows, and is essential for estimating GVAR-based models. 
+Specifically, the trade data—sourced from the International Monetary Fund (IMF) —
+reports the annual value of total goods traded (imports plus exports)
+between each pair of countries in the sample, available from 1948 onward. All the values are free on board 
+and are expressed in U.S. dollars. These data are specifically used to 
+construct the transition matrix of the GVAR models.
 
 ```{r}
 data('CM_Trade')
-```
-
-The GVAR factors database casts country-specific lists of all the
-factors that are used in the estimation of each country's VARX(1,1,1).
-The function titled `DatabasePrep()` provides assistance to structure
-the data in a similar fashion to this form. Moreover, a specific
-function for computing the star risk factors is detailed in the Section
-\@ref(S:SectionGVAR).
-
-```{r}
-data('CM_Factors_GVAR')
 ```
 
 ## Import data from Excel files {#S:SectionImport}
@@ -690,6 +683,7 @@ elements:
     restricted least squares.
 
 ```{r}
+data('CM_Factors_GVAR')
 GVARinputs <- list(Economies = Economies, GVARFactors = FactorsGVAR, VARXtype ="constrained: Inflation")
 ```
 
@@ -733,7 +727,6 @@ check on the inputs provided in *GVARinputs*.
 
 ```{r}
 data("CM_Factors_GVAR")
-
 GVARinputs <- list(Economies = Economies, GVARFactors = FactorsGVAR, VARXtype = "unconstrained", 
                    Wgvar = W_gvar)
 N <- 3

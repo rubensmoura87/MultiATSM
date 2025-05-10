@@ -223,8 +223,6 @@ DatabasePrep <- function(t_First, t_Last, Economies, N, FactorLabels, ModelType,
 
 
 
-
-
 #################################################################################################################
 #' Exclude series that contain NAs
 

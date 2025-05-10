@@ -59,13 +59,11 @@ LoadData("CM_2024")
 data('CM_Yields')
 
 ## -----------------------------------------------------------------------------
-data('CM_Factors')
+data("CM_GlobalMacroFactors")
+data('CM_DomMacroFactors')
 
 ## -----------------------------------------------------------------------------
 data('CM_Trade')
-
-## -----------------------------------------------------------------------------
-data('CM_Factors_GVAR')
 
 ## -----------------------------------------------------------------------------
 Initial_Date <- "2006-09-01" # Format "yyyy-mm-dd"
@@ -203,6 +201,7 @@ FactorsChina <- RiskFactors[1:7, ]
 PdynPara <- VAR(FactorsChina, VARtype= "unconstrained")
 
 ## -----------------------------------------------------------------------------
+data('CM_Factors_GVAR')
 GVARinputs <- list(Economies = Economies, GVARFactors = FactorsGVAR, VARXtype ="constrained: Inflation")
 
 ## -----------------------------------------------------------------------------
@@ -216,7 +215,6 @@ print(W_gvar)
 
 ## -----------------------------------------------------------------------------
 data("CM_Factors_GVAR")
-
 GVARinputs <- list(Economies = Economies, GVARFactors = FactorsGVAR, VARXtype = "unconstrained", 
                    Wgvar = W_gvar)
 N <- 3
