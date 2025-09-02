@@ -32,6 +32,7 @@
 #' @param GVARinputs List. Inputs for GVAR model estimation (see \code{GVAR}). Default is NULL.
 #' @param tol convergence tolerance (scalar). Default value is 1e-4.
 #' @param TimeCount computes the required time for estimation of the model. Default is TRUE.
+#' @param verbose Logical flag controlling function messaging.
 #'
 #'@examples
 #'#' # See an example of implementation in the vignette file of this package (Section 4).
@@ -47,7 +48,7 @@
 #'@keywords internal
 
 Optimization_PE <- function(f, ListInputSet, FactorLabels, Economies, ModelType, JLLinputs = NULL, GVARinputs= NULL,
-                            tol= 1e-4, TimeCount = TRUE){
+                            tol= 1e-4, TimeCount = TRUE, verbose){
 
   # 1) Transform initial guesses of K1XQ and SSZ into auxiliary parameters that
   # will NOT be concentrated out of the log-likelihood function (llk)
@@ -60,8 +61,8 @@ Optimization_PE <- function(f, ListInputSet, FactorLabels, Economies, ModelType,
 
   # 3) Optimization of the llk
   if (TimeCount) { start_time <- Sys.time() }
-  AuxVec_opt <- OptimizationSetup_ATSM(AuxVec_0, FFvec, ListInputSet$OptRun, tol)
-  if (TimeCount) { Optimization_Time(start_time) }
+  AuxVec_opt <- OptimizationSetup_ATSM(AuxVec_0, FFvec, ListInputSet$OptRun, tol, verbose)
+  if (TimeCount) { Optimization_Time(start_time, verbose) }
 
   # 4) Build the full auxiliary vector, including concentrated parameters
   Up_Temp <- Update_ParaList(AuxVec_opt$x0, sizex= AuxVec_opt$Dim_x, con= 'concentration', FactorLabels,
@@ -103,9 +104,25 @@ Optimization_PE <- function(f, ListInputSet, FactorLabels, Economies, ModelType,
 #' @param tol Convergence tolerance (scalar). The default is 1e-4.
 #' @param TimeCount Logical. If TRUE, computes the time required for model estimation. Default is TRUE.
 #' @param BS_outputs Logical. If TRUE, generates a simplified output list in the bootstrap setting. Default is FALSE.
+#' @param verbose Logical flag controlling function messaging. Default is TRUE.
 #'
 #'@examples
-#' # See examples in the vignette file of this package (Section 4).
+#' LoadData("CM_2024")
+#' ModelType <- "JPS original"
+#' Economy <- "Brazil"
+#' t0 <- "01-05-2007" # Initial Sample Date (Format: "dd-mm-yyyy")
+#' tF <- "01-12-2018" # Final Sample Date (Format: "dd-mm-yyyy")
+#' N <- 1
+#' GlobalVar <- "Gl_Eco_Act" # Global Variables
+#' DomVar <- "Eco_Act" # Domestic Variables
+#' DataFreq <- "Monthly"
+#' StatQ <- 0
+#'
+#' FacLab <- LabFac(N, DomVar, GlobalVar, Economy, ModelType)
+#' ATSMInputs <- InputsForOpt(t0, tF, ModelType, Yields, GlobalMacroVar, DomesticMacroVar,
+#'                            FacLab, Economy, DataFreq, CheckInputs = FALSE)
+#'
+#'OptPara <- Optimization(ATSMInputs, StatQ, DataFreq, FacLab, Economy, ModelType)
 #'
 #'@return
 #' An object of class 'ATSMModelOutputs' containing model outputs after the optimization of the chosen ATSM specification.
@@ -122,10 +139,11 @@ Optimization_PE <- function(f, ListInputSet, FactorLabels, Economies, ModelType,
 #'@export
 
 Optimization <- function(MLEinputs, StatQ, DataFreq, FactorLabels, Economies, ModelType, tol= 1e-4,
-                            TimeCount = TRUE, BS_outputs = FALSE){
-
-  cat("2) ATSM ESTIMATION : POINT ESTIMATE ANALYSIS \n")
-  cat("2.1) Estimating ATSM ... \n")
+                            TimeCount = TRUE, BS_outputs = FALSE, verbose = TRUE){
+  if (verbose) {
+  message("2) ATSM ESTIMATION : POINT ESTIMATE ANALYSIS")
+  message("2.1) Estimating ATSM ...")
+  }
   GVARinputs <- MLEinputs$GVARinputs
   JLLinputs <- MLEinputs$JLLinputs
 
@@ -143,9 +161,10 @@ if (any(ModelType ==c('JPS original', 'JPS global', "GVAR single"))){
     # 2) Set the optimization settings
     VarLab <- ParaLabelsOpt(ModelType, StatQ, MLEinputsCS, BS_outputs)
 
-    cat(paste(" ... for country:", Economies[i], ". This may take several minutes. \n"))
-     ModelParaList[[ModelType]][[Economies[i]]] <- Optimization_PE(f, VarLab, FactorLabels, Economies, ModelType,
-                                                                JLLinputs, GVARinputs, tol, TimeCount= TimeCount)}
+    if (verbose) message(paste(" ... for country:", Economies[i], ". This may take several minutes."))
+    ModelParaList[[ModelType]][[Economies[i]]] <- Optimization_PE(f, VarLab, FactorLabels, Economies, ModelType,
+                                                                JLLinputs, GVARinputs, tol, TimeCount = TimeCount,
+                                                                verbose)}
 } else {
 
   # 1) Build the objective function
@@ -153,9 +172,9 @@ if (any(ModelType ==c('JPS original', 'JPS global', "GVAR single"))){
   # 2) Set the optimization settings
   VarLab <- ParaLabelsOpt(ModelType, StatQ, MLEinputs, BS_outputs)
 
-  cat("... This may take several minutes.\n")
+  if (verbose) message("... This may take several minutes.")
   ModelParaList[[ModelType]] <- Optimization_PE(f, VarLab, FactorLabels, Economies, ModelType, JLLinputs,
-                                              GVARinputs, tol, TimeCount= TimeCount)
+                                              GVARinputs, tol, TimeCount= TimeCount, verbose)
 }
 
 # Store metadata inside the class without explicitly exporting it
@@ -281,15 +300,18 @@ K1XQStationary<- function(StationaryEigenvalues){
 #'@param FFvec Log-likelihood function
 #'@param EstType Estimation type
 #'@param tol convergence tolerance (scalar). Default value is set as 1e-4.
+#'@param verbose Logical flag controlling function messaging.
+#'
+#'@importFrom pracma fminunc
 #'
 #'@keywords internal
 
-OptimizationSetup_ATSM <- function(AuxVecSet, FFvec, EstType, tol= 1e-4){
+OptimizationSetup_ATSM <- function(AuxVecSet, FFvec, EstType, tol= 1e-4, verbose){
 
   # 1) Optimization settings
   Max_AG_Iteration <- 1e4
   Previous_Optimal_Obj <-  -1e20
-  options200 <- neldermead::optimset(MaxFunEvals = 200*length(AuxVecSet$x0), Display =  "off",
+  options200 <- optimset(MaxFunEvals = 200*length(AuxVecSet$x0), Display =  "off",
                                      MaxIter = 200, GradObj='off', TolFun= 10^-8, TolX= 10^-8)
   options1000 <- options200
   options1000$MaxIter <- 1000
@@ -315,13 +337,13 @@ OptimizationSetup_ATSM <- function(AuxVecSet, FFvec, EstType, tol= 1e-4){
         }
 
         FFtemp <- function(...) FFtemporary(..., scaling_vector = scaling_vector, FFvectorized = FFvec)
-        x1 <- pracma::fminunc(x0=AuxVecSet$x0/scaling_vector, FFtemp , gr = NULL, tol = options200$TolFun,
+        x1 <- fminunc(x0=AuxVecSet$x0/scaling_vector, FFtemp , gr = NULL, tol = options200$TolFun,
                       maxiter = options200$MaxIter , maxfeval = options200$MaxFunEvals )
 
         x1 <- x1$par*scaling_vector
 
       } else{
-        x1 <- pracma::fminunc(x0=AuxVecSet$x0, FF , gr = NULL, tol = options200$TolFun, maxiter = options200$MaxIter,
+        x1 <- fminunc(x0=AuxVecSet$x0, FF , gr = NULL, tol = options200$TolFun, maxiter = options200$MaxIter,
                       maxfeval = options200$MaxFunEvals)
         x1 <- x1$par
       }
@@ -329,12 +351,12 @@ OptimizationSetup_ATSM <- function(AuxVecSet, FFvec, EstType, tol= 1e-4){
       if (FF(x1, FFvec)<FF(AuxVecSet$x0, FFvec)){ AuxVecSet$x0 <- x1 }
     }
     if (!grepl('fminunc only', EstType)){
-      x1<- neldermead::fminsearch(function(x) FF(x, FFvectorized = FFvec), AuxVecSet$x0, options1000)$optbase$xopt
+      x1<- fminsearch(function(x) FF(x, FFvectorized = FFvec), AuxVecSet$x0, options1000)$optbase$xopt
       if (FF(x1, FFvec)<FF(AuxVecSet$x0, FFvec)){ AuxVecSet$x0 <- x1 }
     }
 
     newF_value <- FF(AuxVecSet$x0, FFvec)
-    cat(paste("   *** Estimation round", count+1, "completed *** \n"))
+    if (verbose) message(paste("   *** Estimation round", count+1, "completed ***"))
 
     converged <-   (abs(oldF_value - newF_value)<tol) ||(count>Max_AG_Iteration && newF_value > Previous_Optimal_Obj)
     oldF_value <- newF_value
@@ -342,7 +364,7 @@ OptimizationSetup_ATSM <- function(AuxVecSet, FFvec, EstType, tol= 1e-4){
     count <- count + 1
 
   }
-  cat('-- Done! \n')
+  if (verbose) message('-- Done!')
 
   return(AuxVecSet)
   }
@@ -485,7 +507,10 @@ df__dx <- function(f, x) {
     hxm[i] <- adjust_delta(f, x, hxm[i], i, fx0, -1)
   }
 
-  y <- matrix(NaN, nrow = length(x), ncol = length(f(x = x)))
+  # y <- matrix(NaN, nrow = length(x), ncol = length(f(x = x)))
+  # If f(x) returns a vector of length T, replace with T_dim
+  T_dim <- length(f(x = x))
+  y <- matrix(NaN, nrow = length(x), ncol = T_dim)
 
   for (i in seq_along(x)) {
     temp <- matrix(list(), 5, 5)
@@ -551,14 +576,15 @@ adjust_delta <- function(f, x, delta, i, fx0, direction) {
 #'Compute the time elapsed in the numerical optimization
 #'
 #'@param start_time Starting time
+#'@param verbose Logical flag controlling function messaging.
 #'
 #'@keywords internal
 
-Optimization_Time <- function(start_time){
+Optimization_Time <- function(start_time, verbose) {
 
 elapsed <- as.numeric(difftime(Sys.time(), start_time, units = "secs"))
 units <- c("seconds", "minutes", "hours")
 scale <- c(1, 60, 3600)
 idx <- max(which(elapsed >= scale))
-cat(sprintf("Elapsed time: %.2f %s\n", elapsed / scale[idx], units[idx]))
+if (verbose) message(sprintf("Elapsed time: %.2f %s", elapsed / scale[idx], units[idx]))
 }

@@ -4,10 +4,12 @@
 \alias{Optimization_Time}
 \title{Compute the time elapsed in the numerical optimization}
 \usage{
-Optimization_Time(start_time)
+Optimization_Time(start_time, verbose)
 }
 \arguments{
 \item{start_time}{Starting time}
+
+\item{verbose}{Logical flag controlling function messaging.}
 }
 \description{
 Compute the time elapsed in the numerical optimization

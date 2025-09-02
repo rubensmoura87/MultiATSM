@@ -25,17 +25,17 @@ RiskFactorsPrep <- function(FactorSet, Economies, FactorLabels, Initial_Date, Fi
   C <- length(Economies) # We subtract 1 because we want to exclude the list of global factors
   N <- length(FactorLabels$Spanned)
   M <- length(FactorLabels$Domestic) - N
-  T <- length(FactorSet[[1]][[1]][[1]])
+  T_dim <- length(FactorSet[[1]][[1]][[1]])
 
 
-  ZZfull <- matrix(NA, nrow= C*(N+M)+G, ncol = T)
-  ZZfull[seq_len(G),] <- do.call(rbind,lapply(FactorSet$Global, matrix, ncol=T))
+  ZZfull <- matrix(NA, nrow= C*(N+M)+G, ncol = T_dim)
+  ZZfull[seq_len(G),] <- do.call(rbind,lapply(FactorSet$Global, matrix, ncol=T_dim))
 
   # 1) Assign variables:
   idx0 <- G
   for (i in 1:C){
     idx1 <- idx0 + N+M
-    ZZfull[(idx0+1):idx1,] <- do.call(rbind,lapply(FactorSet[[Economies[i]]]$Factors[1:(N+M)], matrix, ncol=T))
+    ZZfull[(idx0+1):idx1,] <- do.call(rbind,lapply(FactorSet[[Economies[i]]]$Factors[1:(N+M)], matrix, ncol=T_dim))
     idx0 <- idx1
   }
 
@@ -59,7 +59,7 @@ RiskFactorsPrep <- function(FactorSet, Economies, FactorLabels, Initial_Date, Fi
   }
   # (ii) Daily Business Days data
   if (DataFrequency== "Daily Business Days"){
-    DateLabels <- 1:T
+    DateLabels <- 1:T_dim
   }
   # (iii) Weekly data
   if (DataFrequency== "Weekly"){

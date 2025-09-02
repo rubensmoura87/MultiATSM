@@ -2,9 +2,17 @@
 % Please edit documentation in R/NumOutputs.R
 \name{NumOutputs}
 \alias{NumOutputs}
-\title{Constructs the model numerical outputs (model fit, IRFs, GIRFs, FEVDs, GFEVDs, and risk premia decomposition)}
+\title{Constructs the model numerical outputs (model fit, IRFs, GIRFs, FEVDs, GFEVDs, and term premia decomposition)}
 \usage{
-NumOutputs(ModelType, ModelPara, InputsForOutputs, FactorLabels, Economies)
+NumOutputs(
+  ModelType,
+  ModelPara,
+  InputsForOutputs,
+  FactorLabels,
+  Economies,
+  Folder2save = NULL,
+  verbose = TRUE
+)
 }
 \arguments{
 \item{ModelType}{A character vector indicating the model type to be estimated.}
@@ -16,10 +24,15 @@ NumOutputs(ModelType, ModelPara, InputsForOutputs, FactorLabels, Economies)
 \item{FactorLabels}{A list of character vectors with labels for all variables in the model.}
 
 \item{Economies}{A character vector containing the names of the economies included in the system.}
+
+\item{Folder2save}{Folder path where the outputs will be stored. Default option saves the outputs in a temporary directory.}
+
+\item{verbose}{Logical flag controlling function messaging. Default is TRUE.}
 }
 \value{
-List of the model numerical outputs, namely
+An object of class 'ATSMNumOutputs' containing the following keys elements:
 \enumerate{
+\item Model parameter estimates
 \item Model fit of bond yields
 \item IRFs
 \item FEVDs
@@ -29,13 +42,21 @@ List of the model numerical outputs, namely
 }
 }
 \description{
-Constructs the model numerical outputs (model fit, IRFs, GIRFs, FEVDs, GFEVDs, and risk premia decomposition)
+Constructs the model numerical outputs (model fit, IRFs, GIRFs, FEVDs, GFEVDs, and term premia decomposition)
 }
 \details{
 Both IRFs and FEVDs are computed using the Cholesky decomposition method. The risk factors are ordered as follows: (i) global unspanned factors, and (ii) domestic unspanned and spanned factors for each country. The order of countries follows the sequence defined in the \code{Economies} vector.
 }
 \examples{
-# See an example of implementation in the vignette file of this package (Section 4).
+data("ParaSetEx")
+data("InpForOutEx")
+# Adjust inputs according to the loaded features
+ModelType <- "JPS original"
+Economy <- "Brazil"
+FacLab <- LabFac(N = 1, DomVar ="Eco_Act" , GlobalVar = "Gl_Eco_Act", Economy, ModelType)
+
+NumOut <- NumOutputs(ModelType, ModelParaEx, InpForOutEx, FacLab, Economy,
+                     Folder2save = NULL, verbose = FALSE)
 
 }
 \references{

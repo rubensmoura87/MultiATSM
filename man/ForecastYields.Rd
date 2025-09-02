@@ -13,7 +13,9 @@ ForecastYields(
   JLLlist = NULL,
   GVARlist = NULL,
   WishBRW,
-  BRWlist = NULL
+  BRWlist = NULL,
+  Folder2save = NULL,
+  verbose = TRUE
 )
 }
 \arguments{
@@ -34,6 +36,10 @@ ForecastYields(
 \item{WishBRW}{Whether to estimate the physical parameter model with bias correction, based on the method by Bauer, Rudebusch and Wu (2012) (see \code{\link{Bias_Correc_VAR}} function). Default is set to 0.}
 
 \item{BRWlist}{List of necessary inputs for performing the bias-corrected estimation (see \code{\link{Bias_Correc_VAR}} function).}
+
+\item{Folder2save}{Folder path where the outputs will be stored. Default option saves the outputs in a temporary directory.}
+
+\item{verbose}{Logical flag controlling function messaging. Default is TRUE.}
 }
 \value{
 An object of class 'ATSMModelForecast' containing the following elements:
@@ -52,6 +58,17 @@ Generates forecasts of bond yields for all model types
 }
 
 \examples{
-# See an example of implementation in the vignette file of this package (Section 4).
+\donttest{
+data("ParaSetEx")
+data("InpForOutEx")
+# Adjust inputs according to the loaded features
+ModelType <- "JPS original"
+Economy <- "Brazil"
+FacLab <- LabFac(N = 1, DomVar = "Eco_Act", GlobalVar = "Gl_Eco_Act", Economy, ModelType)
+InpForOutEx[[ModelType]]$Forecasting <- list(WishForecast = 1, ForHoriz = 12,  t0Sample = 1,
+                                            t0Forecast = 143, ForType = "Expanding")
 
+Forecast <- ForecastYields(ModelType, ModelParaEx, InpForOutEx, FacLab, Economy,
+                          WishBRW = 0, verbose = TRUE)
+}
 }

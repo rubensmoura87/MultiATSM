@@ -277,7 +277,12 @@ several general inputs, namely:
     enforcing this stationary constraint may prolong model estimation,
     it can improve the convergence of the model.
 
-**6. Output label**
+
+**6. Selected folder to save outputs**
+
+-  Path where the selected graphical outputs will be saved. If set to `NULL`, the outputs are stored in the user's *temporary directory* (accessible via `tempdir()`).
+
+**7. Output label**
 
 -   Character vector of length one, specifying the name used in the file
     that stores the model outputs.
@@ -304,7 +309,10 @@ DataFrequency <- "Monthly"
 # 5) Risk-neutral stationary constraint
 StationarityUnderQ <- 0 # 1 = set stationary condition under the Q; 0 = no stationary condition
 
-# 6) Output label
+# 6) Path to save outputs
+Folder2Save <- NULL
+
+# 7) Output label
 OutputLabel <- "Model_demo"
 ```
 
@@ -473,9 +481,8 @@ WishOrthoJLLgraphs <- 0 # YES: 1; No = 0.
 
 The function `InputsForOutputs()` can provide some guidance for
 customizing the features of the wished outputs. Conditional to these
-settings, individual folders are created at the user's *temporary
-directory* (which can be accessed using `tempdir()` ) to store the
-different types of the desired graphical outputs.
+settings, individual folders are created at the selected `Folder2Save` to store the
+different types of the desired graphical outputs. The selected outputs are also printed to the user' console.
 
 ### Bond yield decomposition
 
@@ -838,24 +845,26 @@ this package for a detailed reproduction.
 ########################################################################################################
 #################################### USER INPUTS #######################################################
 ########################################################################################################
+library(MultiATSM)
 # A) Load database data
 LoadData("CM_2024")
 
 # B) GENERAL model inputs
-ModelType <- "JPS multi" # available options: "JPS original", "JPS global", "GVAR single", "JPS multi",
+ModelType <- "JPS original" # available options: "JPS original", "JPS global", "GVAR single", "JPS multi",
                           #"GVAR multi", "JLL original", "JLL No DomUnit", "JLL joint Sigma".
 
-Economies <- c("China", "Brazil", "Mexico") # Names of the economies from the economic system
+Economies <- c("China", "Brazil") # Names of the economies from the economic system
 GlobalVar <- c("Gl_Eco_Act")# Global Variables
-DomVar <- c("Eco_Act", "Inflation") # Country-specific variables
+DomVar <- c("Eco_Act") # Country-specific variables
 N <- 2  # Number of spanned factors per country
 
-t0_sample <- "01-05-2005" # Format: "dd-mm-yyyy"
+t0_sample <- "01-12-2007" # Format: "dd-mm-yyyy"
 tF_sample <- "01-12-2019" # Format: "dd-mm-yyyy"
 
 OutputLabel <- "Test" # label of the model for saving the file
 DataFreq <-"Monthly" # Frequency of the data
 
+Folder2Save <- NULL # Folder to save the required graphical outputs. NULL -> temporary directory
 StatQ <- 0 # Wish to impose stationary condition for the eigenvalues of each country: YES: 1,NO:0
 
 # B.1) SPECIFIC model inputs
@@ -894,7 +903,7 @@ WishOrthoJLLgraphs <- 0
 
 # D) Bootstrap settings
 WishBootstrap <- 1 #  YES: 1; No = 0.
-BootList <- list(methodBS = 'bs', BlockLength = 4, ndraws = 5, pctg =  95)
+BootList <- list(methodBS = 'bs', BlockLength = 4, ndraws = 4, pctg =  95)
 # methodBS: bootstrap method. Available options: (i) 'bs' ; (ii) 'wild'; (iii) 'block'
 # BlockLength: Block length, necessary input for the block bootstrap method
 # ndraws: number of bootstrap draws
@@ -902,14 +911,16 @@ BootList <- list(methodBS = 'bs', BlockLength = 4, ndraws = 5, pctg =  95)
 
 # E) Out-of-sample forecast
 WishForecast <- 1 #  YES: 1; No = 0.
-ForecastList <- list(ForHoriz = 12,  t0Sample = 1, t0Forecast = 162, ForType = "Rolling")
+ForecastList <- list(ForHoriz = 12,  t0Sample = 1, t0Forecast = 131, ForType = "Rolling")
 # ForHoriz: forecast horizon
 # t0Sample:   initial sample date
 # t0Forecast:  last sample date for the first forecast
 # ForType: Available options are "Rolling" or "Expanding"
 
 #########################################################################################################
-############################### NO NEED TO MAKE CHANGES FROM HERE #######################################
+## NO NEED TO MAKE CHANGES FROM HERE: 
+## The sections below automatically process the inputs provided above, run the model 
+## estimation, generate the numerical and graphical outputs, and save results.
 #########################################################################################################
 
 # 2) Minor preliminary work: get the sets of factor labels and  a vector of common maturities
@@ -929,20 +940,21 @@ InputsForOutputs <- InputsForOutputs(ModelType, Horiz, DesiredGraphs, OutputLabe
                                     FPmatLim, WishBootstrap, BootList, WishForecast, ForecastList)
 
 # b) Fit, IRF, FEVD, GIRF, GFEVD, and Term Premia
-NumericalOutputs <- NumOutputs(ModelType, ModelParaList, InputsForOutputs, FactorLabels, Economies)
+NumericalOutputs <- NumOutputs(ModelType, ModelParaList, InputsForOutputs, FactorLabels, Economies,   
+                               Folder2Save)
 
 # c) Confidence intervals (bootstrap analysis)
 BootstrapAnalysis <- Bootstrap(ModelType, ModelParaList, NumericalOutputs, Economies, InputsForOutputs,
-                               FactorLabels, JLLlist, GVARlist, WishBC, BRWlist)
+                               FactorLabels, JLLlist, GVARlist, WishBC, BRWlist, Folder2Save)
 
 # 6) Out-of-sample forecasting
 Forecasts <- ForecastYields(ModelType, ModelParaList, InputsForOutputs, FactorLabels, Economies,
-                            JLLlist, GVARlist, WishBC, BRWlist)
+                            JLLlist, GVARlist, WishBC, BRWlist, Folder2Save)
 ```
 
 ## User-Friendly Inspection of Key Elements in the Selected ATSM Specification 
 
-Starting from version $1.3.0$, the *MultiATSM* package provides additional ways to concisely inspect key elements of the selected ATSM. In particular, users can now gain an alternative perspective on the general model inputs, optimized model parameters, and root mean square error (RMSE) from the forecast analysis. For clarity, the variable names used hereafter align with those presented in Section \@ref(S:SectionTemplate).
+Starting from version $1.3.0$, the *MultiATSM* package provides additional ways to concisely inspect key elements of the selected ATSM. In particular, users can now gain an alternative perspective on the general model inputs, optimized model parameters, graphocal outputs and root mean square error (RMSE) from the forecast analysis. For clarity, the variable names used hereafter align with those presented in Section \@ref(S:SectionTemplate).
 
 
 ### ATSM inputs
@@ -957,13 +969,33 @@ print(Out$ATSMInputs)
 summary(Out$ATSMInputs) 
 ```
 
+
 ### ATSM parameters
 The `Optimization()` function returns an object of class *'ATSMModelOutputs'*, which includes the `summary()` $S3$ method. This method offers a parsimonious summary of key model outputs following 
 optimization process, including the maximum log-likelihood value, the intercept and slope coefficients from the model’s cross-sectional dimension, and the count of physical-measure eigenvalues greater than one—an indicator of potential explosive behavior in the model’s time series dimension. 
 
 ```{r}
-summary(Out$ModelParaList) 
+summary(Out$ModelPara) 
 ```
+
+### Graphical outputs
+The `NumOutputs()` function returns an object of class *ATSMNumOutputs*, which includes an `autoplot()` $S3$ method. This method allows users to inspect the empirical properties of the chosen specification by displaying graphical outputs in the console, regardless of whether they were saved to *Folder2Save*. The user must specify a plot type: `RiskFactors`, `Fit`, `TermPremia`, or one of `IRF`, `FEVD`, `GIRF`, `GFEVD` (each suffixed with `_Factors` or `_Yields`). For JLL-based models, an additional `_Ortho` suffix generates orthogonalized outputs. The examples below illustrate the responses of the Brazilian and Chinese yield curves to a global economic activity shock:
+
+```{r}
+GIRF_all <- autoplot(Out$NumOut, type = "GIRF_Yields")
+GIRF_all$Brazil$Gl_Eco_Act
+GIRF_all$China$Gl_Eco_Act
+```
+
+Additionally, the `autoplot()` $S3$ method for *ATSMModelBoot* objects—generated by the `Bootstrap()` function—allows users to assess the statistical significance of the results. The example below shows the responses of 12-month bond yields to several shocks.
+
+```{r}
+GIRF_all_Boot <- autoplot(Out$Bootstrap, Out$NumOut, type = "GIRF_Yields_Boot")
+GIRF_all_Boot$China$Y12M_China
+GIRF_all_Boot$Brazil$Y12M_Brazil
+```
+
+In this context, the `autoplot()` method requires two additional inputs beyond the *ATSMModelBoot* object. First, it takes an *ATSMNumOutputs* object to provide the point estimates of the selected output. Second, the user must specify the plot type, which follows the same structure as for *ATSMNumOutputs* objects, but with the added `_Boot` suffix. It is worth noting that, in this example, the point estimates (black lines) occasionally lie outside the confidence bands. This is not surprising, as the bootstrap was carried out with only a few draws (4).  
 
 
 ### Forecasts

@@ -1,17 +1,28 @@
-#' Constructs the model numerical outputs (model fit, IRFs, GIRFs, FEVDs, GFEVDs, and risk premia decomposition)
+#' Constructs the model numerical outputs (model fit, IRFs, GIRFs, FEVDs, GFEVDs, and term premia decomposition)
 #'
 #' @param ModelType A character vector indicating the model type to be estimated.
 #' @param ModelPara A list containing the point estimates of the model parameters. For details, refer to the outputs from the \code{\link{Optimization}} function.
 #' @param InputsForOutputs A list containing the necessary inputs for generating IRFs, GIRFs, FEVDs, GFEVDs and Term Premia.
 #' @param FactorLabels A list of character vectors with labels for all variables in the model.
 #' @param Economies A character vector containing the names of the economies included in the system.
+#' @param Folder2save Folder path where the outputs will be stored. Default option saves the outputs in a temporary directory.
+#' @param verbose Logical flag controlling function messaging. Default is TRUE.
 #'
 #' @examples
-#' # See an example of implementation in the vignette file of this package (Section 4).
+#' data("ParaSetEx")
+#' data("InpForOutEx")
+#' # Adjust inputs according to the loaded features
+#' ModelType <- "JPS original"
+#' Economy <- "Brazil"
+#' FacLab <- LabFac(N = 1, DomVar ="Eco_Act" , GlobalVar = "Gl_Eco_Act", Economy, ModelType)
+#'
+#' NumOut <- NumOutputs(ModelType, ModelParaEx, InpForOutEx, FacLab, Economy,
+#'                      Folder2save = NULL, verbose = FALSE)
 #'
 #' @returns
-#' List of the model numerical outputs, namely
+#' An object of class 'ATSMNumOutputs' containing the following keys elements:
 #' \enumerate{
+#' \item Model parameter estimates
 #' \item Model fit of bond yields
 #' \item IRFs
 #' \item FEVDs
@@ -27,21 +38,37 @@
 #' Pesaran, H. Hashem, and Shin, Yongcheol. "Generalized impulse response analysis in linear multivariate models." Economics letters 58.1 (1998): 17-29.
 #' @export
 
-NumOutputs <- function(ModelType, ModelPara, InputsForOutputs, FactorLabels, Economies) {
-  cat("2.2) Computing numerical outputs \n")
+NumOutputs <- function(ModelType, ModelPara, InputsForOutputs, FactorLabels, Economies, Folder2save = NULL,
+                       verbose = TRUE) {
+
+  if (verbose) message("2.2) Computing numerical outputs")
 
   AllNumOutputs <- list()
-  AllNumOutputs <- OutputConstruction(ModelType, ModelPara, InputsForOutputs, FactorLabels, Economies)
+  AllNumOutputs <- OutputConstruction(ModelType, ModelPara, InputsForOutputs, FactorLabels, Economies, verbose)
 
   # Save relevant numerical outputs
   PEoutputs <- list(ModelPara, AllNumOutputs)
   names(PEoutputs) <- c("Model Parameters", "Numerical Outputs")
-  saveRDS(PEoutputs, paste(tempdir(), "/PEoutputs_", InputsForOutputs$'Label Outputs', '.rds', sep = ""))
+
+  FolderPath <- if (is.null(Folder2save)) tempdir() else Folder2save
+  saveRDS(PEoutputs, paste(FolderPath, "/PEoutputs_", InputsForOutputs$'Label Outputs', '.rds', sep = ""))
 
   # Generate graphs, if previously selected
-  GraphicalOutputs(ModelType, ModelPara, AllNumOutputs, InputsForOutputs, Economies, FactorLabels)
+  GraphicalOutputs(ModelType, ModelPara, AllNumOutputs, InputsForOutputs, Economies, FactorLabels,
+                   FolderPath, verbose)
 
-  return(AllNumOutputs)
+  # Create model output object
+  attr(AllNumOutputs, "NumOuts") <- list(
+    ModelType = ModelType,
+    ModelPara = ModelPara,
+    NumOut = AllNumOutputs,
+    Inputs = InputsForOutputs,
+    Economies = Economies,
+    FactorLabels = FactorLabels
+  )
+
+  # Return the structured Outputs object
+  return(structure(AllNumOutputs, class = "ATSMNumOutputs"))
 }
 
 ######################################################################################################
@@ -49,35 +76,38 @@ NumOutputs <- function(ModelType, ModelPara, InputsForOutputs, FactorLabels, Eco
 #' Numerical outputs (variance explained, model fit, IRFs, GIRFs, FEVDs, GFEVDs, and risk premia decomposition)
 #' for all models
 #'
-#'@param ModelType string-vector containing the label of the model to be estimated
-#'@param ModelPara list of model parameter estimates (See the "Optimization" function)
-#'@param InputsForOutputs list containing the desired horizon of analysis for the model fit, IRFs, GIRFs, FEVDs, GFEVDs,
+#' @param ModelType string-vector containing the label of the model to be estimated
+#' @param ModelPara list of model parameter estimates (See the "Optimization" function)
+#' @param InputsForOutputs list containing the desired horizon of analysis for the model fit, IRFs, GIRFs, FEVDs, GFEVDs,
 #'                        and risk premia decomposition
-#'@param FactorLabels string-list based which contains all the labels of all the variables present in the model
-#'@param Economies string-vector containing the names of the economies which are part of the economic system
+#' @param FactorLabels string-list based which contains all the labels of all the variables present in the model
+#' @param Economies string-vector containing the names of the economies which are part of the economic system
+#' @param verbose Logical flag controlling function messaging. Default is TRUE.
 #'
 #'@keywords internal
 
-OutputConstruction <- function(ModelType, ModelPara, InputsForOutputs, FactorLabels, Economies){
+OutputConstruction <- function(ModelType, ModelPara, InputsForOutputs, FactorLabels, Economies, verbose = TRUE){
 
   # Output summary
   # Total Variance Explained and Model fit
+  if (verbose) message(" ** Total Variance explained")
   Total_Var_exp <- VarianceExplained(ModelType, ModelPara, FactorLabels, Economies)
-  cat(" ** Total Variance explained \n")
+
+  if (verbose) message(" ** Model Fit")
   ModFit <- YieldsFit(ModelType, ModelPara, FactorLabels, Economies)
-  cat(" ** Model Fit \n")
 
   # IRF and GIRF
+  if (verbose) message(" ** IRFs and GIRFs")
   IRFout <- IRFandGIRF(ModelType, ModelPara, InputsForOutputs[[ModelType]]$IRF$horiz, FactorLabels, Economies)
-    cat(" ** IRFs and GIRFs  \n")
 
   # FEVD and GFEVD
+  if (verbose) message(" ** FEVDs and GFEVDs")
   FEVDout <- FEVDandGFEVD(ModelType, ModelPara, InputsForOutputs[[ModelType]]$FEVD$horiz, FactorLabels, Economies)
-  cat(" ** FEVDs and GFEVDs  \n")
 
   # Risk Premia Decomposition
+  if (verbose) message(" ** Term Premia")
   TermPremia <- TermPremiaDecomp(ModelPara, FactorLabels, ModelType, InputsForOutputs, Economies)
-  cat(" ** Term Premia \n")
+
 
   NumericalOutputs <- list(Total_Var_exp, ModFit, IRFout$IRFs, FEVDout$FEVDs, IRFout$GIRFs, FEVDout$GFEVDs, TermPremia)
   names(NumericalOutputs) <- c("PC var explained", "Fit", "IRF", "FEVD", "GIRF", "GFEVD", "TermPremiaDecomp")
@@ -180,7 +210,7 @@ YieldsFit <- function(ModelType, ModelPara, FactorLabels, Economies) {
       InfoSet <- ModelPara[[ModelType]][[Economies[i]]]
       YieldData <- InfoSet$inputs$Y
       Z <- InfoSet$inputs$AllFactors
-      T <- ncol(Z)
+      T_dim <- ncol(Z)
       Afull <- InfoSet$rot$P$A
       Bspanned <- InfoSet$rot$P$B
       K0Z <- InfoSet$ests$K0Z
@@ -198,10 +228,10 @@ YieldsFit <- function(ModelType, ModelPara, FactorLabels, Economies) {
       P <- get_spanned_factors(Z, LabelSpannedCS, AllLabels)
 
       # Compute model fit and implied yields
-      Yieldfit <- compute_model_fit(Afull, Bspanned, P, J, T, YieldData)
+      Yieldfit <- compute_model_fit(Afull, Bspanned, P, J, T_dim, YieldData)
       Bfull <- BUnspannedAdapSep(G, M, ModelPara[[ModelType]], Economies, Economies[i], ModelType)
       dimnames(Bfull) <- list(rownames(YieldData), rownames(Z))
-      YieldModelImplied <- compute_model_implied_yields(Afull, Bfull, K0Z, K1Z, Z, J, T, YieldData)
+      YieldModelImplied <- compute_model_implied_yields(Afull, Bfull, K0Z, K1Z, Z, J, T_dim, YieldData)
 
       # Store results
       Output[[ModelType]][[Economies[i]]] <- list(
@@ -221,7 +251,7 @@ YieldsFit <- function(ModelType, ModelPara, FactorLabels, Economies) {
     K0Z <- InfoSet$ests$K0Z
     K1Z <- InfoSet$ests$K1Z
     J <- length(mat)
-    T <- ncol(Z)
+    T_dim <- ncol(Z)
 
     # Compute IdxSpanned
     IdxSpanned <- c()
@@ -236,10 +266,10 @@ YieldsFit <- function(ModelType, ModelPara, FactorLabels, Economies) {
     P <- Z[IdxSpanned, ]
 
     # Compute model fit and implied yields
-    Yieldfit <- compute_model_fit(Afull, Bspanned, P, C * J, T, YieldData)
+    Yieldfit <- compute_model_fit(Afull, Bspanned, P, C * J, T_dim, YieldData)
     Bfull <- BUnspannedAdapJoint(G, M, N, C, J, Bspanned)
     dimnames(Bfull) <- list(rownames(YieldData), rownames(Z))
-    YieldModelImplied <- compute_model_implied_yields(Afull, Bfull, K0Z, K1Z, Z, C * J, T, YieldData)
+    YieldModelImplied <- compute_model_implied_yields(Afull, Bfull, K0Z, K1Z, Z, C * J, T_dim, YieldData)
 
     Output <- list(
       "Yield Fit" = Yieldfit,
@@ -752,7 +782,7 @@ ComputeIRFs <- function(SIGMA, K1Z, BLoad, FactorLabels, FacDim, MatLength, IRFh
 #'
 #'#' @references
 #' \itemize{
-#' \item This function is a partially based on the version of the "irf" function from
+#' \item This function is partially based on the version of the "irf" function from
 #' Smith, L.V. and A. Galesi (2014). GVAR Toolbox 2.0, available at https://sites.google.com/site/gvarmodelling/gvar-toolbox.
 #'
 #' \item Pesaran and Shin, 1998. "Generalized impulse response analysis in linear multivariate models" (Economics Letters)
@@ -906,8 +936,8 @@ ComputeFEVDs <- function(SIGMA, K1Z, G0, BLoad, FactorLabels, FacDim, MatLength,
     acc1 <- (eslctCJ%*%BLoad%*%AdjTerm%*%Ry.h[,,l]%*%P%*%vslctCJ)^2
     num <- num + acc1
     acc2 <- diag(eslctCJ%*%BLoad%*%AdjTerm%*%Ry.h[,,l]%*%invGSigmau%*%t(invG)%*%t(Ry.h[,,l])%*%t(AdjTerm)%*%t(BLoad)%*%eslctCJ)
-    den<- den + acc2
-    FEVDresYields[ ,,l] <- scale*num/den
+    den <- den + acc2
+    FEVDresYields[ , , l] <- scale*num/den
   }
 
   FEVDYields <- aperm(FEVDresYields, c(3, 2, 1))
@@ -1079,7 +1109,7 @@ YieldsFitAll <- function(MatInt, ModelPara, FactorLabels, ModelType, Economies, 
 
   # 0) Auxliary functions
   # a) Function to compute fitted yields
-  compute_fitted_yields <- function(MatInt, MatAll, K1XQ, ModelType, r0, SSX, X, T, dt, Economies,
+  compute_fitted_yields <- function(MatInt, MatAll, K1XQ, ModelType, r0, SSX, X, T_dim, dt, Economies,
                                     Time_Labels, Yield_Labels) {
 
     LoadingsLat <- A0N__BnAn(MatAll, K1XQ, ModelType, dX = NULL, r0, SSX, Economies)
@@ -1088,15 +1118,15 @@ YieldsFitAll <- function(MatInt, ModelPara, FactorLabels, ModelType, Economies, 
 
     if( ModelType %in% Joint_Lab){
       C <- length(Economies)
-      FitLat <- matrix(NA, nrow = C*length(MatInt), ncol = T)
+      FitLat <- matrix(NA, nrow = C*length(MatInt), ncol = T_dim)
     } else{
-      FitLat <- matrix(NA, nrow = length(MatInt), ncol = T)
+      FitLat <- matrix(NA, nrow = length(MatInt), ncol = T_dim)
     }
 
       IdxMatInt <- sort(unlist(lapply(MatInt, function(h) seq(h, length(AnXAll), by = max(MatAll)))))
       AnXInt <- AnXAll[IdxMatInt]
       BnXInt <- BnXAll[IdxMatInt, ]
-      FitLat <- matrix(AnXInt, nrow =  nrow(FitLat), ncol= T) + BnXInt %*% X
+      FitLat <- matrix(AnXInt, nrow =  nrow(FitLat), ncol= T_dim) + BnXInt %*% X
 
     if (ModelType %in% Joint_Lab) {
     colnames(FitLat) <- Time_Labels
@@ -1108,10 +1138,10 @@ YieldsFitAll <- function(MatInt, ModelPara, FactorLabels, ModelType, Economies, 
   }
 
   # b) Function to compute time series of the latent factors
-  compute_X <- function(ZZ, Wpca, BnX, AnX, T) {
+  compute_X <- function(ZZ, Wpca, BnX, AnX, T_dim) {
     PP <- ZZ
-    X <- matrix(NA, nrow = nrow(PP), ncol = T)
-    for (t in 1:T) {
+    X <- matrix(NA, nrow = nrow(PP), ncol = T_dim)
+    for (t in 1:T_dim) {
       X[, t] <- solve(Wpca %*% BnX, tol = 1e-50) %*% (PP[, t] - Wpca %*% AnX)
     }
     return(X)
@@ -1129,7 +1159,7 @@ YieldsFitAll <- function(MatInt, ModelPara, FactorLabels, ModelType, Economies, 
   M <- length(FactorLabels$Domestic) - N
   G <- length(FactorLabels$Global)
 
-  T <- if (ModelType %in% Joint_Lab) ncol(Mod_ParaSet$inputs$AllFactors) else
+  T_dim <- if (ModelType %in% Joint_Lab) ncol(Mod_ParaSet$inputs$AllFactors) else
     ncol(Mod_ParaSet[[Economies[1]]]$inputs$AllFactors)
 
   # 2) Compute results for joint or separate models
@@ -1138,19 +1168,19 @@ YieldsFitAll <- function(MatInt, ModelPara, FactorLabels, ModelType, Economies, 
     BnX <- Mod_ParaSet$rot$X$B
     AnX <- Mod_ParaSet$rot$X$A
     K1XQ <- Mod_ParaSet$ests$K1XQ
-    SSX <- Mod_ParaSet$rot$X$Q$SS
+    SSX <- Mod_ParaSet$rot$X$SS
     r0 <- Mod_ParaSet$ests$r0
     Wpca <- Mod_ParaSet$inputs$Wpca
     ZZ <- Mod_ParaSet$inputs$AllFactors
 
     b <- IdxSpanned(G, M, N, C)
     PP <- ZZ[b, ]
-    X <- compute_X(PP, Wpca, BnX, AnX, T)
+    X <- compute_X(PP, Wpca, BnX, AnX, T_dim)
 
     MatAll <- 1:max(mat / dt)
     Time_Labels <- colnames(Mod_ParaSet$inputs$AllFactors)
     Yield_Labels <- paste(MatInt, YLab, sep="")
-    FittedYieldsPerMat <- compute_fitted_yields(MatInt, MatAll, K1XQ, ModelType, r0, SSX, X, T, dt, Economies,
+    FittedYieldsPerMat <- compute_fitted_yields(MatInt, MatAll, K1XQ, ModelType, r0, SSX, X, T_dim, dt, Economies,
                                                 Time_Labels, Yield_Labels)
 
     h <- length(MatInt)
@@ -1174,7 +1204,7 @@ YieldsFitAll <- function(MatInt, ModelPara, FactorLabels, ModelType, Economies, 
       BnX <- Mod_ParaSet[[Economies[i]]]$rot$X$B
       AnX <- Mod_ParaSet[[Economies[i]]]$rot$X$A
       K1XQ <- Mod_ParaSet[[Economies[i]]]$ests$K1XQ
-      SSX <- Mod_ParaSet[[Economies[i]]]$rot$X$Q$SS
+      SSX <- Mod_ParaSet[[Economies[i]]]$rot$X$SS
       r0 <- Mod_ParaSet[[Economies[i]]]$ests$r0
       Wpca <- Mod_ParaSet[[Economies[i]]]$inputs$Wpca
       ZZ <- Mod_ParaSet[[Economies[i]]]$inputs$AllFactors
@@ -1189,11 +1219,11 @@ YieldsFitAll <- function(MatInt, ModelPara, FactorLabels, ModelType, Economies, 
       b <- match(LabelSpannedCS, AllLabels)
       PP <- ZZ[b, ]
 
-      X <- compute_X(PP, Wpca, BnX, AnX, T)
+      X <- compute_X(PP, Wpca, BnX, AnX, T_dim)
       MatAll <- 1:max(mat / dt)
       col_names <- colnames(Mod_ParaSet[[Economies[1]]]$inputs$AllFactors)
       row_names <- paste(MatInt, YLab, sep="")
-      FittedYieldsPerMat[[i]] <- compute_fitted_yields(MatInt, MatAll, K1XQ, ModelType, r0, SSX, X, T, dt, Economies, col_names, row_names)
+      FittedYieldsPerMat[[i]] <- compute_fitted_yields(MatInt, MatAll, K1XQ, ModelType, r0, SSX, X, T_dim, dt, Economies, col_names, row_names)
     }
 
     names(FittedYieldsPerMat) <- Economies
@@ -1277,7 +1307,7 @@ rhoParas <- function(ModelPara, N, ModelType, Economies){
 
   # Compute the intercept and slope coefficients of the short rate expressed as a function of the spanned factors
   # By definition: r_t = r0 + rho1_X* X_t
-  # But X_t = (W*Bx)^(-1)(P- WAx)
+  # But X_t = (W*BX)^(-1)(P- WAx)
   # so r_t = rho0_PP + rho1_PP*P_t
   # where (i) rho0_PP = r0 - rho1_X*(W*BX)^(-1)W*AX and (ii) rho1_PP = rho1_X (W*BX)^(-1)
 

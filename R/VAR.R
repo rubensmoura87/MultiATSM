@@ -1,8 +1,8 @@
 #' Estimates a standard VAR(1)
 #'
-#' @param RiskFactors A numeric matrix (FTx T) representing the time series of risk factors.
+#' @param RiskFactors A numeric matrix (F x T) representing the time series of risk factors.
 #' @param VARtype String vector with two possible values: 'unconstrained' or 'constrained'.
-#' @param Bcon Constraints matrix (F+1 x N), which includes an intercept. If Bcon(i,j) = NA, then B(i,j) is treated as a free parameter. \cr
+#' @param Bcon_Mat Constraints matrix (F+1 x N), which includes an intercept. Entries containing NAs are treated as free parameters. \cr
 #'             Default is set to NULL.
 #'
 #' @return intercept, feedback matrix and the variance-covariance matrix of a VAR(1)
@@ -13,86 +13,68 @@
 #'
 #' # Example 2: constrained case
 #' K <- nrow(RiskFactors)
-#' Bcon <- matrix(0, nrow = K, ncol = K+1)
-#' Bcon[ , 1:3] <- NaN
-#' VAR(RiskFactors, VARtype= 'constrained', Bcon)
+#' Bcon_Mat <- matrix(0, nrow = K, ncol = K+1)
+#' Bcon_Mat[ , 1:3] <- NaN
+#' VAR(RiskFactors, VARtype= 'constrained', Bcon_Mat)
 #'
 #' @export
 
-VAR <- function(RiskFactors, VARtype, Bcon = NULL) {
+VAR <- function(RiskFactors, VARtype, Bcon_Mat = NULL) {
+
   K <- nrow(RiskFactors)
-  T <- ncol(RiskFactors)
-  LHS <- RiskFactors[, 2:T]
-  RHS <- RiskFactors[, 1:(T-1)]
+  T_dim <- ncol(RiskFactors)
+  LHS <- RiskFactors[, 2:T_dim]
+  RHS <- RiskFactors[, 1:(T_dim-1)]
 
   if (VARtype == 'unconstrained') {
     RegVAR <- stats::lm(t(LHS) ~ t(RHS)) # VAR(1) under the P.
     K0Z <- t(t(RegVAR$coefficients[1, ]))
     K1Z <- t(RegVAR$coefficients[2:(K+1), ])
     eZ <- RegVAR$residuals
-    SSZ <- crossprod(eZ) / (T - 1)
+    SSZ <- crossprod(eZ) / (T_dim - 1)
   } else { # i.e. if VARtype == 'constrained'
-    intercept <- rep(1, times = T-1)
+    intercept <- rep(1, times = T_dim-1)
     RHS <- rbind(intercept, RHS)
-    Coeff <- Reg__OLSconstrained(LHS, RHS, Bcon)
+    Coeff <- Est_RestOLS(LHS, RHS, Bcon_Mat)
     colnames(Coeff) <- rownames(RHS)
     rownames(Coeff) <- rownames(RHS)[-1]
 
     K0Z <- as.matrix(Coeff[, 1])
     K1Z <- Coeff[, 2:(K+1)]
     eZ <- LHS - Coeff %*% RHS
-    SSZ <- crossprod(t(eZ)) / (T - 1)
+    SSZ <- crossprod(t(eZ)) / (T_dim - 1)
   }
 
   return(list(K0Z = K0Z, K1Z = K1Z, SSZ = SSZ))
 }
 
 #########################################################################################################
-#' Restricted OLS regression
+#' Estimate a restricted OLS model
 #'
-#' @param Y left hand side variables (M x T)
-#' @param X regressors (i.e. N-1 variables + the intercept) (N x T)
-#' @param Bcon constraints matrix (M x N). If Bcon(i,j) = nan --> B(i,j) is a free parameter
-#' @param G weighting matrix (psd) - (M x M). Default is set to be identity
-#'
-#' @keywords internal
+#' @param LHS left hand side variables (M x T).
+#' @param RHS right hand side variables (should include the intercept, if desired) (N x T).
+#' @param Bmat matrix of constraints (M x N). Entries containing NAs are treated as free parameters.
 #'
 #' @return matrix of coefficient (M x N)
-#' @details
-#' Estimate of B is obtained by minimizing the objective:
-#'   sum_t (Y_t-B X_t)' G^(-1) (Y_t-B*X_t)
-#' subject to the constraint that B = Bcon for all non-nan entries of Bcon
-#'
-#' @references
-#' This function is based on the "Reg__OLSconstrained" function by Le and Singleton (2018).
-#'  "A Small Package of Matlab Routines for the Estimation of Some Term Structure Models."
-#'  (Euro Area Business Cycle Network Training School - Term Structure Modelling).
-#' Available at: https://cepr.org/40029
-#'
+#' @keywords internal
 
-Reg__OLSconstrained <- function(Y, X, Bcon, G = NULL) {
-  M <- nrow(Y)
-  T <- ncol(Y)
-  N <- nrow(X)
+Est_RestOLS <- function(LHS, RHS, Bmat) {
 
-  if (is.null(G)) {
-    G <- diag(M)
-  }
+  T_dim <- ncol(LHS)
 
-  id <- is.nan(Bcon) # id= TRUE -> free parameter; id= FALSE -> constrained
+  # Identify constrained vs free parameters
+  idx_FreePara <- is.nan(Bmat) # TRUE = free parameter
+  Betas  <- Bmat
+  Betas[is.nan(Betas)] <- 0
 
-  B <- matrix(0, nrow = M, ncol = N)
-  B[!id] <- Bcon[!id]
+  # Precompute common matrices
+  XX <- tcrossprod(RHS) / T_dim
+  YX <- LHS %*% t(RHS) / T_dim
+  X_lg <- kronecker(XX, diag(nrow(LHS)))
+  Y_lg <- as.vector(YX)
 
-  if (any(B != 0)) {
-    Y <- Y - B %*% X
-  }
+  # Solve only for free parameters
+  Betas[idx_FreePara] <- solve(X_lg[idx_FreePara, idx_FreePara, drop = FALSE], Y_lg[idx_FreePara])
 
-  bigX <- kronecker((X%*%t(X))/T, solve(G))
-  bigY <- solve(G,Y%*%t(X)) /T
-
-
-  B[id] <- solve(bigX[id, id], bigY[id])
-
-  return(B)
+  return(Betas)
 }

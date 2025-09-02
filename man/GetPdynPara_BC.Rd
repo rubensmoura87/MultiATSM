@@ -11,7 +11,8 @@ GetPdynPara_BC(
   Economies,
   FactorLabels,
   GVARinputs,
-  JLLinputs
+  JLLinputs,
+  verbose
 )
 }
 \arguments{
@@ -28,6 +29,8 @@ GetPdynPara_BC(
 \item{GVARinputs}{list of necessary inputs for the estimation of GVAR-based models (see "GVAR" function)}
 
 \item{JLLinputs}{list of necessary inputs for the estimation of JLL-based models (see "JLL" function)}
+
+\item{verbose}{Logical flag controlling function messaging.}
 }
 \description{
 Compute P-dynamics parameters using the bias correction method from BRW (2012)

@@ -9,10 +9,25 @@
 #' @param GVARlist A list containing the necessary inputs for the estimation of GVAR-based models (see the \code{\link{GVAR}} function).
 #' @param WishBRW Whether to estimate the physical parameter model with bias correction, based on the method by Bauer, Rudebusch and Wu (2012) (see \code{\link{Bias_Correc_VAR}} function). Default is set to 0.
 #' @param BRWlist List of necessary inputs for performing the bias-corrected estimation (see \code{\link{Bias_Correc_VAR}} function).
+#' @param Folder2save Folder path where the outputs will be stored. Default option saves the outputs in a temporary directory.
+#' @param verbose Logical flag controlling function messaging. Default is TRUE.
 #'
 #' @examples
-#' # See an example of implementation in the vignette file of this package (Section 4).
+#' \donttest{
+#' data("ParaSetEx")
+#' data("InpForOutEx")
+#' # Adjust inputs according to the loaded features
+#' ModelType <- "JPS original"
+#' Economy <- "Brazil"
+#' FacLab <- LabFac(N = 1, DomVar = "Eco_Act", GlobalVar = "Gl_Eco_Act", Economy, ModelType)
+
+# Adjust Forecasting setting
+#' InpForOutEx[[ModelType]]$Forecasting <- list(WishForecast = 1, ForHoriz = 12,  t0Sample = 1,
+#'                                             t0Forecast = 143, ForType = "Expanding")
 #'
+#' Forecast <- ForecastYields(ModelType, ModelParaEx, InpForOutEx, FacLab, Economy,
+#'                           WishBRW = 0, verbose = TRUE)
+#'}
 #' @return
 #' An object of class 'ATSMModelForecast' containing the following elements:
 #' \enumerate{
@@ -28,16 +43,17 @@
 #' @export
 
 ForecastYields <- function(ModelType, ModelPara, InputsForOutputs, FactorLabels, Economies, JLLlist = NULL,
-                           GVARlist = NULL, WishBRW, BRWlist = NULL) {
+                           GVARlist = NULL, WishBRW, BRWlist = NULL, Folder2save = NULL, verbose = TRUE) {
 
-  cat("4) OUT-OF-SAMPLE FORECASTING ANALYSIS \n")
+  if (verbose) message("4) OUT-OF-SAMPLE FORECASTING ANALYSIS")
   forecast_info <- InputsForOutputs[[ModelType]]$Forecasting
 
   if (!forecast_info$WishForecast) {
-    cat("No bond yields forecasts were generated \n")
+    if (verbose) message("No bond yields forecasts were generated")
     return(NULL)
   }
 
+  FolderPath <- if (is.null(Folder2save)) tempdir() else Folder2save
   start_time <- Sys.time()
 
   # 1) Redefine some general model outputs
@@ -49,16 +65,16 @@ ForecastYields <- function(ModelType, ModelPara, InputsForOutputs, FactorLabels,
   t0Sample <- forecast_info$t0Sample
   t0Forecast <- forecast_info$t0Forecast
   H <- forecast_info$ForHoriz
-  T <- ncol(if (any(ModelType %in% c("JPS original", "JPS global", "GVAR single"))) {
+  T_dim <- ncol(if (any(ModelType %in% c("JPS original", "JPS global", "GVAR single"))) {
     ModelPara[[ModelType]][[Economies[1]]]$inputs$Y
   } else {
     ModelPara[[ModelType]]$inputs$Y
   })
 
-  nForecasts <- T - t0Forecast - H + 1 # Number of times that the model will be re-estimated
+  nForecasts <- T_dim - t0Forecast - H + 1 # Number of times that the model will be re-estimated
 
   # 2) Perform preliminary consistency checks
-  ChecksOOS(t0Forecast, t0Sample, nForecasts, ForecastType, T)
+  ChecksOOS(t0Forecast, t0Sample, nForecasts, ForecastType, T_dim)
 
   # 3) Redefine full sample time series
   YieldsFull <- GetYields_AllCountries(ModelPara, Economies, ModelType)
@@ -84,11 +100,13 @@ ForecastYields <- function(ModelType, ModelPara, InputsForOutputs, FactorLabels,
     # 4.1) Prepare the inputs of the likelihood function
     invisible(utils::capture.output(ATSMInputs <- InputsForOpt(T0_SubSample, TF_SubSample, ModelType, YieldsFull, Facts$Glob,
                                                                Facts$Dom, FactorLabels, Economies, DataFreq, GVARlist, JLLlist,
-                                                               WishBRW, BRWlist, UnitMatYields, CheckInputs = FALSE)))
+                                                               WishBRW, BRWlist, UnitMatYields,
+                                                               CheckInputs = FALSE, verbose = FALSE)))
 
     # 4.2) Optimization of the ATSM
     invisible(utils::capture.output(FullModelParaList <- Optimization(ATSMInputs, StatQ, DataFreq, FactorLabels,
-                                                                      Economies, ModelType, TimeCount = FALSE)))
+                                                                      Economies, ModelType, TimeCount = FALSE,
+                                                                      verbose = FALSE)))
 
 
     # 5) Forecasting bond yields
@@ -96,9 +114,9 @@ ForecastYields <- function(ModelType, ModelPara, InputsForOutputs, FactorLabels,
                                      Economies, ModelType)
     Forecast_AllDates <- Gather_Forecasts(Forecast_OneDate, Forecast_AllDates, Economies, ModelType)
 
-    cat(sprintf("Out-of-sample forecast for the information set: %s || %s \n",
-                T0_SubSample, TF_SubSample))
-    saveRDS(Forecast_AllDates, paste(tempdir(), "/Forecast_", InputsForOutputs$'Label Outputs', '.rds', sep = ""))
+    if (verbose){ message(sprintf("Out-of-sample forecast for the information set: %s || %s ",
+                                 T0_SubSample, TF_SubSample)) }
+    saveRDS(Forecast_AllDates, paste(FolderPath, "/Forecast_", InputsForOutputs$'Label Outputs', '.rds', sep = ""))
   }
 
   # 6) RMSE
@@ -107,8 +125,8 @@ ForecastYields <- function(ModelType, ModelPara, InputsForOutputs, FactorLabels,
 
   OutofSampleForecast <- append(OutofSampleForecast[[ModelType]], list(RMSE = RMSEs))
 
-  saveRDS(OutofSampleForecast, paste(tempdir(), "/Forecast_", InputsForOutputs$'Label Outputs', '.rds', sep = ""))
-  Optimization_Time(start_time)
+  saveRDS(OutofSampleForecast, paste(FolderPath, "/Forecast_", InputsForOutputs$'Label Outputs', '.rds', sep = ""))
+  Optimization_Time(start_time, verbose)
 
   # Store metadata inside the class without explicitly exporting it
   attr(OutofSampleForecast, "ModelForecast") <- list(Economies = Economies, ModelType = ModelType, ForHoriz = H)
@@ -203,7 +221,7 @@ Get_Unspanned <- function(ModelPara, FactorLabels, Economies, ModelType){
 
     UnspannedFactors_CS <- function(Economy, G, N) {
       AllFactors <- ModelPara[[ModelType]][[Economy]]$inputs$AllFactors
-      AllFactors[(G + 1):(nrow(AllFactors) - N), ]
+      AllFactors[(G + 1):(nrow(AllFactors) - N), , drop = FALSE]
     }
 
     DomesticMacroVar <- do.call(rbind, lapply(Economies, UnspannedFactors_CS, G, N))

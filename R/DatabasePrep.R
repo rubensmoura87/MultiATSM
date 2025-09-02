@@ -33,10 +33,15 @@
 #'@export
 
 
-
 DatabasePrep <- function(t_First, t_Last, Economies, N, FactorLabels, ModelType, Wgvar = NULL,
                          DataPathMacro = NULL, DataPathYields = NULL){
 
+  if (!requireNamespace("readxl", quietly = TRUE)) {
+    stop(
+      "Please install package \"readxl\" to use this feature.",
+      call. = FALSE
+    )
+  }
 
   if (length(DataPathMacro) ==0 ) { DataPathMacro <- system.file("extdata", "MacroData.xlsx", package = "MultiATSM") }
  if (length(DataPathYields) ==0 ){ DataPathYields <- system.file("extdata", "YieldsData.xlsx", package = "MultiATSM") }
@@ -50,6 +55,7 @@ DatabasePrep <- function(t_First, t_Last, Economies, N, FactorLabels, ModelType,
   list_all_Yields <- lapply(tab_names_Yields, function(x) readxl::read_excel(path = DataPathYields, sheet = x))
   names(list_all_Yields) <- tab_names_Yields
 
+
   t_First <- as.POSIXct(as.Date(t_First, "%Y-%m-%d"))
   t_Last <- as.POSIXct(as.Date(t_Last, "%Y-%m-%d"))
   Idx <- match(unclass(c(t_First, t_Last)), unclass(list_all_Macro[["Global"]]$Period)) # Find the indexes of the first and last observation of the desired sample
@@ -59,7 +65,7 @@ DatabasePrep <- function(t_First, t_Last, Economies, N, FactorLabels, ModelType,
 
 
   # 2) Pre-allocate list of factors
-  T <- length(SampleMacro$Global$Period) # length of model's time dimension
+  T_dim <- length(SampleMacro$Global$Period) # length of model's time dimension
   C <- length(Economies) # number of economies in the study
   M <- length(FactorLabels$Domestic) - N # Number of country-specific macro variables
   M.star <- length(FactorLabels$Star) - N # Number of foreign-country-specific macro variables
@@ -138,7 +144,7 @@ DatabasePrep <- function(t_First, t_Last, Economies, N, FactorLabels, ModelType,
   idx1 <- M+N
   Z <- list()
   for (j in 1:(M+N)){
-    X <- matrix(NA, nrow= C, ncol=T)
+    X <- matrix(NA, nrow= C, ncol= T_dim)
 
     for (i in 1:C){
       X[i,] <- ListFactors[[Economies[i]]]$Factors[[j]]
@@ -171,7 +177,7 @@ DatabasePrep <- function(t_First, t_Last, Economies, N, FactorLabels, ModelType,
       for (i in 1:C){
        for (j in 1:(M+N)){
 
-         StarTimeVarTemp <- matrix(NA, nrow = T, ncol = 1)
+         StarTimeVarTemp <- matrix(NA, nrow = T_dim, ncol = 1)
 
          for (k in 1:length(Wgvar_subset)) {
          YearRef <- names(Wgvar_subset)[k] # year of reference
@@ -184,16 +190,15 @@ DatabasePrep <- function(t_First, t_Last, Economies, N, FactorLabels, ModelType,
          if (anyNA(StarTimeVarTemp)){
            LenlastYear <- length(IdxYear)
            IdxLastObs <- IdxYear[LenlastYear] + 1
-           StarTimeVarTemp[IdxLastObs:T]  <- t(WgvarYear[i, ]%*% Z[[j]][, (IdxLastObs):T])
+           StarTimeVarTemp[IdxLastObs:T_dim]  <- t(WgvarYear[i, ]%*% Z[[j]][, (IdxLastObs):T_dim])
            }
 
              ListFactors[[Economies[i]]]$Factors[[idx1+j]] <- StarTimeVarTemp
         }
       }
 
-      # c.2) If star variables are computed with time fixed weigths
+      # c.2) If star variables are computed with time fixed weights
     }else{
-
 
     for (i in 1:C){
       for (j in 1:(M+N)){

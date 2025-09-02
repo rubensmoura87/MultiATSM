@@ -12,7 +12,8 @@ FeedbackMat_BS(
   GVARlist,
   JLLlist,
   WishBRW,
-  BRWlist
+  BRWlist,
+  verbose
 )
 }
 \arguments{
@@ -31,6 +32,8 @@ FeedbackMat_BS(
 \item{WishBRW}{Whether the user wishes to estimate the physical parameter model with the Bias correction model from BRW (2012) (see "Bias_Correc_VAR" function). Default is set to 0.}
 
 \item{BRWlist}{List of necessary inputs for performing the bias-corrected estimation (see \code{\link{Bias_Correc_VAR}} function)}
+
+\item{verbose}{Logical flag controlling function messaging.}
 }
 \description{
 Compute the Feedback matrix of each bootstrap draw

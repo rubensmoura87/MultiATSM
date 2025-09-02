@@ -4,7 +4,14 @@
 \alias{FolderCreation_Boot}
 \title{Creates folder to store graphs generated from the bootstrap analysis}
 \usage{
-FolderCreation_Boot(ModelType, LabIRF, Economies, OutType, Ortho = FALSE)
+FolderCreation_Boot(
+  ModelType,
+  LabIRF,
+  Economies,
+  OutType,
+  Folder2save,
+  Ortho = FALSE
+)
 }
 \arguments{
 \item{ModelType}{Desired model type}
@@ -14,6 +21,8 @@ FolderCreation_Boot(ModelType, LabIRF, Economies, OutType, Ortho = FALSE)
 \item{Economies}{economies of the economic system}
 
 \item{OutType}{Available option "Factors" or "Yields}
+
+\item{Folder2save}{Folder path where the outputs will be stored.}
 
 \item{Ortho}{Option for orthogonal outputs, for JLL models. Default is FALSE.}
 }

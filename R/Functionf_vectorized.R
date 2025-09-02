@@ -258,7 +258,7 @@ True_Jordan <- function(ParaValue, Const_Type, FactorLabels, Economies){
       if (j == 1) {
         b <- K1Q
       } else {
-        b <- magic::adiag(b, K1Q)
+        b <- adiag(b, K1Q)
       }
 
       idx0 <- idx1
@@ -430,7 +430,7 @@ True_BlockDiag <- function(ParaValue, Const_Type, FactorLabels, Economies, GVARi
       }
 
     }
-    if (j == 1) { BD_mat <- btemp } else { BD_mat <- magic::adiag(BD_mat, btemp) }
+    if (j == 1) { BD_mat <- btemp } else { BD_mat <- adiag(BD_mat, btemp) }
     idx0 <- idx1
   }
 
@@ -496,8 +496,8 @@ True_BoundDiag <- function(ParaValue, Const_Type, lb, ub){
   # Re-build the true parameter
   if (is.null(dim(ParaValue))) { b <- NA } else { b <- matrix(NA, nrow = dim(ParaValue)[1], ncol = dim(ParaValue)[2]) }
 
-  if (!exists('lb') || length(lb) == 0 ) { lb <- -Inf }
-  if (!exists('ub') || length(ub) == 0 ) { ub <- Inf }
+  if ( length(lb) == 0 ) { lb <- -Inf }
+  if ( length(ub) == 0 ) { ub <- Inf }
 
   temp <- ParaValue; temp[] <- lb[]; lb <- temp
   temp <- ParaValue; temp[] <- ub[]; ub <- temp

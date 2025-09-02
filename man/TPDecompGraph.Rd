@@ -11,26 +11,47 @@ TPDecompGraph(
   WishRPgraphs,
   UnitYields,
   Economies,
-  PathsGraphs
+  PathsGraphs,
+  Folder2Save,
+  verbose
 )
 }
 \arguments{
-\item{ModelType}{a string-vector containing the label of the model to be estimated}
+\item{ModelType}{A character vector indicating the  estimated model type}
 
 \item{NumOut}{list of computed outputs containing the model fit, IRFs, FEVDs, GIRFs, GFEVDs and Risk premia}
 
-\item{ModelPara}{list of model parameter estimates (See the "Optimization" function)}
+\item{ModelPara}{list of model parameter estimates (See the \code{\link{Optimization}} function)}
 
 \item{WishRPgraphs}{binary variable: set 1, if the user wishes graphs to be generated; or set 0, otherwise}
 
 \item{UnitYields}{(i) "Month": if maturity of yields are expressed in months or
 (ii) "Year": if maturity of yields are expressed in years}
 
-\item{Economies}{a string-vector containing the names of the economies which are part of the economic system}
+\item{Economies}{A character vector containing the names of the economies included in the system.}
 
 \item{PathsGraphs}{Path of the folder in which the graphs will be saved}
+
+\item{Folder2Save}{Folder path where the outputs will be stored.}
+
+\item{verbose}{description  Logical flag controlling function messaging.}
 }
 \description{
 Term Premia decomposition graphs for all models
 }
-\keyword{internal}
+\section{Available Methods}{
+
+- `autoplot(object, type = "TermPremia")`
+}
+
+\examples{
+data("ParaSetEx")
+data("NumOutEx")
+ModelType <- "JPS original"
+Economy <- "Brazil"
+UnitYields <- "Month"
+
+TPDecompGraph(ModelType, NumOutEx, ModelParaEx, WishRPgraphs = 1, UnitYields, Economy,
+             PathsGraphs = NULL, Folder2Save = NULL, verbose = FALSE)
+
+}

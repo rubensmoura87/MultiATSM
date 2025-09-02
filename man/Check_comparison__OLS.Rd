@@ -14,7 +14,8 @@ Check_comparison__OLS(
   JLLinputs,
   FactorLabels,
   Economies,
-  ModelType
+  ModelType,
+  verbose
 )
 }
 \arguments{
@@ -37,6 +38,8 @@ Check_comparison__OLS(
 \item{Economies}{string-vector containing the names of the economies which are part of the economic system}
 
 \item{ModelType}{string-vector containing the label of the model to be estimated}
+
+\item{verbose}{Logical flag controlling function messaging.}
 }
 \description{
 check whether mean/median of OLS is close to actual OLS estimates

@@ -62,6 +62,8 @@ Build_xvec <- function(ListInputSet, Economies, FactorLabels, JLLinputs = NULL){
 #' @param JLLinputs     list of necessary inputs for the estimation of JLL-based models (see "JLL" function)
 #'
 #'
+#'@importFrom hablar s
+#'
 #'@keywords internal
 #'
 #'@return  unconstrained auxiliary matrix.
@@ -93,7 +95,7 @@ GetAuxPara <- function(ParaValue, Const_Type_Full, lb, ub, Economies, FactorLabe
     a <- Aux_BoundDiag(ParaValue, Const_Type, lb, ub)
   }
 
-  for (j in seq_len(length(a)) ) {a[j] <- min(max(hablar::s(c(Re(a[j]), -1e20))), 1e20)}
+  for (j in seq_len(length(a)) ) {a[j] <- min(max(s(c(Re(a[j]), -1e20))), 1e20)}
   return(a)
 }
 
@@ -377,6 +379,8 @@ Aux_BlockDiag <- function(ParaValue, Const_Type, FactorLabels, Economies) {
 #'@param lb lower bound
 #'@param ub upper bound
 #'
+#'@importFrom hablar s
+#'
 #'@keywords internal
 
 Aux_BoundDiag <- function(ParaValue, Const_Type, lb, ub){
@@ -391,15 +395,15 @@ Aux_BoundDiag <- function(ParaValue, Const_Type, lb, ub){
     J <- round(sqrt(length(ParaValue)/M))
     bb <- matrix(NA, M*J, 1)
     for (i in 1:M){
-      if ((i-1)*J+1 < i*J){ IdxSeq <- ((i-1)*J+1):(i*J)}else{ IdxSeq <- numeric()}
+      if ((i-1)*J+1 < i*J){ IdxSeq <- ((i-1)*J+1):(i*J) } else{ IdxSeq <- numeric()}
       bb[IdxSeq ] <- diag(ParaValue[ , IdxSeq ])
     }
     ParaValue <- bb
     }
   }
   # Ensures that the constraints are preserved
-  if (!exists("lb") || is.null(lb) ){ lb <- -Inf }
-  if (!exists("ub") || is.null(ub) ){ ub <- Inf }
+  if (is.null(lb))  lb <- -Inf
+  if (is.null(ub))  ub <-  Inf
 
   temp <- ParaValue
   temp[] <- lb[]
@@ -414,9 +418,9 @@ Aux_BoundDiag <- function(ParaValue, Const_Type, lb, ub){
   }
 
   if (length(ub) == 0 || length(lb) == 0  || (identical(ub,Inf) & identical(lb,Inf))){
-    ParaValue <- pmin(hablar::s(c(pmax(hablar::s(c(lb,ParaValue))) , ub)))
+    ParaValue <- pmin(s(c(pmax(s(c(lb,ParaValue))) , ub)))
   }else{
-    ParaValue <- min(hablar::s(c(max(hablar::s(c(lb,ParaValue))) , ub)))
+    ParaValue <- min(s(c(max(s(c(lb,ParaValue))) , ub)))
   }
 
   if (is.na(ParaValue)  ){
@@ -436,7 +440,7 @@ Aux_BoundDiag <- function(ParaValue, Const_Type, lb, ub){
   if (identical(ub[tt]-ParaValue[tt],numeric(0))){ a[tt] <- pos2x(numeric(0)) }else{ a[tt] <- - pos2x(max((c(ub[tt]-ParaValue[tt],0)))) }
 
   tt<- !is.infinite(lb) & !is.infinite(ub)
-  a[tt] <- bound2x(max(hablar::s(c(min(hablar::s(c(ParaValue[tt], ub[tt]))), lb[tt])) ), lb[tt], ub[tt]  )
+  a[tt] <- bound2x(max(s(c(min(s(c(ParaValue[tt], ub[tt]))), lb[tt])) ), lb[tt], ub[tt]  )
 
   return(a)
 }

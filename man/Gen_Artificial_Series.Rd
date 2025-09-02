@@ -17,6 +17,7 @@ Gen_Artificial_Series(
   JLLlist,
   WishBRW,
   BRWlist,
+  verbose,
   nlag = 1
 )
 }
@@ -44,6 +45,8 @@ Gen_Artificial_Series(
 \item{WishBRW}{Whether the user wishes to estimate the physical parameter model with the Bias correction model from BRW (2012) (see "Bias_Correc_VAR" function). Default is set to 0.}
 
 \item{BRWlist}{List of necessary inputs for performing the bias-corrected estimation (see "Bias_Correc_VAR" function)}
+
+\item{verbose}{Logical flag controlling function messaging.}
 
 \item{nlag}{Number of lags in the P-dynamics. Default is set to 1.}
 }

@@ -4,18 +4,40 @@
 \alias{RiskFactorsGraphs}
 \title{Spanned and unspanned factors plot}
 \usage{
-RiskFactorsGraphs(ModelType, ModelOutputs, Economies, FactorLabels)
+RiskFactorsGraphs(
+  ModelType,
+  ModelOutputs,
+  Economies,
+  FactorLabels,
+  Folder2save
+)
 }
 \arguments{
-\item{ModelType}{string-vector containing the label of the model to be estimated}
+\item{ModelType}{A character vector indicating the  estimated model type}
 
-\item{ModelOutputs}{list of model parameter estimates (see the "Optimization" function)}
+\item{ModelOutputs}{list of model parameter estimates (see the \code{\link{Optimization}} function)}
 
-\item{Economies}{string-vector containing the names of the economies which are part of the economic system}
+\item{Economies}{A character vector containing the names of the economies included in the system.}
 
-\item{FactorLabels}{string-list based which contains the labels of all the variables present in the model}
+\item{FactorLabels}{A character vector indicating the model type to be estimated.}
+
+\item{Folder2save}{Folder path where the outputs will be stored.}
 }
 \description{
 Spanned and unspanned factors plot
 }
-\keyword{internal}
+\section{Available Methods}{
+
+- `autoplot(object, type = "RiskFactors")`
+}
+
+\examples{
+data("ParaSetEx")
+# Adapt factor labels according to the example
+ModelType <- "JPS original"
+Economy <- "Brazil"
+FacLab <- LabFac(N = 1, DomVar ="Eco_Act" , GlobalVar = "Gl_Eco_Act", Economy, ModelType)
+
+RiskFactorsGraphs(ModelType, ModelParaEx, Economy, FacLab, Folder2save = NULL)
+
+}

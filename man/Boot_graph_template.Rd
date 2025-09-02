@@ -7,7 +7,7 @@
 Boot_graph_template(ALLdata, nmResponse)
 }
 \arguments{
-\item{ALLdata}{data-frame containing the necessary data for building the grahs}
+\item{ALLdata}{data-frame containing the necessary data for building the graphs}
 
 \item{nmResponse}{string containing the name of the response variable}
 }

@@ -1,35 +1,42 @@
 #' Generate the graphical outputs for the selected models (Point estimate)
 #'
 #' @param ModelType A character vector indicating the model type to be estimated.
-#' @param ModelPara List of model parameter estimates (See the "Optimization" function)
+#' @param ModelPara List of model parameter estimates (See the \code{\link{Optimization}} function)
 #' @param NumOut list of computed outputs containing the model fit, IRFs, FEVDs, GIRFs, GFEVDs and Term Premia
 #' @param InputsForOutputs list containing the desired inputs for the construction of the desired output
 #' @param Economies A character vector containing the names of the economies included in the system.
 #' @param FactorLabels A list of character vectors with labels for all variables in the model.
+#' @param Folder2save Folder path where the outputs will be stored.
+#' @param verbose Logical flag controlling function messaging.
+#'
+#' @importFrom ggplot2 ggplot theme_classic scale_x_date element_rect theme_minimal scale_x_continuous scale_y_continuous ggplot_build ggplot_gtable
+#' @importFrom cowplot plot_grid ggdraw draw_label
 #'
 #' @keywords internal
 
-GraphicalOutputs <- function(ModelType, ModelPara, NumOut, InputsForOutputs, Economies, FactorLabels) {
+GraphicalOutputs <- function(ModelType, ModelPara, NumOut, InputsForOutputs, Economies, FactorLabels,
+                             Folder2save, verbose) {
 
   # Generate the graph paths and the graph folders
   dirs <- c("Outputs", paste0("Outputs/", ModelType), paste0("Outputs/", ModelType, "/Point Estimate"))
-  lapply(file.path(tempdir(), dirs), dir.create, recursive = TRUE, showWarnings = FALSE)
+  lapply(file.path(Folder2save, dirs), dir.create, recursive = TRUE, showWarnings = FALSE)
 
-  PathsGraphs <- FolderCreationPoint(ModelType, Economies)
+  PathsGraphs <- FolderCreationPoint(ModelType, Economies, Folder2save)
 
   # 1) Plot the set of risk factors
-  RiskFactorsGraphs(ModelType, ModelPara, Economies, FactorLabels)
+  RiskFactorsGraphs(ModelType, ModelPara, Economies, FactorLabels, Folder2save)
 
-  cat(" 2.3) Generating the graphs of interest \n")
+  if (verbose) message("2.3) Generating the graphs of interest")
 
   if (ModelType %in% c("JPS original", "JPS global", "GVAR single")) {
     for (i in 1:length(Economies)) {
-      dir.create(paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/Model ", Economies[i], sep = ""))
+      dir.create(paste(Folder2save, "/Outputs/", ModelType, "/Point Estimate/Model ", Economies[i], sep = ""))
     }
   }
 
   # 2) Model fit
-  Fitgraphs(ModelType, InputsForOutputs[[ModelType]]$Fit$WishGraphs, ModelPara, NumOut, Economies, PathsGraphs)
+  Fitgraphs(ModelType, InputsForOutputs[[ModelType]]$Fit$WishGraphs, ModelPara, NumOut, Economies,
+            PathsGraphs, Folder2save, verbose)
 
   # 3) IRF and GIRF
   if (any(ModelType == c("JLL original", "JLL No DomUnit", "JLL joint Sigma"))) {
@@ -41,7 +48,7 @@ GraphicalOutputs <- function(ModelType, ModelPara, NumOut, InputsForOutputs, Eco
   for (j in 1:length(OutType)) {
     WG <- Wished_Graphs_IRFandGIRF(InputsForOutputs, OutType[j], ModelType)
     IRFandGIRFgraphs(ModelType, NumOut, WG$RiskGraphs, WG$YieldGraphs, InputsForOutputs[[ModelType]]$IRF$horiz,
-                     PathsGraphs, OutputType = OutType[j], Economies)
+                     PathsGraphs, OutputType = OutType[j], Economies, Folder2save, verbose)
   }
 
   # 4) FEVD and GFEVD
@@ -54,31 +61,45 @@ GraphicalOutputs <- function(ModelType, ModelPara, NumOut, InputsForOutputs, Eco
   for (j in 1:length(OutType)) {
     WG <- Wished_Graphs_FEVDandGFEVD(InputsForOutputs, OutType[j], ModelType)
     FEVDandGFEVDgraphs(ModelType, NumOut, WG$RiskGraphs, WG$YieldGraphs, InputsForOutputs[[ModelType]]$FEVD$horiz,
-                       PathsGraphs, OutType[j], Economies)
+                       PathsGraphs, OutType[j], Economies, Folder2save, verbose)
   }
 
   # 5) Term premia decomposition
   TPDecompGraph(ModelType, NumOut, ModelPara, InputsForOutputs[[ModelType]]$RiskPremia$WishGraphs,
-                InputsForOutputs$UnitMatYields, Economies, PathsGraphs)
+                InputsForOutputs$UnitMatYields, Economies, PathsGraphs, Folder2save, verbose)
 
-  cat(paste("Desired graphs are saved in your temporary directory. Please, check:", tempdir(), "\n\n"))
-}
+  if (verbose) {
+    message(paste("Desired graphs are saved in your chosen directory. Please, check:", Folder2save, "\n"))
+  }
+
+ }
 
 #########################################################################################################
 #################################### RISK FACTORS GRAPHS ################################################
 #########################################################################################################
 #' Spanned and unspanned factors plot
 #'
-#' @param ModelType string-vector containing the label of the model to be estimated
-#' @param ModelOutputs list of model parameter estimates (see the "Optimization" function)
-#' @param Economies string-vector containing the names of the economies which are part of the economic system
-#' @param FactorLabels string-list based which contains the labels of all the variables present in the model
+#' @param ModelType A character vector indicating the  estimated model type
+#' @param ModelOutputs list of model parameter estimates (see the \code{\link{Optimization}} function)
+#' @param Economies A character vector containing the names of the economies included in the system.
+#' @param FactorLabels A character vector indicating the model type to be estimated.
+#' @param Folder2save Folder path where the outputs will be stored.
 #'
-#' @importFrom ggplot2 ggplot theme_classic scale_x_date element_rect
+#' @examples
+#' data("ParaSetEx")
+#' # Adapt factor labels according to the example
+#' ModelType <- "JPS original"
+#' Economy <- "Brazil"
+#' FacLab <- LabFac(N = 1, DomVar ="Eco_Act" , GlobalVar = "Gl_Eco_Act", Economy, ModelType)
 #'
-#' @keywords internal
+#' RiskFactorsGraphs(ModelType, ModelParaEx, Economy, FacLab, Folder2save = NULL)
+#'
+#' @section Available Methods:
+#' - `autoplot(object, type = "RiskFactors")`
+#'
+#' @export
 
-RiskFactorsGraphs <- function(ModelType, ModelOutputs, Economies, FactorLabels) {
+RiskFactorsGraphs <- function(ModelType, ModelOutputs, Economies, FactorLabels, Folder2save) {
 
   # Custom ggplot theme
   theme_custom <- function() {
@@ -110,13 +131,15 @@ RiskFactorsGraphs <- function(ModelType, ModelOutputs, Economies, FactorLabels) 
 
   # Ensure column names match expected format
   FactorNames <- c(FactorLabels$Global, FactorLabels$Domestic)
-  Folder2save <- paste(tempdir(), "/Outputs", "/", ModelType, sep = "")
+  if( !is.null(Folder2save)) { # useful command for the implementation of the autoplot method
+  Folder2save <- paste(Folder2save, "/Outputs", "/", ModelType, sep = "")
+  }
 
-  T <- ncol(Factors)  # Time periods
+  T_dim <- ncol(Factors)  # Time periods
 
   # Convert matrix to a properly structured dataframe
   SS <- as.data.frame(t(Factors))  # Transpose correctly
-  SS$TimeSpan <- seq_len(T)
+  SS$TimeSpan <- seq_len(T_dim)
   SS <- SS[ , c("TimeSpan", colnames(SS)[-ncol(SS)])]  # Reorder so TimeSpan is first
 
   # Extract column names after transposition
@@ -127,82 +150,146 @@ RiskFactorsGraphs <- function(ModelType, ModelOutputs, Economies, FactorLabels) 
   plot_list_no_legend <- vector("list", G + N + M)
 
   # a) Global Factors
+  TimeSpan <- Value <- Legend <- NULL  # Define global variables for R CMD check
+
   for (i in seq_len(G)) {
-    g <- ggplot(SS, aes(x = SS$TimeSpan)) + geom_line(aes_string(y = nmFactors[i])) + geom_hline(yintercept = 0) +
-      ggtitle(FactorLabels$Global[i]) + theme_custom()
+    g <- ggplot(SS, aes(x = TimeSpan)) +
+      geom_line(aes(y = get(nmFactors[i]))) +
+      geom_hline(yintercept = 0) +
+      ggtitle(FactorLabels$Global[i]) +
+      theme_custom()
 
     plot_list[[i]] <- g
-    plot_list_no_legend[[i]] <- g + theme(legend.position = "none") # Hide legend
+    plot_list_no_legend[[i]] <- g + theme(legend.position = "none")
   }
 
   # b) Domestic Factors
   IDX <- outer(1:(N + M), 1:C, function(j, i) (G + j) + (N + M) * (i - 1))
 
   for (j in seq_len(N + M)) {
-    # Create a data frame for plotting
     plot_data <- data.frame(TimeSpan = SS$TimeSpan)
 
-    # Add each economy's data to the plot_data
     for (i in seq_len(C)) {
       plot_data[[Economies[i]]] <- SS[[nmFactors[IDX[j, i]]]]
     }
 
-    plot_data_long <- reshape2::melt(plot_data, id.vars = "TimeSpan", variable.name = "Legend", value.name = "Value")
+    plot_data_long <- stats::reshape(
+      plot_data,
+      direction = "long",
+      varying = names(plot_data)[names(plot_data) != "TimeSpan"],
+      v.names = "Value",
+      timevar = "Legend",
+      times = names(plot_data)[names(plot_data) != "TimeSpan"],
+      idvar = "TimeSpan"
+    )
 
-    d <- ggplot(plot_data_long, aes_string(x = "TimeSpan", y = "Value", color = "Legend")) + geom_line() +
-      geom_hline(yintercept = 0) + ggtitle(FactorLabels$Domestic[j]) + theme_custom() +  labs(colour = "Legend")
+
+    d <- ggplot(plot_data_long, aes(x = TimeSpan, y = Value, color = Legend)) +
+      geom_line() +
+      geom_hline(yintercept = 0) +
+      ggtitle(FactorLabels$Domestic[j]) +
+      theme_custom() +
+      labs(colour = "Legend")
 
     plot_list[[G + j]] <- d
-    plot_list_no_legend[[G + j]] <- d + theme(legend.position = "none") # Hide legend
+    plot_list_no_legend[[G + j]] <- d + theme(legend.position = "none")
   }
 
-  # c) Legend settings:
-  LegendSubPlot <- cowplot::get_legend(plot_list[[G + 1]] +
-                                         theme(legend.direction = "horizontal", legend.position = "bottom", legend.justification = "center",
-                                               legend.title = element_text(size = 10, face = "bold"),
-                                               legend.text = element_text(size = 8),
-                                               legend.box.background = element_rect(colour = "black")))
+  # c) Get common legend
+  # Get data from the first domestic factor plot
+  legend_data <- plot_list[[G + 1]]$data
+  # Format legend
+     legend_plot <- ggplot(legend_data, aes(x = TimeSpan, y = Value, color = Legend)) +
+      geom_line(size = 1) +  # Make lines slightly thicker for legend clarity
+      labs(color = "Legend") +
+      theme_minimal() +
+      theme(
+        legend.direction = "horizontal",
+        legend.position = "bottom",
+        legend.justification = "center",
+        legend.title = element_text(size = 10, face = "bold"),
+        legend.text = element_text(size = 8),
+        legend.background = element_rect(color = "black", fill = "white"),
+        axis.title = element_blank(),
+        axis.text = element_blank(),
+        panel.grid = element_blank()
+        ) +
+       scale_x_continuous(breaks = NULL) +
+       scale_y_continuous(breaks = NULL)
+
+   # Force build the plot to ensure legend is created
+   built_plot <- ggplot_build(legend_plot)
+   gtable_plot <- ggplot_gtable(built_plot)
+
+   # Find the legend guide box
+   guide_index <- which(sapply(gtable_plot$grobs, function(x) grepl("guide-box", x$name, fixed = TRUE)))
+   LegendSubPlot <- gtable_plot$grobs[[guide_index[1]]]
 
   # Build the graph subplots:
-  subplots <- cowplot::plot_grid(plotlist = plot_list_no_legend, ncol = 3)
+  subplots <- plot_grid(plotlist = plot_list_no_legend, ncol = 3)
 
   # Create a new subplot with graphs + legend:
-  FactorsGraph <- cowplot::plot_grid(LegendSubPlot, subplots, ncol = 1, rel_heights = c(.1, 1))
+  FactorsGraph <- plot_grid(LegendSubPlot, subplots, ncol = 1, rel_heights = c(.1, 1))
 
-  # Save final graph at the overleaf folder:
+  # Save final graph at the desried folder:
+  if( !is.null(Folder2save)) {
   suppressMessages(ggplot2::ggsave(FactorsGraph, filename = paste0("RiskFactors", ".png"), path = Folder2save))
-}
+  print(FactorsGraph)
+  }
+
+  return(FactorsGraph)
+  }
 
 ######################################################################################################
 ##################################### 1) FIT ########################################################
 #####################################################################################################
 #' Model fit graphs for all models
 #'
-#' @param ModelType a string-vector containing the label of the model to be estimated
+#' @param ModelType A character vector indicating the  estimated model type
 #' @param WishFitgraphs binary variable: set 1, if the user wishes graphs to be generated; or set 0, otherwise
-#' @param ModelPara List of model parameter estimates (See the "Optimization" function)
-#' @param NumOut list of computed outputs containing the model fit, IRFs, FEVDs, GIRFs, and GFEVDs
-#' @param Economies a string-vector containing the names of the economies which are part of the economic system
+#' @param ModelPara List of model parameter estimates (See the \code{\link{Optimization}} function)
+#' @param NumOut A list of outputs containing the model fit, IRFs, FEVDs, GIRFs, GFEVDs and Term premia
+#' @param Economies A character vector containing the names of the economies included in the system.
 #' @param PathsGraphs Path of the folder in which the graphs will be saved
+#' @param Folder2save Desired folder path to save outputs
+#' @param verbose Logical flag controlling function messaging
 #'
 #' @importFrom ggplot2 ggplot theme_classic scale_x_date element_rect
 #'
-#' @keywords internal
+#' @examples
+#'data("ParaSetEx")
+#' data("NumOutEx")
+#' ModelType <- "JPS original"
+#' Economy <- "Brazil"
+#'
+#' Fitgraphs(ModelType, WishFitgraphs = 1, ModelParaEx, NumOutEx, Economy, PathsGraphs = NULL,
+#'           Folder2save = NULL, verbose = FALSE)
+#'
+#' @section Available Methods:
+#' - `autoplot(object, type = "Fit")`
+#'
+#' @export
 
-Fitgraphs <- function(ModelType, WishFitgraphs, ModelPara, NumOut, Economies, PathsGraphs) {
+Fitgraphs <- function(ModelType, WishFitgraphs, ModelPara, NumOut, Economies, PathsGraphs, Folder2save, verbose) {
 
   if (WishFitgraphs == 0) {
-    cat("No graphs for bond yields fit were generated \n")
+    if (verbose) message("No graphs for bond yields fit were generated")
+    return(invisible(NULL))
+
   } else {
-    cat(' ** Fit of bond yields \n')
+    if (verbose) message(' ** Fit of bond yields')
 
     C <- length(Economies)
+
+    Autoplot_List <- list()
 
     # 1) Models estimated individually
     if (any(ModelType == c("JPS original", "JPS global", "GVAR single"))) {
       for (i in 1:C) {
-        dir.create(paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/Model ", Economies[i], "/Fit", sep = ""))
 
+        if( !is.null(Folder2save)) { # useful command for the implementation of the autoplot method
+        dir.create(paste(Folder2save, "/Outputs/", ModelType, "/Point Estimate/Model ", Economies[i], "/Fit", sep = ""))
+        }
         mat <- (ModelPara[[ModelType]][[Economies[i]]]$inputs$mat) * 12
         J <- length(mat)
 
@@ -211,13 +298,17 @@ Fitgraphs <- function(ModelType, WishFitgraphs, ModelPara, NumOut, Economies, Pa
         ModelImplied <- NumOut$Fit[[ModelType]][[Economies[i]]]$`Yield Model Implied`
 
         # Make graphs
-        Fit_Subplot(YieldData, ModelFit, ModelImplied, J, mat, Economies[i], ModelType, PathsGraphs)
-      }
+        p <- Fit_Subplot(YieldData, ModelFit, ModelImplied, J, mat, Economies[i], ModelType, PathsGraphs)
+        Autoplot_List[[Economies[i]]] <- p
+
+        }
     } else {
 
       # 2) Models estimated jointly
-      dir.create(paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/Fit", sep = ""))  # Folder creation
-      mat <- (ModelPara[[ModelType]]$inputs$mat) * 12
+      if( !is.null(Folder2save)) { # useful command for the implementation of the autoplot method
+      dir.create(paste(Folder2save, "/Outputs/", ModelType, "/Point Estimate/Fit", sep = "")) # Folder creation
+      }
+        mat <- (ModelPara[[ModelType]]$inputs$mat) * 12
       J <- length(mat)
 
       Idx0 <- 0
@@ -230,60 +321,87 @@ Fitgraphs <- function(ModelType, WishFitgraphs, ModelPara, NumOut, Economies, Pa
         ModelImplied <- NumOut$Fit$`Yield Model Implied`[IdxGrpahs, ]
 
         # Make graphs
-        Fit_Subplot(YieldData, ModelFit, ModelImplied, J, mat, Economies[i], ModelType, PathsGraphs)
+        p <- Fit_Subplot(YieldData, ModelFit, ModelImplied, J, mat, Economies[i], ModelType, PathsGraphs)
+        Autoplot_List[[Economies[i]]] <- p
 
         Idx0 <- (Idx + J)
       }
     }
   }
-}
+
+  return(Autoplot_List)
+
+  }
 
 ######################################################################################################
 ##################################### 2) IRF and GIRF ################################################
 #####################################################################################################
 #' IRF and GIRF graphs for all models
 #'
-#' @param ModelType a string-vector containing the label of the model to be estimated
-#' @param NumOut list of computed outputs containing the model fit, IRFs, FEVDs, GIRFs, and GFEVDs
+#' @param ModelType A character vector indicating the  estimated model type
+#' @param NumOut list of computed outputs containing the model fit, IRFs, FEVDs, GIRFs, GFEVDs and perm premia
 #' @param WishPdynamicsgraphs binary variable: set 1, if the user wishes graphs to be generated; or set 0, otherwise
 #' @param WishYieldsgraphs binary variable: set 1, if the user wishes graphs to be generated; or set 0, otherwise
 #' @param IRFhoriz single numerical vector containing the desired horizon of analysis for the IRFs
 #' @param PathsGraphs Path of the folder in which the graphs will be saved
 #' @param OutputType Available options are 'IRF' and 'GIRF'
-#' @param Economies a string-vector containing the names of the economies which are part of the economic system
+#' @param Economies A character vector containing the names of the economies included in the system.
+#' @param Folder2save Folder path where the outputs will be stored.
+#' @param verbose Logical flag controlling function messaging.
 #'
 #' @importFrom ggplot2 ggplot geom_line labs geom_hline theme ggtitle theme_classic
 #'
-#' @keywords internal
+#' @examples
+#' data("NumOutEx")
+#' ModelType <- "JPS original"
+#' Economy <- "Brazil"
+#' IRFhoriz <- 20
+#' IRFandGIRFgraphs(ModelType, NumOutEx, WishPdynamicsgraphs = 0, WishYieldsgraphs = 1, IRFhoriz,
+#'                 PathsGraphs = NULL, OutputType = "GIRF", Economy, Folder2save = NULL,
+#'                 verbose = FALSE)
+#'
+#' @section Available Methods:
+#' - `autoplot(object, type = "IRF_Factor")`, `autoplot(object, type = "IRF_Yields")`,
+#'   `autoplot(object, type = "GIRF_Yields")`, `autoplot(object, type = "GIRF_Yields")`. \cr
+#'
+#'  - For JLL-based models other option available are: `autoplot(object, type = "IRF_Factor-_Ortho")`,
+#'  `autoplot(object, type = "IRF_Yields_Ortho")`, `autoplot(object, type = "GIRF_Yields_Ortho")`,
+#'   `autoplot(object, type = "GIRF_Yields_Ortho")`.
+#'
+#' @export
 
 IRFandGIRFgraphs <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsgraphs, IRFhoriz,
-                             PathsGraphs, OutputType, Economies) {
+                             PathsGraphs, OutputType, Economies, Folder2save, verbose) {
 
   if (WishPdynamicsgraphs == 0 & WishYieldsgraphs == 0) {
-    cat(paste("No graphs for", OutputType, "were generated \n"))
+    if (verbose) message(paste("No graphs for", OutputType, "were generated"))
 
     if (any(ModelType == c("JLL original", "JLL No DomUnit", "JLL joint Sigma")) &&
         any(ModelType == c("IRF Ortho", "GIRF Ortho"))) {
-      cat(paste("No graphs for", OutputType, "were generated (orthogonolized version) \n"))
+      if (verbose) message(paste("No graphs for", OutputType, "were generated (orthogonolized version) \n"))
     }
+    return(invisible(NULL))
+
   } else {
     if (OutputType == "IRF") {
-      cat(' ** IRFs \n')
+      if (verbose) message(' ** IRFs')
       Lab_Fac <- "IRFFactors_shock_to_"
       Lab_Yield <- "IRFYields_shock_to_"
     } else if (OutputType == "GIRF") {
-      cat(' ** GIRFs \n')
+      if (verbose) message(' ** GIRFs')
       Lab_Fac <- "GIRFFactors_shock_to_"
       Lab_Yield <- "GIRFYields_shock_to_"
     } else if (OutputType == "IRF Ortho") {
-      cat(' ** IRFs-Ortho \n')
+      if (verbose) message(' ** IRFs-Ortho')
       Lab_Fac <- "IRFFactors_shock_to_"
       Lab_Yield <- "IRFYields_shock_to_"
     } else {
-      cat(' ** GIRFs-Ortho \n')
+      if (verbose) message(' ** GIRFs-Ortho')
       Lab_Fac <- "GIRFFactors_shock_to_"
       Lab_Yield <- "GIRFYields_shock_to_"
     }
+
+    OutList <- list()
 
     ################ 1) Estimation done for countries individually ################
     if (any(ModelType == c("JPS original", "JPS global", "GVAR single"))) {
@@ -292,8 +410,9 @@ IRFandGIRFgraphs <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsg
 
       for (i in 1:C) {
         # a) Folder Creation
-        FolderPrep_IRFs(OutputType, WishPdynamicsgraphs, WishYieldsgraphs, Economies[i], ModelType)
-
+        if (!is.null(Folder2save)) {
+        FolderPrep_IRFs(OutputType, WishPdynamicsgraphs, WishYieldsgraphs, Economies[i], ModelType, Folder2save)
+        }
         # b) Recast IRFs or GIRFs
         IRFset <- BuildIRFlist(NumOut, Economies[i], ModelType, IRFhoriz, K, OutputType)
         nmFactors <- names(IRFset$IRFFactors[[1]])[-1] # Factor names
@@ -301,24 +420,41 @@ IRFandGIRFgraphs <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsg
 
         # c) Graph of Factors
         if (WishPdynamicsgraphs == 1) {
+          if (!is.null(Folder2save)) {
           PathAdj <- AdjustPathIRFs(OutputType, "Factors", PathsGraphs, Economies[i], ModelType)
+          }
 
           for (h in 1:K) {
             p_list <- IRFandGIRFs_Format_Fac(IRFset$IRFFactors[[h]])
-            subplots <- cowplot::plot_grid(plotlist = p_list, ncol = 3) # Gather the graphs in sub-plots
+            subplots <- plot_grid(plotlist = p_list, ncol = 3) # Gather the graphs in sub-plots
+            if (!is.null(Folder2save)) {
             suppressMessages(ggplot2::ggsave(subplots, file = paste0(Lab_Fac, nmFactors[[h]], "_Model_", Economies[i], ".png"),
                                              path = PathAdj)) # Save sub-plots
-          }
+            print(subplots)
+            }
+
+            OutList[[Economies[i]]][[nmFactors[h]]] <- subplots
+
+            }
         }
 
         # d) Graph of yields
         if (WishYieldsgraphs == 1) {
+          if (!is.null(Folder2save)) {
           PathAdj <- AdjustPathIRFs(OutputType, "Yields", PathsGraphs, Economies[i], ModelType)
+          }
+
           for (l in 1:K) {
             p_list <- IRFandGIRFs_Format_Yields(IRFset$IRFYields[[l]])
-            subplots <- cowplot::plot_grid(plotlist = p_list, ncol = 3) # Gather the graphs in sub-plots
+            subplots <- plot_grid(plotlist = p_list, ncol = 3) # Gather the graphs in sub-plots
+            if (!is.null(Folder2save)) {
             suppressMessages(ggplot2::ggsave(subplots, file = paste0(Lab_Yield, nmFactors[[l]], "_Model_", Economies[i], ".png"),
                                              path = PathAdj)) # Save sub-plots
+            print(subplots)
+            }
+
+            OutList[[Economies[i]]][[nmFactors[l]]] <- subplots
+
           }
         }
       }
@@ -334,7 +470,9 @@ IRFandGIRFgraphs <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsg
         }
 
         # a) Folder Creation
-        FolderPrep_IRFs(OutputType, WishPdynamicsgraphs, WishYieldsgraphs, Economies, ModelType)
+        if (!is.null(Folder2save)) {
+        FolderPrep_IRFs(OutputType, WishPdynamicsgraphs, WishYieldsgraphs, Economies, ModelType, Folder2save)
+        }
 
         # b) Recast IRFs or GIRFs
         IRFset <- BuildIRFlist(NumOut, Economies, ModelType, IRFhoriz, K, OutputType)
@@ -344,22 +482,38 @@ IRFandGIRFgraphs <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsg
 
         # c) Graph of Factors
         if (WishPdynamicsgraphs == 1) {
+          if (!is.null(Folder2save)) {
           PathAdj <- AdjustPathIRFs(OutputType, "Factors", PathsGraphs, Economies, ModelType)
+          }
           for (h in 1:K) {
             p_list <- IRFandGIRFs_Format_Fac(IRFset$IRFFactors[[h]])
-            subplots <- cowplot::plot_grid(plotlist = p_list, ncol = 3) # Gather the graphs in sub-plots
+            subplots <- plot_grid(plotlist = p_list, ncol = 3) # Gather the graphs in sub-plots
+            if (!is.null(Folder2save)) {
             suppressMessages(ggplot2::ggsave(subplots, file = paste0(Lab_Fac, nmFactors[[h]], ".png"),
                                              path = PathAdj)) # Save sub-plots
+            print(subplots)
+            }
+
+            OutList[[nmFactors[h]]] <- subplots
+
           }
         }
 
         # d) Graph of yields
         if (WishYieldsgraphs == 1) {
+          if (!is.null(Folder2save)) {
           PathAdj <- AdjustPathIRFs(OutputType, "Yields", PathsGraphs, Economies, ModelType)
+          }
           for (l in 1:K) {
             p_list <- IRFandGIRFs_Format_Yields(IRFset$IRFYields[[l]])
-            subplots <- cowplot::plot_grid(plotlist = p_list, ncol = 3) # Gather the graphs in sub-plots
+            subplots <- plot_grid(plotlist = p_list, ncol = 3) # Gather the graphs in sub-plots
+            if (!is.null(Folder2save)) {
             suppressMessages(ggplot2::ggsave(subplots, file = paste0(Lab_Yield, nmFactors[[l]], ".png"), path = PathAdj)) # Save sub-plots
+            print(subplots)
+            }
+
+            OutList[[nmFactors[l]]] <- subplots
+
           }
         }
       }
@@ -369,7 +523,9 @@ IRFandGIRFgraphs <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsg
         K <- dim(NumOut$IRF[[ModelType]]$Factors$Ortho)[2]
 
         # a) Folder Creation
-        FolderPrep_IRFs(OutputType, WishPdynamicsgraphs, WishYieldsgraphs, Economies, ModelType)
+        if (!is.null(Folder2save)) {
+        FolderPrep_IRFs(OutputType, WishPdynamicsgraphs, WishYieldsgraphs, Economies, ModelType, Folder2save)
+        }
 
         # b) Recast IRFs or GIRFs
         IRFset <- BuildIRFlist(NumOut, Economies, ModelType, IRFhoriz, K, OutputType)
@@ -379,78 +535,119 @@ IRFandGIRFgraphs <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsg
 
         # a.2) Graph of Factors
         if (WishPdynamicsgraphs == 1) {
+          if (!is.null(Folder2save)) {
           PathAdj <- AdjustPathIRFs(OutputType, "Factors", PathsGraphs, Economies, ModelType)
+          }
           for (h in 1:K) {
             p_list <- IRFandGIRFs_Format_Fac(IRFset$IRFFactors[[h]])
-            subplots <- cowplot::plot_grid(plotlist = p_list, ncol = 3) # sub-plots
+            subplots <- plot_grid(plotlist = p_list, ncol = 3) # sub-plots
+            if (!is.null(Folder2save)) {
             suppressMessages(ggplot2::ggsave(subplots, file = paste0(Lab_Fac, nmFactors[[h]], "ORTHO", ".png"),
                                              path = PathAdj))
+            print(subplots)
+            }
+            OutList[[nmFactors[h]]] <- subplots
+
           }
         }
 
         # d) Graph of yields
         if (WishYieldsgraphs == 1) {
+          if (!is.null(Folder2save)) {
           PathAdj <- AdjustPathIRFs(OutputType, "Yields", PathsGraphs, Economies, ModelType)
+          }
           for (l in 1:K) {
             p_list <- IRFandGIRFs_Format_Yields(IRFset$IRFYields[[l]])
-            subplots <- cowplot::plot_grid(plotlist = p_list, ncol = 3) # Gather the graphs in sub-plots
+            subplots <- plot_grid(plotlist = p_list, ncol = 3) # Gather the graphs in sub-plots
+            if (!is.null(Folder2save)) {
             suppressMessages(ggplot2::ggsave(subplots, file = paste0(Lab_Yield, nmFactors[[l]], "ORTHO", ".png"),
                                              path = PathAdj)) # Save sub-plots
-          }
+            print(subplots)
+            }
+
+            OutList[[nmFactors[l]]] <- subplots
+
+            }
         }
       }
     }
   }
-}
+
+  return(OutList)
+  }
 
 ######################################################################################################
 ##################################### 3) FEVD and GFEVD ##############################################
 #####################################################################################################
 #' FEVD and GFEVD graphs for all models
 #'
-#' @param ModelType a string-vector containing the label of the model to be estimated
-#' @param NumOut list of computed outputs containing the model fit, IRFs, FEVDs, GIRFs, and GFEVDs
+#' @param ModelType A character vector indicating the  estimated model type
+#' @param NumOut list of computed outputs containing the model fit, IRFs, FEVDs, GIRFs, GFEVDs and Term premia
 #' @param WishPdynamicsgraphs binary variable: set 1, if the user wishes graphs to be generated; or set 0, otherwise
 #' @param WishYieldsgraphs binary variable: set 1, if the user wishes graphs to be generated; or set 0, otherwise
 #' @param FEVDhoriz single numerical vector containing the desired horizon of analysis for the FEVDs
 #' @param PathsGraphs Path of the folder in which the graphs will be saved
 #' @param OutputType Available options are 'FEVD' and 'GFEVD'
-#' @param Economies a string-vector containing the names of the economies which are part of the economic system
+#' @param Economies A character vector containing the names of the economies included in the system.
+#' @param Folder2save Folder path where the outputs will be stored.
+#' @param verbose Logical flag controlling function messaging.
 #'
-#' @importFrom ggplot2 ggplot theme_classic aes element_text theme labs ggtitle element_blank aes_string geom_bar geom_hline
+#' @importFrom ggplot2 ggplot theme_classic aes element_text theme labs ggtitle element_blank aes_string geom_col geom_hline
 #'
-#' @keywords internal
+#' @examples
+#' data("NumOutEx")
+#' ModelType <- "JPS original"
+#' Economy <- "Brazil"
+#' FEVDhoriz <- 20
+#'
+#' FEVDandGFEVDgraphs(ModelType, NumOutEx, WishPdynamicsgraphs = 0, WishYieldsgraphs= 1, FEVDhoriz,
+#'                   PathsGraphs = NULL, OutputType = "FEVD", Economy,
+#'                   Folder2save = NULL, verbose = FALSE)
+#'
+#'
+#' @section Available Methods:
+#' - `autoplot(object, type = "FEVD_Factor")`, `autoplot(object, type = "FEVD_Yields")`,
+#'   `autoplot(object, type = "GFEVD_Yields")`, `autoplot(object, type = "GFEVD_Yields")`. \cr
+#'
+#'  - For JLL-based models other option available are: `autoplot(object, type = "FEVD_Factor-_Ortho")`,
+#'  `autoplot(object, type = "FEVD_Yields_Ortho")`, `autoplot(object, type = "GFEVD_Yields_Ortho")`,
+#'   `autoplot(object, type = "GFEVD_Yields_Ortho")`.
+#'
+#' @export
 
 FEVDandGFEVDgraphs <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsgraphs, FEVDhoriz,
-                               PathsGraphs, OutputType, Economies) {
+                               PathsGraphs, OutputType, Economies, Folder2save, verbose) {
 
   if (WishPdynamicsgraphs == 0 & WishYieldsgraphs == 0) {
-    cat(paste("No graphs for", OutputType, "were generated \n"))
+    if (verbose) message(paste("No graphs for", OutputType, "were generated"))
 
     if (any(ModelType == c("JLL original", "JLL No DomUnit", "JLL joint Sigma")) &&
         any(ModelType == c("FEVD Ortho", "GFEVD Ortho"))) {
-      cat(paste("No graphs for", OutputType, "were generated (orthogonolized version) \n"))
+      if (verbose) message(paste("No graphs for", OutputType, "were generated (orthogonolized version)"))
     }
+    return(invisible(NULL))
   } else {
     if (OutputType == "FEVD") {
-      cat(' ** FEVDs \n')
+      if (verbose) message(' ** FEVDs')
       Lab_Fac <- "FEVDFactors_"
       Lab_Yield <- "FEVDYields_"
     } else if (OutputType == "GFEVD") {
-      cat(' ** GFEVDs \n')
+      if (verbose) message(' ** GFEVDs')
       Lab_Fac <- "GFEVDFactors_"
       Lab_Yield <- "GFEVDYields_"
     } else if (OutputType == "FEVD Ortho") {
-      cat(' ** FEVDs-Ortho \n')
+      if (verbose) message(' ** FEVDs-Ortho')
       Lab_Fac <- "FEVDFactors_ORTHO_"
       Lab_Yield <- "FEVDYields_ORTHO_"
     } else {
-      cat(' ** GFEVDs-Ortho \n')
+      if (verbose) message(' ** GFEVDs-Ortho')
       Lab_Fac <- "GFEVDFactors_ORTHO_"
       Lab_Yield <- "GFEVDYields_ORTHO_"
     }
 
-    ################ 1) Estimation done for countries individually ################
+    Autoplot_List <- list()
+
+     ################ 1) Estimation done for countries individually ################
     if (any(ModelType == c("JPS original", "JPS global", "GVAR single"))) {
       K <- dim(NumOut$FEVD[[ModelType]][[Economies[1]]]$Factors)[[2]] # Total number of risk factors
       J <- dim(NumOut$FEVD[[ModelType]][[Economies[1]]]$Yields)[3]
@@ -459,8 +656,9 @@ FEVDandGFEVDgraphs <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYield
 
       for (i in 1:C) {
         # a) Folder Creation
-        FolderPrep_FEVDs(OutputType, WishPdynamicsgraphs, WishYieldsgraphs, Economies[i], ModelType)
-
+        if(!is.null(Folder2save)) {
+        FolderPrep_FEVDs(OutputType, WishPdynamicsgraphs, WishYieldsgraphs, Economies[i], ModelType, Folder2save)
+        }
         # b) Recast FEVDs or GFEVDs
         FEDset <- BuildFEVDlist(NumOut, Economies[i], ModelType, FEVDhoriz, K, J, OutputType)
 
@@ -470,8 +668,10 @@ FEVDandGFEVDgraphs <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYield
           nmFactors <- colnames(NumOut$FEVD[[ModelType]][[Economies[i]]]$Factors) # Factor names
 
           for (h in 1:K) {
-            FEVDandGFEVDs_Graphs(OutputType, FEDset$FEVDFactors[[h]], nmFactors[h], Lab_Fac,
-                                 PathAdj)
+            pp <- FEVDandGFEVDs_Graphs(OutputType, FEDset$FEVDFactors[[h]], nmFactors[h], Lab_Fac,
+                                       PathAdj)
+
+            Autoplot_List[[Economies[i]]][[nmFactors[h]]] <- pp
           }
         }
 
@@ -481,8 +681,10 @@ FEVDandGFEVDgraphs <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYield
           nmYields <- dimnames(NumOut$FEVD[[ModelType]][[Economies[i]]]$Yields)[[3]] # Yield labels
 
           for (h in 1:J) {
-            FEVDandGFEVDs_Graphs(OutputType, FEDset$FEVDYields[[h]], nmYields[h], Lab_Yield,
+            pp <- FEVDandGFEVDs_Graphs(OutputType, FEDset$FEVDYields[[h]], nmYields[h], Lab_Yield,
                                  PathAdj)
+
+            Autoplot_List[[Economies[i]]][[nmYields[h]]] <- pp
           }
         }
       }
@@ -504,7 +706,9 @@ FEVDandGFEVDgraphs <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYield
         }
 
         # a) Folder Creation
-        FolderPrep_FEVDs(OutputType, WishPdynamicsgraphs, WishYieldsgraphs, Economies, ModelType)
+        if(!is.null(Folder2save)) {
+        FolderPrep_FEVDs(OutputType, WishPdynamicsgraphs, WishYieldsgraphs, Economies, ModelType, Folder2save)
+        }
 
         # b) Recast FEVDs or GFEVDs
         FEDset <- BuildFEVDlist(NumOut, Economies, ModelType, FEVDhoriz, K, CJ, OutputType)
@@ -512,9 +716,11 @@ FEVDandGFEVDgraphs <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYield
         # c) Graph of Factors
         if (WishPdynamicsgraphs == 1) {
           PathAdj <- AdjustPathFEVDs(OutputType, "Factors", PathsGraphs, Economies, ModelType)
+
           for (h in 1:K) {
-            FEVDandGFEVDs_Graphs(OutputType, FEDset$FEVDFactors[[h]], nmFactors[h], Lab_Fac,
+           pp <- FEVDandGFEVDs_Graphs(OutputType, FEDset$FEVDFactors[[h]], nmFactors[h], Lab_Fac,
                                  PathAdj)
+          Autoplot_List[[nmFactors[h]]] <- pp
           }
         }
 
@@ -522,8 +728,9 @@ FEVDandGFEVDgraphs <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYield
         if (WishYieldsgraphs == 1) {
           PathAdj <- AdjustPathFEVDs(OutputType, "Yields", PathsGraphs, Economies, ModelType)
           for (h in 1:CJ) {
-            FEVDandGFEVDs_Graphs(OutputType, FEDset$FEVDYields[[h]], nmYields[h], Lab_Yield,
+           pp <- FEVDandGFEVDs_Graphs(OutputType, FEDset$FEVDYields[[h]], nmYields[h], Lab_Yield,
                                  PathAdj)
+            Autoplot_List[[nmYields[h]]] <- pp
           }
         }
       }
@@ -537,7 +744,9 @@ FEVDandGFEVDgraphs <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYield
         nmYields <- dimnames(NumOut$FEVD[[ModelType]]$Yields$Ortho)[[3]]
 
         # a) Folder Creation
-        FolderPrep_FEVDs(OutputType, WishPdynamicsgraphs, WishYieldsgraphs, Economies, ModelType)
+        if(!is.null(Folder2save)) {
+        FolderPrep_FEVDs(OutputType, WishPdynamicsgraphs, WishYieldsgraphs, Economies, ModelType, Folder2save)
+        }
 
         # b) Recast FEVDs or GFEVDs
         FEDset <- BuildFEVDlist(NumOut, Economies, ModelType, FEVDhoriz, K, CJ, OutputType)
@@ -546,8 +755,10 @@ FEVDandGFEVDgraphs <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYield
         if (WishPdynamicsgraphs == 1) {
           PathAdj <- AdjustPathFEVDs(OutputType, "Factors", PathsGraphs, Economies, ModelType)
           for (h in 1:K) {
-            FEVDandGFEVDs_Graphs(OutputType, FEDset$FEVDFactors[[h]], nmFactors[h], Lab_Fac,
+            pp <- FEVDandGFEVDs_Graphs(OutputType, FEDset$FEVDFactors[[h]], nmFactors[h], Lab_Fac,
                                  PathAdj)
+
+            Autoplot_List[[nmFactors[h]]] <- pp
           }
         }
 
@@ -555,13 +766,17 @@ FEVDandGFEVDgraphs <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYield
         if (WishYieldsgraphs == 1) {
           PathAdj <- AdjustPathFEVDs(OutputType, "Yields", PathsGraphs, Economies, ModelType)
           for (h in 1:CJ) {
-            FEVDandGFEVDs_Graphs(OutputType, FEDset$FEVDYields[[h]], nmYields[h], Lab_Yield,
+           pp <-  FEVDandGFEVDs_Graphs(OutputType, FEDset$FEVDYields[[h]], nmYields[h], Lab_Yield,
                                  PathAdj)
+
+            Autoplot_List[[nmYields[h]]] <- pp
           }
         }
       }
     }
   }
+
+   return(Autoplot_List)
 }
 
 #####################################################################################################################
@@ -569,25 +784,41 @@ FEVDandGFEVDgraphs <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYield
 #####################################################################################################################
 #' Term Premia decomposition graphs for all models
 #'
-#' @param ModelType a string-vector containing the label of the model to be estimated
+#' @param ModelType A character vector indicating the  estimated model type
 #' @param NumOut list of computed outputs containing the model fit, IRFs, FEVDs, GIRFs, GFEVDs and Risk premia
-#' @param ModelPara list of model parameter estimates (See the "Optimization" function)
+#' @param ModelPara list of model parameter estimates (See the \code{\link{Optimization}} function)
 #' @param WishRPgraphs binary variable: set 1, if the user wishes graphs to be generated; or set 0, otherwise
 #' @param UnitYields (i) "Month": if maturity of yields are expressed in months or
 #'                  (ii) "Year": if maturity of yields are expressed in years
-#' @param Economies a string-vector containing the names of the economies which are part of the economic system
+#' @param Economies A character vector containing the names of the economies included in the system.
 #' @param PathsGraphs Path of the folder in which the graphs will be saved
+#' @param Folder2Save Folder path where the outputs will be stored.
+#' @param verbose description  Logical flag controlling function messaging.
 #'
-#' @keywords internal
+#' @examples
+#' data("ParaSetEx")
+#' data("NumOutEx")
+#' ModelType <- "JPS original"
+#' Economy <- "Brazil"
+#' UnitYields <- "Month"
+#'
+#' TPDecompGraph(ModelType, NumOutEx, ModelParaEx, WishRPgraphs = 1, UnitYields, Economy,
+#'              PathsGraphs = NULL, Folder2Save = NULL, verbose = FALSE)
+#'
+#' @section Available Methods:
+#' - `autoplot(object, type = "TermPremia")`
+#'
+#' @export
 
-TPDecompGraph <- function(ModelType, NumOut, ModelPara, WishRPgraphs, UnitYields, Economies, PathsGraphs) {
+TPDecompGraph <- function(ModelType, NumOut, ModelPara, WishRPgraphs, UnitYields, Economies, PathsGraphs,
+                          Folder2Save, verbose) {
 
   if (WishRPgraphs == 0) {
-    cat("No graphs for term-premia were generated \n")
+    if (verbose) message("No graphs for term-premia were generated")
     return(invisible(NULL))
   }
 
-  cat(' ** Term premia \n')
+  if (verbose) message(' ** Term premia')
 
   # Function to create a single plot
   create_plot <- function(Data, ExpCom, TP, TimeSpan, title) {
@@ -609,8 +840,10 @@ TPDecompGraph <- function(ModelType, NumOut, ModelPara, WishRPgraphs, UnitYields
   isSepQ <- ModelType %in% SepQ_Lab
 
   # Folder creation
+  if (!is.null(Folder2Save)) {
   if (!isSepQ) {
-    dir.create(paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/TermPremia", sep = ""), showWarnings = FALSE)
+    dir.create(paste(Folder2Save, "/Outputs/", ModelType, "/Point Estimate/TermPremia", sep = ""), showWarnings = FALSE)
+  }
   }
 
   # Extract common parameters
@@ -619,12 +852,12 @@ TPDecompGraph <- function(ModelType, NumOut, ModelPara, WishRPgraphs, UnitYields
   if (isSepQ) {
     dt <- Para_Set[[Economies[1]]]$inputs$dt
     mat <- Para_Set[[Economies[1]]]$inputs$mat
-    T <- ncol(Para_Set[[Economies[1]]]$inputs$Y)
+    T_dim <- ncol(Para_Set[[Economies[1]]]$inputs$Y)
   } else {
     dt <- Para_Set$inputs$dt
     mat <- Para_Set$inputs$mat
     Yields <- Para_Set$inputs$Y
-    T <- ncol(Yields)
+    T_dim <- ncol(Yields)
     }
 
   J <- length(mat)
@@ -637,14 +870,18 @@ TPDecompGraph <- function(ModelType, NumOut, ModelPara, WishRPgraphs, UnitYields
   matAdjUnit <- mat * k
 
   # Graph title, legends, and axes
-  Dates <- 1:T
+  Dates <- 1:T_dim
   matRPLab <- paste(matAdjUnit, YLab)
   GraphLegend <- c("Data", "Expected Component", "Term Premium")
 
   # Main loop for generating plots
+  AutoplotExport <- list()
+
   for (i in 1:C) {
     if (isSepQ) {
-      dir.create(paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/Model ", Economies[i], "/TermPremia", sep = ""), showWarnings = FALSE)
+      if (!is.null(Folder2Save)) {
+      dir.create(paste(Folder2Save, "/Outputs/", ModelType, "/Point Estimate/Model ", Economies[i], "/TermPremia", sep = ""), showWarnings = FALSE)
+      }
       GraphPath <- PathsGraphs[[ModelType]]$TermPremia[[Economies[i]]]
       Yields <- Para_Set[[Economies[i]]]$inputs$Y
       YieldData <- t(Yields) * 100
@@ -668,26 +905,41 @@ TPDecompGraph <- function(ModelType, NumOut, ModelPara, WishRPgraphs, UnitYields
     }
 
     # Common title for each model
-    title <- cowplot::ggdraw() + cowplot::draw_label(Economies[i], fontface = 'bold', size = 14)
+    title <- ggdraw() + draw_label(Economies[i], fontface = 'bold', size = 14)
 
     # Generate legend
-    LegendSubPlot_RP <- cowplot::get_legend(plot_list_RP[[1]] +
-                                              theme(legend.direction = "horizontal", legend.position = "bottom", legend.justification = "center",
-                                                    legend.title = element_text(size = 10, face = "bold"),
-                                                    legend.text = element_text(size = 8),
-                                                    legend.box.background = element_rect(colour = "black")))
+    built_plot <- ggplot_build(
+      plot_list_RP[[1]] +  # Start with your original plot
+        theme(legend.direction = "horizontal", legend.position = "bottom", legend.justification = "center",
+              legend.title = element_text(size = 10, face = "bold"),
+              legend.text = element_text(size = 8),
+              legend.box.background = element_rect(colour = "black")))
+
+    gtable_plot <- ggplot_gtable(built_plot)
+
+    # Find the legend guide box
+    guide_index <- which(sapply(gtable_plot$grobs, function(x) grepl("guide-box", x$name, fixed = TRUE)))
+    LegendSubPlot_RP <- gtable_plot$grobs[[guide_index[1]]]
 
     # Build the graph subplots
-    subplots_CS <- cowplot::plot_grid(plotlist = plot_list_no_legend_RP, ncol = 3)
-    subplots2save <- cowplot::plot_grid(LegendSubPlot_RP, subplots_CS, ncol = 1, rel_heights = c(0.2, 1))
+    subplots_CS <- plot_grid(plotlist = plot_list_no_legend_RP, ncol = 3)
+    subplots2save <- plot_grid(LegendSubPlot_RP, subplots_CS, ncol = 1, rel_heights = c(0.1, 1))
+
+    if (!is.null(Folder2Save)) {
     suppressMessages(ggplot2::ggsave(subplots2save, file = paste0("TermPremia_", Economies[i], "_", ModelType, ".png"),
                                      path = GraphPath))
+    print(subplots2save)
+    }
+    AutoplotExport[[Economies[i]]]<- subplots2save
+
   }
+
+   return(AutoplotExport)
 }
 
-################################################################################################################
-######################### AUXILIARY FUNCTIONS ##################################################################
-################################################################################################################
+######################################################################################################
+##################################### AUXILIARY FUNCTIONS #############################################
+######################################################################################################
 #' Build subplot for fitted yields
 #'
 #' @param YieldData Time series of bond yields
@@ -698,6 +950,8 @@ TPDecompGraph <- function(ModelType, NumOut, ModelPara, WishRPgraphs, UnitYields
 #' @param Economies Economies of the economic system
 #' @param ModelType Desired estimated model
 #' @param PathsGraphs Path to save the graphs
+#'
+#' @importFrom ggplot2 scale_color_manual
 #'
 #' @keywords internal
 
@@ -715,7 +969,7 @@ Fit_Subplot <- function(YieldData, ModelFit, ModelImplied, MatLength, mat, Econo
 
   GraphLegend <- c("Data", "Model Fit", "Model-Implied")
 
-  T <- ncol(YieldData)
+  T_dim <- ncol(YieldData)
   # Prepare plots
   p <- c()
   plot_list_FIT <- list()
@@ -725,16 +979,18 @@ Fit_Subplot <- function(YieldData, ModelFit, ModelImplied, MatLength, mat, Econo
     Data <- YieldData[j, -1]
     Modfit <- ModelFit[j, -1]
     ModImp <- ModelImplied[j, -1]
-    TimeSpan <- 1:(T - 1)
+    TimeSpan <- 1:(T_dim - 1)
 
     YieldCompar <- data.frame(Data, Modfit, ModImp, TimeSpan)
 
     # Graph: Fit x Data
     p <- ggplot(data = YieldCompar, aes(x = TimeSpan)) +
-      geom_line(aes_string(y = Data, color = shQuote(GraphLegend[1])), size = 0.5) +
-      geom_line(aes_string(y = Modfit, color = shQuote(GraphLegend[2])), size = 0.5) +
-      geom_line(aes_string(y = ModImp, color = shQuote(GraphLegend[3])), linetype = "dashed") +
-      labs(color = "Legend") + ggtitle(GraphTitles[j]) + theme_classic() +
+      geom_line(aes(y = Data, color = GraphLegend[1]), linewidth = 0.5) +
+      geom_line(aes(y = Modfit, color = GraphLegend[2]), linewidth = 0.5) +
+      geom_line(aes(y = ModImp, color = GraphLegend[3]), linetype = "dashed") +
+      labs(color = "Legend") +
+      scale_color_manual(values = c("black", "#0072B2", "#D55E00")) +
+      ggtitle(GraphTitles[j]) + theme_classic() +
       theme(plot.title = element_text(size = 10, face = "bold", hjust = 0.5), axis.title.x = element_blank(),
             axis.title.y = element_blank(), axis.text.x = element_text(size = 8)) +
       geom_hline(yintercept = 0)
@@ -746,47 +1002,65 @@ Fit_Subplot <- function(YieldData, ModelFit, ModelImplied, MatLength, mat, Econo
 
   # Generate legend
   # Legend settings:
-  LegendSubPlot_FIT <- cowplot::get_legend(plot_list_FIT[[1]] +
-                                             theme(legend.direction = "horizontal", legend.position = "bottom", legend.justification = "center",
-                                                   legend.title = element_text(size = 10, face = "bold"),
-                                                   legend.text = element_text(size = 8),
-                                                   legend.box.background = element_rect(colour = "black")))
+  built_plot <- ggplot_build(
+    plot_list_FIT[[1]] +  # Start with your original plot
+      theme(
+        legend.direction = "horizontal",
+        legend.position = "bottom",
+        legend.justification = "center",
+        legend.title = element_text(size = 10, face = "bold"),
+        legend.text = element_text(size = 8),
+        legend.background = element_rect(color = "black", fill = "white")
+      )
+  )
+
+  gtable_plot <- ggplot_gtable(built_plot)
+
+  # Find the legend guide box
+  guide_index <- which(sapply(gtable_plot$grobs, function(x) grepl("guide-box", x$name, fixed = TRUE)))
+  LegendSubPlot <- gtable_plot$grobs[[guide_index[1]]]
 
   # Build the graph subplots:
-  subplots_FIT <- cowplot::plot_grid(plotlist = plot_list_no_legend_FIT, ncol = 3)
-  subplots2save_FIT <- cowplot::plot_grid(LegendSubPlot_FIT, subplots_FIT, ncol = 1, rel_heights = c(.1, 1))
+  subplots_FIT <- plot_grid(plotlist = plot_list_no_legend_FIT, ncol = 3)
+  subplots2save_FIT <- plot_grid(LegendSubPlot, subplots_FIT, ncol = 1, rel_heights = c(.1, 1))
+  if (!is.null(AdjPath)) {
   suppressMessages(ggplot2::ggsave(subplots2save_FIT, file = paste0("Yields_Fit_", Economies, ".png"),
                                    path = AdjPath))
+  print(subplots2save_FIT)
+  }
+
+  return(subplots2save_FIT)
 }
 #########################################################################################################
 #' Create folders for storing IRFs and GIRFs
 #'
 #' @param OutputType available options are "IRF", "GIRF", "IRF Ortho" and "GIRF Ortho"
-#' @param WishPdynamicsgraphs binary variable specifying whether the user whishes IRFs and/or GIRFs of risk factors
-#' @param WishYieldsgraphs binary variable specifying whether the user whishes IRFs and/or GIRFs of bond yields
+#' @param WishPdynamicsgraphs binary variable specifing whether the user whishes IRFs and/or GIRFs of risk factors
+#' @param WishYieldsgraphs binary variable specifing whether the user whishes IRFs and/or GIRFs of bond yields
 #' @param Economies Set of economies that are part of the economic system
 #' @param ModelType Desired modem type
+#' @param Folder2Save Folder path where the outputs will be stored.
 #'
 #' @keywords internal
 
-FolderPrep_IRFs <- function(OutputType, WishPdynamicsgraphs, WishYieldsgraphs, Economies, ModelType) {
+FolderPrep_IRFs <- function(OutputType, WishPdynamicsgraphs, WishYieldsgraphs, Economies, ModelType, Folder2Save) {
 
   ################# 1) SINGLE-COUNTRY CONTRY MODELS #################
   if (any(ModelType == c("JPS original", "JPS global", "GVAR single"))) {
     # A) General Folder Creation
     if (OutputType == "IRF") {
-      dir.create(paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/Model ", Economies, "/IRF", sep = ""))
+      dir.create(paste(Folder2Save, "/Outputs/", ModelType, "/Point Estimate/Model ", Economies, "/IRF", sep = ""))
     } else {
-      dir.create(paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/Model ", Economies, "/GIRF", sep = ""))
+      dir.create(paste(Folder2Save, "/Outputs/", ModelType, "/Point Estimate/Model ", Economies, "/GIRF", sep = ""))
     }
 
     # a.1) Folders for graph of Factors
     if (WishPdynamicsgraphs == 1) {
       if (OutputType == "IRF") {
-        dir.create(paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/Model ", Economies,
+        dir.create(paste(Folder2Save, "/Outputs/", ModelType, "/Point Estimate/Model ", Economies,
                          "/IRF/Factors", sep = ""))
       } else {
-        dir.create(paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/Model ", Economies,
+        dir.create(paste(Folder2Save, "/Outputs/", ModelType, "/Point Estimate/Model ", Economies,
                          "/GIRF/Factors", sep = ""))
       }
     }
@@ -794,10 +1068,10 @@ FolderPrep_IRFs <- function(OutputType, WishPdynamicsgraphs, WishYieldsgraphs, E
     # a.2) Folders for graph of yields
     if (WishYieldsgraphs == 1) {
       if (OutputType == "IRF") {
-        dir.create(paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/Model ", Economies,
+        dir.create(paste(Folder2Save, "/Outputs/", ModelType, "/Point Estimate/Model ", Economies,
                          "/IRF/Yields", sep = ""))
       } else {
-        dir.create(paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/Model ", Economies,
+        dir.create(paste(Folder2Save, "/Outputs/", ModelType, "/Point Estimate/Model ", Economies,
                          "/GIRF/Yields", sep = ""))
       }
     }
@@ -806,26 +1080,26 @@ FolderPrep_IRFs <- function(OutputType, WishPdynamicsgraphs, WishYieldsgraphs, E
   ################# 2) JOINT COUNTRY CONTRY MODELS #################
     # A) General Folder Creation
     if (OutputType == "IRF") {
-      dir.create(paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/IRF", sep = ""))
+      dir.create(paste(Folder2Save, "/Outputs/", ModelType, "/Point Estimate/IRF", sep = ""))
     } else {
-      dir.create(paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/GIRF", sep = ""))
+      dir.create(paste(Folder2Save, "/Outputs/", ModelType, "/Point Estimate/GIRF", sep = ""))
     }
 
     # a.1) Folders for graph of Factors
     if (WishPdynamicsgraphs == 1) {
       if (OutputType == "IRF") {
-        dir.create(paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/IRF/Factors", sep = ""))
+        dir.create(paste(Folder2Save, "/Outputs/", ModelType, "/Point Estimate/IRF/Factors", sep = ""))
       } else {
-        dir.create(paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/GIRF/Factors", sep = ""))
+        dir.create(paste(Folder2Save, "/Outputs/", ModelType, "/Point Estimate/GIRF/Factors", sep = ""))
       }
     }
 
     # a.2) Folders for graph of yields
     if (WishYieldsgraphs == 1) {
       if (OutputType == "IRF") {
-        dir.create(paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/IRF/Yields", sep = ""))
+        dir.create(paste(Folder2Save, "/Outputs/", ModelType, "/Point Estimate/IRF/Yields", sep = ""))
       } else {
-        dir.create(paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/GIRF/Yields", sep = ""))
+        dir.create(paste(Folder2Save, "/Outputs/", ModelType, "/Point Estimate/GIRF/Yields", sep = ""))
       }
     }
 
@@ -833,9 +1107,9 @@ FolderPrep_IRFs <- function(OutputType, WishPdynamicsgraphs, WishYieldsgraphs, E
   } else {
     # A) General Folder Creation
     if (OutputType == "IRF") {
-      dir.create(paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/IRF", sep = ""))
+      dir.create(paste(Folder2Save, "/Outputs/", ModelType, "/Point Estimate/IRF", sep = ""))
     } else if (OutputType == "GIRF") {
-      dir.create(paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/GIRF", sep = ""))
+      dir.create(paste(Folder2Save, "/Outputs/", ModelType, "/Point Estimate/GIRF", sep = ""))
     }
 
     ########### NON-ORTHO #####################################
@@ -843,36 +1117,36 @@ FolderPrep_IRFs <- function(OutputType, WishPdynamicsgraphs, WishYieldsgraphs, E
       # a.1) Folders for graph of Factors
       if (WishPdynamicsgraphs == 1) {
         if (OutputType == "IRF") {
-          dir.create(paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/IRF/Factors", sep = ""))
+          dir.create(paste(Folder2Save, "/Outputs/", ModelType, "/Point Estimate/IRF/Factors", sep = ""))
         } else {
-          dir.create(paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/GIRF/Factors", sep = ""))
+          dir.create(paste(Folder2Save, "/Outputs/", ModelType, "/Point Estimate/GIRF/Factors", sep = ""))
         }
       }
 
       # a.2) Folders for graph of yields
       if (WishYieldsgraphs == 1) {
         if (OutputType == "IRF") {
-          dir.create(paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/IRF/Yields", sep = ""))
+          dir.create(paste(Folder2Save, "/Outputs/", ModelType, "/Point Estimate/IRF/Yields", sep = ""))
         } else {
-          dir.create(paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/GIRF/Yields", sep = ""))
+          dir.create(paste(Folder2Save, "/Outputs/", ModelType, "/Point Estimate/GIRF/Yields", sep = ""))
         }
       }
     } else {
       ########### ORTHO #####################################
       if (WishPdynamicsgraphs == 1) {
         if (OutputType == "IRF Ortho") {
-          dir.create(paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/IRF/Factors/Ortho", sep = ""))
+          dir.create(paste(Folder2Save, "/Outputs/", ModelType, "/Point Estimate/IRF/Factors/Ortho", sep = ""))
         } else {
-          dir.create(paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/GIRF/Factors/Ortho", sep = ""))
+          dir.create(paste(Folder2Save, "/Outputs/", ModelType, "/Point Estimate/GIRF/Factors/Ortho", sep = ""))
         }
       }
 
       # a.2) Folders for graph of yields
       if (WishYieldsgraphs == 1) {
         if (OutputType == "IRF Ortho") {
-          dir.create(paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/IRF/Yields/Ortho", sep = ""))
+          dir.create(paste(Folder2Save, "/Outputs/", ModelType, "/Point Estimate/IRF/Yields/Ortho", sep = ""))
         } else {
-          dir.create(paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/GIRF/Yields/Ortho", sep = ""))
+          dir.create(paste(Folder2Save, "/Outputs/", ModelType, "/Point Estimate/GIRF/Yields/Ortho", sep = ""))
         }
       }
     }
@@ -1120,27 +1394,28 @@ Wished_Graphs_IRFandGIRF <- function(InputsForOutputs, OutType, ModelType) {
 #' @param WishYieldsgraphs binary variable specifing whether the user whishes IRFs and/or GIRFs of bond yields
 #' @param Economies Set of economies that are part of the economic system
 #' @param ModelType Desired modem type
+#' @param Folder2Save Folder path where the outputs will be stored.
 #'
 #' @keywords internal
 
-FolderPrep_FEVDs <- function(OutputType, WishPdynamicsgraphs, WishYieldsgraphs, Economies, ModelType) {
+FolderPrep_FEVDs <- function(OutputType, WishPdynamicsgraphs, WishYieldsgraphs, Economies, ModelType, Folder2Save) {
 
   ################# 1) SINGLE-COUNTRY CONTRY MODELS #################
   if (any(ModelType == c("JPS original", "JPS global", "GVAR single"))) {
     # A) General Folder Creation
     if (OutputType == "FEVD") {
-      dir.create(paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/Model ", Economies, "/FEVD", sep = ""))
+      dir.create(paste(Folder2Save, "/Outputs/", ModelType, "/Point Estimate/Model ", Economies, "/FEVD", sep = ""))
     } else {
-      dir.create(paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/Model ", Economies, "/GFEVD", sep = ""))
+      dir.create(paste(Folder2Save, "/Outputs/", ModelType, "/Point Estimate/Model ", Economies, "/GFEVD", sep = ""))
     }
 
     # a.1) Folders for graph of Factors
     if (WishPdynamicsgraphs == 1) {
       if (OutputType == "FEVD") {
-        dir.create(paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/Model ", Economies,
+        dir.create(paste(Folder2Save, "/Outputs/", ModelType, "/Point Estimate/Model ", Economies,
                          "/FEVD/Factors", sep = ""))
       } else {
-        dir.create(paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/Model ", Economies,
+        dir.create(paste(Folder2Save, "/Outputs/", ModelType, "/Point Estimate/Model ", Economies,
                          "/GFEVD/Factors", sep = ""))
       }
     }
@@ -1148,10 +1423,10 @@ FolderPrep_FEVDs <- function(OutputType, WishPdynamicsgraphs, WishYieldsgraphs, 
     # a.2) Folders for graph of yields
     if (WishYieldsgraphs == 1) {
       if (OutputType == "FEVD") {
-        dir.create(paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/Model ", Economies,
+        dir.create(paste(Folder2Save, "/Outputs/", ModelType, "/Point Estimate/Model ", Economies,
                          "/FEVD/Yields", sep = ""))
       } else {
-        dir.create(paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/Model ", Economies,
+        dir.create(paste(Folder2Save, "/Outputs/", ModelType, "/Point Estimate/Model ", Economies,
                          "/GFEVD/Yields", sep = ""))
       }
     }
@@ -1160,26 +1435,26 @@ FolderPrep_FEVDs <- function(OutputType, WishPdynamicsgraphs, WishYieldsgraphs, 
     ################# 2) JOINT COUNTRY CONTRY MODELS #################
     # A) General Folder Creation
     if (OutputType == "FEVD") {
-      dir.create(paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/FEVD", sep = ""))
+      dir.create(paste(Folder2Save, "/Outputs/", ModelType, "/Point Estimate/FEVD", sep = ""))
     } else {
-      dir.create(paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/GFEVD", sep = ""))
+      dir.create(paste(Folder2Save, "/Outputs/", ModelType, "/Point Estimate/GFEVD", sep = ""))
     }
 
     # a.1) Folders for graph of Factors
     if (WishPdynamicsgraphs == 1) {
       if (OutputType == "FEVD") {
-        dir.create(paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/FEVD/Factors", sep = ""))
+        dir.create(paste(Folder2Save, "/Outputs/", ModelType, "/Point Estimate/FEVD/Factors", sep = ""))
       } else {
-        dir.create(paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/GFEVD/Factors", sep = ""))
+        dir.create(paste(Folder2Save, "/Outputs/", ModelType, "/Point Estimate/GFEVD/Factors", sep = ""))
       }
     }
 
     # a.2) Folders for graph of yields
     if (WishYieldsgraphs == 1) {
       if (OutputType == "FEVD") {
-        dir.create(paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/FEVD/Yields", sep = ""))
+        dir.create(paste(Folder2Save, "/Outputs/", ModelType, "/Point Estimate/FEVD/Yields", sep = ""))
       } else {
-        dir.create(paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/GFEVD/Yields", sep = ""))
+        dir.create(paste(Folder2Save, "/Outputs/", ModelType, "/Point Estimate/GFEVD/Yields", sep = ""))
       }
     }
 
@@ -1187,9 +1462,9 @@ FolderPrep_FEVDs <- function(OutputType, WishPdynamicsgraphs, WishYieldsgraphs, 
   } else {
     # A) General Folder Creation
     if (OutputType == "FEVD") {
-      dir.create(paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/FEVD", sep = ""))
+      dir.create(paste(Folder2Save, "/Outputs/", ModelType, "/Point Estimate/FEVD", sep = ""))
     } else if (OutputType == "GFEVD") {
-      dir.create(paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/GFEVD", sep = ""))
+      dir.create(paste(Folder2Save, "/Outputs/", ModelType, "/Point Estimate/GFEVD", sep = ""))
     }
 
     ########### NON-ORTHO #####################################
@@ -1197,36 +1472,36 @@ FolderPrep_FEVDs <- function(OutputType, WishPdynamicsgraphs, WishYieldsgraphs, 
       # a.1) Folders for graph of Factors
       if (WishPdynamicsgraphs == 1) {
         if (OutputType == "FEVD") {
-          dir.create(paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/FEVD/Factors", sep = ""))
+          dir.create(paste(Folder2Save, "/Outputs/", ModelType, "/Point Estimate/FEVD/Factors", sep = ""))
         } else {
-          dir.create(paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/GFEVD/Factors", sep = ""))
+          dir.create(paste(Folder2Save, "/Outputs/", ModelType, "/Point Estimate/GFEVD/Factors", sep = ""))
         }
       }
 
       # a.2) Folders for graph of yields
       if (WishYieldsgraphs == 1) {
         if (OutputType == "FEVD") {
-          dir.create(paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/FEVD/Yields", sep = ""))
+          dir.create(paste(Folder2Save, "/Outputs/", ModelType, "/Point Estimate/FEVD/Yields", sep = ""))
         } else {
-          dir.create(paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/GFEVD/Yields", sep = ""))
+          dir.create(paste(Folder2Save, "/Outputs/", ModelType, "/Point Estimate/GFEVD/Yields", sep = ""))
         }
       }
     } else {
       ########### ORTHO #####################################
       if (WishPdynamicsgraphs == 1) {
         if (OutputType == "FEVD Ortho") {
-          dir.create(paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/FEVD/Factors/Ortho", sep = ""))
+          dir.create(paste(Folder2Save, "/Outputs/", ModelType, "/Point Estimate/FEVD/Factors/Ortho", sep = ""))
         } else {
-          dir.create(paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/GFEVD/Factors/Ortho", sep = ""))
+          dir.create(paste(Folder2Save, "/Outputs/", ModelType, "/Point Estimate/GFEVD/Factors/Ortho", sep = ""))
         }
       }
 
       # a.2) Folders for graph of yields
       if (WishYieldsgraphs == 1) {
         if (OutputType == "FEVD Ortho") {
-          dir.create(paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/FEVD/Yields/Ortho", sep = ""))
+          dir.create(paste(Folder2Save, "/Outputs/", ModelType, "/Point Estimate/FEVD/Yields/Ortho", sep = ""))
         } else {
-          dir.create(paste(tempdir(), "/Outputs/", ModelType, "/Point Estimate/GFEVD/Yields/Ortho", sep = ""))
+          dir.create(paste(Folder2Save, "/Outputs/", ModelType, "/Point Estimate/GFEVD/Yields/Ortho", sep = ""))
         }
       }
     }
@@ -1250,6 +1525,7 @@ BuildFEVDlist <- function(NumOut, Economies, ModelType, FEVDhoriz, FacDim, Yield
   Horiz <- 0:(FEVDhoriz - 1)
   FEVDFactors <- list()
   FEVDYields <- list()
+  index <- NULL
 
   # 1) Extract IRFs
   if (OutputType == "FEVD") {
@@ -1258,97 +1534,167 @@ BuildFEVDlist <- function(NumOut, Economies, ModelType, FEVDhoriz, FacDim, Yield
       # Factors
       for (g in 1:FacDim) {
         FEVDFactors[[g]] <- data.frame(NumOut$FEVD[[ModelType]][[Economies]]$Factors[, , g])
-        INDX <- cbind(index = rownames(FEVDFactors[[g]]), FEVDFactors[[g]])
-        FEVDFactors[[g]] <- suppressMessages(reshape2::melt(INDX))
+        FEVDFactors[[g]]$index <- rownames(FEVDFactors[[g]])
+        stacked_data <- utils::stack(FEVDFactors[[g]], select = -index)
+        FEVDFactors[[g]] <- data.frame(
+          index = FEVDFactors[[g]]$index,
+          variable = stacked_data$ind,
+          value = stacked_data$values
+        )
         FEVDFactors[[g]]$index <- factor(FEVDFactors[[g]]$index, levels = 1:(FEVDhoriz))
       }
 
       # Yields
       for (g in 1:YieldsDim) {
         FEVDYields[[g]] <- data.frame(NumOut$FEVD[[ModelType]][[Economies]]$Yields[, , g])
-        INDX <- cbind(index = rownames(FEVDYields[[g]]), FEVDYields[[g]])
-        FEVDYields[[g]] <- suppressMessages(reshape2::melt(INDX))
+        FEVDYields[[g]]$index <- rownames(FEVDYields[[g]])
+        stacked_data <- utils::stack(FEVDYields[[g]], select = -index)
+        FEVDYields[[g]] <- data.frame(
+          index = FEVDYields[[g]]$index,
+          variable = stacked_data$ind,
+          value = stacked_data$values
+        )
         FEVDYields[[g]]$index <- factor(FEVDYields[[g]]$index, levels = 1:(FEVDhoriz))
-      }
+        }
 
       # b) Models estimated jointly
     } else if (any(ModelType == c("JPS multi", "GVAR multi"))) {
       # Factors
       for (g in 1:FacDim) {
         FEVDFactors[[g]] <- data.frame(NumOut$FEVD[[ModelType]]$Factors[, , g])
-        FEVDFactors[[g]] <- suppressMessages(reshape2::melt(cbind(index = rownames(FEVDFactors[[g]]), FEVDFactors[[g]])))
+        FEVDFactors[[g]]$index <- rownames(FEVDFactors[[g]])
+        stacked_data <- utils::stack(FEVDFactors[[g]], select = -index)
+        FEVDFactors[[g]] <- data.frame(
+          index = FEVDFactors[[g]]$index,
+          variable = stacked_data$ind,
+          value = stacked_data$values
+        )
         FEVDFactors[[g]]$index <- factor(FEVDFactors[[g]]$index, levels = 1:(FEVDhoriz))
-      }
+        }
 
       # Yields
       for (g in 1:YieldsDim) {
         FEVDYields[[g]] <- data.frame(NumOut$FEVD[[ModelType]]$Yields[, , g])
-        FEVDYields[[g]] <- suppressMessages(reshape2::melt(cbind(index = rownames(FEVDYields[[g]]), FEVDYields[[g]])))
+        FEVDYields[[g]]$index <- rownames(FEVDYields[[g]])
+        stacked_data <- utils::stack(FEVDYields[[g]], select = -index)
+        FEVDYields[[g]] <- data.frame(
+          index = FEVDYields[[g]]$index,
+          variable = stacked_data$ind,
+          value = stacked_data$values
+        )
         FEVDYields[[g]]$index <- factor(FEVDYields[[g]]$index, levels = 1:(FEVDhoriz))
-      }
+        }
+
     } else {
       # c) JLL-based setups (Non-Orthogonalized version)
       # Factors
       for (g in 1:FacDim) {
         FEVDFactors[[g]] <- data.frame(NumOut$FEVD[[ModelType]]$Factors$NonOrtho[, , g])
-        FEVDFactors[[g]] <- suppressMessages(reshape2::melt(cbind(index = rownames(FEVDFactors[[g]]), FEVDFactors[[g]])))
+        FEVDFactors[[g]]$index <- rownames(FEVDFactors[[g]])
+        stacked_data <- utils::stack(FEVDFactors[[g]], select = -index)
+        FEVDFactors[[g]] <- data.frame(
+          index = FEVDFactors[[g]]$index,
+          variable = stacked_data$ind,
+          value = stacked_data$values
+        )
         FEVDFactors[[g]]$index <- factor(FEVDFactors[[g]]$index, levels = 1:(FEVDhoriz))
-      }
+        }
 
       # Yields
       for (g in 1:YieldsDim) {
         FEVDYields[[g]] <- data.frame(NumOut$FEVD[[ModelType]]$Yields$NonOrtho[, , g])
-        FEVDYields[[g]] <- suppressMessages(reshape2::melt(cbind(index = rownames(FEVDYields[[g]]), FEVDYields[[g]])))
+        FEVDYields[[g]]$index <- rownames(FEVDYields[[g]])
+        stacked_data <- utils::stack(FEVDYields[[g]], select = -index)
+        FEVDYields[[g]] <- data.frame(
+          index = FEVDYields[[g]]$index,
+          variable = stacked_data$ind,
+          value = stacked_data$values
+        )
         FEVDYields[[g]]$index <- factor(FEVDYields[[g]]$index, levels = 1:(FEVDhoriz))
-      }
+        }
     }
 
     # 2) Extract GFEVD
   } else if (OutputType == "GFEVD") {
     # a) Models estimated individually
     if (any(ModelType == c("JPS original", "JPS global", "GVAR single"))) {
-      for (g in 1:FacDim) { # Recast the IRFs into a data-frame
+      for (g in 1:FacDim) {
         FEVDFactors[[g]] <- data.frame(NumOut$GFEVD[[ModelType]][[Economies]]$Factors[, , g])
-        INDX <- cbind(index = rownames(FEVDFactors[[g]]), FEVDFactors[[g]])
-        FEVDFactors[[g]] <- suppressMessages(reshape2::melt(INDX))
+        FEVDFactors[[g]]$index <- rownames(FEVDFactors[[g]])
+        stacked_data <- utils::stack(FEVDFactors[[g]], select = -index)
+        FEVDFactors[[g]] <- data.frame(
+          index = FEVDFactors[[g]]$index,
+          variable = stacked_data$ind,
+          value = stacked_data$values
+        )
         FEVDFactors[[g]]$index <- factor(FEVDFactors[[g]]$index, levels = 1:(FEVDhoriz))
       }
 
-      # Yields
+    # Yields
       for (g in 1:YieldsDim) {
         FEVDYields[[g]] <- data.frame(NumOut$GFEVD[[ModelType]][[Economies]]$Yields[, , g])
-        INDX <- cbind(index = rownames(FEVDYields[[g]]), FEVDYields[[g]])
-        FEVDYields[[g]] <- suppressMessages(reshape2::melt(INDX))
+        FEVDYields[[g]]$index <- rownames(FEVDYields[[g]])
+        stacked_data <- utils::stack(FEVDYields[[g]], select = -index)
+        FEVDYields[[g]] <- data.frame(
+          index = FEVDYields[[g]]$index,
+          variable = stacked_data$ind,
+          value = stacked_data$values
+        )
         FEVDYields[[g]]$index <- factor(FEVDYields[[g]]$index, levels = 1:(FEVDhoriz))
       }
+
       # b) Models estimated jointly
     } else if (any(ModelType == c("JPS multi", "GVAR multi"))) {
-      # Factors
       for (g in 1:FacDim) { # Outputs in data-frame format
         FEVDFactors[[g]] <- data.frame(NumOut$GFEVD[[ModelType]]$Factors[, , g])
-        FEVDFactors[[g]] <- suppressMessages(reshape2::melt(cbind(index = rownames(FEVDFactors[[g]]), FEVDFactors[[g]])))
+        FEVDFactors[[g]]$index <- rownames(FEVDFactors[[g]])
+        stacked_data <- utils::stack(FEVDFactors[[g]], select = -index)
+        FEVDFactors[[g]] <- data.frame(
+          index = FEVDFactors[[g]]$index,
+          variable = stacked_data$ind,
+          value = stacked_data$values
+        )
         FEVDFactors[[g]]$index <- factor(FEVDFactors[[g]]$index, levels = 1:(FEVDhoriz))
-      }
+        }
 
       # Yields
       for (g in 1:YieldsDim) {
         FEVDYields[[g]] <- data.frame(NumOut$GFEVD[[ModelType]]$Yields[, , g])
-        FEVDYields[[g]] <- suppressMessages(reshape2::melt(cbind(index = rownames(FEVDYields[[g]]), FEVDYields[[g]])))
+        FEVDYields[[g]]$index <- rownames(FEVDYields[[g]])
+        stacked_data <- utils::stack(FEVDYields[[g]], select = -index)
+        FEVDYields[[g]] <- data.frame(
+          index = FEVDYields[[g]]$index,
+          variable = stacked_data$ind,
+          value = stacked_data$values
+        )
         FEVDYields[[g]]$index <- factor(FEVDYields[[g]]$index, levels = 1:(FEVDhoriz))
-      }
+        }
+
       # c) JLL-based setups (non-Orthogonalized version)
     } else {
       # Factors
       for (g in 1:FacDim) {
         FEVDFactors[[g]] <- data.frame(NumOut$GFEVD[[ModelType]]$Factors$NonOrtho[, , g])
-        FEVDFactors[[g]] <- suppressMessages(reshape2::melt(cbind(index = rownames(FEVDFactors[[g]]), FEVDFactors[[g]])))
+        FEVDFactors[[g]]$index <- rownames(FEVDFactors[[g]])
+        stacked_data <- utils::stack(FEVDFactors[[g]], select = -index)
+        FEVDFactors[[g]] <- data.frame(
+          index = FEVDFactors[[g]]$index,
+          variable = stacked_data$ind,
+          value = stacked_data$values
+        )
         FEVDFactors[[g]]$index <- factor(FEVDFactors[[g]]$index, levels = 1:(FEVDhoriz))
-      }
+        }
 
       # Yields
       for (g in 1:YieldsDim) {
         FEVDYields[[g]] <- data.frame(NumOut$GFEVD[[ModelType]]$Yields$NonOrtho[, , g])
-        FEVDYields[[g]] <- suppressMessages(reshape2::melt(cbind(index = rownames(FEVDYields[[g]]), FEVDYields[[g]])))
+        FEVDYields[[g]]$index <- rownames(FEVDYields[[g]])
+        stacked_data <- utils::stack(FEVDYields[[g]], select = -index)
+        FEVDYields[[g]] <- data.frame(
+          index = FEVDYields[[g]]$index,
+          variable = stacked_data$ind,
+          value = stacked_data$values
+        )
         FEVDYields[[g]]$index <- factor(FEVDYields[[g]]$index, levels = 1:(FEVDhoriz))
       }
     }
@@ -1358,28 +1704,53 @@ BuildFEVDlist <- function(NumOut, Economies, ModelType, FEVDhoriz, FacDim, Yield
     # Factors
     for (g in 1:FacDim) { # Recast outputs in a data-frame
       FEVDFactors[[g]] <- data.frame(NumOut$FEVD[[ModelType]]$Factors$Ortho[, , g])
-      FEVDFactors[[g]] <- suppressMessages(reshape2::melt(cbind(index = rownames(FEVDFactors[[g]]), FEVDFactors[[g]])))
+      FEVDFactors[[g]]$index <- rownames(FEVDFactors[[g]])
+      stacked_data <- utils::stack(FEVDFactors[[g]], select = -index)
+      FEVDFactors[[g]] <- data.frame(
+        index = FEVDFactors[[g]]$index,
+        variable = stacked_data$ind,
+        value = stacked_data$values
+      )
       FEVDFactors[[g]]$index <- factor(FEVDFactors[[g]]$index, levels = 1:(FEVDhoriz))
-    }
+      }
 
     # Yields
     for (g in 1:YieldsDim) {
       FEVDYields[[g]] <- data.frame(NumOut$FEVD[[ModelType]]$Yields$Ortho[, , g])
-      FEVDYields[[g]] <- suppressMessages(reshape2::melt(cbind(index = rownames(FEVDYields[[g]]), FEVDYields[[g]])))
+      FEVDYields[[g]]$index <- rownames(FEVDYields[[g]])
+      stacked_data <- utils::stack(FEVDYields[[g]], select = -index)
+      FEVDYields[[g]] <- data.frame(
+        index = FEVDYields[[g]]$index,
+        variable = stacked_data$ind,
+        value = stacked_data$values
+      )
       FEVDYields[[g]]$index <- factor(FEVDYields[[g]]$index, levels = 1:(FEVDhoriz))
     }
+
   } else { # GFEVD Ortho
     # Factors
     for (g in 1:FacDim) { # Recast outputs in a data-frame
       FEVDFactors[[g]] <- data.frame(NumOut$GFEVD[[ModelType]]$Factors$Ortho[, , g])
-      FEVDFactors[[g]] <- suppressMessages(reshape2::melt(cbind(index = rownames(FEVDFactors[[g]]), FEVDFactors[[g]])))
+      FEVDFactors[[g]]$index <- rownames(FEVDFactors[[g]])
+      stacked_data <- utils::stack(FEVDFactors[[g]], select = -index)
+      FEVDFactors[[g]] <- data.frame(
+        index = FEVDFactors[[g]]$index,
+        variable = stacked_data$ind,
+        value = stacked_data$values
+      )
       FEVDFactors[[g]]$index <- factor(FEVDFactors[[g]]$index, levels = 1:(FEVDhoriz))
-    }
+   }
 
     # Yields
     for (g in 1:YieldsDim) {
       FEVDYields[[g]] <- data.frame(NumOut$GFEVD[[ModelType]]$Yields$Ortho[, , g])
-      FEVDYields[[g]] <- suppressMessages(reshape2::melt(cbind(index = rownames(FEVDYields[[g]]), FEVDYields[[g]])))
+      FEVDYields[[g]]$index <- rownames(FEVDYields[[g]])
+      stacked_data <- utils::stack(FEVDYields[[g]], select = -index)
+      FEVDYields[[g]] <- data.frame(
+        index = FEVDYields[[g]]$index,
+        variable = stacked_data$ind,
+        value = stacked_data$values
+      )
       FEVDYields[[g]]$index <- factor(FEVDYields[[g]]$index, levels = 1:(FEVDhoriz))
     }
   }
@@ -1464,17 +1835,23 @@ AdjustPathFEVDs <- function(OutputType, ElementType, PathsGraphs, Economies, Mod
 
 FEVDandGFEVDs_Graphs <- function(OutputType, FEVDlist, nmVarInt, Lab_Fac, PathsGraphs) {
 
+  # Merge factors with a small contributions
+  FEVDlist <- MergeFEVD_graphs(FEVDlist, Threshold = 0.05)
+
   index <- FEVDlist$index
   value <- FEVDlist$value
   variable <- FEVDlist$variable
 
-  p <- ggplot(FEVDlist, aes(x = index, y = value, fill = variable)) +
-    geom_bar(stat = "identity", width = 0.25) +
-    labs(title = paste0(OutputType, " - ", nmVarInt)) + theme_classic() +
+p <- ggplot(FEVDlist, aes(x = index, y = value, fill = variable)) +
+     geom_col(position = "dodge") + labs(title = paste0(OutputType, " - ", nmVarInt)) + theme_classic() +
     theme(axis.title.x = element_blank(), axis.title.y = element_blank(), axis.text.x = element_text(size = 8),
           plot.title = element_text(size = 10, face = "bold", hjust = 0.5))
+  if (!is.null(PathsGraphs)) {
   suppressMessages(ggplot2::ggsave(p, file = paste0(Lab_Fac, nmVarInt, ".png"),
                                    path = PathsGraphs, width = 11, height = 7.98))
+  print(p)
+  }
+  return(p)
 }
 #############################################################################################
 #' Extract list of desired graph features (IRFs anc GIRFs)
@@ -1514,4 +1891,24 @@ Wished_Graphs_FEVDandGFEVD <- function(InputsForOutputs, OutType, ModelType) {
     }
   }
   return(list(RiskGraphs = RiskGraphs, YieldGraphs = YieldGraphs))
+}
+
+###########################################################################################################
+#' Limit the number of categories in FEVDs and GFEVDs graphs by merging small groups into other
+#'
+#' @param FEVDlist list of FEVD and GFEVD outputs
+#' @param Threshold Threshold for merging factors. Default is 0.05.
+#'
+#'@keywords internal
+
+MergeFEVD_graphs <- function(FEVDlist, Threshold = 0.05) {
+
+  variable <- FEVDlist$variable
+
+  mean_contrib <- tapply(FEVDlist$value, FEVDlist$variable, mean)
+  small_vars <- names(mean_contrib[mean_contrib < Threshold])
+  FEVD_cleaned <- transform(FEVDlist, variable = ifelse(variable %in% small_vars, "Others", as.character(variable)))
+  FEVD_cleaned <- stats::aggregate(value ~ index + variable, data = FEVD_cleaned, sum)
+
+  return(FEVD_cleaned)
 }

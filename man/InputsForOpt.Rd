@@ -20,7 +20,8 @@ InputsForOpt(
   BRWlist = NULL,
   UnitYields = "Month",
   CheckInputs = TRUE,
-  BS_Adj = FALSE
+  BS_Adj = FALSE,
+  verbose = TRUE
 )
 }
 \arguments{
@@ -55,6 +56,8 @@ InputsForOpt(
 \item{CheckInputs}{Logical. Whether to perform a prior check on the consistency of the provided input list. Default is TRUE.}
 
 \item{BS_Adj}{Logical. Whether to adjust the global series for the sepQ models in the Bootstrap setting. Default is FALSE.}
+
+\item{verbose}{Logical flag controlling function messaging. Default is TRUE.}
 }
 \value{
 An object of class 'ATSMModelInputs' containing the necessary inputs for performing the model optimization.

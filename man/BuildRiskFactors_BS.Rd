@@ -16,7 +16,8 @@ BuildRiskFactors_BS(
   JLLlist,
   WishBRW,
   BRWlist,
-  nlag = 1
+  nlag = 1,
+  verbose
 )
 }
 \arguments{
@@ -43,6 +44,8 @@ BuildRiskFactors_BS(
 \item{BRWlist}{List of necessary inputs for performing the bias-corrected estimation (see "Bias_Correc_VAR" function)}
 
 \item{nlag}{Number of lags in the P-dynamics. Default is set to 1.}
+
+\item{verbose}{Logical flag controlling function messaging.}
 }
 \description{
 Build the time-series of the risk factors in each bootstrap draw

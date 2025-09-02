@@ -11,10 +11,12 @@ Bootstrap(
   Economies,
   InputsForOutputs,
   FactorLabels,
-  JLLlist = NULL,
-  GVARlist = NULL,
-  WishBC = 0,
-  BRWlist = NULL
+  JLLlist,
+  GVARlist,
+  WishBC,
+  BRWlist,
+  Folder2save = NULL,
+  verbose = TRUE
 )
 }
 \arguments{
@@ -37,12 +39,16 @@ Bootstrap(
 \item{WishBC}{Whether to estimate the physical parameter model with bias correction, based on the method by Bauer, Rudebusch and Wu (2012) (see \code{\link{Bias_Correc_VAR}} function). Default is set to 0.}
 
 \item{BRWlist}{List of necessary inputs for performing the bias-corrected estimation (see \code{\link{Bias_Correc_VAR}} function).}
+
+\item{Folder2save}{Folder path where the outputs will be stored. Default option saves the outputs in a temporary directory.}
+
+\item{verbose}{Logical flag controlling function messaging. Default is TRUE.}
 }
 \value{
-List containing the following elements:
+An object of class 'ATSMModelBoot' containing the following keys elements:
 \itemize{
 \item List of model parameters for each draw
-\item List of numerical outputs (IRFs, GIRFs, FEVDs, GFEVDs and Term Premia) for each draw
+\item List of numerical outputs (IRFs, GIRFs, FEVDs and GFEVDs) for each draw
 \item Confidence bounds for the chosen level of significance
 }
 }
@@ -50,10 +56,19 @@ List containing the following elements:
 Generates the bootstrap-related outputs
 }
 \examples{
-# See an example of implementation in the vignette file of this package (Section 4).
+\donttest{
+data("ParaSetEx")
+data("InpForOutEx")
+data("NumOutEx")
+ModelType <- "JPS original"
+Economy <- "Brazil"
+FacLab <- LabFac(N = 1, DomVar = "Eco_Act", GlobalVar = "Gl_Eco_Act", Economy, ModelType)
 
+# Adjust Forecasting setting
+InpForOutEx[[ModelType]]$Bootstrap <- list(WishBootstrap = 1, methodBS = 'bs', BlockLength = 4,
+                                          ndraws = 5, pctg =  95)
+
+Boot <- Bootstrap(ModelType, ModelParaEx, NumOutEx, Economy, InpForOutEx, FacLab, JLLlist = NULL,
+                 GVARlist = NULL, WishBC = 0, BRWlist = NULL, Folder2save  = NULL, verbose = TRUE)
 }
-\references{
-This function is a modified and extended version of the \code{VARirbound} function from "A toolbox for VAR analysis"
-by Ambrogio Cesa-Bianchi (https://github.com/ambropo/VAR-Toolbox)
 }

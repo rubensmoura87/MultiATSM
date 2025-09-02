@@ -2,40 +2,40 @@
 library(MultiATSM)
 
 ## ----eval=FALSE---------------------------------------------------------------
-#  # A) Load database data
-#  LoadData("BR_2017")
-#  
-#  # B) GENERAL model inputs
-#  ModelType <- "JPS original"
-#  
-#  Economies <- c("US") # Names of the economies from the economic system
-#  GlobalVar <- c() # Global Variables
-#  DomVar <- c("GRO", "INF") # Country-specific variables
-#  N <- 3 # Number of spanned factors per country
-#  
-#  t0_sample <- "January-1985"
-#  tF_sample <- "December-2007"
-#  
-#  DataFreq <- "Monthly" # Frequency of the data
-#  
-#  StatQ <- 0 # Stationary condition
-#  
-#  #########################################################################################################
-#  ############################### NO NEED TO MAKE CHANGES FROM HERE #######################################
-#  #########################################################################################################
-#  # 2) Minor preliminary work
-#  FactorLabels <- LabFac(N, DomVar, GlobalVar, Economies, ModelType)
-#  
-#  Yields <- t(BR_jps_out$Y)
-#  DomesticMacroVar <- t(BR_jps_out$M.o)
-#  GlobalMacroVar <- c()
-#  
-#  # 3) Prepare the inputs of the likelihood function
-#  ATSMInputs <- InputsForOpt(t0_sample, tF_sample, ModelType, Yields, GlobalMacroVar, DomesticMacroVar,
-#                             FactorLabels, Economies, DataFreq)
-#  
-#  # 4) Optimization of the model
-#  ModelPara <- Optimization(ATSMInputs, StatQ, DataFreq, FactorLabels, Economies, ModelType)
+# # A) Load database data
+# LoadData("BR_2017")
+# 
+# # B) GENERAL model inputs
+# ModelType <- "JPS original"
+# 
+# Economies <- c("US") # Names of the economies from the economic system
+# GlobalVar <- c() # Global Variables
+# DomVar <- c("GRO", "INF") # Country-specific variables
+# N <- 3 # Number of spanned factors per country
+# 
+# t0_sample <- "January-1985"
+# tF_sample <- "December-2007"
+# 
+# DataFreq <- "Monthly" # Frequency of the data
+# 
+# StatQ <- 0 # Stationary condition
+# 
+# #########################################################################################################
+# ############################### NO NEED TO MAKE CHANGES FROM HERE #######################################
+# #########################################################################################################
+# # 2) Minor preliminary work
+# FactorLabels <- LabFac(N, DomVar, GlobalVar, Economies, ModelType)
+# 
+# Yields <- t(BR_jps_out$Y)
+# DomesticMacroVar <- t(BR_jps_out$M.o)
+# GlobalMacroVar <- c()
+# 
+# # 3) Prepare the inputs of the likelihood function
+# ATSMInputs <- InputsForOpt(t0_sample, tF_sample, ModelType, Yields, GlobalMacroVar, DomesticMacroVar,
+#                            FactorLabels, Economies, DataFreq)
+# 
+# # 4) Optimization of the model
+# ModelPara <- Optimization(ATSMInputs, StatQ, DataFreq, FactorLabels, Economies, ModelType)
 
 ## ----echo= FALSE--------------------------------------------------------------
 options(scipen = 100) # eliminate the scientific notation
@@ -116,151 +116,155 @@ kableExtra::kbl(se, align = "c", caption ="Portfolio of yields with errors") %>%
   kableExtra::footnote(general = " $se$ is the standard deviation of the portfolio of yields observed with errors.")
 
 ## ----eval=FALSE---------------------------------------------------------------
-#  # A) Load database data
-#  LoadData("CM_2024")
-#  
-#  # B) GENERAL model inputs
-#  ModelType <- "GVAR multi" # Options: "GVAR multi" or "JLL original".
-#  
-#  Economies <- c("China", "Brazil", "Mexico", "Uruguay")
-#  GlobalVar <- c("Gl_Eco_Act", "Gl_Inflation")
-#  DomVar <- c("Eco_Act", "Inflation")
-#  N <- 3
-#  
-#  t0_sample <- "01-06-2004"
-#  tF_sample <- "01-01-2020"
-#  
-#  OutputLabel <- "CM_jfec"
-#  DataFreq <-"Monthly"
-#  
-#  StatQ <- 0
-#  
-#  # B.1) SPECIFIC model inputs
-#  #################################### GVAR-based models ##################################################
-#  GVARlist <- list( VARXtype = "unconstrained", W_type = "Sample Mean", t_First_Wgvar = "2004",
-#                    t_Last_Wgvar = "2019", DataConnectedness <- TradeFlows )
-#  #################################### JLL-based models ###################################################
-#  JLLlist <- list(DomUnit =  "China")
-#  ###################################### BRW inputs  ######################################################
-#  WishBC <- 1
-#  BRWlist <- within(list(flag_mean = TRUE, gamma = 0.001, N_iter = 200, B = 50, checkBRW = TRUE,
-#                         B_check = 1000),  N_burn <- round(N_iter * 0.15))
-#  
-#  # C) Decide on Settings for numerical outputs
-#  WishFPremia <- 1
-#  FPmatLim <- c(24,36)
-#  
-#  Horiz <- 25
-#  DesiredGraphs <- c("GIRF", "GFEVD", "TermPremia")
-#  WishGraphRiskFac <- 0
-#  WishGraphYields <- 1
-#  WishOrthoJLLgraphs <- 1
-#  
-#  # D) Bootstrap settings
-#  WishBootstrap <- 0 #  Set it to 1, if bootstrap is desired
-#  BootList <- list(methodBS = 'bs', BlockLength = 4, ndraws = 1000, pctg =  95)
-#  
-#  # E) Out-of-sample forecast
-#  WishForecast <- 1
-#  ForecastList <- list(ForHoriz = 12,  t0Sample = 1, t0Forecast = 100, ForType = "Rolling")
-#  
-#  #########################################################################################################
-#  ############################### NO NEED TO MAKE CHANGES FROM HERE #######################################
-#  #########################################################################################################
-#  
-#  # 2) Minor preliminary work: get the sets of factor labels and  a vector of common maturities
-#  FactorLabels <- LabFac(N, DomVar, GlobalVar, Economies, ModelType)
-#  
-#  # 3) Prepare the inputs of the likelihood function
-#  ATSMInputs <- InputsForOpt(t0_sample, tF_sample, ModelType, Yields, GlobalMacroVar, DomesticMacroVar,
-#                             FactorLabels, Economies, DataFreq, GVARlist, JLLlist, WishBC, BRWlist)
-#  
-#  # 4) Optimization of the ATSM (Point Estimates)
-#  ModelParaList <- Optimization(ATSMInputs, StatQ, DataFreq, FactorLabels, Economies, ModelType)
-#  
-#  # 5) Numerical and graphical outputs
-#  # a) Prepare list of inputs for graphs and numerical outputs
-#  InputsForOutputs <- InputsForOutputs(ModelType, Horiz, DesiredGraphs, OutputLabel, StatQ, DataFreq,
-#                                      WishGraphYields, WishGraphRiskFac, WishOrthoJLLgraphs, WishFPremia,
-#                                      FPmatLim, WishBootstrap, BootList, WishForecast, ForecastList)
-#  
-#  # b) Fit, IRF, FEVD, GIRF, GFEVD, and Term Premia
-#  NumericalOutputs <- NumOutputs(ModelType, ModelParaList, InputsForOutputs, FactorLabels, Economies)
-#  
-#  # c) Confidence intervals (bootstrap analysis)
-#  BootstrapAnalysis <- Bootstrap(ModelType, ModelParaList, NumericalOutputs, Economies, InputsForOutputs,
-#                                 FactorLabels, JLLlist, GVARlist, WishBC, BRWlist)
-#  
-#  # 6) Out-of-sample forecasting
-#  Forecasts <- ForecastYields(ModelType, ModelParaList, InputsForOutputs, FactorLabels, Economies,
-#                              JLLlist, GVARlist, WishBC, BRWlist)
+# # A) Load database data
+# LoadData("CM_2024")
+# 
+# # B) GENERAL model inputs
+# ModelType <- "GVAR multi" # Options: "GVAR multi" or "JLL original".
+# 
+# Economies <- c("China", "Brazil", "Mexico", "Uruguay")
+# GlobalVar <- c("Gl_Eco_Act", "Gl_Inflation")
+# DomVar <- c("Eco_Act", "Inflation")
+# N <- 3
+# 
+# t0_sample <- "01-06-2004"
+# tF_sample <- "01-01-2020"
+# 
+# OutputLabel <- "CM_jfec"
+# DataFreq <-"Monthly"
+# Folder2Save <- NULL
+# 
+# StatQ <- 0
+# 
+# # B.1) SPECIFIC model inputs
+# #################################### GVAR-based models ##################################################
+# GVARlist <- list( VARXtype = "unconstrained", W_type = "Sample Mean", t_First_Wgvar = "2004",
+#                   t_Last_Wgvar = "2019", DataConnectedness <- TradeFlows )
+# #################################### JLL-based models ###################################################
+# JLLlist <- list(DomUnit =  "China")
+# ###################################### BRW inputs  ######################################################
+# WishBC <- 1
+# BRWlist <- within(list(flag_mean = TRUE, gamma = 0.001, N_iter = 200, B = 50, checkBRW = TRUE,
+#                        B_check = 1000),  N_burn <- round(N_iter * 0.15))
+# 
+# # C) Decide on Settings for numerical outputs
+# WishFPremia <- 1
+# FPmatLim <- c(24,36)
+# 
+# Horiz <- 25
+# DesiredGraphs <- c("GIRF", "GFEVD", "TermPremia")
+# WishGraphRiskFac <- 0
+# WishGraphYields <- 1
+# WishOrthoJLLgraphs <- 1
+# 
+# # D) Bootstrap settings
+# WishBootstrap <- 0 #  Set it to 1, if bootstrap is desired
+# BootList <- list(methodBS = 'bs', BlockLength = 4, ndraws = 1000, pctg =  95)
+# 
+# # E) Out-of-sample forecast
+# WishForecast <- 1
+# ForecastList <- list(ForHoriz = 12,  t0Sample = 1, t0Forecast = 100, ForType = "Rolling")
+# 
+# #########################################################################################################
+# ############################### NO NEED TO MAKE CHANGES FROM HERE #######################################
+# #########################################################################################################
+# 
+# # 2) Minor preliminary work: get the sets of factor labels and  a vector of common maturities
+# FactorLabels <- LabFac(N, DomVar, GlobalVar, Economies, ModelType)
+# 
+# # 3) Prepare the inputs of the likelihood function
+# ATSMInputs <- InputsForOpt(t0_sample, tF_sample, ModelType, Yields, GlobalMacroVar, DomesticMacroVar,
+#                            FactorLabels, Economies, DataFreq, GVARlist, JLLlist, WishBC, BRWlist)
+# 
+# # 4) Optimization of the ATSM (Point Estimates)
+# ModelParaList <- Optimization(ATSMInputs, StatQ, DataFreq, FactorLabels, Economies, ModelType)
+# 
+# # 5) Numerical and graphical outputs
+# # a) Prepare list of inputs for graphs and numerical outputs
+# InputsForOutputs <- InputsForOutputs(ModelType, Horiz, DesiredGraphs, OutputLabel, StatQ, DataFreq,
+#                                     WishGraphYields, WishGraphRiskFac, WishOrthoJLLgraphs, WishFPremia,
+#                                     FPmatLim, WishBootstrap, BootList, WishForecast, ForecastList)
+# 
+# # b) Fit, IRF, FEVD, GIRF, GFEVD, and Term Premia
+# NumericalOutputs <- NumOutputs(ModelType, ModelParaList, InputsForOutputs, FactorLabels,
+#                                Economies, Folder2Save)
+# 
+# # c) Confidence intervals (bootstrap analysis)
+# BootstrapAnalysis <- Bootstrap(ModelType, ModelParaList, NumericalOutputs, Economies, InputsForOutputs,
+#                                FactorLabels, JLLlist, GVARlist, WishBC, BRWlist, Folder2Save)
+# 
+# # 6) Out-of-sample forecasting
+# Forecasts <- ForecastYields(ModelType, ModelParaList, InputsForOutputs, FactorLabels, Economies,
+#                             JLLlist, GVARlist, WishBC, BRWlist, Folder2Save)
 
 ## ----eval=FALSE---------------------------------------------------------------
-#  # A) Load database data
-#  LoadData("CM_2023")
-#  
-#  # B) GENERAL model inputs
-#  ModelType <- "GVAR multi"
-#  
-#  Economies <- c("Brazil", "India", "Russia", "Mexico")
-#  GlobalVar <- c("US_Output_growth", "China_Output_growth", "SP500")
-#  DomVar <- c("Inflation","Output_growth", "CDS", "COVID")
-#  N <- 2
-#  
-#  t0_sample <- "22-03-2020"
-#  tF_sample <- "26-09-2021"
-#  
-#  OutputLabel <- "CM_EM"
-#  DataFreq <-"Weekly"
-#  
-#  StatQ <- 0
-#  
-#  # B.1) SPECIFIC model inputs
-#  #################################### GVAR-based models ##################################################
-#  GVARlist <- list( VARXtype = "constrained: COVID", W_type = "Sample Mean", t_First_Wgvar = "2015",
-#                    t_Last_Wgvar = "2020", DataConnectedness = Trade_Flows)
-#  ###################################### BRW inputs  ######################################################
-#  WishBC <- 0
-#  
-#  # C) Decide on Settings for numerical outputs
-#  WishFPremia <- 1
-#  FPmatLim <- c(47,48)
-#  
-#  Horiz <- 12
-#  DesiredGraphs <- c("GIRF", "GFEVD", "TermPremia")
-#  WishGraphRiskFac <- 0
-#  WishGraphYields <- 1
-#  WishOrthoJLLgraphs <- 0
-#  
-#  # D) Bootstrap settings
-#  WishBootstrap <- 1 #  YES: 1; No = 0.
-#  BootList <- list(methodBS = 'bs', BlockLength = 4, ndraws = 100, pctg =  95)
-#  
-#  #########################################################################################################
-#  ############################### NO NEED TO MAKE CHANGES FROM HERE #######################################
-#  #########################################################################################################
-#  
-#  # 2) Minor preliminary work: get the sets of factor labels and  a vector of common maturities
-#  FactorLabels <- LabFac(N, DomVar, GlobalVar, Economies, ModelType)
-#  
-#  # 3) Prepare the inputs of the likelihood function
-#  ATSMInputs <- InputsForOpt(t0_sample, tF_sample, ModelType, Yields, GlobalMacro, DomMacro, FactorLabels,
-#                             Economies, DataFreq, GVARlist)
-#  
-#  # 4) Optimization of the ATSM (Point Estimates)
-#  ModelParaList <- Optimization(ATSMInputs, StatQ, DataFreq, FactorLabels, Economies, ModelType)
-#  
-#  # 5) Numerical and graphical outputs
-#  # a) Prepare list of inputs for graphs and numerical outputs
-#  InputsForOutputs <- InputsForOutputs(ModelType, Horiz, DesiredGraphs, OutputLabel, StatQ, DataFreq,
-#                                      WishGraphYields, WishGraphRiskFac, WishOrthoJLLgraphs, WishFPremia,
-#                                      FPmatLim, WishBootstrap, BootList)
-#  
-#  # b) Fit, IRF, FEVD, GIRF, GFEVD, and Term Premia
-#  NumericalOutputs <- NumOutputs(ModelType, ModelParaList, InputsForOutputs, FactorLabels, Economies)
-#  
-#  # c) Confidence intervals (bootstrap analysis)
-#  BootstrapAnalysis <- Bootstrap(ModelType, ModelParaList, NumericalOutputs, Economies, InputsForOutputs,
-#                                 FactorLabels, JLLlist = NULL, GVARlist)
-#  
+# # A) Load database data
+# LoadData("CM_2023")
+# 
+# # B) GENERAL model inputs
+# ModelType <- "GVAR multi"
+# 
+# Economies <- c("Brazil", "India", "Russia", "Mexico")
+# GlobalVar <- c("US_Output_growth", "China_Output_growth", "SP500")
+# DomVar <- c("Inflation","Output_growth", "CDS", "COVID")
+# N <- 2
+# 
+# t0_sample <- "22-03-2020"
+# tF_sample <- "26-09-2021"
+# 
+# OutputLabel <- "CM_EM"
+# DataFreq <-"Weekly"
+# F2S <- NULL
+# 
+# StatQ <- 0
+# 
+# # B.1) SPECIFIC model inputs
+# #################################### GVAR-based models ##################################################
+# GVARlist <- list( VARXtype = "constrained: COVID", W_type = "Sample Mean", t_First_Wgvar = "2015",
+#                   t_Last_Wgvar = "2020", DataConnectedness = Trade_Flows)
+# ###################################### BRW inputs  ######################################################
+# WishBC <- 0
+# 
+# # C) Decide on Settings for numerical outputs
+# WishFPremia <- 1
+# FPmatLim <- c(47,48)
+# 
+# Horiz <- 12
+# DesiredGraphs <- c("GIRF", "GFEVD", "TermPremia")
+# WishGraphRiskFac <- 0
+# WishGraphYields <- 1
+# WishOrthoJLLgraphs <- 0
+# 
+# # D) Bootstrap settings
+# WishBootstrap <- 1 #  YES: 1; No = 0.
+# BootList <- list(methodBS = 'bs', BlockLength = 4, ndraws = 100, pctg =  95)
+# 
+# #########################################################################################################
+# ############################### NO NEED TO MAKE CHANGES FROM HERE #######################################
+# #########################################################################################################
+# 
+# # 2) Minor preliminary work: get the sets of factor labels and  a vector of common maturities
+# FactorLabels <- LabFac(N, DomVar, GlobalVar, Economies, ModelType)
+# 
+# # 3) Prepare the inputs of the likelihood function
+# ATSMInputs <- InputsForOpt(t0_sample, tF_sample, ModelType, Yields, GlobalMacro, DomMacro, FactorLabels,
+#                            Economies, DataFreq, GVARlist)
+# 
+# # 4) Optimization of the ATSM (Point Estimates)
+# ModelParaList <- Optimization(ATSMInputs, StatQ, DataFreq, FactorLabels, Economies, ModelType)
+# 
+# # 5) Numerical and graphical outputs
+# # a) Prepare list of inputs for graphs and numerical outputs
+# InputsForOutputs <- InputsForOutputs(ModelType, Horiz, DesiredGraphs, OutputLabel, StatQ, DataFreq,
+#                                     WishGraphYields, WishGraphRiskFac, WishOrthoJLLgraphs, WishFPremia,
+#                                     FPmatLim, WishBootstrap, BootList)
+# 
+# # b) Fit, IRF, FEVD, GIRF, GFEVD, and Term Premia
+# NumericalOutputs <- NumOutputs(ModelType, ModelParaList, InputsForOutputs, FactorLabels,
+#                                Economies, F2S)
+# 
+# # c) Confidence intervals (bootstrap analysis)
+# BootstrapAnalysis <- Bootstrap(ModelType, ModelParaList, NumericalOutputs, Economies, InputsForOutputs,
+#                                FactorLabels, JLLlist = NULL, GVARlist, WishBC, BRWlist, F2S)
+# 
 

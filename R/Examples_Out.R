@@ -9,6 +9,8 @@
 #' \item{ModelParaList}{List of parameter estimates of the selected ATSM}
 #'    \item{ATSMinputs}{General inputs from an ATSM}
 #'    \item{Forecasts}{List of forecast outputs}
+#'    \item{NumOut}{List of numerical outputs}
+#'    \item{Bootstrap}{List of set of outputs after bootstrap}
 #'   }
 #' @keywords examples
 NULL

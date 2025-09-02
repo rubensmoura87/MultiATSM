@@ -4,7 +4,7 @@
 \alias{OptimizationSetup_ATSM}
 \title{Optimization routine for the entire selected ATSM}
 \usage{
-OptimizationSetup_ATSM(AuxVecSet, FFvec, EstType, tol = 1e-04)
+OptimizationSetup_ATSM(AuxVecSet, FFvec, EstType, tol = 1e-04, verbose)
 }
 \arguments{
 \item{AuxVecSet}{List containing features for estimation of the risk-neutral parameters.}
@@ -14,6 +14,8 @@ OptimizationSetup_ATSM(AuxVecSet, FFvec, EstType, tol = 1e-04)
 \item{EstType}{Estimation type}
 
 \item{tol}{convergence tolerance (scalar). Default value is set as 1e-4.}
+
+\item{verbose}{Logical flag controlling function messaging.}
 }
 \description{
 Optimization routine for the entire selected ATSM

@@ -14,6 +14,7 @@ Boot_Yields_Graphs(
   Economies,
   PathsGraphs,
   OutInt,
+  Folder2save,
   WishYieldGraphs,
   WishYieldGraphsOrtho = NULL
 )
@@ -33,7 +34,9 @@ Boot_Yields_Graphs(
 
 \item{PathsGraphs}{Path to save the desired graphs}
 
-\item{OutInt}{Available option are "IRF" or "FEVD"}
+\item{OutInt}{Available option are "IRF", "FEVD", "GIRF" or "GFEVD"}
+
+\item{Folder2save}{Folder path where the outputs will be stored.}
 
 \item{WishYieldGraphs}{Binary variable reflecting the graphs of interest}
 

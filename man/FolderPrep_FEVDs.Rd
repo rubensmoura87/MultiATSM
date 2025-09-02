@@ -9,7 +9,8 @@ FolderPrep_FEVDs(
   WishPdynamicsgraphs,
   WishYieldsgraphs,
   Economies,
-  ModelType
+  ModelType,
+  Folder2Save
 )
 }
 \arguments{
@@ -22,6 +23,8 @@ FolderPrep_FEVDs(
 \item{Economies}{Set of economies that are part of the economic system}
 
 \item{ModelType}{Desired modem type}
+
+\item{Folder2Save}{Folder path where the outputs will be stored.}
 }
 \description{
 Create folders for storing IRFs and GIRFs

@@ -12,13 +12,15 @@ IRFandGIRFgraphs(
   IRFhoriz,
   PathsGraphs,
   OutputType,
-  Economies
+  Economies,
+  Folder2save,
+  verbose
 )
 }
 \arguments{
-\item{ModelType}{a string-vector containing the label of the model to be estimated}
+\item{ModelType}{A character vector indicating the  estimated model type}
 
-\item{NumOut}{list of computed outputs containing the model fit, IRFs, FEVDs, GIRFs, and GFEVDs}
+\item{NumOut}{list of computed outputs containing the model fit, IRFs, FEVDs, GIRFs, GFEVDs and perm premia}
 
 \item{WishPdynamicsgraphs}{binary variable: set 1, if the user wishes graphs to be generated; or set 0, otherwise}
 
@@ -30,9 +32,32 @@ IRFandGIRFgraphs(
 
 \item{OutputType}{Available options are 'IRF' and 'GIRF'}
 
-\item{Economies}{a string-vector containing the names of the economies which are part of the economic system}
+\item{Economies}{A character vector containing the names of the economies included in the system.}
+
+\item{Folder2save}{Folder path where the outputs will be stored.}
+
+\item{verbose}{Logical flag controlling function messaging.}
 }
 \description{
 IRF and GIRF graphs for all models
 }
-\keyword{internal}
+\section{Available Methods}{
+
+- `autoplot(object, type = "IRF_Factor")`, `autoplot(object, type = "IRF_Yields")`,
+  `autoplot(object, type = "GIRF_Yields")`, `autoplot(object, type = "GIRF_Yields")`. \cr
+
+ - For JLL-based models other option available are: `autoplot(object, type = "IRF_Factor-_Ortho")`,
+ `autoplot(object, type = "IRF_Yields_Ortho")`, `autoplot(object, type = "GIRF_Yields_Ortho")`,
+  `autoplot(object, type = "GIRF_Yields_Ortho")`.
+}
+
+\examples{
+data("NumOutEx")
+ModelType <- "JPS original"
+Economy <- "Brazil"
+IRFhoriz <- 20
+IRFandGIRFgraphs(ModelType, NumOutEx, WishPdynamicsgraphs = 0, WishYieldsgraphs = 1, IRFhoriz,
+                PathsGraphs = NULL, OutputType = "GIRF", Economy, Folder2save = NULL,
+                verbose = FALSE)
+
+}

@@ -9,19 +9,22 @@ FolderPrep_IRFs(
   WishPdynamicsgraphs,
   WishYieldsgraphs,
   Economies,
-  ModelType
+  ModelType,
+  Folder2Save
 )
 }
 \arguments{
 \item{OutputType}{available options are "IRF", "GIRF", "IRF Ortho" and "GIRF Ortho"}
 
-\item{WishPdynamicsgraphs}{binary variable specifying whether the user whishes IRFs and/or GIRFs of risk factors}
+\item{WishPdynamicsgraphs}{binary variable specifing whether the user whishes IRFs and/or GIRFs of risk factors}
 
-\item{WishYieldsgraphs}{binary variable specifying whether the user whishes IRFs and/or GIRFs of bond yields}
+\item{WishYieldsgraphs}{binary variable specifing whether the user whishes IRFs and/or GIRFs of bond yields}
 
 \item{Economies}{Set of economies that are part of the economic system}
 
 \item{ModelType}{Desired modem type}
+
+\item{Folder2Save}{Folder path where the outputs will be stored.}
 }
 \description{
 Create folders for storing IRFs and GIRFs

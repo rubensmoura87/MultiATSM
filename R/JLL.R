@@ -276,10 +276,10 @@ Get_Sigma_JLL <- function(JLLinputs, FacSet, Para_Ortho_Reg, Para_Ortho_VAR, N) 
   if (JLLinputs$WishSigmas == 1) {
     # If the Variance-covariance matrix of the orthogonalized factors are NOT provided
     if (is.null(JLLinputs$SigmaNonOrtho)) {
-      T <- ncol(Ye)
+      T_dim <- ncol(Ye)
 
-      LHS <- Ye[, 2:T]
-      RHS <- Ye[, 1:(T - 1)]
+      LHS <- Ye[, 2:T_dim]
+      RHS <- Ye[, 1:(T_dim - 1)]
 
       et <- LHS - k0_e - k1_e%*%RHS
       SIGMA_Unres <- crossprod(t(et))/dim(et)[2]
@@ -534,7 +534,7 @@ OrthoVAR_JLL <- function(NonOrthoFactors, JLLinputs, Ortho_Set, FactLabels, N) {
   }
 
   K <- nrow(NonOrthoFactors)
-  T <- ncol(NonOrthoFactors)
+  T_dim <- ncol(NonOrthoFactors)
 
   C <- length(JLLinputs$Economies)
   M <- length(FactLabels$FactorLabels[[1]]) - N
@@ -567,7 +567,7 @@ OrthoVAR_JLL <- function(NonOrthoFactors, JLLinputs, Ortho_Set, FactLabels, N) {
   if (Label_DU == "None") {
     Y <- NonOrthoFactors
   } else {
-    Y <- matrix(NA, nrow = K, ncol = T)
+    Y <- matrix(NA, nrow = K, ncol = T_dim)
     rownames(Y) <- rownames(NonOrthoFactors)
     Y[seq_len(G), ] <- MacroGlobal # Global factors
     Y[(G + 1):(G + M + N), ] <- NonOrthoFactors[FactLabels$FactorLabels[[IdxDomUnit]], ] # Dominant country
@@ -583,13 +583,13 @@ OrthoVAR_JLL <- function(NonOrthoFactors, JLLinputs, Ortho_Set, FactLabels, N) {
   }
 
   # 3.a) Set the constraints on the feedback matrix
-  Bcon <- FeedbackMatrixRestrictionsJLL(Label_DU, K, G, M, N)
+  Bcon_Mat <- FeedbackMatrixRestrictionsJLL(Label_DU, K, G, M, N)
   # 3.b) Estimate the VAR(1) with the orthogonalized variables
-  intercept <- rep(1, times = T - 1)
-  RHS <- rbind(intercept, Ye[, 1:(T - 1)])
-  LHS <- Ye[, 2:T]
+  intercept <- rep(1, times = T_dim - 1)
+  RHS <- rbind(intercept, Ye[, 1:(T_dim - 1)])
+  LHS <- Ye[, 2:T_dim]
 
-  Coeff <- Reg__OLSconstrained(Y = LHS, X = RHS, Bcon, G = NULL)
+  Coeff <- Est_RestOLS(LHS, RHS, Bcon_Mat)
   k0_e <- Coeff[, 1]
   k1_e <- Coeff[, 2:(K + 1)]
 
@@ -597,7 +597,7 @@ OrthoVAR_JLL <- function(NonOrthoFactors, JLLinputs, Ortho_Set, FactLabels, N) {
   dimnames(k1_e) <- list(LabelsJLL, LabelsJLL)
 
   # Output to export
-  Out <- list(k0_e = k0_e, k1_e = k1_e, Ye = Ye, Bcon = Bcon)
+  Out <- list(k0_e = k0_e, k1_e = k1_e, Ye = Ye, Bcon = Bcon_Mat)
   return(Out)
 }
 
@@ -793,10 +793,10 @@ EstimationSigma_Ye <- function(SigmaUnres, res, M, G, Economies, DomUnit) {
   MLfunction <-  function(...) llk_JLL_Sigma(..., res = res, IdxNONzero = IdxNONzeroSigmaJLL, K = K)
 
   iter <- "off" # hides the outputs of each iteration. If one wants to display these features then set 'iter'
-  options200 <- neldermead::optimset(MaxFunEvals = 200000 * length(x), Display = iter,
+  options200 <- optimset(MaxFunEvals = 200000 * length(x), Display = iter,
                                      MaxIter = 200000, GradObj = "off", TolFun = 10^-2, TolX = 10^-2)
 
-  Xmax <- neldermead::fminsearch(MLfunction, x, options200)$optbase$xopt
+  Xmax <- fminsearch(MLfunction, x, options200)$optbase$xopt
   SIGMA_Ye <- matrix(0, K, K)
   SIGMA_Ye[IdxNONzeroSigmaJLL] <- Xmax # Cholesky term (orthogonalized factors)
 

@@ -16,7 +16,9 @@
 #' @param UnitYields A character string indicating the maturity unit of yields. Options are: "Month" for yields expressed in months, or "Year" for yields expressed in years. Default is "Month".
 #' @param CheckInputs Logical. Whether to perform a prior check on the consistency of the provided input list. Default is TRUE.
 #' @param BS_Adj Logical. Whether to adjust the global series for the sepQ models in the Bootstrap setting. Default is FALSE.
+#' @param verbose Logical flag controlling function messaging. Default is TRUE.
 #'
+#'@importFrom pracma null
 #'
 #' @return An object of class 'ATSMModelInputs' containing the necessary inputs for performing the model optimization.
 #'
@@ -94,11 +96,13 @@
 
 InputsForOpt <- function(InitialSampleDate, FinalSampleDate, ModelType, Yields, GlobalMacro, DomMacro,
                          FactorLabels, Economies, DataFrequency, GVARlist = NULL, JLLlist = NULL,
-                         WishBRW = FALSE, BRWlist = NULL, UnitYields = "Month", CheckInputs = TRUE, BS_Adj = FALSE) {
+                         WishBRW = FALSE, BRWlist = NULL, UnitYields = "Month", CheckInputs = TRUE,
+                         BS_Adj = FALSE, verbose = TRUE) {
 
   # Print initial message with model type and sample period
-  cat(paste("1) PREPARING INPUTS FOR THE ESTIMATION OF THE MODEL:", ModelType, ". SAMPLE PERIOD:", InitialSampleDate,
-            "-", FinalSampleDate, "\n"))
+ if (verbose) {
+  message((paste("1) PREPARING INPUTS FOR THE ESTIMATION OF THE MODEL:", ModelType, ". SAMPLE PERIOD:", InitialSampleDate,
+          "-", FinalSampleDate))) }
 
   # Define labels for single and multi-country models
   Label_Single_Models <- c("JPS original", "JPS global", "GVAR single")
@@ -110,7 +114,7 @@ InputsForOpt <- function(InitialSampleDate, FinalSampleDate, ModelType, Yields, 
                       DataFrequency, Label_Single_Models, Label_Multi_Models, FactorLabels, GVARlist, ModelType) }
 
   # Construct the time-series of the risk factors
-  cat("1.1) Constructing the time-series of the risk factors \n")
+  if (verbose) message(("1.1) Constructing the time-series of the risk factors"))
   RiskFactors <-  BuildATSM_RiskFactors(InitialSampleDate, FinalSampleDate, Yields, GlobalMacro, DomMacro,
                                         Economies, FactorLabels, ModelType, BS_Adj)
 
@@ -128,9 +132,9 @@ InputsForOpt <- function(InitialSampleDate, FinalSampleDate, ModelType, Yields, 
                                       WishBRW, BRWlist, DataPathTrade = NULL)
 
   # Estimate P-dynamic parameters
-  cat("1.2) Estimating model P-dynamics parameters: \n")
+  if (verbose) message(("1.2) Estimating model P-dynamics parameters:"))
   PdynPara <- GetPdynPara(RiskFactors, FactorLabels, Economies, ModelType, ModelInputsSpe$BRWinputs,
-                          ModelInputsSpe$GVARinputs, ModelInputsSpe$JLLinputs, CheckInputs)
+                          ModelInputsSpe$GVARinputs, ModelInputsSpe$JLLinputs, CheckInputs, verbose)
 
   # Gather outputs to export
   Outputs <- Outputs2exportMLE(Label_Multi_Models, Economies, RiskFactors, Yields, mat, ModelInputsGen,
@@ -386,16 +390,16 @@ BuildATSM_RiskFactors <- function(InitialSampleDate, FinalSampleDate, Yields, Gl
 
   AllFactorLabels <- c(FactorLabels$Global, FactorLabels$Tables$AllCountries)
 
-  F <- C*(M+N) + G
-  T <- ncol(DomMacroFactors)
+  F_dim <- C*(M+N) + G
+  T_dim <- ncol(DomMacroFactors)
 
-  RiskFactors <- matrix(NA, nrow =  F, ncol = T)
+  RiskFactors <- matrix(NA, nrow =  F_dim, ncol = T_dim)
   colnames(RiskFactors) <- colnames(DomMacroFactors)
   rownames(RiskFactors) <- AllFactorLabels
 
   # Input the global factors
-  if (BS_Adj == FALSE || (ModelType %in% c("JPS multi", "GVAR multi", "JLL original", "JLL No DomUnit",
-                                             "JLL joint Sigma"))){
+  if (!BS_Adj || (ModelType %in% c("JPS multi", "GVAR multi", "JLL original", "JLL No DomUnit","JLL joint Sigma"))){
+
     IdxGlobal <- match(FactorLabels$Global, rownames(GlobalMacroFactors))
     IdxGlobalRF <- IdxGlobal[!is.na(IdxGlobal)]
 
@@ -568,10 +572,10 @@ GeneralMLEInputs <- function(Yields, RiskFactors, FactorLabels, mat, DataFrequen
         PP <- PPCS
         Y <- YCS
       }else{
-        K1XQ <- magic::adiag(K1XQ,K1XQCS)
-        Wpca <- magic::adiag(Wpca,WpcaCS)
-        We <- magic::adiag(We,WeCS)
-        WpcaFull <- magic::adiag(WpcaFull, WpcaFullCS)
+        K1XQ <- adiag(K1XQ,K1XQCS)
+        Wpca <- adiag(Wpca,WpcaCS)
+        We <- adiag(We,WeCS)
+        WpcaFull <- adiag(WpcaFull, WpcaFullCS)
         PP <- rbind(PP, PPCS)
         Y <- rbind(Y, YCS)
       }
@@ -613,20 +617,20 @@ GeneralMLEInputs <- function(Yields, RiskFactors, FactorLabels, mat, DataFrequen
 #'@param GVARinputs list of necessary inputs for the estimation of GVAR-based models (see "GVAR" function)
 #'@param JLLinputs list of necessary inputs for the estimation of JLL-based models (see "JLL" function)
 #'@param CheckInputs Logical. Whether to perform a prior check on the consistency of the provided input list. Default is FALSE.
-#'
+#'@param verbose Logical flag controlling function messaging.
 #'
 #'@keywords internal
 
 
 GetPdynPara <- function(RiskFactors, FactorLabels, Economies, ModelType, BRWinputs, GVARinputs,
-                        JLLinputs, CheckInputs = F){
+                        JLLinputs, CheckInputs = F, verbose){
 
   N <- length(FactorLabels$Spanned)
 
   # Parameters of the of the P-dynamics
   # Get bias-corrected parameters, if selected
   if (!is.null(BRWinputs)){
-    cat("- With the bias-correction procedure from BRW (2012) \n")
+    if (verbose) message("- With the bias-correction procedure from BRW (2012)")
 
     if(CheckInputs){
       if (any(ModelType == c("GVAR single", "GVAR multi"))){
@@ -637,16 +641,17 @@ GetPdynPara <- function(RiskFactors, FactorLabels, Economies, ModelType, BRWinpu
     }
 
     tryCatch({
-    PdynPara <- GetPdynPara_BC(ModelType, BRWinputs, RiskFactors, Economies, FactorLabels,                                   GVARinputs, JLLinputs)
+      PdynPara <- GetPdynPara_BC(ModelType, BRWinputs, RiskFactors, Economies, FactorLabels, GVARinputs,
+                                 JLLinputs, verbose)
     }, error = function(err) {
       stop("BRW procedure leads to a highly collinear system. Please choose another combination of BRW parameters.")})
 
   } else {
 
-    cat("- Without the bias-correction procedure \n\n")
+    if (verbose) message("- Without the bias-correction procedure \n")
     if (any(ModelType == c("JLL original", "JLL No DomUnit", "JLL joint Sigma"))){
-      cat("JLL-based setup in progress: Estimating the variance-covariance matrix numerically.
-          This may take some time. \n\n")
+      if (verbose){ message("JLL-based setup in progress: Estimating the variance-covariance matrix numerically.
+                             This may take some time. \n")}
     }
     # Otherwise compute the non-biased correction model parameters
     PdynPara <- GetPdynPara_NoBC(ModelType, RiskFactors, Economies, N, GVARinputs, JLLinputs, CheckInputs)
@@ -674,7 +679,6 @@ GetPdynPara <- function(RiskFactors, FactorLabels, Economies, ModelType, BRWinpu
 
 Outputs2exportMLE <- function(Label_Multi_Models, Economies, RiskFactors, Yields, mat, ModelInputsGen,
                               ModelInputsSpec, PdynPara, ModelType){
-
 
 
   if ( any(ModelType == Label_Multi_Models)){
@@ -730,12 +734,12 @@ Outputs2exportMLE <- function(Label_Multi_Models, Economies, RiskFactors, Yields
 #'@param FactorLabels string-list based which contains the labels of all variables present in the model
 #'@param GVARinputs list of necessary inputs for the estimation of GVAR-based models (see "GVAR" function)
 #'@param JLLinputs list of necessary inputs for the estimation of JLL-based models (see "JLL" function)
-#'
+#'@param verbose Logical flag controlling function messaging.
 #'
 #'@keywords internal
 
 
-GetPdynPara_BC <- function(ModelType, BRWinputs, RiskFactors, Economies, FactorLabels, GVARinputs, JLLinputs){
+GetPdynPara_BC <- function(ModelType, BRWinputs, RiskFactors, Economies, FactorLabels, GVARinputs, JLLinputs, verbose){
 
   N <- length(FactorLabels$Spanned)
   C <- length(Economies)
@@ -745,15 +749,15 @@ GetPdynPara_BC <- function(ModelType, BRWinputs, RiskFactors, Economies, FactorL
   for (i in 1:C){
     RiskFactors_CS <- RiskFactors[[Economies[i]]]
 
-    cat(paste("Estimation for country:", Economies[i], "\n"))
+    if (verbose) message(paste("Estimation for country:", Economies[i]))
     BiasCorrec <- Bias_Correc_VAR(ModelType, BRWinputs, t(RiskFactors_CS), N, Economies, FactorLabels,
-                                  GVARinputs, JLLinputs)
+                                  GVARinputs, JLLinputs, verbose = verbose)
     PdynPara[[Economies[i]]] <- list (K0Z = BiasCorrec$mu_tilde, K1Z = BiasCorrec$Phi_tilde,
                                       SSZ = BiasCorrec$V_tilde)
   }
 } else{
   BiasCorrec <- Bias_Correc_VAR(ModelType, BRWinputs, t(RiskFactors), N, Economies, FactorLabels,
-                                GVARinputs, JLLinputs)
+                                GVARinputs, JLLinputs, verbose = verbose)
   K0Z <- BiasCorrec$mu_tilde
   K1Z <- BiasCorrec$Phi_tilde
   SSZ <- BiasCorrec$V_tilde
@@ -786,12 +790,12 @@ if (any(ModelType == c('JPS original', 'JPS global'))){
   PdynPara <- list()
   for (i in 1:length(Economies)){
     RiskFactorsMat <- RiskFactors[[Economies[i]]]
-    VARpara <- VAR(RiskFactorsMat, VARtype= 'unconstrained', Bcon = NULL)
+    VARpara <- VAR(RiskFactorsMat, VARtype= 'unconstrained')
     PdynPara[[Economies[i]]] <- VARpara
   }
 
 } else if (ModelType== 'JPS multi'){
-  VARpara <- VAR(RiskFactors, VARtype= 'unconstrained', Bcon = NULL)
+  VARpara <- VAR(RiskFactors, VARtype= 'unconstrained')
   K0Z <- VARpara$K0Z
   K1Z <- VARpara$K1Z
   SSZ <- VARpara$SSZ
@@ -839,7 +843,7 @@ else if (ModelType %in% c("JLL original", "JLL No DomUnit", "JLL joint Sigma")) 
 #'
 #' @param Economies string-vector containing the names of the economies which are part of the economic system
 #' @param DomesticMacroFac time series of the country-specific domestic risk factors (C(M+N) x T)
-#' @param GlobalMacroFac time series of the global risk factors (G X T)
+#' @param GlobalMacroFac time series of the global risk factors (G x T)
 #' @param DomVarLab string-vector containing the names of the desired domestic risk factors
 #' @param GloVarLab string-vector containing the names of the desired global risk factors
 #'

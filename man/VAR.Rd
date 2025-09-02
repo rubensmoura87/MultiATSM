@@ -4,14 +4,14 @@
 \alias{VAR}
 \title{Estimates a standard VAR(1)}
 \usage{
-VAR(RiskFactors, VARtype, Bcon = NULL)
+VAR(RiskFactors, VARtype, Bcon_Mat = NULL)
 }
 \arguments{
-\item{RiskFactors}{A numeric matrix (FTx T) representing the time series of risk factors.}
+\item{RiskFactors}{A numeric matrix (F x T) representing the time series of risk factors.}
 
 \item{VARtype}{String vector with two possible values: 'unconstrained' or 'constrained'.}
 
-\item{Bcon}{Constraints matrix (F+1 x N), which includes an intercept. If Bcon(i,j) = NA, then B(i,j) is treated as a free parameter. \cr
+\item{Bcon_Mat}{Constraints matrix (F+1 x N), which includes an intercept. Entries containing NAs are treated as free parameters. \cr
 Default is set to NULL.}
 }
 \value{
@@ -27,8 +27,8 @@ VAR(RiskFactors, VARtype= 'unconstrained')
 
 # Example 2: constrained case
 K <- nrow(RiskFactors)
-Bcon <- matrix(0, nrow = K, ncol = K+1)
-Bcon[ , 1:3] <- NaN
-VAR(RiskFactors, VARtype= 'constrained', Bcon)
+Bcon_Mat <- matrix(0, nrow = K, ncol = K+1)
+Bcon_Mat[ , 1:3] <- NaN
+VAR(RiskFactors, VARtype= 'constrained', Bcon_Mat)
 
 }

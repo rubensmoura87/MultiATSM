@@ -4,12 +4,14 @@
 \alias{FolderCreationBoot}
 \title{Creates the folders and the path in which the graphical outputs are stored (Bootstrap version)}
 \usage{
-FolderCreationBoot(ModelType, Economies)
+FolderCreationBoot(ModelType, Economies, Folder2save)
 }
 \arguments{
 \item{ModelType}{a string-vector containing the label of the model to be estimated}
 
 \item{Economies}{a string-vector containing the names of the economies which are part of the economic system}
+
+\item{Folder2save}{Folder path where the outputs will be stored.}
 }
 \description{
 Creates the folders and the path in which the graphical outputs are stored (Bootstrap version)

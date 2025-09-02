@@ -13,7 +13,8 @@ Optimization(
   ModelType,
   tol = 1e-04,
   TimeCount = TRUE,
-  BS_outputs = FALSE
+  BS_outputs = FALSE,
+  verbose = TRUE
 )
 }
 \arguments{
@@ -36,6 +37,8 @@ smaller than 1. Set to 1 to impose the restriction, or 0 otherwise.}
 \item{TimeCount}{Logical. If TRUE, computes the time required for model estimation. Default is TRUE.}
 
 \item{BS_outputs}{Logical. If TRUE, generates a simplified output list in the bootstrap setting. Default is FALSE.}
+
+\item{verbose}{Logical flag controlling function messaging. Default is TRUE.}
 }
 \value{
 An object of class 'ATSMModelOutputs' containing model outputs after the optimization of the chosen ATSM specification.
@@ -49,7 +52,22 @@ Perform the optimization of the log-likelihood function of the chosen ATSM
 }
 
 \examples{
-# See examples in the vignette file of this package (Section 4).
+LoadData("CM_2024")
+ModelType <- "JPS original"
+Economy <- "Brazil"
+t0 <- "01-05-2007" # Initial Sample Date (Format: "dd-mm-yyyy")
+tF <- "01-12-2018" # Final Sample Date (Format: "dd-mm-yyyy")
+N <- 1
+GlobalVar <- "Gl_Eco_Act" # Global Variables
+DomVar <- "Eco_Act" # Domestic Variables
+DataFreq <- "Monthly"
+StatQ <- 0
+
+FacLab <- LabFac(N, DomVar, GlobalVar, Economy, ModelType)
+ATSMInputs <- InputsForOpt(t0, tF, ModelType, Yields, GlobalMacroVar, DomesticMacroVar,
+                           FacLab, Economy, DataFreq, CheckInputs = FALSE)
+
+OptPara <- Optimization(ATSMInputs, StatQ, DataFreq, FacLab, Economy, ModelType)
 
 }
 \references{

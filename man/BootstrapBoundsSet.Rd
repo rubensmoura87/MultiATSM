@@ -9,7 +9,9 @@ BootstrapBoundsSet(
   ModelBootstrap,
   NumOutPE,
   InputsForOutputs,
-  Economies
+  Economies,
+  Folder2save,
+  verbose
 )
 }
 \arguments{
@@ -22,6 +24,10 @@ BootstrapBoundsSet(
 \item{InputsForOutputs}{list containing the desired inputs for the construction of IRFs, GIRFs, FEVDs, and GFEVDs}
 
 \item{Economies}{string-vector containing the names of the economies which are part of the economic system}
+
+\item{Folder2save}{Folder path where the outputs will be stored.}
+
+\item{verbose}{Logical flag controlling function messaging.}
 }
 \description{
 Builds the confidence bounds and graphs (Bootstrap set)

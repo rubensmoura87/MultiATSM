@@ -49,7 +49,7 @@ ComputeGIRFs(
 
 #' @references
 \itemize{
-\item This function is a partially based on the version of the "irf" function from
+\item This function is partially based on the version of the "irf" function from
 Smith, L.V. and A. Galesi (2014). GVAR Toolbox 2.0, available at https://sites.google.com/site/gvarmodelling/gvar-toolbox.
 
 \item Pesaran and Shin, 1998. "Generalized impulse response analysis in linear multivariate models" (Economics Letters)

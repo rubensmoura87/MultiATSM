@@ -1,8 +1,8 @@
 Package: MultiATSM
 Type: Package
 Title: Multicountry Term Structure of Interest Rates Models
-Version: 1.3.1
-Date: 2025-05-11
+Version: 1.4.0
+Date: 2025-09-02
 Authors@R: 
     person("Rubens", "Moura", , "rubens.gtmoura@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0001-8105-4729"))
@@ -10,20 +10,14 @@ Description: Estimation routines for several classes of affine term structure of
 License: GPL-2 | GPL-3
 Encoding: UTF-8
 RoxygenNote: 7.2.3
-Imports: ggplot2
+Imports: cowplot, ggplot2, hablar, magic, neldermead, pracma
 Suggests: 
     readxl,
-    cowplot,
-    magic,
-    reshape2,
-    pracma,
     knitr,
     rmarkdown,
     bookdown,
     kableExtra,
-    neldermead,
-    magrittr,
-    hablar
+    magrittr
 Depends: R (>= 4.3.0)
 VignetteBuilder: knitr
 URL: https://github.com/rubensmoura87/MultiATSM

@@ -13,7 +13,8 @@ Optimization_PE(
   JLLinputs = NULL,
   GVARinputs = NULL,
   tol = 1e-04,
-  TimeCount = TRUE
+  TimeCount = TRUE,
+  verbose
 )
 }
 \arguments{
@@ -57,6 +58,8 @@ Optimization_PE(
 \item{tol}{convergence tolerance (scalar). Default value is 1e-4.}
 
 \item{TimeCount}{computes the required time for estimation of the model. Default is TRUE.}
+
+\item{verbose}{Logical flag controlling function messaging.}
 }
 \description{
 Peform the minimization of mean(f)

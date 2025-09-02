@@ -155,6 +155,8 @@ x2bound <-function(x, lb, ub, nargout){
 #'
 #'@param m squared matrix (KxK)
 #'
+#'@importFrom pracma sqrtm
+#'
 #'@return squared matrix x (KxK) such that x%*%x = m
 #'
 #'@references
@@ -173,9 +175,9 @@ sqrtm_robust <- function(m){
   N <- nrow(vv)
   dd <- diag(N)*(sort(eigen(m)$values, decreasing = FALSE) )
 
-  y <-pracma::sqrtm(m)$B
+  y <- sqrtm(m)$B
    if ( any(Im(y)!=0) || any(is.infinite(y))|| any(is.nan(y)) ){
-    y <- vv%*%diag(sqrt(abs(diag(dd))))%*%solve(vv) # the y computed in this line is algebrically identical to y <- sqrtm(m).
+    y <- vv%*%diag(sqrt(abs(diag(dd))))%*%solve(vv) # the y computed in this line is algebraically identical to y <- sqrtm(m).
   }
 
   return(y)

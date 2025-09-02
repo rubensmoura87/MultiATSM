@@ -4,12 +4,14 @@
 \alias{FolderCreationPoint}
 \title{Creates the folders and the path in which the graphical outputs are stored (point estimate version)}
 \usage{
-FolderCreationPoint(ModelType, Economies)
+FolderCreationPoint(ModelType, Economies, Folder2save)
 }
 \arguments{
 \item{ModelType}{A character vector indicating the model type to be estimated.}
 
 \item{Economies}{A character vector containing the names of the economies included in the system.}
+
+\item{Folder2save}{Folder path where the outputs will be stored.}
 }
 \description{
 Creates the folders and the path in which the graphical outputs are stored (point estimate version)

@@ -14,7 +14,8 @@ Bias_Correc_VAR(
   GVARinputs = NULL,
   JLLinputs = NULL,
   ev_restr = 1,
-  nargout = 4
+  nargout = 4,
+  verbose = TRUE
 )
 }
 \arguments{
@@ -46,6 +47,8 @@ Bias_Correc_VAR(
 \item{ev_restr}{Numeric. Restriction on the largest eigenvalue under the P-measure. Default is 1.}
 
 \item{nargout}{Integer. Number of elements in the output list. Default is 4.}
+
+\item{verbose}{verbose Logical flag controlling function messaging. Default is TRUE.}
 }
 \value{
 Bias-corrected VAR parameters based on the framework of Bauer, Rudebusch and Wu (2012). The list contains:

@@ -11,7 +11,7 @@ shrink_Phi(Phi_tilde, Phi_hat, ev_restr)
 
 \item{Phi_hat}{unrestricted VAR(1) feedback matrix}
 
-\item{ev_restr}{maximum eigenvalue desired in the feedback matrix after the adjustement}
+\item{ev_restr}{maximum eigenvalue desired in the feedback matrix after the adjustment}
 }
 \value{
 stationary VAR(1)

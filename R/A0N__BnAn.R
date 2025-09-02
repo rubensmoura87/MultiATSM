@@ -156,7 +156,7 @@ Compute_BnX_AnX <-function(mat, N, K1XQ, r0, dX, SSX, Economies, ModelType, Lab_
         BnXCS <- BnXCS[mat+1, (idx0+1):idx1]/mat
 
         if (N==1){BnXCS <- matrix(BnXCS)}
-        BnX <- magic::adiag(BnX,BnXCS)
+        BnX <- adiag(BnX,BnXCS)
 
         AnXCS <- t(t(AnXCS[mat+1]/mat))
         AnX <- rbind(AnX,AnXCS)

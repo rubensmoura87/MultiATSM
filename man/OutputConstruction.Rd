@@ -10,7 +10,8 @@ OutputConstruction(
   ModelPara,
   InputsForOutputs,
   FactorLabels,
-  Economies
+  Economies,
+  verbose = TRUE
 )
 }
 \arguments{
@@ -24,6 +25,8 @@ and risk premia decomposition}
 \item{FactorLabels}{string-list based which contains all the labels of all the variables present in the model}
 
 \item{Economies}{string-vector containing the names of the economies which are part of the economic system}
+
+\item{verbose}{Logical flag controlling function messaging. Default is TRUE.}
 }
 \description{
 Numerical outputs (variance explained, model fit, IRFs, GIRFs, FEVDs, GFEVDs, and risk premia decomposition)

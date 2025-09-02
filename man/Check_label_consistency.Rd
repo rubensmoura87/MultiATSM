@@ -17,7 +17,7 @@ Check_label_consistency(
 
 \item{DomesticMacroFac}{time series of the country-specific domestic risk factors (C(M+N) x T)}
 
-\item{GlobalMacroFac}{time series of the global risk factors (G X T)}
+\item{GlobalMacroFac}{time series of the global risk factors (G x T)}
 
 \item{DomVarLab}{string-vector containing the names of the desired domestic risk factors}
 

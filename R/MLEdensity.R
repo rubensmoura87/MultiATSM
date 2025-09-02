@@ -34,10 +34,7 @@
 MLEdensity <- function(K1XQ, r0, SSZ, K0Z, K1Z, se, Gy.0, mat, Y, Z, P, Wpca, We, WpcaFull, dt, Economies,
                        FactorLabels, ModelType, GVARinputs = NULL, JLLinputs = NULL, BS_outputs = FALSE, nargout) {
 
-  # 0) Initialize some variables, if necessary
-  if (!exists("r0")) r0 <- numeric()
-  if (!exists("se")) se <- numeric()
-
+  # 0) Initialize some variables
   N <- length(FactorLabels$Spanned)
   if (ModelType == 'JLL joint Sigma') SSZ <- Update_SSZ_JLL(SSZ, Z, N, JLLinputs)
 
@@ -46,8 +43,8 @@ MLEdensity <- function(K1XQ, r0, SSZ, K0Z, K1Z, se, Gy.0, mat, Y, Z, P, Wpca, We
 
   # Test for the optimization feasibility
   if (any(is.nan(x)) || any(is.infinite(x)) || any(Im(x) != 0)) {
-    T <- ncol(Z)
-    y <- 1e6 * rep(1, times = T - 1)
+    T_dim <- ncol(Z)
+    y <- 1e6 * rep(1, times = T_dim - 1)
     out <- list()
   } else {
 
@@ -125,8 +122,8 @@ Get_r0 <- function(Y, P, N, mat, dt, B_list, Wpca, We, Economies, ModelType){
   # Recall that BnP= Bx(W*Bx)^(-1)
 
   J <- length(mat) # number of country-specific yields used in estimation;
-  T <- dim(Y)[2]
-  tt <- 2:T
+  T_dim <- dim(Y)[2]
+  tt <- 2:T_dim
 
   BnP <- B_list$BnP
   betan <- B_list$betan
@@ -235,7 +232,6 @@ Get_Bs <- function(mat, dt, K1XQ, SSZ, Wpca, FactorLabels, Economy, ModelType) {
   } else {
     SSX <- matrix(Inf, nrow = nrow(SSP), ncol = ncol(SSP)) # Try to assign the correct value
   }
-
   SSX <- solve(WBX, SSP, tol = 1e-50) %*% solve(t(WBX))
 
   # 3) Optimal estimate of r0. NOTE: We set r0=0, because when r0=0, An = Betan.
@@ -323,8 +319,8 @@ GetLabels_sepQ <- function(Economy, ModelType, FactorLabels) {
 
 Get_llk <- function(P, Y, Z, N, mat, We, Wpca, K0Z, K1Z, SSZ, LoadBs, LoadAs, ModelType) {
 
-  T <- dim(P)[2]
-  t <- 2:T
+  T_dim <- dim(P)[2]
+  t <- 2:T_dim
   J <- length(mat)
 
   Peo <- We %*% Y # portfolio observed WITH errors
@@ -338,8 +334,7 @@ Get_llk <- function(P, Y, Z, N, mat, We, Wpca, K0Z, K1Z, SSZ, LoadBs, LoadAs, Mo
   eQ <- Peo[, t] - Pe[, t]
 
   # 2) Standard deviation of the measurement error.
-  if (!exists("se") || is.null(se) || length(se) == 0) {
-    if (any(ModelType == c("JPS original", "JPS global", "GVAR single"))) {
+  if (any(ModelType == c("JPS original", "JPS global", "GVAR single"))) {
       se <- sqrt(mean(as.vector(eQ^2)))
     } else {
       C <- nrow(P) / N
@@ -351,11 +346,10 @@ Get_llk <- function(P, Y, Z, N, mat, We, Wpca, K0Z, K1Z, SSZ, LoadBs, LoadAs, Mo
         idx0 <- idx1
       }
     }
-  }
 
   # 3) The log-likelihood function:
   if (any(is.nan(se))) {
-    y <- 1e6 * matrix(1, T - 1, 1)
+    y <- 1e6 * matrix(1, T_dim - 1, 1)
   } else {
 
     # Cross-sectional density (i.e. density for the portfolios observed with measurement error)
@@ -376,7 +370,7 @@ Get_llk <- function(P, Y, Z, N, mat, We, Wpca, K0Z, K1Z, SSZ, LoadBs, LoadAs, Mo
 
     # Time series density:
     MatOne_Z <- matrix(1, nrow = 1, ncol = ncol(Z) - 1)
-    eP <- Z[, -1] - K1Z %*% Z[ , 1:(T - 1)] - K0Z%*%MatOne_Z
+    eP <- Z[, -1] - K1Z %*% Z[ , 1:(T_dim - 1)] - K0Z%*%MatOne_Z
 
     y <- y + GaussianDensity(eP, SSZ) # Cross-sectional density + time-series density (final likelihood function, except for the Jacobian term)
 
@@ -386,7 +380,7 @@ Get_llk <- function(P, Y, Z, N, mat, We, Wpca, K0Z, K1Z, SSZ, LoadBs, LoadAs, Mo
   }
 
   if (any(is.nan(y)) || any(is.infinite(y)) || any(Im(y) != 0)) {
-    y <- 1e6 * rep(1, times = T - 1)
+    y <- 1e6 * rep(1, times = T_dim - 1)
   } else {
     y <- -t(as.vector(y)) # necessary for minimization
   }
@@ -397,37 +391,20 @@ Get_llk <- function(P, Y, Z, N, mat, We, Wpca, K0Z, K1Z, SSZ, LoadBs, LoadAs, Mo
 #' computes the density function of a gaussian process
 #'
 #' @param res matrix of residuals (N x T)
-#' @param SS covariance matrice or array of covariance matrices (N x N) or (N x N x T)
-#' @param invSS Inverse of SS (N x N) or (N x N x T) - optional input
-#' @param logabsdetSS log(abs(|SS|)) (1 x T) - optional input
+#' @param SS covariance matrices or array of covariance matrices (N x N)
 #'
 #' @keywords internal
 #'
 #' @return y vector of density (1 x T)
-#'
-#' @references
-#' This function is based on the "Gaussian" function by Le and Singleton (2018).\cr
-#'  "A Small Package of Matlab Routines for the Estimation of Some Term Structure Models." \cr
-#'  (Euro Area Business Cycle Network Training School - Term Structure Modelling).
-#'  Available at: https://cepr.org/40029
 
-GaussianDensity <- function(res, SS, invSS, logabsdetSS) {
+GaussianDensity <- function(res, SS) {
 
-  N <- dim(res)[1]
-  T <- dim(res)[2]
+ N <- nrow(res)
 
-  if (!missing("invSS")) {
-    SSres <- invSS %*% res
-  } else {
-    SSres <- solve(SS, res, tol = 1e-50)
-  }
+ SSres <- chol2inv(chol(SS)) %*% res
+ logabsdetSS <- 0.5 * (2 * sum(log(abs(diag(chol(SS %*% t(SS)))))))
 
-  if (missing("logabsdetSS")) {
-    LodDet <- 2 * sum(log(abs(diag(chol(SS %*% t(SS))))))
-    logabsdetSS <- 0.5 * LodDet
-  }
-
-  y <- -0.5 * N * log(2 * pi) - 0.5 * logabsdetSS - 0.5 * abs(colSums(res * SSres))
+ y <- -0.5 * N * log(2 * pi) - 0.5 * logabsdetSS - 0.5 * abs(colSums(res * SSres))
 
   return(y)
 }
@@ -570,80 +547,54 @@ OptOutputs <- function(Y, Z, mat, N, dt, Wpca, K1XQ, SSZ, LoadAs, LoadBs, r0, se
   # a.3) List "llk"
   llk <- list(-t(y))
 
-  # a.4) List Q dynamics: X as risk factors:
-  if (any(ModelType == c("JPS original", "JPS global", "GVAR single"))) {
-    Q <- list(K0 = matrix(0, N, 1), K1 = K1XQ, SS = LoadBs$SSX)
-  } else {
-    Q <- list(K0 = matrix(0, N * length(Economies), 1), K1 = K1XQ, SS = LoadBs$SSX)
-  }
-  X <- list(B = LoadBs$BnX, A = LoadAs$AnX, Q = Q)
-  rot <- list(X = X)
+  # a.4) List of rotated parameters:
+  rot <- list()
+  rot$X <- list(B = LoadBs$BnX, A = LoadAs$AnX, SS = LoadBs$SSX)
 
-  # Summary: List 1
-  Out <- list(inputs = inputs, ests = ests, llk = llk, rot = rot)
-
-  # b) Build LIST 2
-  # Q dynamics: PCN as risk factors: % PCN = U0 + U1*X, where U0 = W*AnX and U1 = W*BnX
+  # Q dynamics: Pt as risk factors: % PCN = U0 + U1*X, where U0 = W*AnX and U1 = W*BnX
   U1 <- Wpca %*% LoadBs$BnX
   U0 <- Wpca %*% LoadAs$AnX
-  Out$rot$P <- FMN__Rotate(Out$rot$X, U1, U0)
+
+  rot$P <- Rotate_Lat_Obs(rot$X, U1, U0)
+
+  row.names(rot$P$A) <- row.names(Y)
+  row.names(rot$P$B) <- row.names(Y)
+  idxSpanned <- LoadBs$idxSpa
+  colnames(rot$P$B) <- row.names(Z)[idxSpanned]
 
   if (BS_out) {
-    Out$rot$X <- NULL # Delete the parameters related to the latent factors
+    rot$X <- NULL # Delete the parameters related to the latent factors
     #(Not needed for the Bootstrap, save some time and pc memory)
-  } else {
-    # P-dynamics: Z as risk factors:
-    Out$rot$P$P <- list(K0 = K0Z, K1 = K1Z, SS = SSZ)
-
-    # P-dynamics: PCN as risk factors:
-    idxSpanned <- LoadBs$idxSpa
-    K0P <- K0Z[idxSpanned]
-    K1P <- K1Z[idxSpanned, idxSpanned]
-    SSP <- SSZ[idxSpanned, idxSpanned]
-    out_rot_P_P2 <- list(K0 = K0P, K1 = K1P, SS = SSP)
-
-    Out$rot$X$P <- FMN__Rotate(out_rot_P_P2, solve(U1, tol = 1e-50), -solve(U1, U0, tol = 1e-50))
-
-    row.names(Out$rot$P$A) <- row.names(Y)
-    row.names(Out$rot$P$B) <- row.names(Y)
-    colnames(Out$rot$P$B) <- row.names(Z)[idxSpanned]
-
-    # PC as risk factors:
-    if (any(ModelType == c("JPS original", "JPS global", "GVAR single"))) {
-      PC1NW <- pca_weights_one_country(Y, Economies)
-      PC1NW <- PC1NW[1:N, ] * 100
-      U1 <- PC1NW %*% LoadBs$BnX
-      U0 <- PC1NW %*% LoadAs$AnX
-    } else {
-      U1 <- Wpca %*% LoadBs$BnX
-      U0 <- Wpca %*% LoadAs$AnX
-    }
-
-    Out$rot$PC <- FMN__Rotate(Out$rot$X, U1, U0)
-
-    # P-dynamics: PC as risk factors:
-    Out$rot$PC$P <- list(K0 = K0Z, K1 = K1Z, SS = SSZ)
   }
 
+  # Summary list to export
+  Out <- list(inputs = inputs, ests = ests, llk = llk, rot = rot)
   return(Out)
 }
-
-##############################################################################################################
-#' Efficient computation of matrix product for arrays
+###################################################################################################
+#' Rotate latent states to observed ones
 #'
-#' @param a array
-#' @param b array
+#' @param X_List    list of risk-neutral parameters: (i) intercept (A_X); slope (B_X) and volatility matrix (SS_X)
+#' @param U1  rotation matrix (N x N)
+#' @param U0  rotation vector (N x 1)
 #'
 #' @keywords internal
-#'
-#' @references
-#' This function is a simplified version of the "mult__prod" function by Le and Singleton (2018). \cr
-#'  "A Small Package of Matlab Routines for the Estimation of Some Term Structure Models."\cr
-#'  (Euro Area Business Cycle Network Training School - Term Structure Modelling).
-#'  Available at: https://cepr.org/40029
 
-mult__prod <- function(a, b) {
-  d <- a %*% b
-  return(d)
+Rotate_Lat_Obs <- function(X_List, U1, U0) {
+
+  N <- dim(U1)[1]
+  U1_inv <- solve(U1)
+  Obs_List <- list()
+
+  # 1) Get volatility matrix
+  M <- dim(X_List$SS)[[2]] / N - 1
+  SSi <- array(X_List$SS, c(N, N, M + 1))
+  SSi <- U1 %*% drop(SSi) %*% t(U1) # Sigma(Z) = U1*Sigma(X)*(U1)'
+  Obs_List$SS <- array(SSi, c(N, N * (M + 1)))
+
+  # 2) Get loadings A and B
+  Obs_List$B <- if (N == 1) matrix(X_List$B) %*% solve(U1) else X_List$B %*% U1_inv # BX* BZ = U1 --> BZ = BX*U1^(-1)
+  Obs_List$A <- X_List$A - Obs_List$B %*% U0 # AX = AZ + BZ*U0 --> AZ = AX - BZ*U0
+
+  return(Obs_List)
 }
-

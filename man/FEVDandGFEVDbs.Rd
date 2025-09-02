@@ -10,7 +10,9 @@ FEVDandGFEVDbs(
   NumOutPE,
   InputsForOutputs,
   Economies,
-  PathsGraphs
+  PathsGraphs,
+  Folder2save,
+  verbose
 )
 }
 \arguments{
@@ -25,6 +27,10 @@ FEVDandGFEVDbs(
 \item{Economies}{string-vector containing the names of the economies which are part of the economic system}
 
 \item{PathsGraphs}{path of the folder in which the graphs will be saved}
+
+\item{Folder2save}{Folder path where the outputs will be stored.}
+
+\item{verbose}{Logical flag controlling function messaging.}
 }
 \description{
 Creates the confidence bounds and the graphs of FEVDs and GFEVDs after bootstrap (all models)

@@ -55,15 +55,15 @@ Transition_Matrix <- function(t_First, t_Last, Economies, type, DataConnectednes
   # 2) Pre-allocation of variables
   DataAdj <- lapply(DataConnectedness, function(x) as.data.frame(t(x)))
   C <- length(Economies)
-  T <- ncol(DataConnectedness[[1]])
-  WgvarAllYears <- vector(mode='list', length = T)
+  T_dim <- ncol(DataConnectedness[[1]])
+  WgvarAllYears <- vector(mode='list', length = T_dim)
   names(WgvarAllYears) <- colnames(DataConnectedness[[1]])
   num <- matrix(NA, nrow = C, ncol= C)
   dem <- c()
   Wyear <- matrix(NA, nrow = C, ncol= C)
 
   # 3) Generate the matrix of weights year-by-year
-  for (k in 1:T) {
+  for (k in 1:T_dim) {
     for (h in 1:C) {
       for (j in 1:C) {
         num[h,j] <- DataAdj[[Economies[h]]][[Economies[j]]][k]

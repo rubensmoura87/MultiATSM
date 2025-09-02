@@ -100,7 +100,10 @@ DataFrequency <- "Monthly"
 # 5) Risk-neutral stationary constraint
 StationarityUnderQ <- 0 # 1 = set stationary condition under the Q; 0 = no stationary condition
 
-# 6) Output label
+# 6) Path to save outputs
+Folder2Save <- NULL
+
+# 7) Output label
 OutputLabel <- "Model_demo"
 
 ## -----------------------------------------------------------------------------
@@ -124,21 +127,21 @@ BRWlist <- within(list(flag_mean = TRUE, gamma = 0.2, N_iter = 500, B = 50,
                        checkBRW = TRUE, B_check = 1000), N_burn <- round(N_iter * 0.15))
 
 ## ----eval=FALSE---------------------------------------------------------------
-#  LoadData("CM_2024")
-#  
-#  ModelType <- "JPS original"
-#  Economies <- "Mexico"
-#  t0 <- "01-05-2007" # Initial Sample Date (Format: "dd-mm-yyyy")
-#  tF <- "01-12-2018" # Final Sample Date (Format: "dd-mm-yyyy")
-#  N <- 3
-#  GlobalVar <- c("Gl_Eco_Act") # Global Variables
-#  DomVar <- c("Eco_Act") # Domestic Variables
-#  FactorLabels <- LabFac(N, DomVar, GlobalVar, Economies, ModelType)
-#  
-#  DataFreq <- "Monthly"
-#  
-#  ATSMInputs <- InputsForOpt(t0, tF, ModelType, Yields, GlobalMacroVar, DomesticMacroVar,
-#                             FactorLabels, Economies, DataFreq, CheckInputs = FALSE)
+# LoadData("CM_2024")
+# 
+# ModelType <- "JPS original"
+# Economies <- "Mexico"
+# t0 <- "01-05-2007" # Initial Sample Date (Format: "dd-mm-yyyy")
+# tF <- "01-12-2018" # Final Sample Date (Format: "dd-mm-yyyy")
+# N <- 3
+# GlobalVar <- c("Gl_Eco_Act") # Global Variables
+# DomVar <- c("Eco_Act") # Domestic Variables
+# FactorLabels <- LabFac(N, DomVar, GlobalVar, Economies, ModelType)
+# 
+# DataFreq <- "Monthly"
+# 
+# ATSMInputs <- InputsForOpt(t0, tF, ModelType, Yields, GlobalMacroVar, DomesticMacroVar,
+#                            FactorLabels, Economies, DataFreq, CheckInputs = FALSE)
 
 ## -----------------------------------------------------------------------------
 Horiz <- 100
@@ -231,114 +234,119 @@ JLLinputs <- list(Economies = Economies, DomUnit = "China", WishSigmas = 1,  Sig
                   JLLModelType = ModelType)
 
 ## ----eval=FALSE---------------------------------------------------------------
-#  data("CM_Factors")
-#  N <- 3
-#  JLLpara <- JLL(RiskFactors, N, JLLinputs, CheckInputs = TRUE)
+# data("CM_Factors")
+# N <- 3
+# JLLpara <- JLL(RiskFactors, N, JLLinputs, CheckInputs = TRUE)
 
 ## ----eval=FALSE---------------------------------------------------------------
-#  ########################################################################################################
-#  #################################### USER INPUTS #######################################################
-#  ########################################################################################################
-#  # A) Load database data
-#  LoadData("CM_2024")
-#  
-#  # B) GENERAL model inputs
-#  ModelType <- "JPS multi" # available options: "JPS original", "JPS global", "GVAR single", "JPS multi",
-#                            #"GVAR multi", "JLL original", "JLL No DomUnit", "JLL joint Sigma".
-#  
-#  Economies <- c("China", "Brazil", "Mexico") # Names of the economies from the economic system
-#  GlobalVar <- c("Gl_Eco_Act")# Global Variables
-#  DomVar <- c("Eco_Act", "Inflation") # Country-specific variables
-#  N <- 2  # Number of spanned factors per country
-#  
-#  t0_sample <- "01-05-2005" # Format: "dd-mm-yyyy"
-#  tF_sample <- "01-12-2019" # Format: "dd-mm-yyyy"
-#  
-#  OutputLabel <- "Test" # label of the model for saving the file
-#  DataFreq <-"Monthly" # Frequency of the data
-#  
-#  StatQ <- 0 # Wish to impose stationary condition for the eigenvalues of each country: YES: 1,NO:0
-#  
-#  # B.1) SPECIFIC model inputs
-#  #################################### GVAR-based models ##################################################
-#  GVARlist <- list( VARXtype = "unconstrained", W_type = "Sample Mean", t_First_Wgvar = "2005",
-#                    t_Last_Wgvar = "2019", DataConnectedness <- TradeFlows )
-#  # VARXtype: Available options "unconstrained" or "constrained" (VARX)
-#  # W_type: Method to compute the transition matrix. Options:"Time-varying" or "Sample Mean"
-#  # t_First_Wgvar: First year of the sample (transition matrix)
-#  # t_Last_Wgvar:  Last year of the sample (transition matrix)
-#  # DataConnectedness: measure of connectedness across countries
-#  #################################### JLL-based models ###################################################
-#  JLLlist <- list(DomUnit =  "China")
-#  # DomUnit: name of the economy of the economic system, or "None" for the model "JLL No DomUnit"
-#  ###################################### BRW inputs  ######################################################
-#  WishBC <- 0 # Wish to estimate the model with the bias correction method of BRW (2012): #YES: 1, NO:0
-#  BRWlist <- within(list(flag_mean = TRUE, gamma = 0.05, N_iter = 250, B = 50, checkBRW = TRUE,
-#                         B_check = 1000),  N_burn <- round(N_iter * 0.15))
-#  # flag_mean: TRUE = compute the mean; FALSE = compute the median
-#  # gamma: Adjustment parameter
-#  # N_iter:  Number of iteration to be conserved
-#  # N_burn:  Number of iteration to be discarded
-#  # B: Number of bootstrap samples
-#  # checkBRW: wishes to perform closeness check: TRUE or FALSE
-#  # B_check: If checkBRW is chosen as TRUE, then choose number of bootstrap samples used in the check
-#  
-#  # C) Decide on Settings for numerical outputs
-#  WishFPremia <- 1 # Wish to estimate the forward premia: YES: 1, NO:0
-#  FPmatLim <- c(60,120) #  If the forward premia is desired, then choose the Min and max maturities of the
-#                        # forward premia. Otherwise set NA
-#  Horiz <- 30
-#  DesiredGraphs <- c("Fit", "IRF", "TermPremia") # "Fit", "IRF", "FEVD", "GIRF", "GFEVD", "TermPremia"
-#  WishGraphRiskFac <- 0
-#  WishGraphYields <- 1
-#  WishOrthoJLLgraphs <- 0
-#  
-#  # D) Bootstrap settings
-#  WishBootstrap <- 1 #  YES: 1; No = 0.
-#  BootList <- list(methodBS = 'bs', BlockLength = 4, ndraws = 5, pctg =  95)
-#  # methodBS: bootstrap method. Available options: (i) 'bs' ; (ii) 'wild'; (iii) 'block'
-#  # BlockLength: Block length, necessary input for the block bootstrap method
-#  # ndraws: number of bootstrap draws
-#  # pctg: confidence level
-#  
-#  # E) Out-of-sample forecast
-#  WishForecast <- 1 #  YES: 1; No = 0.
-#  ForecastList <- list(ForHoriz = 12,  t0Sample = 1, t0Forecast = 162, ForType = "Rolling")
-#  # ForHoriz: forecast horizon
-#  # t0Sample:   initial sample date
-#  # t0Forecast:  last sample date for the first forecast
-#  # ForType: Available options are "Rolling" or "Expanding"
-#  
-#  #########################################################################################################
-#  ############################### NO NEED TO MAKE CHANGES FROM HERE #######################################
-#  #########################################################################################################
-#  
-#  # 2) Minor preliminary work: get the sets of factor labels and  a vector of common maturities
-#  FactorLabels <- LabFac(N, DomVar, GlobalVar, Economies, ModelType)
-#  
-#  # 3) Prepare the inputs of the likelihood function
-#  ATSMInputs <- InputsForOpt(t0_sample, tF_sample, ModelType, Yields, GlobalMacroVar, DomesticMacroVar,
-#                             FactorLabels, Economies, DataFreq, GVARlist, JLLlist, WishBC, BRWlist)
-#  
-#  # 4) Optimization of the ATSM (Point Estimates)
-#  ModelParaList <- Optimization(ATSMInputs, StatQ, DataFreq, FactorLabels, Economies, ModelType)
-#  
-#  # 5) Numerical and graphical outputs
-#  # a) Prepare list of inputs for graphs and numerical outputs
-#  InputsForOutputs <- InputsForOutputs(ModelType, Horiz, DesiredGraphs, OutputLabel, StatQ, DataFreq,
-#                                      WishGraphYields, WishGraphRiskFac, WishOrthoJLLgraphs, WishFPremia,
-#                                      FPmatLim, WishBootstrap, BootList, WishForecast, ForecastList)
-#  
-#  # b) Fit, IRF, FEVD, GIRF, GFEVD, and Term Premia
-#  NumericalOutputs <- NumOutputs(ModelType, ModelParaList, InputsForOutputs, FactorLabels, Economies)
-#  
-#  # c) Confidence intervals (bootstrap analysis)
-#  BootstrapAnalysis <- Bootstrap(ModelType, ModelParaList, NumericalOutputs, Economies, InputsForOutputs,
-#                                 FactorLabels, JLLlist, GVARlist, WishBC, BRWlist)
-#  
-#  # 6) Out-of-sample forecasting
-#  Forecasts <- ForecastYields(ModelType, ModelParaList, InputsForOutputs, FactorLabels, Economies,
-#                              JLLlist, GVARlist, WishBC, BRWlist)
+# ########################################################################################################
+# #################################### USER INPUTS #######################################################
+# ########################################################################################################
+# library(MultiATSM)
+# # A) Load database data
+# LoadData("CM_2024")
+# 
+# # B) GENERAL model inputs
+# ModelType <- "JPS original" # available options: "JPS original", "JPS global", "GVAR single", "JPS multi",
+#                           #"GVAR multi", "JLL original", "JLL No DomUnit", "JLL joint Sigma".
+# 
+# Economies <- c("China", "Brazil") # Names of the economies from the economic system
+# GlobalVar <- c("Gl_Eco_Act")# Global Variables
+# DomVar <- c("Eco_Act") # Country-specific variables
+# N <- 2  # Number of spanned factors per country
+# 
+# t0_sample <- "01-12-2007" # Format: "dd-mm-yyyy"
+# tF_sample <- "01-12-2019" # Format: "dd-mm-yyyy"
+# 
+# OutputLabel <- "Test" # label of the model for saving the file
+# DataFreq <-"Monthly" # Frequency of the data
+# 
+# Folder2Save <- NULL # Folder to save the required graphical outputs. NULL -> temporary directory
+# StatQ <- 0 # Wish to impose stationary condition for the eigenvalues of each country: YES: 1,NO:0
+# 
+# # B.1) SPECIFIC model inputs
+# #################################### GVAR-based models ##################################################
+# GVARlist <- list( VARXtype = "unconstrained", W_type = "Sample Mean", t_First_Wgvar = "2005",
+#                   t_Last_Wgvar = "2019", DataConnectedness <- TradeFlows )
+# # VARXtype: Available options "unconstrained" or "constrained" (VARX)
+# # W_type: Method to compute the transition matrix. Options:"Time-varying" or "Sample Mean"
+# # t_First_Wgvar: First year of the sample (transition matrix)
+# # t_Last_Wgvar:  Last year of the sample (transition matrix)
+# # DataConnectedness: measure of connectedness across countries
+# #################################### JLL-based models ###################################################
+# JLLlist <- list(DomUnit =  "China")
+# # DomUnit: name of the economy of the economic system, or "None" for the model "JLL No DomUnit"
+# ###################################### BRW inputs  ######################################################
+# WishBC <- 0 # Wish to estimate the model with the bias correction method of BRW (2012): #YES: 1, NO:0
+# BRWlist <- within(list(flag_mean = TRUE, gamma = 0.05, N_iter = 250, B = 50, checkBRW = TRUE,
+#                        B_check = 1000),  N_burn <- round(N_iter * 0.15))
+# # flag_mean: TRUE = compute the mean; FALSE = compute the median
+# # gamma: Adjustment parameter
+# # N_iter:  Number of iteration to be conserved
+# # N_burn:  Number of iteration to be discarded
+# # B: Number of bootstrap samples
+# # checkBRW: wishes to perform closeness check: TRUE or FALSE
+# # B_check: If checkBRW is chosen as TRUE, then choose number of bootstrap samples used in the check
+# 
+# # C) Decide on Settings for numerical outputs
+# WishFPremia <- 1 # Wish to estimate the forward premia: YES: 1, NO:0
+# FPmatLim <- c(60,120) #  If the forward premia is desired, then choose the Min and max maturities of the
+#                       # forward premia. Otherwise set NA
+# Horiz <- 30
+# DesiredGraphs <- c("Fit", "IRF", "TermPremia") # "Fit", "IRF", "FEVD", "GIRF", "GFEVD", "TermPremia"
+# WishGraphRiskFac <- 0
+# WishGraphYields <- 1
+# WishOrthoJLLgraphs <- 0
+# 
+# # D) Bootstrap settings
+# WishBootstrap <- 1 #  YES: 1; No = 0.
+# BootList <- list(methodBS = 'bs', BlockLength = 4, ndraws = 4, pctg =  95)
+# # methodBS: bootstrap method. Available options: (i) 'bs' ; (ii) 'wild'; (iii) 'block'
+# # BlockLength: Block length, necessary input for the block bootstrap method
+# # ndraws: number of bootstrap draws
+# # pctg: confidence level
+# 
+# # E) Out-of-sample forecast
+# WishForecast <- 1 #  YES: 1; No = 0.
+# ForecastList <- list(ForHoriz = 12,  t0Sample = 1, t0Forecast = 131, ForType = "Rolling")
+# # ForHoriz: forecast horizon
+# # t0Sample:   initial sample date
+# # t0Forecast:  last sample date for the first forecast
+# # ForType: Available options are "Rolling" or "Expanding"
+# 
+# #########################################################################################################
+# ## NO NEED TO MAKE CHANGES FROM HERE:
+# ## The sections below automatically process the inputs provided above, run the model
+# ## estimation, generate the numerical and graphical outputs, and save results.
+# #########################################################################################################
+# 
+# # 2) Minor preliminary work: get the sets of factor labels and  a vector of common maturities
+# FactorLabels <- LabFac(N, DomVar, GlobalVar, Economies, ModelType)
+# 
+# # 3) Prepare the inputs of the likelihood function
+# ATSMInputs <- InputsForOpt(t0_sample, tF_sample, ModelType, Yields, GlobalMacroVar, DomesticMacroVar,
+#                            FactorLabels, Economies, DataFreq, GVARlist, JLLlist, WishBC, BRWlist)
+# 
+# # 4) Optimization of the ATSM (Point Estimates)
+# ModelParaList <- Optimization(ATSMInputs, StatQ, DataFreq, FactorLabels, Economies, ModelType)
+# 
+# # 5) Numerical and graphical outputs
+# # a) Prepare list of inputs for graphs and numerical outputs
+# InputsForOutputs <- InputsForOutputs(ModelType, Horiz, DesiredGraphs, OutputLabel, StatQ, DataFreq,
+#                                     WishGraphYields, WishGraphRiskFac, WishOrthoJLLgraphs, WishFPremia,
+#                                     FPmatLim, WishBootstrap, BootList, WishForecast, ForecastList)
+# 
+# # b) Fit, IRF, FEVD, GIRF, GFEVD, and Term Premia
+# NumericalOutputs <- NumOutputs(ModelType, ModelParaList, InputsForOutputs, FactorLabels, Economies,
+#                                Folder2Save)
+# 
+# # c) Confidence intervals (bootstrap analysis)
+# BootstrapAnalysis <- Bootstrap(ModelType, ModelParaList, NumericalOutputs, Economies, InputsForOutputs,
+#                                FactorLabels, JLLlist, GVARlist, WishBC, BRWlist, Folder2Save)
+# 
+# # 6) Out-of-sample forecasting
+# Forecasts <- ForecastYields(ModelType, ModelParaList, InputsForOutputs, FactorLabels, Economies,
+#                             JLLlist, GVARlist, WishBC, BRWlist, Folder2Save)
 
 ## -----------------------------------------------------------------------------
 data("Out_Example")
@@ -348,7 +356,17 @@ print(Out$ATSMInputs)
 summary(Out$ATSMInputs) 
 
 ## -----------------------------------------------------------------------------
-summary(Out$ModelParaList) 
+summary(Out$ModelPara) 
+
+## -----------------------------------------------------------------------------
+GIRF_all <- autoplot(Out$NumOut, type = "GIRF_Yields")
+GIRF_all$Brazil$Gl_Eco_Act
+GIRF_all$China$Gl_Eco_Act
+
+## -----------------------------------------------------------------------------
+GIRF_all_Boot <- autoplot(Out$Bootstrap, Out$NumOut, type = "GIRF_Yields_Boot")
+GIRF_all_Boot$China$Y12M_China
+GIRF_all_Boot$Brazil$Y12M_Brazil
 
 ## -----------------------------------------------------------------------------
 plot(Out$Forecasts) 

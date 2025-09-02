@@ -269,3 +269,240 @@ for (i in 1:C){
   }
   }
 }
+
+###############################################################################################################
+#' Autoplot method for ATSMNumOutputs objects
+#'
+#' @param x An object of class 'ATSMNumOutputs'
+#' @param type Plot type: "RiskFactors", "Fit", "TermPremia", or one of
+#'   "IRF", "FEVD", "GIRF", "GFEVD" (each must be suffixed with "_Factors" or
+#'   "_Yields"). For JLL-based models, an additional "_Ortho" suffix produces
+#'   orthogonalized outputs.
+#' @param ... Additional arguments (not used)
+#'
+#' @method autoplot ATSMNumOutputs
+#' @usage \method{autoplot}{ATSMNumOutputs}(x, type, ...)
+#' @export
+
+autoplot.ATSMNumOutputs <- function(x, type, ...) {
+
+  # 0) Get model info from attributes
+  info <- attr(x, "NumOuts")
+
+  # 1) Input validation
+  valid_types <- c("RiskFactors", "Fit",
+                   "IRF_Factors", "IRF_Yields", "IRF_Factors_Ortho", "IRF_Yields_Ortho",
+                   "GIRF_Factors", "GIRF_Yields", "GIRF_Factors_Ortho", "GIRF_Yields_Ortho",
+                   "FEVD_Factors", "FEVD_Yields", "FEVD_Factors_Ortho", "FEVD_Yields_Ortho",
+                   "GFEVD_Factors", "GFEVD_Yields", "GFEVD_Factors_Ortho", "GFEVD_Yields_Ortho",
+                   "TermPremia")
+
+  # a) Check 1
+  if (!type %in% valid_types) {
+    stop("Invalid plot type. Choose from: ", paste(valid_types, collapse = ", "))
+  }
+
+  # b) Check 2
+  if (!any(info$ModelType == c("JLL original", "JLL No DomUnit", "JLL joint Sigma"))
+      & grepl("Ortho", type)) {
+    stop("Invalid plot type: Orthogonalized outputs are only available for JLL-based models." )
+  }
+
+  # 2) Extract useful inputs
+  MT <- info$ModelType
+  MP <- info$ModelPara
+  Eco <- info$Economies
+  FL <- info$FactorLabels
+  NOut <- info$NumOut
+  Horiz <- info$Inputs[[MT]]$IRF$horiz
+  F2S <- NULL
+  PathGraph  <- NULL
+  verb <- FALSE
+  UMY <- info$Inputs$UnitMatYields
+
+  # 3) Dispatch to appropriate plotting function
+  switch(type,
+         # 1) Risk Factors
+         RiskFactors = RiskFactorsGraphs(
+           MT, MP, Eco, FL, F2S
+         ),
+         # 2) Fit
+         Fit = Fitgraphs(
+           MT, WishFitgraphs = 1, MP, NOut, Eco, PathGraph, F2S, verb
+         ),
+         # 3) IRFs
+         IRF_Factors = IRFandGIRFgraphs(
+           MT, NOut, WishPdynamicsgraphs = 1, WishYieldsgraphs = 0, Horiz, PathGraph,
+           OutputType = "IRF", Eco, F2S, verb
+         ),
+         IRF_Yields = IRFandGIRFgraphs(
+           MT, NOut, WishPdynamicsgraphs = 0, WishYieldsgraphs = 1, Horiz, PathGraph,
+           OutputType = "IRF", Eco, F2S, verb
+         ),
+         IRF_Factors_Ortho = IRFandGIRFgraphs(
+             MT, NOut, WishPdynamicsgraphs = 1, WishYieldsgraphs = 0, Horiz, PathGraph,
+             OutputType = "IRF Ortho", Eco, F2S, verb
+          ),
+         IRF_Yields_Ortho = IRFandGIRFgraphs(
+             MT, NOut, WishPdynamicsgraphs = 0, WishYieldsgraphs = 1, Horiz, PathGraph,
+             OutputType = "IRF Ortho", Eco, F2S, verb
+         ),
+         # 4) GIRFs
+         GIRF_Factors = IRFandGIRFgraphs(
+         MT, NOut, WishPdynamicsgraphs = 1, WishYieldsgraphs = 0, Horiz, PathGraph,
+        OutputType = "GIRF", Eco, F2S, verb
+         ),
+        GIRF_Yields = IRFandGIRFgraphs(
+         MT, NOut, WishPdynamicsgraphs = 0, WishYieldsgraphs = 1, Horiz, PathGraph,
+         OutputType = "GIRF", Eco, F2S, verb
+         ),
+        GIRF_Factors_Ortho = IRFandGIRFgraphs(
+          MT, NOut, WishPdynamicsgraphs = 1, WishYieldsgraphs = 0, Horiz, PathGraph,
+          OutputType = "GIRF Ortho", Eco, F2S, verb
+        ),
+        GIRF_Yields_Ortho = IRFandGIRFgraphs(
+          MT, NOut, WishPdynamicsgraphs = 0, WishYieldsgraphs = 1, Horiz, PathGraph,
+          OutputType = "GIRF Ortho", Eco, F2S, verb
+        ),
+        # 5) FEVD
+         FEVD_Factors = FEVDandGFEVDgraphs(
+           MT, NOut, WishPdynamicsgraphs = 1, WishYieldsgraphs = 0, Horiz, PathGraph,
+           OutputType = "FEVD", Eco, F2S, verb
+        ),
+        FEVD_Yields = FEVDandGFEVDgraphs(
+         MT, NOut, WishPdynamicsgraphs = 0, WishYieldsgraphs = 1, Horiz, PathGraph,
+         OutputType = "FEVD", Eco, F2S, verb
+        ),
+        FEVD_Factors_Ortho = FEVDandGFEVDgraphs(
+          MT, NOut, WishPdynamicsgraphs = 1, WishYieldsgraphs = 0, Horiz, PathGraph,
+          OutputType = "FEVD Ortho", Eco, F2S, verb
+        ),
+        FEVD_Yields_Ortho = FEVDandGFEVDgraphs(
+          MT, NOut, WishPdynamicsgraphs = 0, WishYieldsgraphs = 1, Horiz, PathGraph,
+          OutputType = "FEVD Ortho", Eco, F2S, verb
+        ),
+        # 6) GFEVD
+        GFEVD_Factors = FEVDandGFEVDgraphs(
+          MT, NOut, WishPdynamicsgraphs = 1, WishYieldsgraphs = 0, Horiz, PathGraph,
+          OutputType = "GFEVD", Eco, F2S, verb
+          ),
+        GFEVD_Yields =  FEVDandGFEVDgraphs(
+          MT, NOut, WishPdynamicsgraphs = 0, WishYieldsgraphs = 1, Horiz, PathGraph,
+          OutputType = "GFEVD", Eco, F2S, verb
+          ),
+        GFEVD_Factors_Ortho = FEVDandGFEVDgraphs(
+            MT, NOut, WishPdynamicsgraphs = 1, WishYieldsgraphs = 0, Horiz, PathGraph,
+            OutputType = "GFEVD Ortho", Eco, F2S, verb
+          ),
+        GFEVD_Yields_Ortho = FEVDandGFEVDgraphs(
+          MT, NOut, WishPdynamicsgraphs = 0, WishYieldsgraphs = 1, Horiz, PathGraph,
+          OutputType = "GFEVD Ortho", Eco, F2S, verb
+          ),
+        # 7) Term Premia
+        TermPremia = TPDecompGraph(
+           MT, NOut, MP, WishRPgraphs = 1, UMY, Eco, PathGraph, F2S, verb
+         ),
+         stop("Unknown plot type: ", type)
+  )
+}
+#####################################################################################
+#' Autoplot method for ATSMModelBoot objects
+#'
+#' @param x An object of class 'ATSMModelBoot'
+#' @param NumOutPE An object of class 'ATSMNumOutputs': point estimates of the numerical outputs
+#' @param type Plot type:  one of "IRF", "FEVD", "GIRF", "GFEVD" (each must be suffixed with "_Factors" or
+#'   "_Yields"). For JLL-based models, an additional "_Ortho" suffix produces
+#'   orthogonalized outputs. All inputs must end by "_Boot" as a reference to the bootstrap procedure.
+#' @param ... Additional arguments (not used)
+#'
+#' @method autoplot ATSMModelBoot
+#' @usage \method{autoplot}{ATSMModelBoot}(x, NumOutPE, type, ...)
+#' @export
+
+autoplot.ATSMModelBoot <- function(x, NumOutPE, type, ...) {
+
+  MT <- names(x$ConfBounds[[1]][[1]])
+
+  # 1) Input validation
+  valid_types <- c("IRF_Factors_Boot", "IRF_Yields_Boot", "IRF_Factors_Ortho_Boot", "IRF_Yields_Ortho_Boot",
+                   "GIRF_Factors_Boot", "GIRF_Yields_Boot", "GIRF_Factors_Ortho_Boot", "GIRF_Yields_Ortho_Boot",
+                   "FEVD_Factors_Boot", "FEVD_Yields_Boot", "FEVD_Factors_Ortho_Boot", "FEVD_Yields_Ortho_Boot",
+                   "GFEVD_Factors_Boot", "GFEVD_Yields_Boot", "GFEVD_Factors_Ortho_Boot", "GFEVD_Yields_Ortho_Boot")
+
+
+  # a) Check 1
+  if (!type %in% valid_types) {
+    stop("Invalid plot type. Choose from: ", paste(valid_types, collapse = ", "))
+  }
+
+  # b) Check 2
+  if (!any(MT == c("JLL original", "JLL No DomUnit", "JLL joint Sigma"))
+      & grepl("Ortho", type)) {
+    stop("Invalid plot type: Orthogonalized outputs are only available for JLL-based models." )
+  }
+
+  # c) Check 3:
+  if (missing(NumOutPE)) {
+    stop("This is an 'ATSMModelBoot' object. Specify the 'NumOutPE' input.")
+  }
+
+
+# 2) Extract useful inputs
+
+  if (any(MT %in% c("JPS original", "JPS global", "GVAR single"))) {
+  K <- dim(x$ConfBounds$Factors[[1]][[MT]][[1]][[1]])[2] # Number of risk factors
+  Horiz <- dim(x$ConfBounds[[1]][[1]][[MT]][[1]][[1]])[1] # Horizon
+  } else{
+  K <- dim(x$ConfBounds$Factors[[1]][[MT]][[2]])[2] # Number of risk factors
+  Horiz <- dim(x$ConfBounds[[1]][[1]][[MT]][[1]])[1] # Horizon
+  }
+
+  J <- length(x$GeneralInputs$mat) # Number of common maturities
+  CI <- x$ConfBounds
+  Eco <- names(NumOutPE[["PC var explained"]])
+  F2S <- NULL
+  PG <- NULL
+
+  switch(type,
+      # 1) IRFs
+         IRF_Factors_Boot = Boot_Fac_Graphs(CI, NumOutPE, MT, K, Horiz, Eco, PG, "IRF", F2S, WishFacGraphs = 1,
+      ), IRF_Yields_Boot = Boot_Yields_Graphs(CI, NumOutPE, MT, K, J, Horiz, Eco, PG, "IRF", F2S, WishYieldGraphs = 1
+      ), IRF_Factors_Ortho_Boot = Boot_Fac_Graphs(CI, NumOutPE, MT, K, Horiz, Eco, PG, "IRF", F2S, WishFacGraphs = 1,
+                                                  WishFacGraphsOrtho = 1
+      ), IRF_Yields_Ortho_Boot = Boot_Yields_Graphs(CI, NumOutPE, MT, K, J, Horiz, Eco, PG, "IRF", F2S, WishYieldGraphs = 1,
+                                                     WishYieldGraphsOrtho = 1
+      # 2) GIRF
+      ), GIRF_Factors_Boot = Boot_Fac_Graphs(CI, NumOutPE, MT, K, Horiz, Eco, PG, "GIRF", F2S, WishFacGraphs = 1
+      ), GIRF_Yields_Boot = Boot_Yields_Graphs(CI, NumOutPE, MT, K, J, Horiz, Eco, PG, "GIRF", F2S, WishYieldGraphs = 1
+      ), GIRF_Factors_Ortho_Boot = Boot_Fac_Graphs(CI, NumOutPE, MT, K, Horiz, Eco, PG, "GIRF", F2S, WishFacGraphs = 1,
+                                                   WishFacGraphsOrtho = 1
+      ), GIRF_Yields_Ortho_Boot = Boot_Yields_Graphs(CI, NumOutPE, MT, K, J, Horiz, Eco, PG, "GIRF", F2S, WishYieldGraphs = 1,
+                                                     WishYieldGraphsOrtho = 1
+      # 3) FEVD
+      ), FEVD_Factors_Boot = Boot_Fac_Graphs(CI, NumOutPE, MT, K, Horiz, Eco, PG, "FEVD", F2S, WishFacGraphs = 1
+      ), FEVD_Yields_Boot = Boot_Yields_Graphs(CI, NumOutPE, MT, K, J, Horiz, Eco, PG, "FEVD", F2S, WishYieldGraphs = 1
+      ), FEVD_Factors_Ortho_Boot = Boot_Fac_Graphs(CI, NumOutPE, MT, K, Horiz, Eco, PG, "FEVD", F2S, WishFacGraphs = 1,
+                                                   WishFacGraphsOrtho = 1
+      ), FEVD_Yields_Ortho_Boot = Boot_Yields_Graphs(CI, NumOutPE, MT, K, J, Horiz, Eco, PG, "FEVD", F2S, WishYieldGraphs = 1,
+                                                    WishYieldGraphsOrtho = 1
+     # 4) GFEVD
+      ), GFEVD_Factors_Boot = Boot_Fac_Graphs(CI, NumOutPE, MT, K, Horiz, Eco, PG, "GFEVD", F2S, WishFacGraphs = 1
+      ), GFEVD_Yields_Boot = Boot_Yields_Graphs(CI, NumOutPE, MT, K, J, Horiz, Eco, PG, "GFEVD", F2S, WishYieldGraphs = 1
+      ), GFEVD_Factors_Ortho_Boot = Boot_Fac_Graphs(CI, NumOutPE, MT, K, Horiz, Eco, PG, "GFEVD", F2S, WishFacGraphs = 1,
+                                                    WishFacGraphsOrtho = 1
+      ), GFEVD_Yields_Ortho_Boot = Boot_Yields_Graphs(CI, NumOutPE, MT, K, J, Horiz, Eco, PG, "GFEVD", F2S, WishYieldGraphs = 1,
+                                                      WishYieldGraphsOrtho = 1
+      )
+      )
+}
+#####################################################################################
+#' Autoplot generic function
+#'
+#' @param x Object to plot
+#' @param ... Additional arguments passed to methods
+#' @export
+autoplot <- function(x, ...) {
+  UseMethod("autoplot")
+}
+
+

@@ -175,6 +175,7 @@ tF_sample <- "01-01-2020"
 
 OutputLabel <- "CM_jfec"
 DataFreq <-"Monthly"
+Folder2Save <- NULL
 
 StatQ <- 0
 
@@ -228,15 +229,16 @@ InputsForOutputs <- InputsForOutputs(ModelType, Horiz, DesiredGraphs, OutputLabe
                                     FPmatLim, WishBootstrap, BootList, WishForecast, ForecastList)
 
 # b) Fit, IRF, FEVD, GIRF, GFEVD, and Term Premia
-NumericalOutputs <- NumOutputs(ModelType, ModelParaList, InputsForOutputs, FactorLabels, Economies)
+NumericalOutputs <- NumOutputs(ModelType, ModelParaList, InputsForOutputs, FactorLabels, 
+                               Economies, Folder2Save)
 
 # c) Confidence intervals (bootstrap analysis)
 BootstrapAnalysis <- Bootstrap(ModelType, ModelParaList, NumericalOutputs, Economies, InputsForOutputs,
-                               FactorLabels, JLLlist, GVARlist, WishBC, BRWlist)
+                               FactorLabels, JLLlist, GVARlist, WishBC, BRWlist, Folder2Save)
 
 # 6) Out-of-sample forecasting
 Forecasts <- ForecastYields(ModelType, ModelParaList, InputsForOutputs, FactorLabels, Economies,
-                            JLLlist, GVARlist, WishBC, BRWlist)
+                            JLLlist, GVARlist, WishBC, BRWlist, Folder2Save)
 ```
 
 # Candelon and Moura (2023)
@@ -260,6 +262,7 @@ tF_sample <- "26-09-2021"
 
 OutputLabel <- "CM_EM"
 DataFreq <-"Weekly"
+F2S <- NULL
 
 StatQ <- 0
 
@@ -305,11 +308,12 @@ InputsForOutputs <- InputsForOutputs(ModelType, Horiz, DesiredGraphs, OutputLabe
                                     FPmatLim, WishBootstrap, BootList)
 
 # b) Fit, IRF, FEVD, GIRF, GFEVD, and Term Premia
-NumericalOutputs <- NumOutputs(ModelType, ModelParaList, InputsForOutputs, FactorLabels, Economies)
+NumericalOutputs <- NumOutputs(ModelType, ModelParaList, InputsForOutputs, FactorLabels, 
+                               Economies, F2S)
 
 # c) Confidence intervals (bootstrap analysis)
 BootstrapAnalysis <- Bootstrap(ModelType, ModelParaList, NumericalOutputs, Economies, InputsForOutputs,
-                               FactorLabels, JLLlist = NULL, GVARlist)
+                               FactorLabels, JLLlist = NULL, GVARlist, WishBC, BRWlist, F2S)
 
 ```
 

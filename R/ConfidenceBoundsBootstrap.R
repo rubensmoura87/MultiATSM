@@ -5,30 +5,35 @@
 #' @param NumOutPE point estimate from the numerical outputs (see the outputs of the "NumOutputs" function)
 #' @param InputsForOutputs list containing the desired inputs for the construction of IRFs, GIRFs, FEVDs, and GFEVDs
 #' @param Economies string-vector containing the names of the economies which are part of the economic system
+#' @param Folder2save Folder path where the outputs will be stored.
+#' @param verbose Logical flag controlling function messaging.
 #'
 #' @keywords internal
 
-BootstrapBoundsSet <- function(ModelType, ModelBootstrap, NumOutPE, InputsForOutputs, Economies) {
+BootstrapBoundsSet <- function(ModelType, ModelBootstrap, NumOutPE, InputsForOutputs, Economies, Folder2save, verbose) {
 
   # Generate the graph paths and the graph folders
-  dir.create(paste(tempdir(), "/Outputs/", ModelType, "/Bootstrap", sep = ""))
+  FolderPath <- if (is.null(Folder2save)) tempdir() else Folder2save
+  dir.create(paste(FolderPath, "/Outputs/", ModelType, "/Bootstrap", sep = ""))
   if (any(ModelType %in% c("JPS original", "JPS global", "GVAR single"))) {
     for (i in seq_along(Economies)) {
-      dir.create(paste(tempdir(), "/Outputs/", ModelType, "/Bootstrap/Model ", Economies[i], sep = ""))
+      dir.create(paste(FolderPath, "/Outputs/", ModelType, "/Bootstrap/Model ", Economies[i], sep = ""))
     }
   }
 
-  PathsGraphs <- FolderCreationBoot(ModelType, Economies)
+  PathsGraphs <- FolderCreationBoot(ModelType, Economies, FolderPath)
 
   AllNumOutputs <- list()
 
-  IRFandGIRF <- IRFandGIRFbs(ModelType, ModelBootstrap, NumOutPE, InputsForOutputs, Economies, PathsGraphs)
-  FEVDandGFEVD <- FEVDandGFEVDbs(ModelType, ModelBootstrap, NumOutPE, InputsForOutputs, Economies, PathsGraphs)
+  IRFandGIRF <- IRFandGIRFbs(ModelType, ModelBootstrap, NumOutPE, InputsForOutputs, Economies, PathsGraphs,
+                             Folder2save, verbose)
+  FEVDandGFEVD <- FEVDandGFEVDbs(ModelType, ModelBootstrap, NumOutPE, InputsForOutputs, Economies, PathsGraphs,
+                                 Folder2save, verbose)
 
   AllNumOutputs$Factors <- append(IRFandGIRF$Factors, FEVDandGFEVD$Factors)
   AllNumOutputs$Yields <- append(IRFandGIRF$Yields, FEVDandGFEVD$Yields)
 
-  cat(paste("Desired graphs are saved in your temporary directory. Please, check:", tempdir(), "\n\n"))
+  if (verbose) message(paste("Desired graphs are saved in your chosen directory. Please, check:", FolderPath, "\n"))
   return(AllNumOutputs)
 }
 
@@ -42,10 +47,13 @@ BootstrapBoundsSet <- function(ModelType, ModelBootstrap, NumOutPE, InputsForOut
 #' @param InputsForOutputs list containing the desired inputs for the construction of the outputs of interest
 #' @param Economies string-vector containing the names of the economies which are part of the economic system
 #' @param PathsGraphs path of the folder in which the graphs will be saved
+#' @param Folder2save Folder path where the outputs will be stored.
+#' @param verbose Logical flag controlling function messaging.
 #'
 #' @keywords internal
 
-IRFandGIRFbs <- function(ModelType, ModelBootstrap, NumOutPE, InputsForOutputs, Economies, PathsGraphs) {
+IRFandGIRFbs <- function(ModelType, ModelBootstrap, NumOutPE, InputsForOutputs, Economies, PathsGraphs,
+                         Folder2save, verbose) {
 
   ndraws <- InputsForOutputs[[ModelType]]$Bootstrap$ndraws
   pctg <- InputsForOutputs[[ModelType]]$Bootstrap$pctg
@@ -73,16 +81,18 @@ IRFandGIRFbs <- function(ModelType, ModelBootstrap, NumOutPE, InputsForOutputs, 
   WG <- WishGraphs_IRFandGIRF_Boot(InputsForOutputs, ModelType)
 
   if (any(c(WG$Fac, WG$Yields) == 1)) {
-    cat(' ** IRFs/GIRFs (Bootstrap) \n')
+    if (verbose) message(' ** IRFs/GIRFs (Bootstrap)')
 
     # a) Factors
     if (any(WG$Fac == 1)) {
-      Boot_Fac_Graphs(NumOutBounds, NumOutPE, ModelType, K, Horiz, Economies, PathsGraphs, "IRF", WG$Fac, WG$Fac_Ortho)
+      Boot_Fac_Graphs(NumOutBounds, NumOutPE, ModelType, K, Horiz, Economies, PathsGraphs, "IRF", Folder2save,
+                      WG$Fac, WG$Fac_Ortho)
     }
 
     # b) Yields
     if (any(WG$Yields == 1)) {
-      Boot_Yields_Graphs(NumOutBounds, NumOutPE, ModelType, K, J, Horiz, Economies, PathsGraphs, "IRF", WG$Yields, WG$Yields_Ortho)
+      Boot_Yields_Graphs(NumOutBounds, NumOutPE, ModelType, K, J, Horiz, Economies, PathsGraphs, "IRF", Folder2save,
+                         WG$Yields, WG$Yields_Ortho)
     }
   }
 
@@ -98,10 +108,13 @@ IRFandGIRFbs <- function(ModelType, ModelBootstrap, NumOutPE, InputsForOutputs, 
 #' @param InputsForOutputs list containing the desired inputs for the construction of the outputs of interest
 #' @param Economies string-vector containing the names of the economies which are part of the economic system
 #' @param PathsGraphs path of the folder in which the graphs will be saved
+#' @param Folder2save Folder path where the outputs will be stored.
+#' @param verbose Logical flag controlling function messaging.
 #'
 #' @keywords internal
 
-FEVDandGFEVDbs <- function(ModelType, ModelBootstrap, NumOutPE, InputsForOutputs, Economies, PathsGraphs) {
+FEVDandGFEVDbs <- function(ModelType, ModelBootstrap, NumOutPE, InputsForOutputs, Economies,
+                           PathsGraphs, Folder2save, verbose) {
 
   ndraws <- InputsForOutputs[[ModelType]]$Bootstrap$ndraws
   pctg <- InputsForOutputs[[ModelType]]$Bootstrap$pctg
@@ -129,16 +142,18 @@ FEVDandGFEVDbs <- function(ModelType, ModelBootstrap, NumOutPE, InputsForOutputs
   WG <- WishGraphs_FEVDandGFEVD_Boot(InputsForOutputs, ModelType)
 
   if (any(c(WG$Fac, WG$Yields) == 1)) {
-    cat(' ** FEVDs/GFEVDs (Bootstrap) \n')
+    if (verbose) message(' ** FEVDs/GFEVDs (Bootstrap)')
 
     # a) Factors
     if (any(WG$Fac == 1)) {
-      Boot_Fac_Graphs(NumOutBounds, NumOutPE, ModelType, K, Horiz, Economies, PathsGraphs, "FEVD", WG$Fac, WG$Fac_Ortho)
+      Boot_Fac_Graphs(NumOutBounds, NumOutPE, ModelType, K, Horiz, Economies, PathsGraphs, "FEVD",
+                      Folder2save, WG$Fac, WG$Fac_Ortho)
     }
 
     # b) Yields
     if (any(WG$Yields == 1)) {
-      Boot_Yields_Graphs(NumOutBounds, NumOutPE, ModelType, K, J, Horiz, Economies, PathsGraphs, "FEVD", WG$Yields, WG$Yields_Ortho)
+      Boot_Yields_Graphs(NumOutBounds, NumOutPE, ModelType, K, J, Horiz, Economies, PathsGraphs, "FEVD",
+                         Folder2save, WG$Yields, WG$Yields_Ortho)
     }
   }
 
@@ -501,15 +516,15 @@ WishGraphs_IRFandGIRF_Boot <- function(InputsForOutputs, ModelType) {
 #' @param Horiz horizon of numerical outputs
 #' @param Economies Economies that are part of the economic system
 #' @param PathsGraphs Path to save the desired graphs
-#' @param OutInt available options are "IRF" and "FEVD"
+#' @param OutInt available options are "IRF", "FEVD", "GIRF" or "GFEVD"
+#' @param Folder2save Folder path where the outputs will be stored.
 #' @param WishFacGraphs Binary variable reflecting the graphs of interest
 #' @param WishFacGraphsOrtho Binary variable reflecting the graphs of interest (orthogonalized version). Default is NULL
 #'
 #' @keywords internal
 
 Boot_Fac_Graphs <- function(NumOutBounds, NumOutPE, ModelType, FacDim, Horiz, Economies, PathsGraphs, OutInt,
-
-  WishFacGraphs, WishFacGraphsOrtho = NULL) {
+                            Folder2save, WishFacGraphs, WishFacGraphsOrtho = NULL) {
 
   C <- length(Economies)
 
@@ -525,6 +540,8 @@ Boot_Fac_Graphs <- function(NumOutBounds, NumOutPE, ModelType, FacDim, Horiz, Ec
 
   IdxFacGraphs <- which(WishFacGraphs == 1)
 
+  Autoplot_List <- list()
+
   ################ 1) Estimation done for countries individually ################
   if (any(ModelType %in% c("JPS original", "JPS global", "GVAR single"))) {
     for (f in 1:C) {
@@ -532,10 +549,12 @@ Boot_Fac_Graphs <- function(NumOutBounds, NumOutPE, ModelType, FacDim, Horiz, Ec
       for (d in IdxFacGraphs) {
 
         # Adjust the graph path
+        if (!is.null(Folder2save)){
         if (OutInt == "IRF") {
           PathAdj <- AdjustPathIRFs(Lab_Int[d], "Factors", PathsGraphs, Economies[f], ModelType)
         } else {
           PathAdj <- AdjustPathFEVDs(Lab_Int[d], "Factors", PathsGraphs, Economies[f], ModelType)
+        }
         }
 
         # Labels of shocks and response variables
@@ -543,16 +562,23 @@ Boot_Fac_Graphs <- function(NumOutBounds, NumOutPE, ModelType, FacDim, Horiz, Ec
         nmShock <- dimnames(NumOutPE[[Lab_Int[d]]][[ModelType]][[Economies[f]]]$Factors)[[3]]
 
         # Folder Creation
-        FolderCreation_Boot(ModelType, Lab_Int[d], Economies[f], "Factors")
+        if (!is.null(Folder2save)){
+        FolderCreation_Boot(ModelType, Lab_Int[d], Economies[f], "Factors", Folder2save)
+        }
 
         # Create plots
         for (b in 1:FacDim) {
           plotlist_OneShock <- Boot_DataGraphFact_perShock(NumOutBounds, NumOutPE, b, nmResponse, Lab_Int[d],
-            ModelType, FacDim, Horiz, Economies[f])
+                                                           ModelType, FacDim, Horiz, Economies[f])
 
-          subplots <- cowplot::plot_grid(plotlist = plotlist_OneShock, ncol = 3)
-          suppressMessages(ggplot2::ggsave(subplots, file = paste0(Lab_Int[d], Graph_Lab, nmShock[b], ".png"),
-            path = PathAdj))
+          subplots <- plot_grid(plotlist = plotlist_OneShock, ncol = 3)
+          if (!is.null(Folder2save)){
+            suppressMessages(ggplot2::ggsave(subplots, file = paste0(Lab_Int[d], Graph_Lab, nmShock[b], ".png"),
+                                          path = PathAdj))
+            print(subplots)
+          }
+          Autoplot_List[[Economies[f]]][[nmShock[b]]] <- subplots
+
         }
       }
     }
@@ -562,10 +588,12 @@ Boot_Fac_Graphs <- function(NumOutBounds, NumOutPE, ModelType, FacDim, Horiz, Ec
     for (d in IdxFacGraphs) {
 
       # Adjust the graph path
+      if (!is.null(Folder2save)){
       if (OutInt == "IRF") {
         PathAdj <- AdjustPathIRFs(Lab_Int[d], "Factors", PathsGraphs, Economies, ModelType)
       } else {
         PathAdj <- AdjustPathFEVDs(Lab_Int[d], "Factors", PathsGraphs, Economies, ModelType)
+      }
       }
 
       # Labels of shocks and response variables
@@ -577,16 +605,22 @@ Boot_Fac_Graphs <- function(NumOutBounds, NumOutPE, ModelType, FacDim, Horiz, Ec
         nmShock <- dimnames(NumOutPE[[Lab_Int[d]]][[ModelType]]$Factors)[[3]]
       }
       # Folder Creation
-      FolderCreation_Boot(ModelType, Lab_Int[d], Economies, "Factors")
+      if (!is.null(Folder2save)){ FolderCreation_Boot(ModelType, Lab_Int[d], Economies, "Factors", Folder2save) }
 
       # Create plots
       for (b in 1:FacDim) {
         plotlist_OneShock <- Boot_DataGraphFact_perShock(NumOutBounds, NumOutPE, b, nmResponse, Lab_Int[d],
           ModelType, FacDim, Horiz)
 
-        subplots <- cowplot::plot_grid(plotlist = plotlist_OneShock, ncol = 3)
+        subplots <- plot_grid(plotlist = plotlist_OneShock, ncol = 3)
+      if (!is.null(Folder2save)){
         suppressMessages(ggplot2::ggsave(subplots, file = paste0(Lab_Int[d], Graph_Lab, nmShock[b], ".png"),
           path = PathAdj))
+        print(subplots)
+      }
+       Autoplot_List[[nmShock[b]]] <- subplots
+
+
       }
     }
   }
@@ -604,29 +638,41 @@ Boot_Fac_Graphs <- function(NumOutBounds, NumOutPE, ModelType, FacDim, Horiz, Ec
 
     for (d in IdxFacGraphs_Ortho) {
       # Adjust the graph path
+      if (!is.null(Folder2save)){
       if (OutInt == "IRF") {
         PathAdj <- AdjustPathIRFs(Lab_Int_Ortho[d], "Factors", PathsGraphs, Economies, ModelType)
       } else {
         PathAdj <- AdjustPathFEVDs(Lab_Int_Ortho[d], "Factors", PathsGraphs, Economies, ModelType)
+      }
       }
       # Labels of shocks and response variables
       nmResponse <- dimnames(NumOutPE[[Lab_Int[d]]][[ModelType]]$Factors$Ortho)[[2]]
       nmShock <- dimnames(NumOutPE[[Lab_Int[d]]][[ModelType]]$Factors$Ortho)[[3]]
 
       # Folder Creation
-      FolderCreation_Boot(ModelType, Lab_Int[d], Economies, "Factors", Ortho = TRUE)
+      if (!is.null(Folder2save)){
+        FolderCreation_Boot(ModelType, Lab_Int[d], Economies, "Factors", Folder2save, Ortho = TRUE)
+      }
 
       # Create plots
       for (b in 1:FacDim) {
         plotlist_OneShock <- Boot_DataGraphFact_perShock(NumOutBounds, NumOutPE, b, nmResponse, Lab_Int[d],
           ModelType, FacDim, Horiz, Ortho = TRUE)
 
-        subplots <- cowplot::plot_grid(plotlist = plotlist_OneShock, ncol = 3)
+        subplots <- plot_grid(plotlist = plotlist_OneShock, ncol = 3)
+        if (!is.null(Folder2save)) {
         suppressMessages(ggplot2::ggsave(subplots, file = paste0(Lab_Int[d], Graph_Lab, nmShock[b], "_ORTHO", ".png"),
           path = PathAdj))
+          print(subplots)
+      }
+        Autoplot_List[[nmShock[b]]] <- subplots
+
+
       }
     }
   }
+
+  return(Autoplot_List)
 }
 
 ###############################################################################################
@@ -636,27 +682,28 @@ Boot_Fac_Graphs <- function(NumOutBounds, NumOutPE, ModelType, FacDim, Horiz, Ec
 #' @param LabIRF Output types "IRF", "GIRF" and "IRF Ortho"
 #' @param Economies economies of the economic system
 #' @param OutType Available option "Factors" or "Yields
+#' @param Folder2save Folder path where the outputs will be stored.
 #' @param Ortho Option for orthogonal outputs, for JLL models. Default is FALSE.
 #'
 #' @keywords internal
 
-FolderCreation_Boot <- function(ModelType, LabIRF, Economies, OutType, Ortho = FALSE) {
+FolderCreation_Boot <- function(ModelType, LabIRF, Economies, OutType, Folder2save, Ortho = FALSE) {
 
   # A) Folder for factors
   if (OutType == "Factors") {
 
     # 1) Models estimated on a country-by-country basis
     if (any(ModelType %in% c("JPS original", "JPS global", "GVAR single"))) {
-      dir.create(paste(tempdir(), "/Outputs/", ModelType, "/Bootstrap/Model ", Economies, "/", LabIRF, sep = ""), showWarnings = FALSE)
-      dir.create(paste(tempdir(), "/Outputs/", ModelType, "/Bootstrap/Model ", Economies, "/", LabIRF, "/Factors", sep = ""))
+      dir.create(paste(Folder2save, "/Outputs/", ModelType, "/Bootstrap/Model ", Economies, "/", LabIRF, sep = ""), showWarnings = FALSE)
+      dir.create(paste(Folder2save, "/Outputs/", ModelType, "/Bootstrap/Model ", Economies, "/", LabIRF, "/Factors", sep = ""))
     } else {
 
       # 2) Country estimated jointly
-      dir.create(paste(tempdir(), "/Outputs/", ModelType, "/Bootstrap/", LabIRF, sep = ""), showWarnings = FALSE)
-      dir.create(paste(tempdir(), "/Outputs/", ModelType, "/Bootstrap/", LabIRF, "/Factors", sep = ""))
+      dir.create(paste(Folder2save, "/Outputs/", ModelType, "/Bootstrap/", LabIRF, sep = ""), showWarnings = FALSE)
+      dir.create(paste(Folder2save, "/Outputs/", ModelType, "/Bootstrap/", LabIRF, "/Factors", sep = ""))
       # 3) Orthogonalized outputs (for JLL models)
       if (Ortho) {
-        dir.create(paste(tempdir(), "/Outputs/", ModelType, "/Bootstrap/", LabIRF, "/Factors/Ortho", sep = ""))
+        dir.create(paste(Folder2save, "/Outputs/", ModelType, "/Bootstrap/", LabIRF, "/Factors/Ortho", sep = ""))
       }
     }
 
@@ -664,16 +711,16 @@ FolderCreation_Boot <- function(ModelType, LabIRF, Economies, OutType, Ortho = F
     # B) Folder for yields
     # 1) Models estimated on a country-by-country basis
     if (any(ModelType %in% c("JPS original", "JPS global", "GVAR single"))) {
-      dir.create(paste(tempdir(), "/Outputs/", ModelType, "/Bootstrap/Model ", Economies, "/", LabIRF, sep = ""), showWarnings = FALSE)
-      dir.create(paste(tempdir(), "/Outputs/", ModelType, "/Bootstrap/Model ", Economies, "/", LabIRF, "/Yields", sep = ""))
+      dir.create(paste(Folder2save, "/Outputs/", ModelType, "/Bootstrap/Model ", Economies, "/", LabIRF, sep = ""), showWarnings = FALSE)
+      dir.create(paste(Folder2save, "/Outputs/", ModelType, "/Bootstrap/Model ", Economies, "/", LabIRF, "/Yields", sep = ""))
     } else {
 
       # 2) Country estimated jointly
-      dir.create(paste(tempdir(), "/Outputs/", ModelType, "/Bootstrap/", LabIRF, sep = ""), showWarnings = FALSE)
-      dir.create(paste(tempdir(), "/Outputs/", ModelType, "/Bootstrap/", LabIRF, "/Yields", sep = ""))
+      dir.create(paste(Folder2save, "/Outputs/", ModelType, "/Bootstrap/", LabIRF, sep = ""), showWarnings = FALSE)
+      dir.create(paste(Folder2save, "/Outputs/", ModelType, "/Bootstrap/", LabIRF, "/Yields", sep = ""))
       # 3) Orthogonalized outputs (for JLL models)
       if (Ortho) {
-        dir.create(paste(tempdir(), "/Outputs/", ModelType, "/Bootstrap/", LabIRF, "/Yields/Ortho", sep = ""))
+        dir.create(paste(Folder2save, "/Outputs/", ModelType, "/Bootstrap/", LabIRF, "/Yields/Ortho", sep = ""))
       }
     }
   }
@@ -696,8 +743,7 @@ FolderCreation_Boot <- function(ModelType, LabIRF, Economies, OutType, Ortho = F
 #' @keywords internal
 
 Boot_DataGraphFact_perShock <- function(NumOutBounds, NumOutPE, IdxShock, nmResponse, Lab_Int, ModelType,
-
-  FacDim, Horiz, Economies = NULL, Ortho = FALSE) {
+                                        FacDim, Horiz, Economies = NULL, Ortho = FALSE) {
 
   plot_list <- list()
 
@@ -750,16 +796,22 @@ Boot_DataGraphFact_perShock <- function(NumOutBounds, NumOutPE, IdxShock, nmResp
 ####################################################################################################
 #' Builds template from bootstrap-related graphs
 #'
-#' @param ALLdata data-frame containing the necessary data for building the grahs
+#' @param ALLdata data-frame containing the necessary data for building the graphs
 #' @param nmResponse string containing the name of the response variable
 #'
 #' @keywords internal
 
 Boot_graph_template <- function(ALLdata, nmResponse) {
 
-  p <- ggplot(data = ALLdata, aes(x = ALLdata$TimeSpan)) + geom_line(aes(y = ALLdata$LL), color = 'blue') +
-    geom_line(aes(y = ALLdata$MM), color = 'green') + geom_line(aes(y = ALLdata$UU), color = 'red') +
-    geom_line(aes(y = ALLdata$PP)) + theme_classic() +
+  LL <- ALLdata$LL
+  MM <- ALLdata$MM
+  UU <- ALLdata$UU
+  PP <- ALLdata$PP
+  TimeSpan <- ALLdata$TimeSpan
+
+  p <- ggplot(data = ALLdata, aes(x = TimeSpan)) + geom_line(aes(y = LL), color = "#0072B2") +
+    geom_line(aes(y = MM), color = "#009E73") + geom_line(aes(y = UU), color = "#D55E00") +
+    geom_line(aes(y = PP)) + theme_classic() +
     theme(plot.title = element_text(size = 6, face = "bold", hjust = 0.5),
       axis.title.x = element_blank(), axis.title.y = element_blank()) +
     ggtitle(nmResponse) + geom_hline(yintercept = 0)
@@ -777,15 +829,15 @@ Boot_graph_template <- function(ALLdata, nmResponse) {
 #' @param Horiz horizon of numerical outputs
 #' @param Economies Economies that are part of the economic system
 #' @param PathsGraphs Path to save the desired graphs
-#' @param OutInt Available option are "IRF" or "FEVD"
+#' @param OutInt Available option are "IRF", "FEVD", "GIRF" or "GFEVD"
+#' @param Folder2save Folder path where the outputs will be stored.
 #' @param WishYieldGraphs Binary variable reflecting the graphs of interest
 #' @param WishYieldGraphsOrtho Binary variable reflecting the graphs of interest (orthogonalized version). Default is NULL
 #'
 #' @keywords internal
 
 Boot_Yields_Graphs <- function(NumOutBounds, NumOutPE, ModelType, FacDim, YielDim, Horiz, Economies, PathsGraphs,
-
-  OutInt, WishYieldGraphs, WishYieldGraphsOrtho = NULL) {
+                                OutInt, Folder2save, WishYieldGraphs, WishYieldGraphsOrtho = NULL) {
 
   C <- length(Economies)
   if (OutInt == "IRF") {
@@ -799,6 +851,8 @@ Boot_Yields_Graphs <- function(NumOutBounds, NumOutPE, ModelType, FacDim, YielDi
 
   IdxYielddGraphs <- which(WishYieldGraphs == 1)
 
+  Autoplot_List <- list()
+
   ################ 1) Estimation done for countries individually ################
   if (ModelType %in% c("JPS original", "JPS global", "GVAR single")) {
     for (f in 1:C) {
@@ -806,10 +860,12 @@ Boot_Yields_Graphs <- function(NumOutBounds, NumOutPE, ModelType, FacDim, YielDi
       for (d in IdxYielddGraphs) {
 
         # Adjust the graph path
+        if (!is.null (Folder2save)){
         if (OutInt == "IRF") {
           PathAdj <- AdjustPathIRFs(Lab_Int[d], "Yields", PathsGraphs, Economies[f], ModelType)
         } else {
           PathAdj <- AdjustPathFEVDs(Lab_Int[d], "Yields", PathsGraphs, Economies[f], ModelType)
+        }
         }
 
         # Labels of shocks and response variables
@@ -817,7 +873,9 @@ Boot_Yields_Graphs <- function(NumOutBounds, NumOutPE, ModelType, FacDim, YielDi
         nmShock <- dimnames(NumOutPE[[Lab_Int[d]]][[ModelType]][[Economies[f]]]$Yields)[[3]]
 
         # Folder Creation
-        FolderCreation_Boot(ModelType, Lab_Int[d], Economies[f], "Yields")
+        if (!is.null (Folder2save)) {
+          FolderCreation_Boot(ModelType, Lab_Int[d], Economies[f], "Yields", Folder2save)
+        }
 
         # Create plots
         if (Lab_Int[d] %in% c("IRF", "GIRF")) {
@@ -830,9 +888,15 @@ Boot_Yields_Graphs <- function(NumOutBounds, NumOutPE, ModelType, FacDim, YielDi
           plot_list <- Boot_DataGraphYield_perShock(NumOutBounds, NumOutPE, b, nmResponse, Lab_Int[d],
             ModelType, FacDim, YielDim, Horiz, Economies[f])
 
-          subplots <- cowplot::plot_grid(plotlist = plot_list, ncol = 3)
-          suppressMessages(ggplot2::ggsave(subplots, file = paste0(Lab_Int[d], Graph_Lab, nmShock[b], ".png"),
-            path = PathAdj))
+          subplots <- plot_grid(plotlist = plot_list, ncol = 3)
+          if (!is.null (Folder2save)){
+            suppressMessages(ggplot2::ggsave(subplots, file = paste0(Lab_Int[d], Graph_Lab, nmShock[b], ".png"),
+                                           path = PathAdj))
+            print(subplots)
+          }
+
+          Autoplot_List[[Economies[f]]][[nmShock[b]]] <- subplots
+
         }
       }
     }
@@ -842,10 +906,12 @@ Boot_Yields_Graphs <- function(NumOutBounds, NumOutPE, ModelType, FacDim, YielDi
     for (d in IdxYielddGraphs) {
 
       # Adjust the graph path
+      if (!is.null (Folder2save)) {
       if (OutInt == "IRF") {
         PathAdj <- AdjustPathIRFs(Lab_Int[d], "Yields", PathsGraphs, Economies, ModelType)
       } else {
         PathAdj <- AdjustPathFEVDs(Lab_Int[d], "Yields", PathsGraphs, Economies, ModelType)
+      }
       }
 
       # Labels of shocks and response variables
@@ -858,7 +924,7 @@ Boot_Yields_Graphs <- function(NumOutBounds, NumOutPE, ModelType, FacDim, YielDi
       }
 
       # Folder Creation
-      FolderCreation_Boot(ModelType, Lab_Int[d], Economies, "Yields")
+      if (!is.null (Folder2save)) { FolderCreation_Boot(ModelType, Lab_Int[d], Economies, "Yields", Folder2save) }
 
       # Create plots
       if (Lab_Int[d] %in% c("IRF", "GIRF")) {
@@ -871,9 +937,16 @@ Boot_Yields_Graphs <- function(NumOutBounds, NumOutPE, ModelType, FacDim, YielDi
         plot_list <- Boot_DataGraphYield_perShock(NumOutBounds, NumOutPE, b, nmResponse, Lab_Int[d],
           ModelType, FacDim, C * YielDim, Horiz, Economies)
 
-        subplots <- cowplot::plot_grid(plotlist = plot_list, ncol = 3)
+        subplots <- plot_grid(plotlist = plot_list, ncol = 3)
+        if (!is.null (Folder2save)) {
         suppressMessages(ggplot2::ggsave(subplots, file = paste0(Lab_Int[d], Graph_Lab, nmShock[b], ".png"),
-          path = PathAdj))
+                                         path = PathAdj))
+        print(subplots)
+        }
+
+        Autoplot_List[[nmShock[b]]] <- subplots
+
+
       }
     }
   }
@@ -890,10 +963,12 @@ Boot_Yields_Graphs <- function(NumOutBounds, NumOutPE, ModelType, FacDim, YielDi
 
     for (d in IdxYieldGraphs_Ortho) {
       # Adjust the graph path
+      if (!is.null (Folder2save)) {
       if (OutInt == "IRF") {
         PathAdj <- AdjustPathIRFs(Lab_Int_Ortho[d], "Yields", PathsGraphs, Economies, ModelType)
       } else {
         PathAdj <- AdjustPathFEVDs(Lab_Int_Ortho[d], "Yields", PathsGraphs, Economies, ModelType)
+      }
       }
 
       # Labels of shocks and response variables
@@ -901,7 +976,9 @@ Boot_Yields_Graphs <- function(NumOutBounds, NumOutPE, ModelType, FacDim, YielDi
       nmShock <- dimnames(NumOutPE[[Lab_Int[d]]][[ModelType]]$Yields$Ortho)[[3]]
 
       # Folder Creation
-      FolderCreation_Boot(ModelType, Lab_Int[d], Economies, "Yields", Ortho = TRUE)
+      if (!is.null (Folder2save)) {
+        FolderCreation_Boot(ModelType, Lab_Int[d], Economies, "Yields", Folder2save, Ortho = TRUE)
+      }
 
       # Create plots
       if (Lab_Int[d] %in% c("IRF", "GIRF")) {
@@ -914,13 +991,20 @@ Boot_Yields_Graphs <- function(NumOutBounds, NumOutPE, ModelType, FacDim, YielDi
         plot_list <- Boot_DataGraphYield_perShock(NumOutBounds, NumOutPE, b, nmResponse, Lab_Int[d],
           ModelType, FacDim, C * YielDim, Horiz, Economies, Ortho = TRUE)
 
-        subplots <- cowplot::plot_grid(plotlist = plot_list, ncol = 3)
+        subplots <- plot_grid(plotlist = plot_list, ncol = 3)
+      if (!is.null (Folder2save)) {
         suppressMessages(ggplot2::ggsave(subplots, file = paste0(Lab_Int[d], Graph_Lab, nmShock[b], ".png"),
-          path = PathAdj))
+                          path = PathAdj))
+        print(subplots)
+      }
+        Autoplot_List[[nmShock[b]]] <- subplots
+
+
       }
     }
   }
-}
+  if (is.null (Folder2save)){ return(Autoplot_List) }
+  }
 
 ####################################################################################################
 #' Generates the desired bootstrap graphs

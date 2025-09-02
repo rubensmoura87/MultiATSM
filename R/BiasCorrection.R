@@ -1,7 +1,7 @@
 #' Estimates an unbiased VAR(1) using stochastic approximation (Bauer, Rudebusch and Wu, 2012)
 #'
-#'@param ModelType A character vector indicating the model type to be estimated.
-#'@param BRWinputs A list containing the necessary inputs for the BRW model estimation:
+#' @param ModelType A character vector indicating the model type to be estimated.
+#' @param BRWinputs A list containing the necessary inputs for the BRW model estimation:
 #'\enumerate{
 #'\item \code{flag_mean}: Logical. Determines whether mean- (TRUE) or median- (FALSE) unbiased estimation is desired. Default is TRUE.
 #'\item \code{gamma}: Numeric. Adjustment parameter between 0 and 1. Default is 0.5.
@@ -11,14 +11,15 @@
 #'\item \code{check}: Logical. Indicates whether to perform a closeness check. Default is TRUE.
 #'\item \code{B_check}: Integer. Number of bootstrap samples for the closeness check. Default is 100,000.
 #'}
-#'@param RiskFactors A numeric matrix (T x F) representing the time series of risk factors.
-#'@param N Integer. Number of country-specific spanned factors.
-#'@param Economies A character vector containing the names of the economies included in the system.
-#'@param FactorLabels A list of character vectors with labels for all variables in the model.
-#'@param GVARinputs List. Inputs for GVAR model estimation (see \code{\link{GVAR}} function). Default is NULL.
-#'@param JLLinputs List. Inputs for JLL model estimation (see \code{\link{JLL}} function). Default is NULL.
-#'@param ev_restr Numeric. Restriction on the largest eigenvalue under the P-measure. Default is 1.
-#'@param nargout Integer. Number of elements in the output list. Default is 4.
+#' @param RiskFactors A numeric matrix (T x F) representing the time series of risk factors.
+#' @param N Integer. Number of country-specific spanned factors.
+#' @param Economies A character vector containing the names of the economies included in the system.
+#' @param FactorLabels A list of character vectors with labels for all variables in the model.
+#' @param GVARinputs List. Inputs for GVAR model estimation (see \code{\link{GVAR}} function). Default is NULL.
+#' @param JLLinputs List. Inputs for JLL model estimation (see \code{\link{JLL}} function). Default is NULL.
+#' @param ev_restr Numeric. Restriction on the largest eigenvalue under the P-measure. Default is 1.
+#' @param nargout Integer. Number of elements in the output list. Default is 4.
+#' @param verbose verbose Logical flag controlling function messaging. Default is TRUE.
 #'
 #'@examples
 #'\donttest{
@@ -53,7 +54,7 @@
 #'@export
 
 Bias_Correc_VAR  <- function(ModelType, BRWinputs, RiskFactors, N, Economies, FactorLabels, GVARinputs = NULL,
-                             JLLinputs = NULL, ev_restr = 1, nargout= 4){
+                             JLLinputs = NULL, ev_restr = 1, nargout= 4, verbose = TRUE){
 
   flag_mean <- ifelse(is.null(BRWinputs$flag_mean), TRUE, BRWinputs$flag_mean)
   gamma <- ifelse(is.null(BRWinputs$gamma), 0.5, BRWinputs$gamma)
@@ -64,7 +65,6 @@ Bias_Correc_VAR  <- function(ModelType, BRWinputs, RiskFactors, N, Economies, Fa
   B_check <- ifelse(is.null(BRWinputs$B_check), 100000, BRWinputs$B_check)
   checkSigma <- ifelse(is.null(BRWinputs$checkSigma), TRUE, BRWinputs$checkSigma)
 
-  T <- dim(RiskFactors)[1]
   k <- dim(RiskFactors)[2]
 
   # 1) OLS
@@ -88,8 +88,10 @@ Bias_Correc_VAR  <- function(ModelType, BRWinputs, RiskFactors, N, Economies, Fa
       # print some diagnostics
       theta_tilde <- rowMeans(theta[ ,(N_burn+1):j])
       Phi_tilde <- matrix(theta_tilde,k,k)
-      cat(paste('  *** Iteration:', j-N_burn, '. Largest absolute eigenvalue: ',
-                round(max(abs(eigen(Phi_tilde)$values)), 6),"\n"))
+      if (verbose) {
+        message(paste('  *** Iteration:', j-N_burn, '. Largest absolute eigenvalue: ',
+                round(max(abs(eigen(Phi_tilde)$values)), 6)))
+      }
     }
   }
 
@@ -98,7 +100,7 @@ Bias_Correc_VAR  <- function(ModelType, BRWinputs, RiskFactors, N, Economies, Fa
   # 4) check whether mean/median of OLS is close to actual OLS estimates
   if (check){
     dist <- Check_comparison__OLS(theta_tilde, theta_hat, B_check, RiskFactors, N, GVARinputs, JLLinputs,
-                                  FactorLabels, Economies, ModelType)
+                                  FactorLabels, Economies, ModelType, verbose)
   }else{
     Phi_sample <- NaN
   }
@@ -151,13 +153,13 @@ Bias_Correc_VAR  <- function(ModelType, BRWinputs, RiskFactors, N, Economies, Fa
 estVARbrw <- function(RiskFactors, ModelType, N, GVARinputs, JLLinputs, FactorLabels, Economies,
                       demean = FALSE, intercept = TRUE){
 
-  T <- dim(RiskFactors)[1]; k <- dim(RiskFactors)[2]
+  T_dim <- dim(RiskFactors)[1]; k <- dim(RiskFactors)[2]
 
   # 1) Data prep
   if (demean) RiskFactors <- scale(RiskFactors, scale = FALSE)
 
-  Yt <- RiskFactors[1:(T-1), ]  # (T-1)*k
-  Ytp1 <- RiskFactors[2:T, ]  # (T-1)*k
+  Yt <- RiskFactors[1:(T_dim - 1), ]  # (T-1)*k
+  Ytp1 <- RiskFactors[2:T_dim, ]  # (T-1)*k
   Y <- t(Ytp1)  # k*(T-1)
 
   Z <- if (intercept) t(cbind(1, Yt)) else t(Yt) # (k+1)*(T-1) or k*(T-1)
@@ -169,7 +171,7 @@ estVARbrw <- function(RiskFactors, ModelType, N, GVARinputs, JLLinputs, FactorLa
     Gamma_hat <- if (intercept) A[, -1] else A
 
   } else if (any(ModelType == c("GVAR single", "GVAR multi"))){
-    Economies <- GVARinputs$Economies # necessary to ensure that the code works for the "GVAR sepQ" model
+    Economies <- GVARinputs$Economies # necessary to ensure that the code works for the "GVAR single" model
     GVARinputs$GVARFactors <- DataSet_BS(ModelType, t(RiskFactors), GVARinputs$Wgvar, Economies, FactorLabels)
     GVARpara <- GVAR(GVARinputs, N)
     alpha_hat <- if (intercept) GVARpara$F0 else NaN
@@ -201,11 +203,11 @@ estVARbrw <- function(RiskFactors, ModelType, N, GVARinputs, JLLinputs, FactorLa
 
 genVARbrw <- function(Phi, M, RiskFactors){
 
-  T <- dim(RiskFactors)[1];  k <- dim(RiskFactors)[2]
+  T_dim <- dim(RiskFactors)[1];  k <- dim(RiskFactors)[2]
 
   Y_mean <- colMeans(RiskFactors)
   Y_mean_rep <- t(t(Y_mean))%*%matrix(1,1,M)
-  X_sim <- array(0, c(k, T, M))
+  X_sim <- array(0, c(k, T_dim, M))
 
   # VAR(1)
   # 1. obtain residuals
@@ -213,10 +215,10 @@ genVARbrw <- function(Phi, M, RiskFactors){
 
   # 2. generate series
   # randomly select initial values from the data Y
-  ind_start <- sample(T, M, replace = TRUE)
+  ind_start <- sample(T_dim, M, replace = TRUE)
   X_sim[, 1, ] <- t(RiskFactors[ind_start, ])
-  for (t in 2:T){
-    u_sim <- resid[ , sample(T-1, M, replace = TRUE)]
+  for (t in 2:T_dim){
+    u_sim <- resid[ , sample(T_dim -1, M, replace = TRUE)]
     X_sim[ ,t, ] <- Y_mean_rep + Phi%*% (drop(X_sim[ ,t-1,]) - Y_mean_rep) + u_sim
   }
 
@@ -248,7 +250,7 @@ genVARbrw <- function(Phi, M, RiskFactors){
 
 m_var <- function(theta, M, RiskFactors, N, GVARinputs, JLLinputs, FactorLabels, Economies, ModelType, flag_mean = TRUE){
 
-  T <- dim(RiskFactors)[1]; k <- dim(RiskFactors)[2]
+  T_dim <- dim(RiskFactors)[1]; k <- dim(RiskFactors)[2]
 
   Phi_sample <- if (flag_mean) array(0, c(k, k, M)) else NaN
 
@@ -279,7 +281,7 @@ m_var <- function(theta, M, RiskFactors, N, GVARinputs, JLLinputs, FactorLabels,
 #'
 #'@param Phi_tilde VAR (1) bias-corrected feedback matrix from Bauer, Rudebusch and, Wu (2012)
 #'@param Phi_hat  unrestricted VAR(1) feedback matrix
-#'@param ev_restr maximum eigenvalue desired in the feedback matrix after the adjustement
+#'@param ev_restr maximum eigenvalue desired in the feedback matrix after the adjustment
 #'
 #'@keywords internal
 #'
@@ -332,10 +334,10 @@ shrink_Phi <- function(Phi_tilde, Phi_hat, ev_restr){
 Get_V_tilde_BC <- function(Phi_tilde, N, RiskFactors, GVARinputs, JLLinputs, FactorLabels, ModelType){
 
   if (any(ModelType == c("JPS original", "JPS global", "JPS multi"))){
-    T <- nrow(RiskFactors)
+    T_dim <- nrow(RiskFactors)
     Xdem <- scale(RiskFactors, scale = FALSE)
-    resid_tilde <- t(Xdem[2:T, ]) - Phi_tilde %*% t(Xdem[1:(T-1), ])
-    V_tilde <- resid_tilde %*% t(resid_tilde) / (T-1)
+    resid_tilde <- t(Xdem[2:T_dim, ]) - Phi_tilde %*% t(Xdem[1:(T_dim - 1), ])
+    V_tilde <- resid_tilde %*% t(resid_tilde) / (T_dim - 1)
   } else if (any(ModelType == c("GVAR single", "GVAR multi"))){
     Economies <- GVARinputs$Economies # necessary to ensure that the code works for the "GVAR single" model
     GVARinputs$GVARFactors <- DataSet_BS(ModelType, t(RiskFactors), GVARinputs$Wgvar, Economies, FactorLabels)
@@ -362,14 +364,14 @@ Get_V_tilde_BC <- function(Phi_tilde, N, RiskFactors, GVARinputs, JLLinputs, Fac
 #'@param FactorLabels string-list based which contains the labels of all variables present in the model
 #'@param Economies string-vector containing the names of the economies which are part of the economic system
 #'@param ModelType string-vector containing the label of the model to be estimated
-#'
+#'@param verbose Logical flag controlling function messaging.
 #'
 #'@keywords internal
 
 Check_comparison__OLS <- function(theta_tilde, theta_OLS, B_check, RiskFactors, N, GVARinputs, JLLinputs,
-                                  FactorLabels, Economies, ModelType){
+                                  FactorLabels, Economies, ModelType, verbose){
 
-  cat('... checking closeness of mean/median to actual estimates ... \n')
+  if (verbose) message('... checking closeness of mean/median to actual estimates ...')
   Phi_set <- m_var(theta_tilde, B_check, RiskFactors, N, GVARinputs, JLLinputs, FactorLabels, Economies,
                    ModelType, flag_mean = TRUE)
   Phi_new <- Phi_set$Phi_new
@@ -377,8 +379,8 @@ Check_comparison__OLS <- function(theta_tilde, theta_OLS, B_check, RiskFactors, 
   theta_new <- as.vector(Phi_new)
 
   dist <- sqrt(mean((theta_new - theta_OLS)^2))
-  cat(paste('Root mean square distance: ', round(dist, 6), "\n"))
-  cat('... Done! \n\n')
+  if (verbose) message(paste('Root mean square distance: ', round(dist, 6)))
+  if (verbose) message('... Done! \n')
 
   return(dist)
 }

@@ -13,6 +13,7 @@ Boot_Fac_Graphs(
   Economies,
   PathsGraphs,
   OutInt,
+  Folder2save,
   WishFacGraphs,
   WishFacGraphsOrtho = NULL
 )
@@ -32,7 +33,9 @@ Boot_Fac_Graphs(
 
 \item{PathsGraphs}{Path to save the desired graphs}
 
-\item{OutInt}{available options are "IRF" and "FEVD"}
+\item{OutInt}{available options are "IRF", "FEVD", "GIRF" or "GFEVD"}
+
+\item{Folder2save}{Folder path where the outputs will be stored.}
 
 \item{WishFacGraphs}{Binary variable reflecting the graphs of interest}
 
