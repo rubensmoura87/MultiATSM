@@ -52,11 +52,12 @@
 InputsForOutputs <- function(ModelType, Horiz, ListOutputWished, OutputLabel, WishStationarityQ, DataFrequency,
                              WishGraphYields = 0, WishGraphRiskFactors = 0, WishOrthoJLLgraphs = 0,
                              WishForwardPremia = 0, LimFP = NULL, WishBootstrap = 0, ListBoot = NULL,
-                             WishForecast = 0, ListForecast = NULL, UnitYields = "Month") {
+                            WishForecast = 0, ListForecast = NULL, UnitYields = "Month") {
 
-  OutputTypeSet <- c("Fit", "IRF", "FEVD", "GIRF", "GFEVD", "TermPremia", "ForwardPremia")
+  OutputTypeSet <- c("RiskFactors", "Fit", "IRF", "FEVD", "GIRF", "GFEVD", "TermPremia", "ForwardPremia")
   IdxWishOut <- match(ListOutputWished, OutputTypeSet)
 
+  if ('RiskFactors' %in% ListOutputWished) {WishRFGraph <- 1}
   if ('Fit' %in% ListOutputWished) {WishFitGraph <- 1}
   if ('TermPremia' %in% ListOutputWished) {WishTPGraph <- 1}
 
@@ -71,8 +72,9 @@ InputsForOutputs <- function(ModelType, Horiz, ListOutputWished, OutputLabel, Wi
 # Initialization
 for (h in 1:length(OutputTypeSet)){
 
-  if (h==1){InputsForOutputs[[ModelType]]$Fit$WishGraphs <- 0}
-  if(h>=2 & h <=5){
+  if (h == 1){InputsForOutputs[[ModelType]]$RiskFactors$WishGraphs <- 0}
+  if (h == 2){InputsForOutputs[[ModelType]]$Fit$WishGraphs <- 0}
+  if(h>=3 & h <=6){
 
 
   InputsForOutputs[[ModelType]][[OutputTypeSet[h]]]$horiz <- Horiz
@@ -90,7 +92,7 @@ for (h in 1:length(OutputTypeSet)){
     }
 
   }
-  if(h > 5){
+  if(h > 6){
   InputsForOutputs[[ModelType]]$RiskPremia$WishGraphs <- 0
   InputsForOutputs[[ModelType]]$ForwardPremia$Limits <- LimFP
   }
@@ -100,9 +102,10 @@ for (h in 1:length(OutputTypeSet)){
 # Filling up the desired outputs
 for (h in IdxWishOut){
 
-  if (h==1){InputsForOutputs[[ModelType]]$Fit$WishGraphs <- WishFitGraph}
+  if (h==1){InputsForOutputs[[ModelType]]$RiskFactors$WishGraphs <- WishRFGraph}
+  if (h==2){InputsForOutputs[[ModelType]]$Fit$WishGraphs <- WishFitGraph}
 
-  if(h>=2 & h <=5){
+  if(h>=3 & h <=6){
 
 InputsForOutputs[[ModelType]][[OutputTypeSet[h]]]$horiz <- Horiz
 
@@ -125,7 +128,7 @@ InputsForOutputs[[ModelType]][[OutputTypeSet[h]]]$WishGraphsOrtho$YieldsBootstra
 }
 }
 
-  if(h == 6){InputsForOutputs[[ModelType]]$RiskPremia$WishGraphs <- WishTPGraph}
+  if(h == 7){InputsForOutputs[[ModelType]]$RiskPremia$WishGraphs <- WishTPGraph}
 
 }
 
@@ -139,7 +142,7 @@ if (WishBootstrap==0){
 }
 
 
-#3) Forecasting list
+# 3) Forecasting list
 if (WishForecast==0){
   InputsForOutputs[[ModelType]]$Forecasting$WishForecast <- 0
 }else{

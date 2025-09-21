@@ -47,6 +47,11 @@ Constructs the model numerical outputs (model fit, IRFs, GIRFs, FEVDs, GFEVDs, a
 \details{
 Both IRFs and FEVDs are computed using the Cholesky decomposition method. The risk factors are ordered as follows: (i) global unspanned factors, and (ii) domestic unspanned and spanned factors for each country. The order of countries follows the sequence defined in the \code{Economies} vector.
 }
+\section{Available methods}{
+
+- `autoplot(object, type)`
+}
+
 \examples{
 data("ParaSetEx")
 data("InpForOutEx")

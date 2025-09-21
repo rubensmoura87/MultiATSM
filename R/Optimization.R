@@ -1,4 +1,4 @@
-#' Peform the minimization of mean(f)
+#' Perform the minimization of mean(f)
 #'
 #' @param f vector-valued objective function (function)
 #' @param ListInputSet list contain starting values and constraints:

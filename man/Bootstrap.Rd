@@ -55,6 +55,11 @@ An object of class 'ATSMModelBoot' containing the following keys elements:
 \description{
 Generates the bootstrap-related outputs
 }
+\section{Available methods}{
+
+- `autoplot(object, NumOutPE, type)`
+}
+
 \examples{
 \donttest{
 data("ParaSetEx")
@@ -71,4 +76,5 @@ InpForOutEx[[ModelType]]$Bootstrap <- list(WishBootstrap = 1, methodBS = 'bs', B
 Boot <- Bootstrap(ModelType, ModelParaEx, NumOutEx, Economy, InpForOutEx, FacLab, JLLlist = NULL,
                  GVARlist = NULL, WishBC = 0, BRWlist = NULL, Folder2save  = NULL, verbose = TRUE)
 }
+
 }

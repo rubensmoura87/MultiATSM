@@ -43,8 +43,9 @@ G <- c() # Extract the number of global factors
 for (h in 1:K){ G[h] <- all(sapply(JLLinputs$Economies, grepl, rownames(NonOrthoFactors))[h,] == 0)}
 G <- length(G[G==TRUE]) # Number of global unspnned factors
 C <- length(JLLinputs$Economies)
-# Factor labels
-Labels_All <- GetLabels_JLL(NonOrthoFactors,JLLinputs, G)
+
+  # Factor labels
+  Labels_All <- GetLabels_JLL(NonOrthoFactors,JLLinputs, G)
 
   # 1) Pre-allocation of the factors set
   Fact_NonOrtho <- Factors_NonOrtho(NonOrthoFactors, JLLinputs, Labels_All, N)
@@ -377,8 +378,8 @@ OrthoReg_JLL <- function(JLLinputs, N, FacSet, FactorLab_NonOrth, FactorLab_JLL)
   Economies <- JLLinputs$Economies
   G <- nrow(FacSet$MacroGlobal)
   C <- length(Economies)
-  M <- nrow(FacSet$FullFactorsSet[[1]]$Macro)
-  K <- (M + N) * C + G
+  K <- length(FactorLab_NonOrth)
+  M <- (K - G)/C - N
 
   # 1) Orthogonalization of the pricing factors
   # Equation 6
@@ -393,7 +394,7 @@ OrthoReg_JLL <- function(JLLinputs, N, FacSet, FactorLab_NonOrth, FactorLab_JLL)
 
       # Ensure Macro is a matrix with the correct orientation
       MacroMat <- if (is.null(dim(Macro))) {
-        matrix(Macro, nrow = length(Macro), ncol = 1)  # Convert to column vector if it's a numeric vector
+        matrix(Macro, ncol = length(Macro))  # Convert to column vector if it's a numeric vector
       } else {  Macro      }
 
       stats::lm(t(PricingMat) ~ t(MacroMat) - 1)
@@ -427,8 +428,15 @@ OrthoReg_JLL <- function(JLLinputs, N, FacSet, FactorLab_NonOrth, FactorLab_JLL)
 
   # 2) Orthogonalization of the macro factors
   MacroRegressEQ8 <- lapply(JLLinputs$Economies, function(economy) {
-    stats::lm(t(FullFactorsSet[[economy]]$Macro) ~ t(MacroGlobal) - 1)
+    if (is.null(dim(FullFactorsSet[[economy]]$Macro))){
+      Macro <- FullFactorsSet[[economy]]$Macro
+      MacroMat <- matrix(Macro, ncol = length(Macro))
+      stats::lm(t(MacroMat) ~ t(MacroGlobal) - 1)
+    }else {
+      stats::lm(t(FullFactorsSet[[economy]]$Macro) ~ t(MacroGlobal) - 1)
+    }
   })
+
   a_W <- lapply(MacroRegressEQ8, function(model) t(model$coefficients))
   M_e <- lapply(MacroRegressEQ8, function(model) t(model$residuals))
 
@@ -442,10 +450,21 @@ OrthoReg_JLL <- function(JLLinputs, N, FacSet, FactorLab_NonOrth, FactorLab_JLL)
 
   if (Label_DU != "None") {
     MacroRegressEQ9 <- lapply(JLLinputs$Economies[-IdxDomUnit], function(economy) {
+      if (is.null(dim(FullFactorsSet[[economy]]$Macro))){
+        Macro <- FullFactorsSet[[economy]]$Macro
+        MacroMat <- matrix(Macro, ncol = length(Macro))
+        stats::lm(t(MacroMat) ~ t(MacroGlobal) - 1)
+      } else {
       stats::lm(t(FullFactorsSet[[economy]]$Macro) ~ t(MacroGlobal) + t(M_e[[Label_DU]]) - 1)
-    })
+    }
+      })
+
     a_W[JLLinputs$Economies[-IdxDomUnit]] <- lapply(MacroRegressEQ9, function(model) t(model$coefficients)[, seq_len(G)])
+    if (M > 1) {
     a_DU_CS[JLLinputs$Economies[-IdxDomUnit]] <- lapply(MacroRegressEQ9, function(model) t(model$coefficients)[, (G + 1):(G + M)])
+    } else {
+    a_DU_CS[JLLinputs$Economies[-IdxDomUnit]] <- lapply(MacroRegressEQ9, function(model) model$coefficients)
+    }
     M_e_CS[JLLinputs$Economies[-IdxDomUnit]] <- lapply(MacroRegressEQ9, function(model) t(model$residuals))
   }
 

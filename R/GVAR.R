@@ -58,6 +58,7 @@
 #' @export
 
 GVAR <- function(GVARinputs, N, CheckInputs = FALSE) {
+
   # 0) Check whether there are inconsistency in the specification of GVARinputs
   if (isTRUE(CheckInputs)) {
     CheckInputsGVAR(GVARinputs, N)
@@ -613,19 +614,9 @@ CheckInputsGVAR <- function(GVARinputs, N){
 #'@param Economies  string-vector containing the names of the economies which are part of the economic system
 #'@param W GVAR transition matrix (C x C)
 #'
-#'@return List containg the star factors of each country of the economic system
+#'@return List contaning the star factors of each country of the economic system
 #'
-#'@examples
-#'data(CM_Factors)
-
-#' Economies <- c("China", "Brazil", "Mexico", "Uruguay")
-#' Wgvar <- matrix( c(0, 0.83, 0.86, 0.38, 0.65, 0, 0.13, 0.55,
-#'          0.32, 0.12, 0, 0.07, 0.03, 0.05, 0.01, 0), nrow = 4, ncol = 4,
-#'          dimnames = list(Economies, Economies))
-#' SF <- StarFactors(RiskFactors, Economies, Wgvar)
-#'
-#'@export
-
+#'@keywords internal
 
 StarFactors <- function(RiskFactors, Economies, W){
 

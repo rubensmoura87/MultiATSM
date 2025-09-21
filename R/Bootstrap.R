@@ -29,6 +29,10 @@
 #' Boot <- Bootstrap(ModelType, ModelParaEx, NumOutEx, Economy, InpForOutEx, FacLab, JLLlist = NULL,
 #'                  GVARlist = NULL, WishBC = 0, BRWlist = NULL, Folder2save  = NULL, verbose = TRUE)
 #'}
+#'
+#' @section Available methods:
+#' - `autoplot(object, NumOutPE, type)`
+#'
 #' @returns
 #' An object of class 'ATSMModelBoot' containing the following keys elements:
 #' \itemize{
@@ -36,6 +40,7 @@
 #' \item List of numerical outputs (IRFs, GIRFs, FEVDs and GFEVDs) for each draw
 #' \item Confidence bounds for the chosen level of significance
 #' }
+#'
 #'
 #' @export
 
@@ -528,9 +533,10 @@ FeedbackMat_BS <- function(ModelType, RiskFactors_TS, FactorLabels, Economies, G
   # b) GVAR single model and  bias correction
     } else if (ModelType ==  "GVAR single" & WishBRW){
     N <- length(FactorLabels$Spanned)
-    PdynPara <- Bias_Correc_VAR(ModelType, SpeInputs$BRWinputs, t(RiskFactors_TS[[1]]), N, Economies, FactorLabels,
+    PdynPara <- Bias_Correc_VAR(ModelType, SpeInputs$BRWinputs, t(RiskFactors_TS[[1]]), Economies, FactorLabels,
                                 SpeInputs$GVARinputs)
-    K1Z_BS <- PdynPara$Phi_tilde
+
+    K1Z_BS <- PdynPara$K1Z_BC
 
   } else {
   # 2) All other specifications

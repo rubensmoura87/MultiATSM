@@ -1,8 +1,8 @@
 #' Creates the folders and the path in which the graphical outputs are stored (point estimate version)
 #'
-#'@param ModelType A character vector indicating the model type to be estimated.
-#'@param Economies A character vector containing the names of the economies included in the system.
-#'@param Folder2save Folder path where the outputs will be stored.
+#' @param ModelType A character vector indicating the model type to be estimated.
+#' @param Economies A character vector containing the names of the economies included in the system.
+#' @param Folder2save Folder path where the outputs will be stored.
 #'
 #'@keywords internal
 

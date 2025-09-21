@@ -6,14 +6,18 @@
 \usage{
 RiskFactorsGraphs(
   ModelType,
+  WishRFgraphs,
   ModelOutputs,
   Economies,
   FactorLabels,
-  Folder2save
+  Folder2save,
+  verbose
 )
 }
 \arguments{
 \item{ModelType}{A character vector indicating the  estimated model type}
+
+\item{WishRFgraphs}{binary variable: set 1, if the user wishes graphs to be generated; or set 0, otherwise}
 
 \item{ModelOutputs}{list of model parameter estimates (see the \code{\link{Optimization}} function)}
 
@@ -22,6 +26,8 @@ RiskFactorsGraphs(
 \item{FactorLabels}{A character vector indicating the model type to be estimated.}
 
 \item{Folder2save}{Folder path where the outputs will be stored.}
+
+\item{verbose}{Logical flag controlling function messaging.}
 }
 \description{
 Spanned and unspanned factors plot
@@ -38,6 +44,7 @@ ModelType <- "JPS original"
 Economy <- "Brazil"
 FacLab <- LabFac(N = 1, DomVar ="Eco_Act" , GlobalVar = "Gl_Eco_Act", Economy, ModelType)
 
-RiskFactorsGraphs(ModelType, ModelParaEx, Economy, FacLab, Folder2save = NULL)
+RiskFactorsGraphs(ModelType, WishRFgraphs = 1, ModelParaEx, Economy, FacLab,
+                  Folder2save = NULL, verbose = FALSE)
 
 }

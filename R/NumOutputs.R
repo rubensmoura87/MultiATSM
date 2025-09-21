@@ -19,6 +19,9 @@
 #' NumOut <- NumOutputs(ModelType, ModelParaEx, InpForOutEx, FacLab, Economy,
 #'                      Folder2save = NULL, verbose = FALSE)
 #'
+#'@section Available methods:
+#'- `autoplot(object, type)`
+#'
 #' @returns
 #' An object of class 'ATSMNumOutputs' containing the following keys elements:
 #' \enumerate{

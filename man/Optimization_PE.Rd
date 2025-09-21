@@ -2,7 +2,7 @@
 % Please edit documentation in R/Optimization.R
 \name{Optimization_PE}
 \alias{Optimization_PE}
-\title{Peform the minimization of mean(f)}
+\title{Perform the minimization of mean(f)}
 \usage{
 Optimization_PE(
   f,
@@ -62,7 +62,7 @@ Optimization_PE(
 \item{verbose}{Logical flag controlling function messaging.}
 }
 \description{
-Peform the minimization of mean(f)
+Perform the minimization of mean(f)
 }
 \examples{
 #' # See an example of implementation in the vignette file of this package (Section 4).

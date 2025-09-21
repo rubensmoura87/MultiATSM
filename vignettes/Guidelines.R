@@ -123,8 +123,8 @@ GVARlist <- list( VARXtype = "unconstrained", W_type = "Sample Mean", t_First_Wg
 JLLlist <- list(DomUnit =  "China")
 
 ## -----------------------------------------------------------------------------
-BRWlist <- within(list(flag_mean = TRUE, gamma = 0.2, N_iter = 500, B = 50, 
-                       checkBRW = TRUE, B_check = 1000), N_burn <- round(N_iter * 0.15))
+BRWlist <- within(list(Cent_Measure = "Mean", gamma = 0.2, N_iter = 500, B = 50, 
+                       checkBRW = TRUE, B_check = 1000, Eigen_rest = 1), N_burn <- round(N_iter * 0.15))
 
 ## ----eval=FALSE---------------------------------------------------------------
 # LoadData("CM_2024")
@@ -225,10 +225,6 @@ N <- 3
 GVARpara <- GVAR(GVARinputs, N, CheckInputs = TRUE)
 
 ## -----------------------------------------------------------------------------
-data('CM_Factors')
-StaFac <- StarFactors(RiskFactors, Economies, W_gvar)
-
-## -----------------------------------------------------------------------------
 ModelType <- "JLL original"   
 JLLinputs <- list(Economies = Economies, DomUnit = "China", WishSigmas = 1,  SigmaNonOrtho = NULL,
                   JLLModelType = ModelType)
@@ -278,9 +274,9 @@ JLLinputs <- list(Economies = Economies, DomUnit = "China", WishSigmas = 1,  Sig
 # # DomUnit: name of the economy of the economic system, or "None" for the model "JLL No DomUnit"
 # ###################################### BRW inputs  ######################################################
 # WishBC <- 0 # Wish to estimate the model with the bias correction method of BRW (2012): #YES: 1, NO:0
-# BRWlist <- within(list(flag_mean = TRUE, gamma = 0.05, N_iter = 250, B = 50, checkBRW = TRUE,
-#                        B_check = 1000),  N_burn <- round(N_iter * 0.15))
-# # flag_mean: TRUE = compute the mean; FALSE = compute the median
+# BRWlist <- within(list(Cent_Measure = "Mean", gamma = 0.05, N_iter = 250, B = 50, checkBRW = TRUE,
+#                        B_check = 1000, Eigen_rest = 1),  N_burn <- round(N_iter * 0.15))
+# # Cent_Measure: "Mean" = compute the mean; "Median" = compute the median
 # # gamma: Adjustment parameter
 # # N_iter:  Number of iteration to be conserved
 # # N_burn:  Number of iteration to be discarded

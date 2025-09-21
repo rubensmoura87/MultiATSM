@@ -31,7 +31,7 @@ InputsForOpt(
 
 \item{ModelType}{A character vector indicating the model type to be estimated. Available options: "JPS original", "JPS global", "GVAR single", "JPS multi", "GVAR multi", "JLL original", "JLL No DomUnit", "JLL joint Sigma".}
 
-\item{Yields}{A numerical matrix with time series of yields (JxT or CJ x T)}
+\item{Yields}{A numerical matrix with time series of yields (J x T or CJ x T)}
 
 \item{GlobalMacro}{A numerical matrix with time series of the global risk factors (G x T)}
 

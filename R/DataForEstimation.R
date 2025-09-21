@@ -1,7 +1,7 @@
 #' Retrieves data from Excel and build the database used in the model estimation
 #'
-#' @param t0 Start date of the sample period in the format yyyy-mm-dd.
-#' @param tF End date of the sample period in the format yyyy-mm-dd.
+#' @param t0 Start date of the sample period in the format yyyy-mm-dd. Day form must be "01"
+#' @param tF End date of the sample period in the format yyyy-mm-dd. Day form must be "01".
 #' @param Economies A character vector containing the names of the economies included in the system.
 #' @param N Integer. Number of country-specific spanned factors.
 #' @param FactorLabels String-list based which contains the labels of all the variables present in the model

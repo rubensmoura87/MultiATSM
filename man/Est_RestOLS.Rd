@@ -4,14 +4,14 @@
 \alias{Est_RestOLS}
 \title{Estimate a restricted OLS model}
 \usage{
-Est_RestOLS(LHS, RHS, Bmat)
+Est_RestOLS(LHS, RHS, Rmat)
 }
 \arguments{
 \item{LHS}{left hand side variables (M x T).}
 
 \item{RHS}{right hand side variables (should include the intercept, if desired) (N x T).}
 
-\item{Bmat}{matrix of constraints (M x N). Entries containing NAs are treated as free parameters.}
+\item{Rmat}{matrix of constraints (M x N). Entries containing NAs are treated as free parameters.}
 }
 \value{
 matrix of coefficient (M x N)

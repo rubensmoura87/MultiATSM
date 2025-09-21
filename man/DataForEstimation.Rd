@@ -21,9 +21,9 @@ DataForEstimation(
 )
 }
 \arguments{
-\item{t0}{Start date of the sample period in the format yyyy-mm-dd.}
+\item{t0}{Start date of the sample period in the format yyyy-mm-dd. Day form must be "01"}
 
-\item{tF}{End date of the sample period in the format yyyy-mm-dd.}
+\item{tF}{End date of the sample period in the format yyyy-mm-dd. Day form must be "01".}
 
 \item{Economies}{A character vector containing the names of the economies included in the system.}
 

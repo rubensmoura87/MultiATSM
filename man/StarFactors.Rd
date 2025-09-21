@@ -14,17 +14,9 @@ StarFactors(RiskFactors, Economies, W)
 \item{W}{GVAR transition matrix (C x C)}
 }
 \value{
-List containg the star factors of each country of the economic system
+List contaning the star factors of each country of the economic system
 }
 \description{
 Generates the star variables necessary for the GVAR estimation
 }
-\examples{
-data(CM_Factors)
-Economies <- c("China", "Brazil", "Mexico", "Uruguay")
-Wgvar <- matrix( c(0, 0.83, 0.86, 0.38, 0.65, 0, 0.13, 0.55,
-         0.32, 0.12, 0, 0.07, 0.03, 0.05, 0.01, 0), nrow = 4, ncol = 4,
-         dimnames = list(Economies, Economies))
-SF <- StarFactors(RiskFactors, Economies, Wgvar)
-
-}
+\keyword{internal}

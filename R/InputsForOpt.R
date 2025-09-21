@@ -3,7 +3,7 @@
 #' @param InitialSampleDate Start date of the sample period in the format "dd-mm-yyyy"
 #' @param FinalSampleDate End date of the sample period in the format "dd-mm-yyyy"
 #' @param ModelType A character vector indicating the model type to be estimated. Available options: "JPS original", "JPS global", "GVAR single", "JPS multi", "GVAR multi", "JLL original", "JLL No DomUnit", "JLL joint Sigma".
-#' @param Yields A numerical matrix with time series of yields (JxT or CJ x T)
+#' @param Yields A numerical matrix with time series of yields (J x T or CJ x T)
 #' @param GlobalMacro A numerical matrix with time series of the global risk factors (G x T)
 #' @param DomMacro A numerical matrix with time series of the country-specific risk factors for all C countries (CM x T)
 #' @param FactorLabels A list of character vectors with labels for all variables in the model.
@@ -18,7 +18,7 @@
 #' @param BS_Adj Logical. Whether to adjust the global series for the sepQ models in the Bootstrap setting. Default is FALSE.
 #' @param verbose Logical flag controlling function messaging. Default is TRUE.
 #'
-#'@importFrom pracma null
+#' @importFrom pracma null
 #'
 #' @return An object of class 'ATSMModelInputs' containing the necessary inputs for performing the model optimization.
 #'
@@ -605,7 +605,6 @@ GeneralMLEInputs <- function(Yields, RiskFactors, FactorLabels, mat, DataFrequen
   return(ListInputs)
 }
 
-
 ##############################################################################################################
 #'Compute the parameters used in the P-dynamics of the model
 #'
@@ -643,6 +642,7 @@ GetPdynPara <- function(RiskFactors, FactorLabels, Economies, ModelType, BRWinpu
     tryCatch({
       PdynPara <- GetPdynPara_BC(ModelType, BRWinputs, RiskFactors, Economies, FactorLabels, GVARinputs,
                                  JLLinputs, verbose)
+
     }, error = function(err) {
       stop("BRW procedure leads to a highly collinear system. Please choose another combination of BRW parameters.")})
 
@@ -741,7 +741,6 @@ Outputs2exportMLE <- function(Label_Multi_Models, Economies, RiskFactors, Yields
 
 GetPdynPara_BC <- function(ModelType, BRWinputs, RiskFactors, Economies, FactorLabels, GVARinputs, JLLinputs, verbose){
 
-  N <- length(FactorLabels$Spanned)
   C <- length(Economies)
 
   if (any(ModelType == c("JPS original", "JPS global", "GVAR single"))){
@@ -750,17 +749,20 @@ GetPdynPara_BC <- function(ModelType, BRWinputs, RiskFactors, Economies, FactorL
     RiskFactors_CS <- RiskFactors[[Economies[i]]]
 
     if (verbose) message(paste("Estimation for country:", Economies[i]))
-    BiasCorrec <- Bias_Correc_VAR(ModelType, BRWinputs, t(RiskFactors_CS), N, Economies, FactorLabels,
+
+    BiasCorrec <- Bias_Correc_VAR(ModelType, BRWinputs, t(RiskFactors_CS), Economies, FactorLabels,
                                   GVARinputs, JLLinputs, verbose = verbose)
-    PdynPara[[Economies[i]]] <- list (K0Z = BiasCorrec$mu_tilde, K1Z = BiasCorrec$Phi_tilde,
-                                      SSZ = BiasCorrec$V_tilde)
+
+    PdynPara[[Economies[i]]] <- list (K0Z = BiasCorrec$K0Z_BC, K1Z = BiasCorrec$K1Z_BC,
+                                      SSZ = BiasCorrec$SSZ_BC)
   }
 } else{
-  BiasCorrec <- Bias_Correc_VAR(ModelType, BRWinputs, t(RiskFactors), N, Economies, FactorLabels,
+
+  BiasCorrec <- Bias_Correc_VAR(ModelType, BRWinputs, t(RiskFactors), Economies, FactorLabels,
                                 GVARinputs, JLLinputs, verbose = verbose)
-  K0Z <- BiasCorrec$mu_tilde
-  K1Z <- BiasCorrec$Phi_tilde
-  SSZ <- BiasCorrec$V_tilde
+  K0Z <- BiasCorrec$K0Z_BC
+  K1Z <- BiasCorrec$K1Z_BC
+  SSZ <- BiasCorrec$SSZ_BC
 }
 
 # Export outputs

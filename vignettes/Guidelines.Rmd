@@ -374,10 +374,10 @@ framework proposed by BRW (2012) to each one of its ATSM types. Some
 additional inputs must be specified, if the user intends to perform the
 model estimation along the lines of BRW (2012). They are:
 
--   *Mean or median of OLS estimates* *(flag_mean)*: the user must
-    decide whether to compute the mean or median of the OLS estimates
+-   *Mean or median of P-dynamics estimates* *(Cent_Measure)*: the user must
+    decide whether to compute the mean or median of the physical dynamics estimates
     after each bootstrap iteration. To compute the mean (median), the
-    user must set *TRUE* (*FALSE*);
+    user must set *Mean* (*Median*);
 
 -   *Adjustment parameter* *(gamma)*: this parameter controls the degree
     of shrinkage between the difference in the OLS estimates and the BRW
@@ -402,10 +402,13 @@ model estimation along the lines of BRW (2012). They are:
     to be discarded in the first stage of the bias-correction estimation
     process. The recommended number is $15\%$ of the total number of
     iterations.
+  
+-   *Eigenvalue restriction (Eigen_rest)*: set a restriction on the largest eigenvalue 
+     under the $P$-measure. Default is $1$.    
 
 ```{r}
-BRWlist <- within(list(flag_mean = TRUE, gamma = 0.2, N_iter = 500, B = 50, 
-                       checkBRW = TRUE, B_check = 1000), N_burn <- round(N_iter * 0.15))
+BRWlist <- within(list(Cent_Measure = "Mean", gamma = 0.2, N_iter = 500, B = 50, 
+                       checkBRW = TRUE, B_check = 1000, Eigen_rest = 1), N_burn <- round(N_iter * 0.15))
 ```
 
 ## The `InputsForOpt()` function
@@ -741,14 +744,6 @@ N <- 3
 GVARpara <- GVAR(GVARinputs, N, CheckInputs = TRUE)
 ```
 
-A separate routine is provided for computing the foreign-specific
-factors (also commonly referred to as the star variables) used in the
-estimation of the VARX models.
-
-```{r}
-data('CM_Factors')
-StaFac <- StarFactors(RiskFactors, Economies, W_gvar)
-```
 
 ### JLL {#S:SectionJLL}
 
@@ -881,9 +876,9 @@ JLLlist <- list(DomUnit =  "China")
 # DomUnit: name of the economy of the economic system, or "None" for the model "JLL No DomUnit"
 ###################################### BRW inputs  ######################################################
 WishBC <- 0 # Wish to estimate the model with the bias correction method of BRW (2012): #YES: 1, NO:0
-BRWlist <- within(list(flag_mean = TRUE, gamma = 0.05, N_iter = 250, B = 50, checkBRW = TRUE,
-                       B_check = 1000),  N_burn <- round(N_iter * 0.15))
-# flag_mean: TRUE = compute the mean; FALSE = compute the median
+BRWlist <- within(list(Cent_Measure = "Mean", gamma = 0.05, N_iter = 250, B = 50, checkBRW = TRUE,
+                       B_check = 1000, Eigen_rest = 1),  N_burn <- round(N_iter * 0.15))
+# Cent_Measure: "Mean" = compute the mean; "Median" = compute the median
 # gamma: Adjustment parameter
 # N_iter:  Number of iteration to be conserved
 # N_burn:  Number of iteration to be discarded

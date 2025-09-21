@@ -320,11 +320,12 @@ autoplot.ATSMNumOutputs <- function(x, type, ...) {
   verb <- FALSE
   UMY <- info$Inputs$UnitMatYields
 
+  #ModelType, WishRFgraphs, ModelOutputs, Economies, FactorLabels, Folder2save, verbose
   # 3) Dispatch to appropriate plotting function
   switch(type,
          # 1) Risk Factors
          RiskFactors = RiskFactorsGraphs(
-           MT, MP, Eco, FL, F2S
+           MT, WishRFgraphs= 1, MP, Eco, FL, F2S, verb
          ),
          # 2) Fit
          Fit = Fitgraphs(

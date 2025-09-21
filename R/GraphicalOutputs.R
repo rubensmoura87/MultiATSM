@@ -24,9 +24,9 @@ GraphicalOutputs <- function(ModelType, ModelPara, NumOut, InputsForOutputs, Eco
   PathsGraphs <- FolderCreationPoint(ModelType, Economies, Folder2save)
 
   # 1) Plot the set of risk factors
-  RiskFactorsGraphs(ModelType, ModelPara, Economies, FactorLabels, Folder2save)
-
   if (verbose) message("2.3) Generating the graphs of interest")
+  RiskFactorsGraphs(ModelType, InputsForOutputs[[ModelType]]$RiskFactors$WishGraphs, ModelPara, Economies,
+                    FactorLabels, Folder2save, verbose)
 
   if (ModelType %in% c("JPS original", "JPS global", "GVAR single")) {
     for (i in 1:length(Economies)) {
@@ -80,10 +80,12 @@ GraphicalOutputs <- function(ModelType, ModelPara, NumOut, InputsForOutputs, Eco
 #' Spanned and unspanned factors plot
 #'
 #' @param ModelType A character vector indicating the  estimated model type
+#' @param WishRFgraphs binary variable: set 1, if the user wishes graphs to be generated; or set 0, otherwise
 #' @param ModelOutputs list of model parameter estimates (see the \code{\link{Optimization}} function)
 #' @param Economies A character vector containing the names of the economies included in the system.
 #' @param FactorLabels A character vector indicating the model type to be estimated.
 #' @param Folder2save Folder path where the outputs will be stored.
+#' @param verbose Logical flag controlling function messaging.
 #'
 #' @examples
 #' data("ParaSetEx")
@@ -92,15 +94,24 @@ GraphicalOutputs <- function(ModelType, ModelPara, NumOut, InputsForOutputs, Eco
 #' Economy <- "Brazil"
 #' FacLab <- LabFac(N = 1, DomVar ="Eco_Act" , GlobalVar = "Gl_Eco_Act", Economy, ModelType)
 #'
-#' RiskFactorsGraphs(ModelType, ModelParaEx, Economy, FacLab, Folder2save = NULL)
+#' RiskFactorsGraphs(ModelType, WishRFgraphs = 1, ModelParaEx, Economy, FacLab,
+#'                   Folder2save = NULL, verbose = FALSE)
 #'
 #' @section Available Methods:
 #' - `autoplot(object, type = "RiskFactors")`
 #'
 #' @export
 
-RiskFactorsGraphs <- function(ModelType, ModelOutputs, Economies, FactorLabels, Folder2save) {
+RiskFactorsGraphs <- function(ModelType, WishRFgraphs, ModelOutputs, Economies, FactorLabels, Folder2save, verbose) {
 
+
+  if (WishRFgraphs == 0) {
+    if (verbose) message("No graphs for risk factor dynamics were generated")
+    return(invisible(NULL))
+
+  }
+
+  if (verbose) message(' ** Risk Factor dynamics')
   # Custom ggplot theme
   theme_custom <- function() {
     theme_classic() +
@@ -827,7 +838,9 @@ TPDecompGraph <- function(ModelType, NumOut, ModelPara, WishRPgraphs, UnitYields
       geom_line(aes(x = TimeSpan, y = Data, color = GraphLegend[1])) +
       geom_line(aes(x = TimeSpan, y = ExpCom, color = GraphLegend[2])) +
       geom_line(aes(x = TimeSpan, y = TP, color = GraphLegend[3])) +
-      labs(color = "Legend") + ggtitle(title) +  theme_classic() +
+      labs(color = "Legend") +
+      scale_color_manual(values = c("black", "#0072B2", "#D55E00")) +
+      ggtitle(title) +  theme_classic() +
       theme(plot.title = element_text(size = 8, face = "bold", hjust = 0.5),
             axis.title.x = element_blank(),
             axis.title.y = element_blank(),
@@ -911,9 +924,9 @@ TPDecompGraph <- function(ModelType, NumOut, ModelPara, WishRPgraphs, UnitYields
     built_plot <- ggplot_build(
       plot_list_RP[[1]] +  # Start with your original plot
         theme(legend.direction = "horizontal", legend.position = "bottom", legend.justification = "center",
-              legend.title = element_text(size = 10, face = "bold"),
-              legend.text = element_text(size = 8),
-              legend.box.background = element_rect(colour = "black")))
+              legend.title = element_blank(),
+              legend.text = element_text(size = 8)
+              ))
 
     gtable_plot <- ggplot_gtable(built_plot)
 
@@ -1003,14 +1016,13 @@ Fit_Subplot <- function(YieldData, ModelFit, ModelImplied, MatLength, mat, Econo
   # Generate legend
   # Legend settings:
   built_plot <- ggplot_build(
-    plot_list_FIT[[1]] +  # Start with your original plot
+    plot_list_FIT[[1]] +  # Start with the original plot
       theme(
         legend.direction = "horizontal",
         legend.position = "bottom",
         legend.justification = "center",
-        legend.title = element_text(size = 10, face = "bold"),
-        legend.text = element_text(size = 8),
-        legend.background = element_rect(color = "black", fill = "white")
+        legend.title = element_blank(),
+        legend.text = element_text(size = 8)
       )
   )
 

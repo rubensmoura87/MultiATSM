@@ -187,8 +187,8 @@ GVARlist <- list( VARXtype = "unconstrained", W_type = "Sample Mean", t_First_Wg
 JLLlist <- list(DomUnit =  "China")
 ###################################### BRW inputs  ######################################################
 WishBC <- 1
-BRWlist <- within(list(flag_mean = TRUE, gamma = 0.001, N_iter = 200, B = 50, checkBRW = TRUE,
-                       B_check = 1000),  N_burn <- round(N_iter * 0.15))
+BRWlist <- within(list(Cent_Measure = "Mean", gamma = 0.001, N_iter = 200, B = 50, checkBRW = TRUE,
+                       B_check = 1000, Eigen_rest = 1),  N_burn <- round(N_iter * 0.15))
 
 # C) Decide on Settings for numerical outputs
 WishFPremia <- 1

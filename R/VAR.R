@@ -53,18 +53,18 @@ VAR <- function(RiskFactors, VARtype, Bcon_Mat = NULL) {
 #'
 #' @param LHS left hand side variables (M x T).
 #' @param RHS right hand side variables (should include the intercept, if desired) (N x T).
-#' @param Bmat matrix of constraints (M x N). Entries containing NAs are treated as free parameters.
+#' @param Rmat matrix of constraints (M x N). Entries containing NAs are treated as free parameters.
 #'
 #' @return matrix of coefficient (M x N)
 #' @keywords internal
 
-Est_RestOLS <- function(LHS, RHS, Bmat) {
+Est_RestOLS <- function(LHS, RHS, Rmat) {
 
   T_dim <- ncol(LHS)
 
   # Identify constrained vs free parameters
-  idx_FreePara <- is.nan(Bmat) # TRUE = free parameter
-  Betas  <- Bmat
+  idx_FreePara <- is.nan(Rmat) # TRUE = free parameter
+  Betas  <- Rmat
   Betas[is.nan(Betas)] <- 0
 
   # Precompute common matrices
