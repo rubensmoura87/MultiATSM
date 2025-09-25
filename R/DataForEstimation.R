@@ -7,6 +7,9 @@
 #' @param FactorLabels String-list based which contains the labels of all the variables present in the model
 #' @param ModelType String-vector containing the label of the model to be estimated
 #' @param DataFrequency Character-based-vector. Available options are: "Daily All Days", "Daily Business Days", "Weekly", "Monthly", "Quarterly", "Annually"
+#' @param Macro_FullData  List containing a full set of macroeconomic data.
+#' @param Yields_FullData List containing a full set of bond yield data
+#' @param DataConnect List containing data for computing bilateral contentedness measures. Default is NULL.
 #' @param W_type Three possibilities:
 #' \itemize{
 #'      \item \code{Full Sample}: if one wishes ALL weight matrices of each year from which data is available (it may extrapolate the sample period);
@@ -15,9 +18,6 @@
 #' }
 #' @param t_First_Wgvar Sample starting date (year)
 #' @param t_Last_Wgvar Sample last date (year)
-#' @param DataPathMacro Path of the Excel file containing the macroeconomic data (if any). The default is linked to the excel file present in the package.
-#' @param DataPathYields Path of the Excel file containing the yields data (if any). The default is linked to the excel file present in the package.
-#' @param DataPathTrade Path of the Excel file containing the trade data (if any). The default is linked to the excel file present in the package.
 #'
 #' @return A list containing the
 #' \enumerate{
@@ -30,33 +30,39 @@
 #' @seealso \code{\link{InputsForOpt}}
 #'
 #' @examples
-#' DomVar <- c("Eco_Act", "Inflation")
-#' GlobalVar <- c("GBC", "CPI_OECD")
-#' t0 <- "2006-09-01"
-#' tF <-  "2019-01-01"
-#' Economies <- c("China", "Brazil", "Mexico", "Uruguay", "Russia")
-#' N <- 2
-#' ModelType <- "JPS original"
-#' FactorLabels <-  LabFac(N, DomVar, GlobalVar, Economies, ModelType)
-#' DataFrequency <- "Monthly"
 #'
-#' DataModel <- DataForEstimation(t0, tF, Economies, N, FactorLabels, ModelType, DataFrequency)
+#'  DomVar <- c("Eco_Act", "Inflation")
+#'  GlobalVar <- c("GBC", "CPI_OECD")
+#'  t0 <- "2006-09-01"
+#'  tF <-  "2019-01-01"
+#'  Economies <- c("China", "Brazil", "Mexico", "Uruguay", "Russia")
+#'  N <- 2
+#'  ModelType <- "JPS original"
+#'  FactorLabels <-  LabFac(N, DomVar, GlobalVar, Economies, ModelType)
+#'  DataFrequency <- "Monthly"
+#'
+#'#  Retrieve data from excel files
+#' MacroData  <- Load_Excel_Data(system.file("extdata", "MacroData.xlsx", package = "MultiATSM"))
+#' YieldData <- Load_Excel_Data(system.file("extdata", "YieldsData.xlsx", package = "MultiATSM"))
+#'
+#'  DataModel <- DataForEstimation(t0, tF, Economies, N, FactorLabels, ModelType, DataFrequency,
+#'                                 MacroData, YieldData)
 #'
 #' @export
 
-DataForEstimation <- function(t0, tF, Economies, N, FactorLabels, ModelType, DataFrequency, W_type= NULL,
-                              t_First_Wgvar= NULL, t_Last_Wgvar = NULL, DataPathMacro = NULL, DataPathYields = NULL,
-                              DataPathTrade = NULL) {
+DataForEstimation <- function(t0, tF, Economies, N, FactorLabels, ModelType, DataFrequency, Macro_FullData,
+                              Yields_FullData, DataConnect = NULL, W_type= NULL, t_First_Wgvar= NULL,
+                              t_Last_Wgvar = NULL) {
 
   C <- length(Economies)
 
   # Compute the transition matrix if the model is GVAR-based
   if (any(ModelType == c('GVAR single','GVAR multi'))) {
-    Wgvar <- Transition_Matrix(t_First_Wgvar, t_Last_Wgvar, Economies, W_type, DataPathTrade)
+    Wgvar <- Transition_Matrix(t_First_Wgvar, t_Last_Wgvar, Economies, W_type, DataConnect)
   }
 
   # Prepare the database
-  FactorSet <- DatabasePrep(t0, tF, Economies, N, FactorLabels, ModelType, Wgvar, DataPathMacro, DataPathYields)
+  FactorSet <- DatabasePrep(t0, tF, Economies, N, FactorLabels, ModelType, Macro_FullData, Yields_FullData, Wgvar)
 
   # Gather all bond yields of all countries
   Yields <- c()
@@ -84,3 +90,26 @@ DataForEstimation <- function(t0, tF, Economies, N, FactorLabels, ModelType, Dat
   return(Outputs)
 }
 
+##########################################################################################################
+#' Read data from Excel files and transform them into a dataframe
+#'
+#'@param ExcelFilePath Path of the excel file
+#'
+#'@examples
+#'  if (!requireNamespace("readxl", quietly = TRUE)) {
+#'  stop(
+#'    "Please install package \"readxl\" to use this feature.",
+#'    call. = FALSE
+#'  )
+#'
+#' Load_Excel_Data(system.file("extdata", "MacroData.xlsx", package = "MultiATSM"))
+#' Load_Excel_Data(system.file("extdata", "YieldsData.xlsx", package = "MultiATSM"))
+#'  }
+#'@export
+
+Load_Excel_Data <- function(ExcelFilePath) {
+  sheets <- readxl::excel_sheets(ExcelFilePath)
+  out <- lapply(sheets, function(x) readxl::read_excel(ExcelFilePath, sheet = x))
+  names(out) <- sheets
+  out
+}

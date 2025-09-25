@@ -12,12 +12,12 @@ DataForEstimation(
   FactorLabels,
   ModelType,
   DataFrequency,
+  Macro_FullData,
+  Yields_FullData,
+  DataConnect = NULL,
   W_type = NULL,
   t_First_Wgvar = NULL,
-  t_Last_Wgvar = NULL,
-  DataPathMacro = NULL,
-  DataPathYields = NULL,
-  DataPathTrade = NULL
+  t_Last_Wgvar = NULL
 )
 }
 \arguments{
@@ -35,6 +35,12 @@ DataForEstimation(
 
 \item{DataFrequency}{Character-based-vector. Available options are: "Daily All Days", "Daily Business Days", "Weekly", "Monthly", "Quarterly", "Annually"}
 
+\item{Macro_FullData}{List containing a full set of macroeconomic data.}
+
+\item{Yields_FullData}{List containing a full set of bond yield data}
+
+\item{DataConnect}{List containing data for computing bilateral contentedness measures. Default is NULL.}
+
 \item{W_type}{Three possibilities:
 \itemize{
      \item \code{Full Sample}: if one wishes ALL weight matrices of each year from which data is available (it may extrapolate the sample period);
@@ -45,12 +51,6 @@ DataForEstimation(
 \item{t_First_Wgvar}{Sample starting date (year)}
 
 \item{t_Last_Wgvar}{Sample last date (year)}
-
-\item{DataPathMacro}{Path of the Excel file containing the macroeconomic data (if any). The default is linked to the excel file present in the package.}
-
-\item{DataPathYields}{Path of the Excel file containing the yields data (if any). The default is linked to the excel file present in the package.}
-
-\item{DataPathTrade}{Path of the Excel file containing the trade data (if any). The default is linked to the excel file present in the package.}
 }
 \value{
 A list containing the
@@ -65,17 +65,23 @@ A list containing the
 Retrieves data from Excel and build the database used in the model estimation
 }
 \examples{
-DomVar <- c("Eco_Act", "Inflation")
-GlobalVar <- c("GBC", "CPI_OECD")
-t0 <- "2006-09-01"
-tF <-  "2019-01-01"
-Economies <- c("China", "Brazil", "Mexico", "Uruguay", "Russia")
-N <- 2
-ModelType <- "JPS original"
-FactorLabels <-  LabFac(N, DomVar, GlobalVar, Economies, ModelType)
-DataFrequency <- "Monthly"
 
-DataModel <- DataForEstimation(t0, tF, Economies, N, FactorLabels, ModelType, DataFrequency)
+ DomVar <- c("Eco_Act", "Inflation")
+ GlobalVar <- c("GBC", "CPI_OECD")
+ t0 <- "2006-09-01"
+ tF <-  "2019-01-01"
+ Economies <- c("China", "Brazil", "Mexico", "Uruguay", "Russia")
+ N <- 2
+ ModelType <- "JPS original"
+ FactorLabels <-  LabFac(N, DomVar, GlobalVar, Economies, ModelType)
+ DataFrequency <- "Monthly"
+
+#  Retrieve data from excel files
+MacroData  <- Load_Excel_Data(system.file("extdata", "MacroData.xlsx", package = "MultiATSM"))
+YieldData <- Load_Excel_Data(system.file("extdata", "YieldsData.xlsx", package = "MultiATSM"))
+
+ DataModel <- DataForEstimation(t0, tF, Economies, N, FactorLabels, ModelType, DataFrequency,
+                                MacroData, YieldData)
 
 }
 \seealso{

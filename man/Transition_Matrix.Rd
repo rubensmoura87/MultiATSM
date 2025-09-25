@@ -4,14 +4,7 @@
 \alias{Transition_Matrix}
 \title{Computes the transition matrix required in the estimation of the GVAR model}
 \usage{
-Transition_Matrix(
-  t_First,
-  t_Last,
-  Economies,
-  type,
-  DataConnectedness = NULL,
-  DataPath = NULL
-)
+Transition_Matrix(t_First, t_Last, Economies, type, DataConnectedness)
 }
 \arguments{
 \item{t_First}{Sample starting date (in the format: yyyy).}
@@ -27,9 +20,7 @@ Transition_Matrix(
      \item A specific year (e.g., "1998", "2005"): Used to compute time-invariant interdependence for the specified year.
 }}
 
-\item{DataConnectedness}{Data used to compute the transition matrix. Default is set to NULL.}
-
-\item{DataPath}{Path to the Excel file containing the data (if applicable). The default is linked to the Excel file available in the package.}
+\item{DataConnectedness}{Data used to compute the transition matrix.}
 }
 \value{
 matrix or list of matrices
@@ -42,12 +33,39 @@ If there is missing data for any country of the system for that particularly yea
 then the transition matrix will include only NAs.
 }
 \examples{
-data(CM_Trade)
-
 t_First <- "2006"
 t_Last <-  "2019"
 Economies <- c("China", "Brazil", "Mexico", "Uruguay")
 type <- "Sample Mean"
-W_mat <- Transition_Matrix(t_First, t_Last, Economies, type, DataConnectedness = TradeFlows)
+GetExcelData <- FALSE
+
+ if (GetExcelData) {
+ if (!requireNamespace("readxl", quietly = TRUE)) {
+ stop(
+   "Please install package \"readxl\" to use this feature.",
+   call. = FALSE
+ )
+   DataPath <- system.file("extdata", "TradeData.xlsx", package = "MultiATSM")
+   tab_names_Trade <- readxl::excel_sheets(DataPath)
+   list_all_Trade <- suppressMessages(lapply(tab_names_Trade, function(x)
+                     readxl::read_excel(path = DataPath, sheet = x)))
+   names(list_all_Trade) <- tab_names_Trade
+
+   L <- length(list_all_Trade)
+
+   for (i in 1:L) {
+     Countries <- list_all_Trade[[i]][[1]]
+     list_all_Trade[[i]] <- as.data.frame(list_all_Trade[[i]][,-1])
+     rownames(list_all_Trade[[i]]) <- Countries
+   }
+
+   DataConnectedness <- list_all_Trade
+ }
+} else {
+ data(CM_Trade)
+ DataConnectedness <- TradeFlows
+}
+
+W_mat <- Transition_Matrix(t_First, t_Last, Economies, type, DataConnectedness)
 
 }

@@ -1,68 +1,66 @@
 #' Gather data of several countries in a list. Particularly useful for GVAR-based setups (Compute "GVARFactors")
 #'
-#'@param t_First        Start date of the sample period in the format yyyy-mm-dd.
-#'@param t_Last         End date of the sample period in the format yyyy-mm-dd.
-#'@param Economies      A character vector containing the names of the economies included in the system.
-#'@param N              Integer. Number of country-specific spanned factors.
-#'@param FactorLabels   A list of character vectors with labels for all variables in the model.
-#'@param ModelType      A character vector indicating the model type to be estimated.
-#'@param Wgvar          GVAR transition matrix of size C x C, applicable if a GVAR-type model is selected. Default is NULL.
-#'@param DataPathMacro  File path to the Excel file containing macroeconomic data, if provided. The default path points to the Excel file available within the package.
-#'@param DataPathYields File path to the Excel file containing yields data, if provided. The default path points to the Excel file available within the package
-#'
+#' @param t_First        Start date of the sample period in the format yyyy-mm-dd.
+#' @param t_Last         End date of the sample period in the format yyyy-mm-dd.
+#' @param Economies      A character vector containing the names of the economies included in the system.
+#' @param N              Integer. Number of country-specific spanned factors.
+#' @param FactorLabels   A list of character vectors with labels for all variables in the model.
+#' @param ModelType      A character vector indicating the model type to be estimated.
+#' @param Macro_FullData  List containing a full set of macroeconomic data.
+#' @param Yields_FullData  List containing a full set of bond yield data
+#' @param Wgvar          GVAR transition matrix of size C x C, applicable if a GVAR-type model is selected. Default is NULL.
 #'
 #'
 #'@examples
-#' DomVar <- c("Eco_Act", "Inflation")
-#' GlobalVar <- c("GBC", "CPI_OECD")
-#' t0 <- "2006-09-01"
-#' tF <-  "2019-01-01"
-#' Economies <- c("China", "Brazil", "Mexico", "Uruguay", "Russia")
-#' N <- 3
+#'
+#' # Load data from excel
+#' macro_data  <- Load_Excel_Data(system.file("extdata", "MacroData.xlsx", package = "MultiATSM"))
+#' yields_data <- Load_Excel_Data(system.file("extdata", "YieldsData.xlsx", package = "MultiATSM"))
+#' trade_data  <- Load_Excel_Data(system.file("extdata", "TradeData.xlsx", package = "MultiATSM"))
+#'
+#' # Adjust trade data
+#'trade_data <- lapply(trade_data, function(df) {
+#'  countries <- df[[1]]
+#'  df <- as.data.frame(df[-1])
+#'  rownames(df) <- countries
+#'  df
+#'})
+#'
+#' # Define features of interest
 #' ModelType <- "GVAR multi"
+#'Economies <- c("China", "Uruguay", "Russia")
+#' GlobalVar <- c("GBC", "CPI_OECD")
+#'DomVar <- c("Eco_Act", "Inflation")
+#' N <- 3
+#' t0 <- "2006-09-01"
+#' tF <- "2019-01-01"
+#'
+#'
+#' # Compute some inputs
 #' FactorLabels <-  LabFac(N, DomVar, GlobalVar, Economies, ModelType)
-#' Wgvar <- Transition_Matrix(t_First = "2006", t_Last= "2019", Economies, type = "Sample Mean")
+#' Wgvar <- Transition_Matrix(t_First = "2006", t_Last= "2019", Economies,
+#'                           type = "Sample Mean", trade_data)
 #'
-#'
-#' GVARFactors <- DatabasePrep(t0, tF, Economies, N, FactorLabels, ModelType, Wgvar)
-#'
+#' # Compute GVARFactors
+#'GVARFactors <- DatabasePrep(t0, tF, Economies, N, FactorLabels, ModelType, macro_data,
+#'                            yields_data, Wgvar)
 #'
 #'@returns
-#' List containing the risk factor set used in the estimation of the GVAR-based models
+#' List containing the risk factor set. This list is particularly useful for the estimation of the GVAR-based models.
 #'
 #'@export
 
 
-DatabasePrep <- function(t_First, t_Last, Economies, N, FactorLabels, ModelType, Wgvar = NULL,
-                         DataPathMacro = NULL, DataPathYields = NULL){
+DatabasePrep <- function(t_First, t_Last, Economies, N, FactorLabels, ModelType, Macro_FullData,
+                          Yields_FullData, Wgvar = NULL){
 
-  if (!requireNamespace("readxl", quietly = TRUE)) {
-    stop(
-      "Please install package \"readxl\" to use this feature.",
-      call. = FALSE
-    )
-  }
-
-  if (length(DataPathMacro) ==0 ) { DataPathMacro <- system.file("extdata", "MacroData.xlsx", package = "MultiATSM") }
- if (length(DataPathYields) ==0 ){ DataPathYields <- system.file("extdata", "YieldsData.xlsx", package = "MultiATSM") }
-
-  # 1) Retrieve Data
-  tab_names_Macro <- readxl::excel_sheets(DataPathMacro)
-  list_all_Macro <- lapply(tab_names_Macro, function(x) readxl::read_excel(path = DataPathMacro, sheet = x))
-  names(list_all_Macro) <- tab_names_Macro
-
-  tab_names_Yields <- readxl::excel_sheets(DataPathYields)
-  list_all_Yields <- lapply(tab_names_Yields, function(x) readxl::read_excel(path = DataPathYields, sheet = x))
-  names(list_all_Yields) <- tab_names_Yields
-
-
+  # 1) Preliminary work
   t_First <- as.POSIXct(as.Date(t_First, "%Y-%m-%d"))
   t_Last <- as.POSIXct(as.Date(t_Last, "%Y-%m-%d"))
-  Idx <- match(unclass(c(t_First, t_Last)), unclass(list_all_Macro[["Global"]]$Period)) # Find the indexes of the first and last observation of the desired sample
+  Idx <- match(unclass(c(t_First, t_Last)), unclass(Macro_FullData[["Global"]]$Period)) # Find the indexes of the first and last observation of the desired sample
 
-  SampleMacro <- lapply(list_all_Macro, "[", Idx[1]:Idx[2], )
-  SampleYields <- lapply(list_all_Yields, "[", Idx[1]:Idx[2], )
-
+  SampleMacro <- lapply(Macro_FullData, "[", Idx[1]:Idx[2], )
+  SampleYields <- lapply(Yields_FullData, "[", Idx[1]:Idx[2], )
 
   # 2) Pre-allocate list of factors
   T_dim <- length(SampleMacro$Global$Period) # length of model's time dimension
@@ -288,10 +286,8 @@ for (i in 1:C){
     }
   }
 
-
   names(Yields) <- Economies
   names(DomesticMacro) <- Economies
-
 
   Output <- list(Yields,DomesticMacro, GlobalMacro)
   names(Output) <- c("Yields","DomMacro","GlobalMacro")

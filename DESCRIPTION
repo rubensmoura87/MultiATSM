@@ -21,7 +21,7 @@ Suggests:
     magrittr
 Depends: R (>= 4.3.0)
 VignetteBuilder: knitr
-URL: https://github.com/rubensmoura87/MultiATSM
+URL: https://github.com/rubensmoura87/MultiATSM, https://rubensmoura87.github.io/MultiATSM/
 BugReports: https://github.com/rubensmoura87/MultiATSM/issues
 NeedsCompilation: no
 Packaged: 2025-01-27 16:59:24 UTC; rmoura

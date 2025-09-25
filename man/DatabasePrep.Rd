@@ -11,9 +11,9 @@ DatabasePrep(
   N,
   FactorLabels,
   ModelType,
-  Wgvar = NULL,
-  DataPathMacro = NULL,
-  DataPathYields = NULL
+  Macro_FullData,
+  Yields_FullData,
+  Wgvar = NULL
 )
 }
 \arguments{
@@ -29,31 +29,50 @@ DatabasePrep(
 
 \item{ModelType}{A character vector indicating the model type to be estimated.}
 
+\item{Macro_FullData}{List containing a full set of macroeconomic data.}
+
+\item{Yields_FullData}{List containing a full set of bond yield data}
+
 \item{Wgvar}{GVAR transition matrix of size C x C, applicable if a GVAR-type model is selected. Default is NULL.}
-
-\item{DataPathMacro}{File path to the Excel file containing macroeconomic data, if provided. The default path points to the Excel file available within the package.}
-
-\item{DataPathYields}{File path to the Excel file containing yields data, if provided. The default path points to the Excel file available within the package}
 }
 \value{
-List containing the risk factor set used in the estimation of the GVAR-based models
+List containing the risk factor set. This list is particularly useful for the estimation of the GVAR-based models.
 }
 \description{
 Gather data of several countries in a list. Particularly useful for GVAR-based setups (Compute "GVARFactors")
 }
 \examples{
-DomVar <- c("Eco_Act", "Inflation")
-GlobalVar <- c("GBC", "CPI_OECD")
-t0 <- "2006-09-01"
-tF <-  "2019-01-01"
-Economies <- c("China", "Brazil", "Mexico", "Uruguay", "Russia")
-N <- 3
+
+# Load data from excel
+macro_data  <- Load_Excel_Data(system.file("extdata", "MacroData.xlsx", package = "MultiATSM"))
+yields_data <- Load_Excel_Data(system.file("extdata", "YieldsData.xlsx", package = "MultiATSM"))
+trade_data  <- Load_Excel_Data(system.file("extdata", "TradeData.xlsx", package = "MultiATSM"))
+
+# Adjust trade data
+trade_data <- lapply(trade_data, function(df) {
+ countries <- df[[1]]
+ df <- as.data.frame(df[-1])
+ rownames(df) <- countries
+ df
+})
+
+# Define features of interest
 ModelType <- "GVAR multi"
+Economies <- c("China", "Uruguay", "Russia")
+GlobalVar <- c("GBC", "CPI_OECD")
+DomVar <- c("Eco_Act", "Inflation")
+N <- 3
+t0 <- "2006-09-01"
+tF <- "2019-01-01"
+
+
+# Compute some inputs
 FactorLabels <-  LabFac(N, DomVar, GlobalVar, Economies, ModelType)
-Wgvar <- Transition_Matrix(t_First = "2006", t_Last= "2019", Economies, type = "Sample Mean")
+Wgvar <- Transition_Matrix(t_First = "2006", t_Last= "2019", Economies,
+                          type = "Sample Mean", trade_data)
 
-
-GVARFactors <- DatabasePrep(t0, tF, Economies, N, FactorLabels, ModelType, Wgvar)
-
+# Compute GVARFactors
+GVARFactors <- DatabasePrep(t0, tF, Economies, N, FactorLabels, ModelType, macro_data,
+                           yields_data, Wgvar)
 
 }

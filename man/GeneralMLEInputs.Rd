@@ -12,7 +12,8 @@ GeneralMLEInputs(
   DataFrequency,
   Label_Multi_Models,
   Economies,
-  ModelType
+  ModelType,
+  UnitYields
 )
 }
 \arguments{

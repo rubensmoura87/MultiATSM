@@ -1,7 +1,12 @@
 library(testthat)
 library(MultiATSM)
 
-# Define common inputs
+
+#  Retrieve data from excel files
+MacroAllData  <- Load_Excel_Data(system.file("extdata", "MacroData.xlsx", package = "MultiATSM"))
+YieldsAllData <- Load_Excel_Data(system.file("extdata", "YieldsData.xlsx", package = "MultiATSM"))
+
+# Define common inputs of interest
 DomVar <- c("Eco_Act", "Inflation")
 GlobalVar <- c("GBC", "CPI_OECD")
 t0 <- "2006-09-01"
@@ -15,7 +20,8 @@ test_that("DataForEstimation returns correct structure for non-GVAR model", {
   K <- (N + length(DomVar)) * length(Economies) + length(GlobalVar)
   FactorLabels <- LabFac(N, DomVar, GlobalVar, Economies, ModelType)
   DataFrequency <- "Monthly"
-  res <- DataForEstimation(t0, tF, Economies, N, FactorLabels, ModelType, DataFrequency)
+  res <- DataForEstimation(t0, tF, Economies, N, FactorLabels, ModelType, DataFrequency,
+                           MacroAllData, YieldsAllData)
   expect_type(res, "list")
   expect_true(all(c("Yields", "RiskFactors", "GVARFactors") %in% names(res)))
   expect_null(res$GVARFactors)
@@ -28,7 +34,10 @@ test_that("DataForEstimation returns correct structure for GVAR model", {
   ModelType <- "GVAR multi"
   FactorLabels <- LabFac(N, DomVar, GlobalVar, Economies, ModelType)
   DataFrequency <- "Monthly"
-  res <- DataForEstimation(t0, tF, Economies, N, FactorLabels, ModelType, DataFrequency, W_type = "Sample Mean", t_First_Wgvar = "2006", t_Last_Wgvar = "2006")
+  data("CM_Trade")
+  res <- DataForEstimation(t0, tF, Economies, N, FactorLabels, ModelType, DataFrequency, MacroAllData,
+                           YieldsAllData, TradeFlows, W_type = "Sample Mean",
+                           t_First_Wgvar = "2006", t_Last_Wgvar = "2006")
   expect_type(res, "list")
   expect_true(all(c("Yields", "RiskFactors", "GVARFactors") %in% names(res)))
   expect_type(res$GVARFactors, "list")
@@ -43,7 +52,8 @@ test_that("DataForEstimation throws error for invalid input", {
   ModelType <- "JPS original"
   FactorLabels <- LabFac(N, DomVar, GlobalVar, Economies, ModelType)
   DataFrequency <- "Monthly"
-  expect_error(DataForEstimation(t0, tF, Economies, N, FactorLabels, ModelType, DataFrequency))
+  expect_error(DataForEstimation(t0, tF, Economies, N, FactorLabels, ModelType, DataFrequency, MacroAllData,
+                                 YieldsAllData))
 })
 
 # b) Type 2

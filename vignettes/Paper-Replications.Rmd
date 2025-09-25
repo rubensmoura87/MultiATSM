@@ -182,7 +182,7 @@ StatQ <- 0
 # B.1) SPECIFIC model inputs
 #################################### GVAR-based models ##################################################
 GVARlist <- list( VARXtype = "unconstrained", W_type = "Sample Mean", t_First_Wgvar = "2004",
-                  t_Last_Wgvar = "2019", DataConnectedness <- TradeFlows )
+                  t_Last_Wgvar = "2019", DataConnectedness = TradeFlows )
 #################################### JLL-based models ###################################################
 JLLlist <- list(DomUnit =  "China")
 ###################################### BRW inputs  ######################################################

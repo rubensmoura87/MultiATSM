@@ -12,8 +12,7 @@ SpecificMLEInputs(
   GVARlist = NULL,
   JLLlist = NULL,
   WishBRW = 0,
-  BRWlist = NULL,
-  DataPathTrade = NULL
+  BRWlist = NULL
 )
 }
 \arguments{
@@ -56,8 +55,6 @@ Default is set to 0.}
      \item checkBRW flag whether the user wishes to perform the closeness check (BRW model)
      \item B_check number of bootstrap samples for closeness check
 }}
-
-\item{DataPathTrade}{path of the Excel file containing the data (if any)}
 }
 \description{
 Concatenate the model-specific inputs in a list

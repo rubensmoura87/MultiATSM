@@ -107,7 +107,7 @@ FactorLabels <- LabFac(N, DomVar, GlobalVar, Economies, ModelType)
 
 DataFreq <- "Monthly"
 GVARlist <- list(VARXtype = "unconstrained", W_type = "Sample Mean",
-                 t_First_Wgvar = "2007", t_Last_Wgvar = "2019")
+                 t_First_Wgvar = "2007", t_Last_Wgvar = "2019", DataConnectedness = TradeFlows)
 
 ATSMInputs <- InputsForOpt(t0, tF, ModelType, Yields, GlobalMacroVar, DomesticMacroVar,
                            FactorLabels, Economies, DataFreq, GVARlist, CheckInputs = FALSE)

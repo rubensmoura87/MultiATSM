@@ -9,8 +9,7 @@
 #'      \item \code{Sample Mean}: Returns a single weight matrix containing the average weights over the entire sample period, suitable for time-invariant interdependence.
 #'      \item A specific year (e.g., "1998", "2005"): Used to compute time-invariant interdependence for the specified year.
 #' }
-#' @param DataConnectedness Data used to compute the transition matrix. Default is set to NULL.
-#' @param DataPath Path to the Excel file containing the data (if applicable). The default is linked to the Excel file available in the package.
+#' @param DataConnectedness Data used to compute the transition matrix.
 #'
 #' @return matrix or list of matrices
 #'
@@ -19,40 +18,48 @@
 #' then the transition matrix will include only NAs.
 #'
 #' @examples
-#' data(CM_Trade)
-#'
 #' t_First <- "2006"
 #' t_Last <-  "2019"
 #' Economies <- c("China", "Brazil", "Mexico", "Uruguay")
 #' type <- "Sample Mean"
-#' W_mat <- Transition_Matrix(t_First, t_Last, Economies, type, DataConnectedness = TradeFlows)
+# # Load data if Connectedness data from excel, otherwise use pre-saved data
+#' GetExcelData <- FALSE
+#'
+#'  if (GetExcelData) {
+#'  if (!requireNamespace("readxl", quietly = TRUE)) {
+#'  stop(
+#'    "Please install package \"readxl\" to use this feature.",
+#'    call. = FALSE
+#'  )
+#'    DataPath <- system.file("extdata", "TradeData.xlsx", package = "MultiATSM")
+#'    tab_names_Trade <- readxl::excel_sheets(DataPath)
+#'    list_all_Trade <- suppressMessages(lapply(tab_names_Trade, function(x)
+#'                      readxl::read_excel(path = DataPath, sheet = x)))
+#'    names(list_all_Trade) <- tab_names_Trade
+#'
+#'    L <- length(list_all_Trade)
+#'
+#'    for (i in 1:L) {
+#'      Countries <- list_all_Trade[[i]][[1]]
+#'      list_all_Trade[[i]] <- as.data.frame(list_all_Trade[[i]][,-1])
+#'      rownames(list_all_Trade[[i]]) <- Countries
+#'    }
+#'
+#'    DataConnectedness <- list_all_Trade
+#'  }
+#'} else {
+#'  data(CM_Trade)
+#'  DataConnectedness <- TradeFlows
+#' }
+#'
+#' W_mat <- Transition_Matrix(t_First, t_Last, Economies, type, DataConnectedness)
 #'
 #' @export
 
-Transition_Matrix <- function(t_First, t_Last, Economies, type, DataConnectedness = NULL, DataPath = NULL) {
+Transition_Matrix <- function(t_First, t_Last, Economies, type, DataConnectedness) {
 
-  # 1) Load data if Data Connectedness is not provided
-  if (is.null(DataConnectedness) || length(DataConnectedness) == 0) {
-    if (is.null(DataPath)) {
-      DataPath <- system.file("extdata", "TradeData.xlsx", package = "MultiATSM")
-    }
 
-    tab_names_Trade <- readxl::excel_sheets(DataPath)
-    list_all_Trade <- suppressMessages(lapply(tab_names_Trade, function(x) readxl::read_excel(path = DataPath, sheet = x)))
-    names(list_all_Trade) <- tab_names_Trade
-
-    L <- length(list_all_Trade)
-
-    for (i in 1:L) {
-      Countries <- list_all_Trade[[i]][[1]]
-      list_all_Trade[[i]] <- as.data.frame(list_all_Trade[[i]][,-1])
-      rownames(list_all_Trade[[i]]) <- Countries
-    }
-
-    DataConnectedness <- list_all_Trade
-  }
-
-  # 2) Pre-allocation of variables
+  # 1) Pre-allocation of variables
   DataAdj <- lapply(DataConnectedness, function(x) as.data.frame(t(x)))
   C <- length(Economies)
   T_dim <- ncol(DataConnectedness[[1]])
@@ -62,7 +69,7 @@ Transition_Matrix <- function(t_First, t_Last, Economies, type, DataConnectednes
   dem <- c()
   Wyear <- matrix(NA, nrow = C, ncol= C)
 
-  # 3) Generate the matrix of weights year-by-year
+  # 2) Generate the matrix of weights year-by-year
   for (k in 1:T_dim) {
     for (h in 1:C) {
       for (j in 1:C) {
@@ -105,3 +112,4 @@ Transition_Matrix <- function(t_First, t_Last, Economies, type, DataConnectednes
 
   return(Wgvar)
 }
+

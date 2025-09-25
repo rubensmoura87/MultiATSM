@@ -62,7 +62,7 @@
 #'
 #' DataFreq <- "Monthly"
 #' GVARlist <- list(VARXtype = "unconstrained", W_type = "Sample Mean",
-#'                  t_First_Wgvar = "2007", t_Last_Wgvar = "2019")
+#'                  t_First_Wgvar = "2007", t_Last_Wgvar = "2019", DataConnectedness = TradeFlows)
 #'
 #' ATSMInputs <- InputsForOpt(t0, tF, ModelType, Yields, GlobalMacroVar, DomesticMacroVar,
 #'                            FactorLabels, Economies, DataFreq, GVARlist, CheckInputs = FALSE)
@@ -125,11 +125,11 @@ InputsForOpt <- function(InitialSampleDate, FinalSampleDate, ModelType, Yields, 
 
   # Collect general input lists
   ModelInputsGen <- GeneralMLEInputs(Yields, RiskFactors, FactorLabels, mat, DataFrequency, Label_Multi_Models,
-                                     Economies, ModelType)
+                                     Economies, ModelType, UnitYields)
 
   # Collect model-specific input lists (GVARinputs, JLLinputs, and BRWlist)
   ModelInputsSpe <- SpecificMLEInputs(ModelType, Economies, RiskFactors, FactorLabels, GVARlist, JLLlist,
-                                      WishBRW, BRWlist, DataPathTrade = NULL)
+                                      WishBRW, BRWlist)
 
   # Estimate P-dynamic parameters
   if (verbose) message(("1.2) Estimating model P-dynamics parameters:"))
@@ -222,13 +222,12 @@ Maturities <- function(DataYields, Economies, UnitYields){
 #'      \item checkBRW flag whether the user wishes to perform the closeness check (BRW model)
 #'      \item B_check number of bootstrap samples for closeness check
 #'}
-#'@param DataPathTrade path of the Excel file containing the data (if any)
 #'
 #'@keywords internal
 
 
 SpecificMLEInputs <-function(ModelType, Economies, RiskFactors, FactorLabels, GVARlist = NULL, JLLlist = NULL,
-                             WishBRW=0, BRWlist= NULL, DataPathTrade = NULL){
+                             WishBRW=0, BRWlist= NULL){
 
   if (ModelType %in% c("GVAR single", "GVAR multi")){
     # Compute the transition matrix and the
@@ -242,7 +241,7 @@ SpecificMLEInputs <-function(ModelType, Economies, RiskFactors, FactorLabels, GV
     tF <- GVARlist$t_Last_Wgvar
     LinkageMeasure <- GVARlist$DataConnectedness
     W_type <- GVARlist$W_type
-    Wgvar <- Transition_Matrix(t0, tF, Economies, W_type, LinkageMeasure, DataPathTrade)
+    Wgvar <- Transition_Matrix(t0, tF, Economies, W_type, LinkageMeasure)
     if(ModelType == "GVAR single"){RiskFactors <- RiskFactors[[1]]}
 
     GVARFactors <- DataSet_BS(ModelType, RiskFactors, Wgvar, Economies, FactorLabels)
@@ -337,7 +336,6 @@ AdjustYieldsDates <- function(Yields, PdynamicsFactors, Economies){
 #'\item Candelon and Moura (2024). "A Multicountry Model of the Term Structures of Interest Rates with a GVAR" (Journal of Financial Econometrics)
 #'}
 #'@export
-
 
 
 LoadData <- function(DataPaper) {
@@ -539,7 +537,7 @@ CheckInputsForMLE <- function(t0, tF, Economies, DomesticMacroFac, GlobalMacroFa
 
 
 GeneralMLEInputs <- function(Yields, RiskFactors, FactorLabels, mat, DataFrequency, Label_Multi_Models,
-                             Economies, ModelType){
+                             Economies, ModelType, UnitYields){
 
   N <- length(FactorLabels$Spanned)
   dt <- Getdt(DataFrequency)
@@ -556,12 +554,13 @@ GeneralMLEInputs <- function(Yields, RiskFactors, FactorLabels, mat, DataFrequen
     idxN1 <- idxN0 + N
 
     YCS <- Yields[(idxJ0+1):idxJ1,] # Yields (JxT)
-    WpcaCS <- pca_weights_one_country(YCS, Economy= Economies[i])[1:N,] # matrix of weights for the portfolio without errors (N x J)
+    WpcaCS <- pca_weights_one_country(YCS, Economy= Economies[i])[1:N, ] # matrix of weights for the portfolio without errors (N x J)
     WpcaCS <- 100*matrix(WpcaCS, nrow=N) # useful command for the case N = 1
     WeCS <- t(pracma::null(matrix(WpcaCS, nrow=N))) # matrix of weights for the yield portfolios priced with errors
     WpcaFullCS <- rbind(WpcaCS, WeCS)
     PPCS <- Spanned_Factors(YCS, Economies = Economies[i], N) # Spanned Factors (N x T)
-    K1XQCS <-  Reg_K1Q(YCS, mat, PPCS, dt, type="Jordan")
+    K1XQCS <-  FeedMat_Q(YCS, PPCS, Economies[i], UnitYields, dt)
+
 
     if ( any(ModelType == Label_Multi_Models)){
       if (i==1){
@@ -603,6 +602,301 @@ GeneralMLEInputs <- function(Yields, RiskFactors, FactorLabels, mat, DataFrequen
   }
 
   return(ListInputs)
+}
+
+####################################################################################################
+#' Get an estimate for the risk-neutral (Q) feedback matrix
+#'
+#' @param Yields matrix of bond yields (J x T)
+#' @param Spa_Fac matrix of spanned factors  (N x T)
+#' @param Economies string-vector containing the names of the economies which are part of the economic system
+#' @param UnitYields (i) "Month": if maturity of yields are expressed in months or
+#'                  (ii) "Year": if maturity of yields are expressed in years
+#'
+#' @param time_step time unit of the model (scalar). For instance, if data is (i) monthly, dt <- 12; (ii) quarterly, dt <- 4; (iii) yearly, dt <- 1.
+#' @param check_inputs Perform input validation. Default is TRUE.
+#'
+#' @references
+#' Le, A., & Singleton, K. J. (2018). Small Package of Matlab Routines for
+#' Estimation of Some Term Structure Models. EABCN Training School.\cr
+#' An R implementation inspired by the methodology described therein.
+#'
+#' @keywords internal
+
+FeedMat_Q <- function(Yields, Spa_Fac, Economies, UnitYields, time_step, check_inputs = TRUE) {
+
+  # 1) Input Validation
+  mat_vec <- Maturities(Yields, Economies, UnitYields)
+
+  if (check_inputs) {
+    CheckInput_K1X(Yields, mat_vec, time_step)
+  }
+
+  # 2) Get interpolated yield set
+  Y_Inta <- Intra_Yields(Yields, mat_vec, time_step)
+
+  # 3) Regression: Y = Betas × P
+  Betas <- Reg_demean(Y_Inta, Spa_Fac)
+
+  # 4) Estimate K1Q at horizon h
+  min_mat <- mat_vec[1]
+  max_mat <- nrow(Y_Inta)
+  Min_horiz <- max(1, round(min_mat / time_step))  # Ensure horiz >= 1
+  K1_h <- Est_K1h(Min_horiz, min_mat, max_mat, time_step, Betas)
+
+  # 5) Compute matrix h-th root via eigen-decomposition
+  N <- nrow(Spa_Fac)
+  K1_root <- RootEigen(K1_h, Min_horiz, N)
+  CheckNumericalPrecision(K1_root) # Check for numerical issues
+
+  # 6) Convert K1XQ to the Jordan form
+  K1XQ <- JordanMat(K1_root)
+
+  return(K1XQ)
+}
+
+
+###############################################################################
+#' Input validation for the 'FeedMat_Q' function
+#'
+#' @param Yields matrix containing country-specific yields  (J x T)
+#' @param mat_vec vector of maturities expressed in years (J x 1)
+#' @param time_step time unit of the model (scalar).
+#'
+#' @keywords internal
+
+CheckInput_K1X  <- function(Yields, mat_vec, time_step) {
+
+  if (!is.numeric(time_step) || length(time_step) != 1 || time_step <= 0) {
+    stop("Argument 'time_step' must be a positive numeric scalar.")
+  }
+
+  if (nrow(Yields) != length(mat_vec)) {
+    stop("Length of 'maturity_vec' must equal the number of rows in yield dataset.")
+  }
+
+}
+###############################################################################
+#' Fit the cross-section of yields using spline
+#'
+#' @param Yields matrix containing country-specific yields  (J x T)
+#' @param mat_vec vector of maturities expressed in years (J x 1)
+#' @param time_step time unit of the model (scalar)
+#'
+#' @keywords internal
+
+Intra_Yields <- function(Yields, mat_vec, time_step) {
+
+  max_mat <- max(mat_vec)
+  min_mat <- min(mat_vec)
+  grid_points <- seq(from = time_step,
+                     to = ceiling(max_mat / time_step) * time_step,
+                     by = time_step)
+  n_grid <- length(grid_points)
+
+  interp_fn <- function(mats, yields, target_mats) {
+    spline_func <- stats::splinefun(mats, yields, method = "fmm")
+    spline_func(target_mats)
+  }
+  interpolated_Yields <- apply(Yields, 2, function(y) interp_fn(mat_vec, y, grid_points))
+
+  return(interpolated_Yields)
+}
+############################################################################
+#' Perform a linear regression using demeaned variables
+#'
+#' @param LHS Left-hand side variables
+#' @param RHS Right-hand side variables
+#'
+#' @return Beta coefficients
+#'
+#' @keywords internal
+
+Reg_demean <- function(LHS, RHS) {
+
+  lhs_deman <- scale(t(LHS), center = TRUE, scale = FALSE)
+  rhs_deman <- scale(t(RHS), center = TRUE, scale = FALSE)
+  B_coef <- stats::lm(lhs_deman ~ rhs_deman - 1)$coefficients
+  B_coef <- t(B_coef)
+
+  return(B_coef)
+}
+############################################################################
+#' Estimate K1h
+#'
+#' @param horiz Minimum horizon observed
+#' @param min_mat shortest maturity observed
+#' @param max_mat longest maturity observed
+#' @param time_step time unit of the model (scalar)
+#' @param B_coef matrix of beta coefficients
+#'
+#' @keywords internal
+
+Est_K1h <- function(horiz, min_mat, max_mat, time_step, B_coef) {
+
+  n_indices <- (2 * horiz):max_mat
+  if (length(n_indices) == 0) {
+    stop("Not enough grid points for estimation. Increase time_step or data range.")
+  }
+
+  LHS <- RHS <- matrix(NA, nrow = length(n_indices), ncol = ncol(B_coef))
+  for (i in seq_along(n_indices)) {
+    n <- n_indices[i]
+    LHS[i, ] <- B_coef[n, ] - (horiz/n) * B_coef[horiz, ]
+    RHS[i, ] <- (1 - horiz/n) * B_coef[n - horiz, ]
+  }
+
+  # Solve for K1h
+  K1h <- tryCatch({
+    qr.solve(RHS, LHS)
+  }, error = function(e) {
+    stop("Failed to solve for K1Qh. System may be ill-conditioned: ", e$message)
+  })
+
+  return(K1h)
+}
+
+############################################################################
+#' Compute the root of the eigenvalue of K1h
+#'
+#' @param K1_h K1_h squared matrix
+#' @param horiz Minimum horizon observed
+#' @param N number of country-specific spanned factors
+#'
+#' @keywords internal
+
+RootEigen <- function(K1_h, horiz, N) {
+
+  eig <- eigen(K1_h)
+  root_eigenvalues <- Mod(eig$values)^(1/horiz) * exp(1i * Arg(eig$values)/horiz)
+  if (N == 1) root_eigenvalues <- matrix(root_eigenvalues)
+
+  K1Q_est <- Re(eig$vectors %*% diag(root_eigenvalues) %*% solve(eig$vectors))
+
+  if (any(is.nan(K1Q_est)) || any(is.infinite(K1Q_est))) {
+    stop("Numerical instability detected in the K1Q matrix")
+  }
+
+  return(K1Q_est)
+}
+############################################################################
+#' Check Numerical Precision Issues of K1_root matrix
+#'
+#' @param matrix_in K1_root matrix
+#' @param tolerance Numerical tolerance
+#' @return List with precision indicators
+#'
+#' @keywords internal
+CheckNumericalPrecision <- function(matrix_in, tolerance = 1e-10) {
+
+  diagnostics <- list(
+    is_precise = TRUE,
+    has_nan = any(is.nan(matrix_in)),
+    has_inf = any(is.infinite(matrix_in)),
+    has_large_values = any(abs(matrix_in) > 1e6)
+  )
+
+  # Check for NaN/Inf
+  if (diagnostics$has_nan || diagnostics$has_inf) {
+    stop("Matrix contains NaN or Inf values")
+    diagnostics$is_precise <- FALSE
+  }
+
+  # Check for extreme values that might indicate numerical issues
+  if (diagnostics$has_large_values) {
+    stop("Matrix contains unplausibly large values - possible numerical overflow")
+    diagnostics$is_precise <- FALSE
+  }
+
+  return(diagnostics)
+}
+
+############################################################################
+#' Convert a Matrix to Jordan-Like Form for Term Structure Models
+#'
+#' @param matrix_in squared matrix prior to Jordan form
+#'
+#' @return A matrix in a specialized block form used in term structure modeling
+#'
+#' @references
+#' \itemize{
+#'   \item The mathematical approach is based on methods described in:
+#'   Dai, Q., & Singleton, K. J. (2000). Specification Analysis of Affine
+#'   Term Structure Models. The Journal of Finance, 55(5), 1943-1978.
+#'
+#'   \item Le, A., & Singleton, K. J. (2018). Small Package of Matlab Routines for
+#'   Estimation of Some Term Structure Models. EABCN Training School.
+#'
+#'   \item For theoretical background on Jordan forms in term structure models:
+#'   Duffee, G. R. (2002). Term Premia and Interest Rate Forecasts in Affine
+#'   Models. The Journal of Finance, 57(1), 405-443.
+#'}
+#' @keywords internal
+
+JordanMat <- function(matrix_in) {
+
+  # Eigenvalues of the input matrix
+  eigvals <- eigen(matrix_in)$values
+
+  # Separate real and complex eigenvalues
+  is_real <- Im(eigvals) == 0
+  real_vals <- Re(eigvals[is_real])
+  complex_vals <- eigvals[!is_real]
+
+  # Build the "lQ" vector from eigenvalue pairs
+  lq <- numeric(0)
+
+  # Handle odd real eigenvalue case
+  if (length(real_vals) %% 2 == 1) {
+    lq <- real_vals[1]
+    real_vals <- real_vals[-1]
+  }
+
+  # Process real eigenvalue pairs
+  if (length(real_vals) > 0) {
+    for (h in seq_len(length(real_vals) / 2)) {
+      avg <- 0.5 * (real_vals[2*h - 1] + real_vals[2*h])
+      diff_sq <- (0.5 * (real_vals[2*h - 1] - real_vals[2*h]))^2
+      lq <- c(lq, avg, diff_sq)
+    }
+  }
+
+  # Process complex eigenvalue pairs (assumed conjugates)
+  if (length(complex_vals) > 0) {
+    for (h in seq_len(length(complex_vals) / 2)) {
+      real_part <- Re(complex_vals[2*h - 1])
+      imag_sq <- -abs(Im(complex_vals[2*h - 1]))^2
+      lq <- c(lq, real_part, imag_sq)
+    }
+  }
+
+  n <- length(lq)
+
+  # Build Jordan block skeleton
+  if (n == 1) {
+    jordan_mat <- matrix(0, 1, 1)
+  } else {
+    jordan_mat <- rbind(rep(0, n), diag(1, n - 1, n))
+  }
+
+  # Fill in diagonal and superdiagonal blocks
+  offset <- 0
+  if (n %% 2 == 1) {
+    jordan_mat[1, 1] <- lq[1]
+    lq <- lq[-1]
+    offset <- 1
+  }
+
+  if (length(lq) > 0) {
+    for (h in seq_len(length(lq) / 2)) {
+      idx <- offset + 2*h - 1
+      jordan_mat[idx, idx] <- lq[2*h - 1]
+      jordan_mat[idx + 1, idx + 1] <- lq[2*h - 1]
+      jordan_mat[idx, idx + 1] <- lq[2*h]
+    }
+  }
+
+  return(jordan_mat)
 }
 
 ##############################################################################################################

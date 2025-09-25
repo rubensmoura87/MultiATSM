@@ -66,6 +66,11 @@ data('CM_DomMacroFactors')
 data('CM_Trade')
 
 ## -----------------------------------------------------------------------------
+
+ MacroData  <- Load_Excel_Data(system.file("extdata", "MacroData.xlsx", package = "MultiATSM"))
+ YieldData <- Load_Excel_Data(system.file("extdata", "YieldsData.xlsx", package = "MultiATSM"))
+
+## -----------------------------------------------------------------------------
 Initial_Date <- "2006-09-01" # Format "yyyy-mm-dd"
 Final_Date <- "2019-01-01" # Format "yyyy-mm-dd"
 DataFrequency <- "Monthly"
@@ -78,7 +83,7 @@ ModelType <- "JPS original"
 ## -----------------------------------------------------------------------------
 FactorLabels <- LabFac(N, DomVar, GlobalVar, Economies, ModelType)
 RiskFac_TS <- DataForEstimation(Initial_Date, Final_Date, Economies, N, FactorLabels, ModelType,
-                                DataFrequency)
+                                DataFrequency, MacroData, YieldData)
 
 ## -----------------------------------------------------------------------------
 # 1) Model type
@@ -213,7 +218,7 @@ t_First <- "2006"
 t_Last <-  "2019"
 Economies <- c("China", "Brazil", "Mexico", "Uruguay")
 type <- "Sample Mean"
-W_gvar <- Transition_Matrix(t_First, t_Last, Economies, type, DataPath = NULL, TradeFlows)
+W_gvar <- Transition_Matrix(t_First, t_Last, Economies, type, TradeFlows)
 print(W_gvar)
 
 ## -----------------------------------------------------------------------------
@@ -263,7 +268,7 @@ JLLinputs <- list(Economies = Economies, DomUnit = "China", WishSigmas = 1,  Sig
 # # B.1) SPECIFIC model inputs
 # #################################### GVAR-based models ##################################################
 # GVARlist <- list( VARXtype = "unconstrained", W_type = "Sample Mean", t_First_Wgvar = "2005",
-#                   t_Last_Wgvar = "2019", DataConnectedness <- TradeFlows )
+#                   t_Last_Wgvar = "2019", DataConnectedness = TradeFlows )
 # # VARXtype: Available options "unconstrained" or "constrained" (VARX)
 # # W_type: Method to compute the transition matrix. Options:"Time-varying" or "Sample Mean"
 # # t_First_Wgvar: First year of the sample (transition matrix)
