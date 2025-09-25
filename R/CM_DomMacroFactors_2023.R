@@ -2,6 +2,7 @@
 #'
 #' @description Risk factors data used in the GVAR models - Candelon and Moura (2023)
 #' @name DomMacro
+#' @aliases CM_DomMacro_2023
 #' @docType data
 #' @usage data("CM_DomMacro_2023")
 #' @format list containing the variables used in the GVAR models

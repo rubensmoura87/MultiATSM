@@ -2,6 +2,7 @@
 #'
 #' @description Example for illustration used in the package vignette
 #' @name Out
+#' @aliases Out_Example
 #' @docType data
 #' @usage data("Out_Example")
 #' @format several model classes

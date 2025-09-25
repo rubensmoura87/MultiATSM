@@ -2,6 +2,7 @@
 #'
 #' @description Risk factors data used in Candelon and Moura (2024, JFEC)
 #' @name GlobalMacroVar
+#' @aliases CM_GlobalMacroFactors
 #' @docType data
 #' @usage data("CM_GlobalMacroFactors")
 #' @format matrix containing the  risk factors of the models

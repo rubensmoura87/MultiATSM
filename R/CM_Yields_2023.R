@@ -2,6 +2,7 @@
 #'
 #' @description Bond yield data used in Candelon and Moura (2023)
 #' @name Yields
+#' @aliases CM_Yields_2023
 #' @docType data
 #' @usage data("CM_Yields_2023")
 #' @format matrix containing the Yields of the models

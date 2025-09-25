@@ -3,6 +3,7 @@
 \docType{data}
 \name{BR_jps_out}
 \alias{BR_jps_out}
+\alias{BR_jps_gro_R3}
 \title{Replications of the JPS (2014) outputs by Bauer and Rudebusch (2017)}
 \format{
 Unspanned macro risk model outputs by Bauer and Rudebusch (2017)

@@ -2,6 +2,7 @@
 #'
 #' @description Unspanned macro risk model outputs by the MultiATSM package
 #' @name ModelPara
+#' @aliases JPSrep
 #' @docType data
 #' @usage data("JPSrep")
 #' @format list of inputs and outputs

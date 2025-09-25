@@ -3,6 +3,7 @@
 \docType{data}
 \name{ModelParaEx}
 \alias{ModelParaEx}
+\alias{ParaSetEx}
 \title{Example of parameter set after optimization}
 \format{
 list of inputs and outputs

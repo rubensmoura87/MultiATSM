@@ -3,12 +3,13 @@
 \docType{data}
 \name{Trade_Flows}
 \alias{Trade_Flows}
+\alias{CM_Trade_2023}
 \title{Data: Trade Flows - Candelon and Moura (2023)}
 \format{
 list containing the bilateral trade flows
 }
 \usage{
-data("CM_Trade")
+data("CM_Trade_2023")
 }
 \description{
 Trade Flows data used in Candelon and Moura (2023)

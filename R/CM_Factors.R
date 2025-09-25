@@ -2,6 +2,7 @@
 #'
 #' @description Risk factors data used in Candelon and Moura (2024, JFEC)
 #' @name RiskFactors
+#' @aliases CM_Factors
 #' @docType data
 #' @usage data("CM_Factors")
 #' @format matrix containing the  risk factors of the models

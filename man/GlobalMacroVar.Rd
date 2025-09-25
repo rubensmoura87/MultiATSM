@@ -3,6 +3,7 @@
 \docType{data}
 \name{GlobalMacroVar}
 \alias{GlobalMacroVar}
+\alias{CM_GlobalMacroFactors}
 \title{Data: Risk Factors - Candelon and Moura (2024, JFEC)}
 \format{
 matrix containing the  risk factors of the models

@@ -2,6 +2,7 @@
 #'
 #' @description Yields data used in Candelon and Moura (2024, JFEC)
 #' @name Yields
+#' @aliases CM_Yields
 #' @docType data
 #' @usage data("CM_Yields")
 #' @format matrix containing the Yields of the models

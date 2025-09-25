@@ -3,6 +3,7 @@
 \docType{data}
 \name{FactorsGVAR}
 \alias{FactorsGVAR}
+\alias{CM_Factors_GVAR}
 \title{Data: Risk Factors for the GVAR - Candelon and Moura (2024, JFEC)}
 \format{
 list containing the variables used in the GVAR models

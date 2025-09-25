@@ -1,16 +1,11 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
-<!-- badges: start -->
 
 [![CRAN
 status](https://www.r-pkg.org/badges/version/MultiATSM)](https://cran.r-project.org/package=MultiATSM)
-[![R-CMD-check](https://github.com/mothur/phylotypr/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/mothur/phylotypr/actions/workflows/R-CMD-check.yaml)
-[![Codecov test
-coverage](https://codecov.io/gh/mothur/phylotypr/branch/main/graph/badge.svg)](https://app.codecov.io/gh/mothur/phylotypr?branch=main)
+[![R-CMD-check](https://github.com/rubensmoura87/MultiATSM/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/rubensmoura87/MultiATSM/actions/workflows/R-CMD-check.yaml)
 [![CRAN
 downloads](https://cranlogs.r-pkg.org/badges/MultiATSM)](https://CRAN.R-project.org/package=MultiATSM)
-
-<!-- badges: end -->
 
 ## Overview
 
@@ -50,7 +45,7 @@ install.packages("MultiATSM")
 ## Usage and documentation
 
 - See the package manual and
-  [vignettes](https://https://rubensmoura87.github.io/articles/MultiATSM/)
+  [vignettes](https://https://rubensmoura87.github.io/articles/MultiATSM.html/)
   for detailed function documentation and examples.
 - Main functions: `InputsForOpt`, `Bias_Correc_VAR`, `Optimization`,
   `NumOutputs`, `Bootstrap`, `ForecastYields`, etc.

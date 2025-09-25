@@ -3,6 +3,7 @@
 \docType{data}
 \name{GlobalMacro}
 \alias{GlobalMacro}
+\alias{CM_GlobalMacro_2023}
 \title{Data: Risk Factors - Candelon and Moura (2023)}
 \format{
 matrix containing the  risk factors of the models

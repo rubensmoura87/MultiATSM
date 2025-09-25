@@ -10,3 +10,4 @@ This is a re-submission. In this version I have:
 * included unit tests to all user facing functions;
 * replaced the use of *Convert2JordanForm* and *Reg_K1Q* functions by the *FeedMat_Q* function and its sub-functions in order to enhance the modularity of the code;
 * introduced a new helper function, *Load_Excel_Data*, to simplify retrieving data from Excel files. This avoids performing file I/O inside other functions, which now accept data frames or matrices directly as inputs. In this context, I refactored *DatabasePrep*, *Transition_Matrix*, *SpecificMLEInputs*, and *DataForEstimation* so that they no longer take file paths as arguments
+* added a pkgdown site for the package;

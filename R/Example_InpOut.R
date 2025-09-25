@@ -2,6 +2,7 @@
 #'
 #' @description List of inputs of a JPS-based model for Brazilian data
 #' @name InpForOutEx
+#' @aliases InpForOutEx
 #' @docType data
 #' @usage data("InpForOutEx")
 #' @format list of inputs

@@ -3,6 +3,8 @@
 \docType{data}
 \name{Yields}
 \alias{Yields}
+\alias{CM_Yields}
+\alias{CM_Yields_2023}
 \title{Data: Yields - Candelon and Moura (2024, JFEC)}
 \format{
 matrix containing the Yields of the models

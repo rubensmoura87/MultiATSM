@@ -2,6 +2,7 @@
 #'
 #' @description Numerical outputs for JPS-based model using Brazilian data
 #' @name NumOutEx
+#' @aliases NumOutEx
 #' @docType data
 #' @usage data("NumOutEx")
 #' @format list of inputs and outputs

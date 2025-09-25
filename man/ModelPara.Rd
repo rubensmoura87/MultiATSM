@@ -3,6 +3,7 @@
 \docType{data}
 \name{ModelPara}
 \alias{ModelPara}
+\alias{JPSrep}
 \title{Replications of the JPS (2014) outputs by the MultiATSM package}
 \format{
 list of inputs and outputs

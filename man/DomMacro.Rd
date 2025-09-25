@@ -3,6 +3,7 @@
 \docType{data}
 \name{DomMacro}
 \alias{DomMacro}
+\alias{CM_DomMacro_2023}
 \title{Data: Risk Factors for the GVAR - Candelon and Moura (2023)}
 \format{
 list containing the variables used in the GVAR models

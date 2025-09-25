@@ -3,6 +3,7 @@
 \docType{data}
 \name{RiskFactors}
 \alias{RiskFactors}
+\alias{CM_Factors}
 \title{Data: Risk Factors - Candelon and Moura (2024, JFEC)}
 \format{
 matrix containing the  risk factors of the models

@@ -2,22 +2,32 @@ url: https://rubensmoura87.github.io/MultiATSM/
 template:
   bootstrap: 5
 
+development:
+  mode: auto
+
+vignettes:
+  keep_html: true
+  toc: true
+  number_sections: true
+
 reference:
 - title: Dataset
   desc: >
-    Examples of dataset used in several papers
+    Datasets included in the package
   contents:
-  - CM_DomMacroFactors
-  - CM_Factors_GVAR
-  - CM_GlobalMacro_2023
   - CM_GlobalMacroFactors
+  - CM_GlobalMacro_2023
   - CM_Factors
+  - CM_DomMacroFactors
+  - CM_DomMacro_2023
   - CM_Trade
-  - CM_Trade
-  - CM_Yields CM_Yields_2023
+  - CM_Trade_2023
+  - CM_Yields
+  - CM_Yields_2023
+  - CM_Factors_GVAR
 - title: Data handling
   desc: >
-   blah blah
+   Functions for handling and transforming data
   contents:
   - DataForEstimation
   - DatabasePrep
@@ -25,9 +35,9 @@ reference:
   - Load_Excel_Data
   - InputsForOutputs
   - LabFac
-- title: P-dynamics estimation
+- title: Estimation of model P-dynamics
   desc: >
-    blah blah
+    Functions for estimating the parameters from the P-dynamics
   contents:
   - Bias_Correc_VAR
   - GVAR
@@ -38,16 +48,16 @@ reference:
   desc: >
     Available methods for several object classes
   contents:
-  - autoplot()
-  - autoplot(<ATSMModelBoot>)
-  - autoplot(<ATSMNumOutputs>)
-  - plot(<ATSMModelForecast>)
-  - print(<ATSMModelInputs>)
-  - summary(<ATSMModelInputs>)
-  - summary(<ATSMModelOutputs>)
+  - autoplot
+  - autoplot.ATSMModelBoot
+  - autoplot.ATSMNumOutputs
+  - plot.ATSMModelForecast
+  - print.ATSMModelInputs
+  - summary.ATSMModelInputs
+  - summary.ATSMModelOutputs
 - title: Graphs
   desc: >
-    Available methods for several object classes
+    Functions to generate graphical outputs
   contents:
   - FEVDandGFEVDgraphs
   - Fitgraphs
@@ -56,22 +66,22 @@ reference:
   - TPDecompGraph
 - title: Spanned factors-related
   desc: >
-    blah
+    Functions related to the computation of spanned factors
   contents:
   - Spanned_Factors
   - pca_weights_one_country
-- title: optimization-related
+- title: Optimization-related
   desc: >
-    blah
+    Model optimization, numerical outputs, bootstrap and forecasting
   contents:
   - Bootstrap
   - ForecastYields
   - InputsForOpt
   - Optimization
   - NumOutputs
-- title: Pre-loaded otputs
+- title: Pre-loaded outputs
   desc: >
-    blah
+    Pre computed outputs
   contents:
   - BR_jps_gro_R3
   - InpForOutEx
@@ -79,7 +89,4 @@ reference:
   - ParaSetEx
   - NumOutEx
   - Out_Example
-  - MultiATSM MultiATSM-package
-
-
-
+  - MultiATSM-package

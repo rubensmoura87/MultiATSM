@@ -3,6 +3,7 @@
 \docType{data}
 \name{Out}
 \alias{Out}
+\alias{Out_Example}
 \title{Complete list of several outputs from an ATSM}
 \format{
 several model classes

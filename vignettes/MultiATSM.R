@@ -359,16 +359,16 @@ summary(Out$ATSMInputs)
 ## -----------------------------------------------------------------------------
 summary(Out$ModelPara) 
 
-## -----------------------------------------------------------------------------
+## ----fig.alt="GIRFs - Responses of yields curves in China and Brazil to a global economic shocks"----
 GIRF_all <- autoplot(Out$NumOut, type = "GIRF_Yields")
 GIRF_all$Brazil$Gl_Eco_Act
 GIRF_all$China$Gl_Eco_Act
 
-## -----------------------------------------------------------------------------
+## ----fig.alt="GIRFs - Responses of 12-month maturity bonds in China and Brazil to several shocks"----
 GIRF_all_Boot <- autoplot(Out$Bootstrap, Out$NumOut, type = "GIRF_Yields_Boot")
 GIRF_all_Boot$China$Y12M_China
 GIRF_all_Boot$Brazil$Y12M_Brazil
 
-## -----------------------------------------------------------------------------
+## ----fig.alt="Root mean square error (RMSE)"----------------------------------
 plot(Out$Forecasts) 
 

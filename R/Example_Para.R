@@ -2,6 +2,7 @@
 #'
 #' @description JPS-based model for Brazilian data
 #' @name ModelParaEx
+#' @aliases ParaSetEx
 #' @docType data
 #' @usage data("ParaSetEx")
 #' @format list of inputs and outputs

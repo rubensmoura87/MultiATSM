@@ -2,6 +2,7 @@
 #'
 #' @description Trade Flows data used in Candelon and Moura (2024, JFEC)
 #' @name TradeFlows
+#' @aliases CM_Trade
 #' @docType data
 #' @usage data("CM_Trade")
 #' @format list containing the bilateral trade flows

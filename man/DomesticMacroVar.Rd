@@ -3,6 +3,7 @@
 \docType{data}
 \name{DomesticMacroVar}
 \alias{DomesticMacroVar}
+\alias{CM_DomMacroFactors}
 \title{Data: Risk Factors - Candelon and Moura (2024, JFEC)}
 \format{
 matrix containing the  risk factors of the models

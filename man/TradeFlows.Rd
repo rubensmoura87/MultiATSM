@@ -3,6 +3,7 @@
 \docType{data}
 \name{TradeFlows}
 \alias{TradeFlows}
+\alias{CM_Trade}
 \title{Data: Trade Flows - Candelon and Moura (2024, JFEC)}
 \format{
 list containing the bilateral trade flows

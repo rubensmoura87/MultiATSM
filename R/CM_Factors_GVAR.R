@@ -2,6 +2,7 @@
 #'
 #' @description Risk factors data used in the GVAR models - Candelon and Moura (2024, JFEC)
 #' @name FactorsGVAR
+#' @aliases CM_Factors_GVAR
 #' @docType data
 #' @usage data("CM_Factors_GVAR")
 #' @format list containing the variables used in the GVAR models

@@ -2,6 +2,7 @@
 #'
 #' @description Risk factors data used in Candelon and Moura (2024, JFEC)
 #' @name DomesticMacroVar
+#' @aliases CM_DomMacroFactors
 #' @docType data
 #' @usage data("CM_DomMacroFactors")
 #' @format matrix containing the  risk factors of the models

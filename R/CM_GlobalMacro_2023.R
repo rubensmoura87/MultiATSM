@@ -2,6 +2,7 @@
 #'
 #' @description Risk factors data used in Candelon and Moura (2023)
 #' @name GlobalMacro
+#' @aliases CM_GlobalMacro_2023
 #' @docType data
 #' @usage data("CM_GlobalMacro_2023")
 #' @format matrix containing the  risk factors of the models
