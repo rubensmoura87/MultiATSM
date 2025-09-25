@@ -2,3 +2,84 @@ url: https://rubensmoura87.github.io/MultiATSM/
 template:
   bootstrap: 5
 
+reference:
+- title: Dataset
+  desc: >
+    Examples of dataset used in several papers
+  contents:
+  - CM_DomMacroFactors
+  - CM_Factors_GVAR
+  - CM_GlobalMacro_2023
+  - CM_GlobalMacroFactors
+  - CM_Factors
+  - CM_Trade
+  - CM_Trade
+  - CM_Yields CM_Yields_2023
+- title: Data handling
+  desc: >
+   blah blah
+  contents:
+  - DataForEstimation
+  - DatabasePrep
+  - LoadData
+  - Load_Excel_Data
+  - InputsForOutputs
+  - LabFac
+- title: P-dynamics estimation
+  desc: >
+    blah blah
+  contents:
+  - Bias_Correc_VAR
+  - GVAR
+  - JLL
+  - Transition_Matrix
+  - VAR
+- title: Methods
+  desc: >
+    Available methods for several object classes
+  contents:
+  - autoplot()
+  - autoplot(<ATSMModelBoot>)
+  - autoplot(<ATSMNumOutputs>)
+  - plot(<ATSMModelForecast>)
+  - print(<ATSMModelInputs>)
+  - summary(<ATSMModelInputs>)
+  - summary(<ATSMModelOutputs>)
+- title: Graphs
+  desc: >
+    Available methods for several object classes
+  contents:
+  - FEVDandGFEVDgraphs
+  - Fitgraphs
+  - IRFandGIRFgraphs
+  - RiskFactorsGraphs
+  - TPDecompGraph
+- title: Spanned factors-related
+  desc: >
+    blah
+  contents:
+  - Spanned_Factors
+  - pca_weights_one_country
+- title: optimization-related
+  desc: >
+    blah
+  contents:
+  - Bootstrap
+  - ForecastYields
+  - InputsForOpt
+  - Optimization
+  - NumOutputs
+- title: Pre-loaded otputs
+  desc: >
+    blah
+  contents:
+  - BR_jps_gro_R3
+  - InpForOutEx
+  - JPSrep
+  - ParaSetEx
+  - NumOutEx
+  - Out_Example
+  - MultiATSM MultiATSM-package
+
+
+
