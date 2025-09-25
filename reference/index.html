@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">MultiATSM</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.5.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.5.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -15,11 +15,11 @@
     </button>
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
-      <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
+      <ul class="navbar-nav me-auto"><li class="nav-item"><a class="nav-link" href="../articles/MultiATSM.html">Get started</a></li>
+<li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/Guidelines.html">MultiATSM package - General Guidelines</a></li>
-    <li><a class="dropdown-item" href="../articles/Paper-Replications.html">Paper Replications</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/Paper-Replications.html">Paper Replications</a></li>
   </ul></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
@@ -36,9 +36,9 @@
     </div>
 
     <div class="section level2">
-      <h2 id="all-functions">All functions<a class="anchor" aria-label="anchor" href="#all-functions"></a></h2>
+      <h2 id="dataset">Dataset<a class="anchor" aria-label="anchor" href="#dataset"></a></h2>
 
-
+      <div class="section-desc"><p>Datasets included in the package</p></div>
 
 
     </div><div class="section level2">
@@ -48,23 +48,70 @@
 
       <dl><dt>
 
-          <code><a href="BR_jps_out.html">BR_jps_gro_R3</a></code>
+          <code><a href="GlobalMacroVar.html">CM_GlobalMacroFactors</a></code>
 
         </dt>
-        <dd>Replications of the JPS (2014) outputs by Bauer and Rudebusch (2017)</dd>
+        <dd>Data: Risk Factors - Candelon and Moura (2024, JFEC)</dd>
       </dl><dl><dt>
 
-          <code><a href="Bias_Correc_VAR.html">Bias_Correc_VAR()</a></code>
+          <code><a href="GlobalMacro.html">CM_GlobalMacro_2023</a></code>
 
         </dt>
-        <dd>Estimates an unbiased VAR(1) using stochastic approximation (Bauer, Rudebusch and Wu, 2012)</dd>
+        <dd>Data: Risk Factors - Candelon and Moura (2023)</dd>
       </dl><dl><dt>
 
-          <code><a href="Bootstrap.html">Bootstrap()</a></code>
+          <code><a href="RiskFactors.html">CM_Factors</a></code>
 
         </dt>
-        <dd>Generates the bootstrap-related outputs</dd>
+        <dd>Data: Risk Factors - Candelon and Moura (2024, JFEC)</dd>
       </dl><dl><dt>
+
+          <code><a href="DomesticMacroVar.html">CM_DomMacroFactors</a></code>
+
+        </dt>
+        <dd>Data: Risk Factors - Candelon and Moura (2024, JFEC)</dd>
+      </dl><dl><dt>
+
+          <code><a href="DomMacro.html">CM_DomMacro_2023</a></code>
+
+        </dt>
+        <dd>Data: Risk Factors for the GVAR - Candelon and Moura (2023)</dd>
+      </dl><dl><dt>
+
+          <code><a href="TradeFlows.html">CM_Trade</a></code>
+
+        </dt>
+        <dd>Data: Trade Flows - Candelon and Moura (2024, JFEC)</dd>
+      </dl><dl><dt>
+
+          <code><a href="Trade_Flows.html">CM_Trade_2023</a></code>
+
+        </dt>
+        <dd>Data: Trade Flows - Candelon and Moura (2023)</dd>
+      </dl><dl><dt>
+
+          <code><a href="Yields.html">CM_Yields</a></code> <code><a href="Yields.html">CM_Yields_2023</a></code>
+
+        </dt>
+        <dd>Data: Yields - Candelon and Moura (2024, JFEC)</dd>
+      </dl><dl><dt>
+
+          <code><a href="FactorsGVAR.html">CM_Factors_GVAR</a></code>
+
+        </dt>
+        <dd>Data: Risk Factors for the GVAR - Candelon and Moura (2024, JFEC)</dd>
+      </dl></div><div class="section level2">
+      <h2 id="data-handling">Data handling<a class="anchor" aria-label="anchor" href="#data-handling"></a></h2>
+
+      <div class="section-desc"><p>Functions for handling and transforming data</p></div>
+
+
+    </div><div class="section level2">
+
+
+
+
+      <dl><dt>
 
           <code><a href="DataForEstimation.html">DataForEstimation()</a></code>
 
@@ -76,96 +123,6 @@
 
         </dt>
         <dd>Gather data of several countries in a list. Particularly useful for GVAR-based setups (Compute "GVARFactors")</dd>
-      </dl><dl><dt>
-
-          <code><a href="DomMacro.html">CM_DomMacro_2023</a></code>
-
-        </dt>
-        <dd>Data: Risk Factors for the GVAR - Candelon and Moura (2023)</dd>
-      </dl><dl><dt>
-
-          <code><a href="DomesticMacroVar.html">CM_DomMacroFactors</a></code>
-
-        </dt>
-        <dd>Data: Risk Factors - Candelon and Moura (2024, JFEC)</dd>
-      </dl><dl><dt>
-
-          <code><a href="FEVDandGFEVDgraphs.html">FEVDandGFEVDgraphs()</a></code>
-
-        </dt>
-        <dd>FEVD and GFEVD graphs for all models</dd>
-      </dl><dl><dt>
-
-          <code><a href="FactorsGVAR.html">CM_Factors_GVAR</a></code>
-
-        </dt>
-        <dd>Data: Risk Factors for the GVAR - Candelon and Moura (2024, JFEC)</dd>
-      </dl><dl><dt>
-
-          <code><a href="Fitgraphs.html">Fitgraphs()</a></code>
-
-        </dt>
-        <dd>Model fit graphs for all models</dd>
-      </dl><dl><dt>
-
-          <code><a href="ForecastYields.html">ForecastYields()</a></code>
-
-        </dt>
-        <dd>Generates forecasts of bond yields for all model types</dd>
-      </dl><dl><dt>
-
-          <code><a href="GVAR.html">GVAR()</a></code>
-
-        </dt>
-        <dd>Estimates a GVAR(1) and a VARX(1,1,1) models</dd>
-      </dl><dl><dt>
-
-          <code><a href="GlobalMacro.html">CM_GlobalMacro_2023</a></code>
-
-        </dt>
-        <dd>Data: Risk Factors - Candelon and Moura (2023)</dd>
-      </dl><dl><dt>
-
-          <code><a href="GlobalMacroVar.html">CM_GlobalMacroFactors</a></code>
-
-        </dt>
-        <dd>Data: Risk Factors - Candelon and Moura (2024, JFEC)</dd>
-      </dl><dl><dt>
-
-          <code><a href="IRFandGIRFgraphs.html">IRFandGIRFgraphs()</a></code>
-
-        </dt>
-        <dd>IRF and GIRF graphs for all models</dd>
-      </dl><dl><dt>
-
-          <code><a href="InpForOutEx.html">InpForOutEx</a></code>
-
-        </dt>
-        <dd>Example of list inputs used in the construction of several model outputs</dd>
-      </dl><dl><dt>
-
-          <code><a href="InputsForOpt.html">InputsForOpt()</a></code>
-
-        </dt>
-        <dd>Generates inputs necessary to build the likelihood function for the ATSM model</dd>
-      </dl><dl><dt>
-
-          <code><a href="InputsForOutputs.html">InputsForOutputs()</a></code>
-
-        </dt>
-        <dd>Collects the inputs that are used to construct the numerical and the graphical outputs</dd>
-      </dl><dl><dt>
-
-          <code><a href="JLL.html">JLL()</a></code>
-
-        </dt>
-        <dd>Estimates the P-dynamics from JLL-based models</dd>
-      </dl><dl><dt>
-
-          <code><a href="LabFac.html">LabFac()</a></code>
-
-        </dt>
-        <dd>Generates the labels factors</dd>
       </dl><dl><dt>
 
           <code><a href="LoadData.html">LoadData()</a></code>
@@ -180,82 +137,45 @@
         <dd>Read data from Excel files and transform them into a dataframe</dd>
       </dl><dl><dt>
 
-          <code><a href="ModelPara.html">JPSrep</a></code>
+          <code><a href="InputsForOutputs.html">InputsForOutputs()</a></code>
 
         </dt>
-        <dd>Replications of the JPS (2014) outputs by the MultiATSM package</dd>
+        <dd>Collects the inputs that are used to construct the numerical and the graphical outputs</dd>
       </dl><dl><dt>
 
-          <code><a href="ModelParaEx.html">ParaSetEx</a></code>
+          <code><a href="LabFac.html">LabFac()</a></code>
 
         </dt>
-        <dd>Example of parameter set after optimization</dd>
+        <dd>Generates the labels factors</dd>
+      </dl></div><div class="section level2">
+      <h2 id="estimation-of-model-p-dynamics">Estimation of model P-dynamics<a class="anchor" aria-label="anchor" href="#estimation-of-model-p-dynamics"></a></h2>
+
+      <div class="section-desc"><p>Functions for estimating the parameters from the P-dynamics</p></div>
+
+
+    </div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="Bias_Correc_VAR.html">Bias_Correc_VAR()</a></code>
+
+        </dt>
+        <dd>Estimates an unbiased VAR(1) using stochastic approximation (Bauer, Rudebusch and Wu, 2012)</dd>
       </dl><dl><dt>
 
-          <code><a href="MultiATSM.html">MultiATSM</a></code> <code><a href="MultiATSM.html">MultiATSM-package</a></code>
+          <code><a href="GVAR.html">GVAR()</a></code>
 
         </dt>
-        <dd>ATSM Package</dd>
+        <dd>Estimates a GVAR(1) and a VARX(1,1,1) models</dd>
       </dl><dl><dt>
 
-          <code><a href="NumOutEx.html">NumOutEx</a></code>
+          <code><a href="JLL.html">JLL()</a></code>
 
         </dt>
-        <dd>Example of computed numerical outputs</dd>
-      </dl><dl><dt>
-
-          <code><a href="NumOutputs.html">NumOutputs()</a></code>
-
-        </dt>
-        <dd>Constructs the model numerical outputs (model fit, IRFs, GIRFs, FEVDs, GFEVDs, and term premia decomposition)</dd>
-      </dl><dl><dt>
-
-          <code><a href="Optimization.html">Optimization()</a></code>
-
-        </dt>
-        <dd>Perform the optimization of the log-likelihood function of the chosen ATSM</dd>
-      </dl><dl><dt>
-
-          <code><a href="Out.html">Out_Example</a></code>
-
-        </dt>
-        <dd>Complete list of several outputs from an ATSM</dd>
-      </dl><dl><dt>
-
-          <code><a href="RiskFactors.html">CM_Factors</a></code>
-
-        </dt>
-        <dd>Data: Risk Factors - Candelon and Moura (2024, JFEC)</dd>
-      </dl><dl><dt>
-
-          <code><a href="RiskFactorsGraphs.html">RiskFactorsGraphs()</a></code>
-
-        </dt>
-        <dd>Spanned and unspanned factors plot</dd>
-      </dl><dl><dt>
-
-          <code><a href="Spanned_Factors.html">Spanned_Factors()</a></code>
-
-        </dt>
-        <dd>Computes the country-specific spanned factors</dd>
-      </dl><dl><dt>
-
-          <code><a href="TPDecompGraph.html">TPDecompGraph()</a></code>
-
-        </dt>
-        <dd>Term Premia decomposition graphs for all models</dd>
-      </dl><dl><dt>
-
-          <code><a href="TradeFlows.html">CM_Trade</a></code>
-
-        </dt>
-        <dd>Data: Trade Flows - Candelon and Moura (2024, JFEC)</dd>
-      </dl><dl><dt>
-
-          <code><a href="Trade_Flows.html">CM_Trade</a></code>
-
-        </dt>
-        <dd>Data: Trade Flows - Candelon and Moura (2023)</dd>
+        <dd>Estimates the P-dynamics from JLL-based models</dd>
       </dl><dl><dt>
 
           <code><a href="Transition_Matrix.html">Transition_Matrix()</a></code>
@@ -268,12 +188,23 @@
 
         </dt>
         <dd>Estimates a standard VAR(1)</dd>
-      </dl><dl><dt>
+      </dl></div><div class="section level2">
+      <h2 id="methods">Methods<a class="anchor" aria-label="anchor" href="#methods"></a></h2>
 
-          <code><a href="Yields.html">CM_Yields</a></code> <code><a href="Yields.html">CM_Yields_2023</a></code>
+      <div class="section-desc"><p>Available methods for several object classes</p></div>
+
+
+    </div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="autoplot.html">autoplot()</a></code>
 
         </dt>
-        <dd>Data: Yields - Candelon and Moura (2024, JFEC)</dd>
+        <dd>Autoplot generic function</dd>
       </dl><dl><dt>
 
           <code><a href="autoplot.ATSMModelBoot.html">autoplot(<i>&lt;ATSMModelBoot&gt;</i>)</a></code>
@@ -286,18 +217,6 @@
 
         </dt>
         <dd>Autoplot method for ATSMNumOutputs objects</dd>
-      </dl><dl><dt>
-
-          <code><a href="autoplot.html">autoplot()</a></code>
-
-        </dt>
-        <dd>Autoplot generic function</dd>
-      </dl><dl><dt>
-
-          <code><a href="pca_weights_one_country.html">pca_weights_one_country()</a></code>
-
-        </dt>
-        <dd>Computes the PCA weights for a single country</dd>
       </dl><dl><dt>
 
           <code><a href="plot.ATSMModelForecast.html">plot(<i>&lt;ATSMModelForecast&gt;</i>)</a></code>
@@ -322,8 +241,167 @@
 
         </dt>
         <dd>Summary method for ATSMModelOutputs objects</dd>
+      </dl></div><div class="section level2">
+      <h2 id="graphs">Graphs<a class="anchor" aria-label="anchor" href="#graphs"></a></h2>
+
+      <div class="section-desc"><p>Functions to generate graphical outputs</p></div>
+
+
+    </div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="FEVDandGFEVDgraphs.html">FEVDandGFEVDgraphs()</a></code>
+
+        </dt>
+        <dd>FEVD and GFEVD graphs for all models</dd>
+      </dl><dl><dt>
+
+          <code><a href="Fitgraphs.html">Fitgraphs()</a></code>
+
+        </dt>
+        <dd>Model fit graphs for all models</dd>
+      </dl><dl><dt>
+
+          <code><a href="IRFandGIRFgraphs.html">IRFandGIRFgraphs()</a></code>
+
+        </dt>
+        <dd>IRF and GIRF graphs for all models</dd>
+      </dl><dl><dt>
+
+          <code><a href="RiskFactorsGraphs.html">RiskFactorsGraphs()</a></code>
+
+        </dt>
+        <dd>Spanned and unspanned factors plot</dd>
+      </dl><dl><dt>
+
+          <code><a href="TPDecompGraph.html">TPDecompGraph()</a></code>
+
+        </dt>
+        <dd>Term Premia decomposition graphs for all models</dd>
+      </dl></div><div class="section level2">
+      <h2 id="spanned-factors-related">Spanned factors-related<a class="anchor" aria-label="anchor" href="#spanned-factors-related"></a></h2>
+
+      <div class="section-desc"><p>Functions related to the computation of spanned factors</p></div>
+
+
+    </div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="Spanned_Factors.html">Spanned_Factors()</a></code>
+
+        </dt>
+        <dd>Computes the country-specific spanned factors</dd>
+      </dl><dl><dt>
+
+          <code><a href="pca_weights_one_country.html">pca_weights_one_country()</a></code>
+
+        </dt>
+        <dd>Computes the PCA weights for a single country</dd>
+      </dl></div><div class="section level2">
+      <h2 id="optimization-related">Optimization-related<a class="anchor" aria-label="anchor" href="#optimization-related"></a></h2>
+
+      <div class="section-desc"><p>Model optimization, numerical outputs, bootstrap and forecasting</p></div>
+
+
+    </div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="Bootstrap.html">Bootstrap()</a></code>
+
+        </dt>
+        <dd>Generates the bootstrap-related outputs</dd>
+      </dl><dl><dt>
+
+          <code><a href="ForecastYields.html">ForecastYields()</a></code>
+
+        </dt>
+        <dd>Generates forecasts of bond yields for all model types</dd>
+      </dl><dl><dt>
+
+          <code><a href="InputsForOpt.html">InputsForOpt()</a></code>
+
+        </dt>
+        <dd>Generates inputs necessary to build the likelihood function for the ATSM model</dd>
+      </dl><dl><dt>
+
+          <code><a href="Optimization.html">Optimization()</a></code>
+
+        </dt>
+        <dd>Perform the optimization of the log-likelihood function of the chosen ATSM</dd>
+      </dl><dl><dt>
+
+          <code><a href="NumOutputs.html">NumOutputs()</a></code>
+
+        </dt>
+        <dd>Constructs the model numerical outputs (model fit, IRFs, GIRFs, FEVDs, GFEVDs, and term premia decomposition)</dd>
+      </dl></div><div class="section level2">
+      <h2 id="pre-loaded-outputs">Pre-loaded outputs<a class="anchor" aria-label="anchor" href="#pre-loaded-outputs"></a></h2>
+
+      <div class="section-desc"><p>Pre computed outputs</p></div>
+
+
+    </div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="BR_jps_out.html">BR_jps_gro_R3</a></code>
+
+        </dt>
+        <dd>Replications of the JPS (2014) outputs by Bauer and Rudebusch (2017)</dd>
+      </dl><dl><dt>
+
+          <code><a href="InpForOutEx.html">InpForOutEx</a></code>
+
+        </dt>
+        <dd>Example of list inputs used in the construction of several model outputs</dd>
+      </dl><dl><dt>
+
+          <code><a href="ModelPara.html">JPSrep</a></code>
+
+        </dt>
+        <dd>Replications of the JPS (2014) outputs by the MultiATSM package</dd>
+      </dl><dl><dt>
+
+          <code><a href="ModelParaEx.html">ParaSetEx</a></code>
+
+        </dt>
+        <dd>Example of parameter set after optimization</dd>
+      </dl><dl><dt>
+
+          <code><a href="NumOutEx.html">NumOutEx</a></code>
+
+        </dt>
+        <dd>Example of computed numerical outputs</dd>
+      </dl><dl><dt>
+
+          <code><a href="Out.html">Out_Example</a></code>
+
+        </dt>
+        <dd>Complete list of several outputs from an ATSM</dd>
+      </dl><dl><dt>
+
+          <code><a href="MultiATSM.html">MultiATSM</a></code> <code><a href="MultiATSM.html">MultiATSM-package</a></code>
+
+        </dt>
+        <dd>ATSM Package</dd>
       </dl></div>
-  </main></div>
+  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
+    </nav></aside></div>
 
 
     <footer><div class="pkgdown-footer-left">

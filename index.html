@@ -22,7 +22,7 @@
 
     <a class="navbar-brand me-2" href="index.html">MultiATSM</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.5.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.5.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -31,12 +31,12 @@
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
+<li class="nav-item"><a class="nav-link" href="articles/MultiATSM.html">Get started</a></li>
 <li class="nav-item"><a class="nav-link" href="reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="articles/Guidelines.html">MultiATSM package - General Guidelines</a></li>
-    <li><a class="dropdown-item" href="articles/Paper-Replications.html">Paper Replications</a></li>
+<li><a class="dropdown-item" href="articles/Paper-Replications.html">Paper Replications</a></li>
   </ul>
 </li>
       </ul>
@@ -53,7 +53,62 @@
 </nav><div class="container template-home">
 <div class="row">
   <main id="main" class="col-md-9">
-Estimation routines for several classes of affine term structure of interest rates models. All the models are based on the single-country unspanned macroeconomic risk framework from Joslin, Priebsch, and Singleton (2014, JF) &lt;<a href="https://doi.org/10.1111/jofi.12131" class="external-link">doi:10.1111/jofi.12131</a>&gt;. Multicountry extensions such as the ones of Jotikasthira, Le, and Lundblad (2015, JFE) &lt;<a href="https://doi.org/10.1016/j.jfineco.2014.09.004" class="external-link">doi:10.1016/j.jfineco.2014.09.004</a>&gt;, Candelon and Moura (2023, EM) &lt;<a href="https://doi.org/10.1016/j.econmod.2023.106453" class="external-link">doi:10.1016/j.econmod.2023.106453</a>&gt;, and Candelon and Moura (2024, JFEC) &lt;<a href="https://doi.org/10.1093/jjfinec/nbae008" class="external-link">doi:10.1093/jjfinec/nbae008</a>&gt; are also available.
+<div class="section level2">
+<h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
+</h2>
+<p>MultiATSM is an R package for estimating, analyzing, and forecasting multi-country macro-finance affine term structure models (ATSMs). The package implements a variety of models, including JPS, GVAR, and JLL frameworks (see complete references below), and provides tools for bias correction, bootstrap analysis, and graphical/numerical outputs.</p>
+</div>
+<div class="section level2">
+<h2 id="features">Features<a class="anchor" aria-label="anchor" href="#features"></a>
+</h2>
+<ul>
+<li>Estimation of multi-country ATSMs (JPS, 2014, JLL, 2015, GVAR, 2023-2024, and variants)</li>
+<li>Flexible input structure for macroeconomic and yield data</li>
+<li>Graphical and numerical outputs for model diagnostics and interpretation</li>
+<li>Bias correction for a VAR dynamics (BRW, 2012)</li>
+<li>Bootstrap analysis for confidence intervals</li>
+<li>Out-of-sample forecasting</li>
+</ul>
+</div>
+<div class="section level2">
+<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
+</h2>
+<p>You can install the development version of MultiATSM from <a href="https://github.com/" class="external-link">GitHub</a> with:</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># install.packages("devtools")</span></span>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"rubensmoura87/MultiATSM"</span><span class="op">)</span></span></code></pre></div>
+<p>You can also get the official release version from CRAN</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"MultiATSM"</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="usage-and-documentation">Usage and documentation<a class="anchor" aria-label="anchor" href="#usage-and-documentation"></a>
+</h2>
+<ul>
+<li>See the package manual and <a href="https://https://rubensmoura87.github.io/articles/MultiATSM.html/" class="external-link">vignettes</a> for detailed function documentation and examples.</li>
+<li>Main functions: <code>InputsForOpt</code>, <code>Bias_Correc_VAR</code>, <code>Optimization</code>, <code>NumOutputs</code>, <code>Bootstrap</code>, <code>ForecastYields</code>, etc.</li>
+</ul>
+</div>
+<div class="section level2">
+<h2 id="more-information-about-multiatsm">More information about <code>{MultiATSM}</code>
+<a class="anchor" aria-label="anchor" href="#more-information-about-multiatsm"></a>
+</h2>
+<p>You can learn more about the underlying models in the working paper published in the <a href="https://dial.uclouvain.be/pr/boreal/object/boreal%3A259119/datastream/PDF_01/view#:~:text=Abstract,sample%20forecasting%20of%20bond%20yields." class="external-link">LIDAM-LFIN Series.</a>.</p>
+</div>
+<div class="section level2">
+<h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
+</h2>
+<ul>
+<li><p>Bauer, M. D., Rudebusch, G. D., &amp; Wu, J. C. (2012). Correcting estimation bias in dynamic term structure models. <em>Journal of Business &amp; Economic Statistics</em>, 30(3), 454-467.</p></li>
+<li><p>Candelon, B., &amp; Moura, R. (2023). Sovereign yield curves and the COVID-19 in emerging markets. <em>Economic Modelling</em>, 127, 106453.</p></li>
+<li><p>Candelon, B., &amp; Moura, R. (2024). A Multicountry Model of the Term Structures of Interest Rates with a GVAR. <em>Journal of Financial Econometrics</em>, 22(5), 1558-1587.</p></li>
+<li><p>Joslin, S., Priebsch, M., &amp; Singleton, K. J. (2014). Risk premiums in dynamic term structure models with unspanned macro risks. <em>The Journal of Finance</em>, 69(3), 1197-1233.</p></li>
+<li><p>Joslin, S., Singleton, K. J., &amp; Zhu, H. (2011). A new perspective on Gaussian dynamic term structure models. <em>The Review of Financial Studies</em>, 24(3), 926-970.</p></li>
+<li><p>Jotikasthira, C., Le, A., &amp; Lundblad, C. (2015). Why do term structures in different currencies co-move?. <em>Journal of Financial Economics</em>, 115(1), 58-83.</p></li>
+<li><p>See also the references in the package documentation.</p></li>
+</ul>
+</div>
+
   </main><aside class="col-md-3"><div class="links">
 <h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
