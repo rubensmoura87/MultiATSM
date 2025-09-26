@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">MultiATSM</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.5.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.5.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -60,7 +60,7 @@
                         <h4 data-toc-skip class="author">Rubens
 Moura</h4>
             
-            <h4 data-toc-skip class="date">2025-09-25</h4>
+            <h4 data-toc-skip class="date">2025-09-26</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/rubensmoura87/MultiATSM/blob/main/vignettes/Paper-Replications.Rmd" class="external-link"><code>vignettes/Paper-Replications.Rmd</code></a></small>
       <div class="d-none name"><code>Paper-Replications.Rmd</code></div>
@@ -222,6 +222,7 @@ is the long-run mean of the short rate under Q.
 </tr>
 </tfoot>
 </table>
+<p><a id="tab-PdynTab"></a></p>
 <table class="table  lightable-classic lightable-striped" style='font-family: "Arial Narrow", "Source Sans Pro", sans-serif; width: auto !important; margin-left: auto; margin-right: auto;border-bottom: 0;'>
 <caption>
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>P</mi><annotation encoding="application/x-tex">P</annotation></semantics></math>-dynamics
@@ -565,18 +566,18 @@ errors.
 </table>
 <p>For replicability, it is important to note that the
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>P</mi><mo>−</mo></mrow><annotation encoding="application/x-tex">P-</annotation></semantics></math>dynamics
-results reported in Table @ref(tab:PdynTab) for the <em>MultiATSM</em>
-package make use of the principal component weights provided by BR
-(2017). Such a matrix is simply a scaled-up version of the one provided
-by the function <code><a href="../reference/pca_weights_one_country.html">pca_weights_one_country()</a></code> of this package.
-Accordingly, despite the numerical differences on the weight matrices,
-both methods generate time series of spanned factors which are perfectly
-correlated. Another difference between the two approaches relates to the
-construction form of the log-likelihood function (llk): while in the BR
-(2017) code the llk is expressed in terms of a portfolio of yields, the
-<em>MultiATSM</em> package generates this same input directly as a
-function of observed yields (i.e. both procedures lead to equivalent llk
-up to the Jacobian term).</p>
+results reported in <a href="#tab-PdynTab">Table 1.2</a> for the
+<em>MultiATSM</em> package make use of the principal component weights
+provided by BR (2017). Such a matrix is simply a scaled-up version of
+the one provided by the function <code><a href="../reference/pca_weights_one_country.html">pca_weights_one_country()</a></code>
+of this package. Accordingly, despite the numerical differences on the
+weight matrices, both methods generate time series of spanned factors
+which are perfectly correlated. Another difference between the two
+approaches relates to the construction form of the log-likelihood
+function (llk): while in the BR (2017) code the llk is expressed in
+terms of a portfolio of yields, the <em>MultiATSM</em> package generates
+this same input directly as a function of observed yields (i.e. both
+procedures lead to equivalent llk up to the Jacobian term).</p>
 </div>
 <div class="section level2">
 <h2 id="candelon-and-moura-2024">Candelon and Moura (2024)<a class="anchor" aria-label="anchor" href="#candelon-and-moura-2024"></a>

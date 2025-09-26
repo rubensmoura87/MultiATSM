@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">MultiATSM</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.5.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.5.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -60,7 +60,7 @@
                         <h4 data-toc-skip class="author">Rubens
 Moura</h4>
             
-            <h4 data-toc-skip class="date">2025-09-25</h4>
+            <h4 data-toc-skip class="date">2025-09-26</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/rubensmoura87/MultiATSM/blob/main/vignettes/MultiATSM.Rmd" class="external-link"><code>vignettes/MultiATSM.Rmd</code></a></small>
       <div class="d-none name"><code>MultiATSM.Rmd</code></div>
@@ -105,6 +105,7 @@ density functions. In all cases, the risk factor dynamics under the
 follow a VAR(1) model of some sort. The table below summarizes the
 general features of each one of the models available at this
 package.</p>
+<p><a id="tab-ModFea"></a></p>
 <table class="table  lightable-classic lightable-striped" style='font-family: "Arial Narrow", "Source Sans Pro", sans-serif; width: auto !important; margin-left: auto; margin-right: auto;'>
 <caption>
 Model Features
@@ -623,16 +624,15 @@ considered that the dynamics of the risk factors under the
 evolves according to a GVAR model. The version labeled <em>“GVAR
 multi”</em> is the one presented in CM (2024).</p>
 <p>In what follows, the focus will be devoted to describe the various
-pieces that are necessary to implement ATSMs. Specifically, Section
-@ref(S:SectionData) describes the data-set available at this package and
-the set of functions that are useful to retrieve data from Excel files.
-Section @ref(S:SectionInputs) exposes the necessary inputs that have to
-be specified by the user. In Section @ref(S:SectionEstimation) the
-estimation procedure is detailed. Section @ref(S:SectionReplication)
-shows how to use the <em>MultiATSM</em> package to estimate ATSMs from
-scratch.</p>
+pieces that are necessary to implement ATSMs. Specifically, <a href="#SectionData">Section Data</a> describes the data-set available at
+this package and the set of functions that are useful to retrieve data
+from Excel files. <a href="#SectionInputs">Section Required user
+inputs</a> exposes the necessary inputs that have to be specified by the
+user. In Section <a href="#SectionEstimation">Model Estimation</a> the
+estimation procedure is detailed. Section <a href="#SectionEstimation">Model Estimation</a> shows how to use the
+<em>MultiATSM</em> package to estimate ATSMs from scratch.</p>
 <div class="section level2">
-<h2 id="S:SectionData">Data<a class="anchor" aria-label="anchor" href="#S:SectionData"></a>
+<h2 id="SectionData">Data<a class="anchor" aria-label="anchor" href="#SectionData"></a>
 </h2>
 <div class="section level3">
 <h3 id="S:SectionDataPackage">Package data-set<a class="anchor" aria-label="anchor" href="#S:SectionDataPackage"></a>
@@ -668,8 +668,7 @@ themselves if needed. The data can also be retrieved using:</p>
 <strong>spanned</strong> factors, according to the terminology of JPS
 (2014). These factors typically correspond to the standard yield curve
 components, namely level, slope, and curvature. An intuitive explanation
-of their statistical properties is provided in Section
-@ref(S:SpaFac).</p>
+of their statistical properties is provided in Section <a href="#SpaFac">Spanned Factors</a>.</p>
 <p>The second dataset contains time series for macroeconomic risk
 factors — also referred to as <strong>unspanned</strong> factors,
 following the classification of JPS (2014). These include measures of
@@ -736,7 +735,7 @@ factors required for the model.</li>
 </div>
 </div>
 <div class="section level2">
-<h2 id="S:SectionInputs">Required user inputs<a class="anchor" aria-label="anchor" href="#S:SectionInputs"></a>
+<h2 id="SectionInputs">Required user inputs<a class="anchor" aria-label="anchor" href="#SectionInputs"></a>
 </h2>
 <div class="section level3">
 <h3 id="fundamental-inputs-required-for-estimation">Fundamental inputs required for estimation<a class="anchor" aria-label="anchor" href="#fundamental-inputs-required-for-estimation"></a>
@@ -747,7 +746,7 @@ specify several general inputs, namely:</p>
 <ul>
 <li>
 <em>Model type</em>: a character vector indicating the model type to
-be estimated, as presented in Table @ref(tab:ModFea).</li>
+be estimated, as presented in <a href="#tab-ModFea">Table 0.1</a>.</li>
 </ul>
 <p><strong>2. Risk factor set</strong></p>
 <ul>
@@ -839,9 +838,8 @@ that stores the model outputs.</li>
 <p>Additional inputs are required for estimating GVAR-ATSM or JLL-ATSM
 models. These inputs should be organized into separate lists, named
 <em>GVARlist</em> and <em>JLLlist</em> for clarity. This section
-outlines the general structure of both lists, while Sections
-@ref(S:SectionGVAR) and @ref(S:SectionJLL) provide detailed explanations
-and available options.</p>
+outlines the general structure of both lists, while Sections <a href="#SectionGVAR">GVAR</a> and <a href="#SectionJLL">JLL</a> provide
+detailed explanations and available options.</p>
 <p>For GVAR models, the nature of the inputs is twofold. First, the
 dynamic structure of each country’s VARX model must be specified. For
 example:</p>
@@ -1074,7 +1072,7 @@ this input should be set as <em>Expanding</em>.</li>
 </div>
 </div>
 <div class="section level2">
-<h2 id="S:SectionEstimation">Model Estimation<a class="anchor" aria-label="anchor" href="#S:SectionEstimation"></a>
+<h2 id="SectionEstimation">Model Estimation<a class="anchor" aria-label="anchor" href="#SectionEstimation"></a>
 </h2>
 <p>Once bond yields and other (macro)economic time series data are
 gathered and model features are selected, ATSM estimation proceeds in
@@ -1086,7 +1084,7 @@ Finally, it optimizes the entire selected ATSM, including the
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Q</mi><mo>−</mo></mrow><annotation encoding="application/x-tex">Q-</annotation></semantics></math>measure
 parameters.</p>
 <div class="section level3">
-<h3 id="S:SpaFac">Spanned Factors<a class="anchor" aria-label="anchor" href="#S:SpaFac"></a>
+<h3 id="SpaFac">Spanned Factors<a class="anchor" aria-label="anchor" href="#SpaFac"></a>
 </h3>
 <p>The spanned factors are yield-related variables that are used to fit
 the cross-section dimensions of the term structures. Typically, the
@@ -1141,8 +1139,8 @@ follows:</p>
 <div class="section level3">
 <h3 id="the-p-dynamics-estimation">The P-dynamics estimation<a class="anchor" aria-label="anchor" href="#the-p-dynamics-estimation"></a>
 </h3>
-<p>As presented in Table @ref(tab:ModFea), the dynamics of the risk
-factors under the
+<p>As presented in <a href="#tab-ModFea">Table 0.1</a>, the dynamics of
+the risk factors under the
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>P</mi><annotation encoding="application/x-tex">P</annotation></semantics></math>-measure
 evolve according to a VAR(1) model, which may be fully unrestricted (as
 in the case of the JPS-related models) or partially restricted (as in
@@ -1172,7 +1170,7 @@ both the feedback and variance-covariance matrices of an unconstrained
 VAR model.</p>
 </div>
 <div class="section level4">
-<h4 id="S:SectionGVAR">GVAR<a class="anchor" aria-label="anchor" href="#S:SectionGVAR"></a>
+<h4 id="SectionGVAR">GVAR<a class="anchor" aria-label="anchor" href="#SectionGVAR"></a>
 </h4>
 <p>The <code><a href="../reference/GVAR.html">GVAR()</a></code> function is designed to estimate a
 first-order GVAR which is built from country-specific VARX(1,1,1)
@@ -1255,7 +1253,7 @@ prior consistency check on the inputs provided in
 <span><span class="va">GVARpara</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/GVAR.html">GVAR</a></span><span class="op">(</span><span class="va">GVARinputs</span>, <span class="va">N</span>, CheckInputs <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level4">
-<h4 id="S:SectionJLL">JLL<a class="anchor" aria-label="anchor" href="#S:SectionJLL"></a>
+<h4 id="SectionJLL">JLL<a class="anchor" aria-label="anchor" href="#SectionJLL"></a>
 </h4>
 <p>Calculating the
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>P</mi><annotation encoding="application/x-tex">P</annotation></semantics></math>-dynamics
@@ -1284,8 +1282,7 @@ matrix</em>: to save time, the user may provide the variance-covariance
 matrix from the non-orthogonalized dynamics. Otherwise, this input
 should be set as <em>NULL</em>.</p></li>
 <li><p><em>JLL type</em>: a string-vector containing the label of the
-JLL model to be estimated according to the features described in Table
-@ref(tab:ModFea).</p></li>
+JLL model to be estimated according to the features described in <a href="#tab-ModFea">Table 0.1</a>.</p></li>
 </ol>
 <p>One possible list of <em>JLLinputs</em> is as follows:</p>
 <div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
@@ -1470,8 +1467,7 @@ inspect key elements of the selected ATSM. In particular, users can now
 gain an alternative perspective on the general model inputs, optimized
 model parameters, graphocal outputs and root mean square error (RMSE)
 from the forecast analysis. For clarity, the variable names used
-hereafter align with those presented in Section
-@ref(S:SectionTemplate).</p>
+hereafter align with those presented in Section <a href="#SectionTemplate">General template</a>.</p>
 <div class="section level4">
 <h4 id="atsm-inputs">ATSM inputs<a class="anchor" aria-label="anchor" href="#atsm-inputs"></a>
 </h4>
