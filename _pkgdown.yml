@@ -2,13 +2,8 @@ url: https://rubensmoura87.github.io/MultiATSM/
 template:
   bootstrap: 5
 
-development:
-  mode: auto
-
 vignettes:
-  keep_html: true
-  toc: true
-  number_sections: true
+  rmarkdown: bookdown::html_document2
 
 reference:
 - title: Dataset
@@ -17,13 +12,13 @@ reference:
   contents:
   - CM_GlobalMacroFactors
   - CM_GlobalMacro_2023
-  - CM_Factors
   - CM_DomMacroFactors
   - CM_DomMacro_2023
   - CM_Trade
   - CM_Trade_2023
   - CM_Yields
   - CM_Yields_2023
+  - CM_Factors
   - CM_Factors_GVAR
 - title: Data handling
   desc: >

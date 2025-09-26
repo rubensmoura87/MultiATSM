@@ -44,8 +44,10 @@ install.packages("MultiATSM")
 
 ## Usage and documentation
 
-- See the package manual and
-  [vignettes](https://https://rubensmoura87.github.io/articles/MultiATSM.html/)
+- See the package
+  [manual](https://rubensmoura87.github.io/MultiATSM/reference/index.html)
+  and
+  [vignettes](https://rubensmoura87.github.io/MultiATSM/articles/MultiATSM.html)
   for detailed function documentation and examples.
 - Main functions: `InputsForOpt`, `Bias_Correc_VAR`, `Optimization`,
   `NumOutputs`, `Bootstrap`, `ForecastYields`, etc.

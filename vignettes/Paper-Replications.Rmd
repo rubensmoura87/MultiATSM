@@ -94,6 +94,8 @@ kableExtra::kbl(TableQ, align = "c", caption = "$Q$-dynamics parameters") %>%
   kableExtra::footnote(general = " $\\lambda$'s are the eigenvalues from the risk-neutral feedback matrix and $r0$ is the long-run mean of the short rate under Q.")
 ```
 
+<a id="tab-PdynTab"></a>
+
 ```{r PdynTab, echo= FALSE}
 data("BR_jps_gro_R3")
 data("JPSrep")
@@ -151,7 +153,7 @@ kableExtra::kbl(se, align = "c", caption ="Portfolio of yields with errors") %>%
   kableExtra::footnote(general = " $se$ is the standard deviation of the portfolio of yields observed with errors.")
 ```
 
-For replicability, it is important to note that the $P-$dynamics results reported in Table \@ref(tab:PdynTab) for the *MultiATSM* package make use of the principal component weights provided by BR (2017). Such a matrix is simply a scaled-up version of the one provided by the function `pca_weights_one_country()` of this package. Accordingly, despite the numerical differences on the weight matrices, both methods generate time series of spanned factors which are perfectly correlated. Another difference between the two approaches relates to the construction form of the log-likelihood function (llk): while in the BR (2017) code the llk is expressed in terms of a portfolio of yields, the *MultiATSM* package generates this same input directly as a function of observed yields (i.e. both procedures lead to equivalent llk up to the Jacobian term).
+For replicability, it is important to note that the $P-$dynamics results reported in [Table&nbsp;1.2](#tab-PdynTab) for the *MultiATSM* package make use of the principal component weights provided by BR (2017). Such a matrix is simply a scaled-up version of the one provided by the function `pca_weights_one_country()` of this package. Accordingly, despite the numerical differences on the weight matrices, both methods generate time series of spanned factors which are perfectly correlated. Another difference between the two approaches relates to the construction form of the log-likelihood function (llk): while in the BR (2017) code the llk is expressed in terms of a portfolio of yields, the *MultiATSM* package generates this same input directly as a function of observed yields (i.e. both procedures lead to equivalent llk up to the Jacobian term).
 
 
 # Candelon and Moura (2024)
