@@ -4,10 +4,14 @@
 \alias{ImposeStat_Aux}
 \title{Impose stationary constraint under the risk-neutral measure}
 \usage{
-ImposeStat_Aux(yy)
+ImposeStat_Aux(yy, ub = 0.9999, lb = 1e-04)
 }
 \arguments{
 \item{yy}{numerical vector before imposing stationary constraint}
+
+\item{ub}{upper bound}
+
+\item{lb}{lower bound}
 }
 \description{
 Impose stationary constraint under the risk-neutral measure

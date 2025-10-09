@@ -7,10 +7,8 @@
 #' @usage data("ParaSetEx")
 #' @format list of inputs and outputs
 #' \describe{
-#'    \item{inputs}{general model inputs}
-#'    \item{ests}{model parameters estimates (JPS form)}
-#'    \item{llk}{log-likelihood of the observations}
-#'    \item{rot}{model parameters estimates (rotation form)}
+#'    \item{Inupts}{general model inputs}
+#'    \item{ModEst}{model parameters estimates (JPS form)}
 #'   }
 #' @keywords  JPS model - Brazil
 NULL

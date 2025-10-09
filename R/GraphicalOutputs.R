@@ -131,13 +131,13 @@ RiskFactorsGraphs <- function(ModelType, WishRFgraphs, ModelOutputs, Economies, 
   # Extract Factors
   if (ModelType %in% SepQ_Lab) {
     FactorList <- lapply(Economies, function(e) {
-      X <- ModelOutputs[[ModelType]][[e]]$inputs$AllFactors
+      X <- ModelOutputs[[ModelType]][[e]]$Inputs$AllFactors
       if (e != Economies[1] && G > 0) X <- X[-seq_len(G), ]  # Remove global factors for second economy onwards
       return(X)
     })
     Factors <- do.call(rbind, FactorList)
   } else {
-    Factors <- ModelOutputs[[ModelType]]$inputs$AllFactors
+    Factors <- ModelOutputs[[ModelType]]$Inputs$AllFactors
   }
 
   # Ensure column names match expected format
@@ -301,10 +301,10 @@ Fitgraphs <- function(ModelType, WishFitgraphs, ModelPara, NumOut, Economies, Pa
         if( !is.null(Folder2save)) { # useful command for the implementation of the autoplot method
         dir.create(paste(Folder2save, "/Outputs/", ModelType, "/Point Estimate/Model ", Economies[i], "/Fit", sep = ""))
         }
-        mat <- (ModelPara[[ModelType]][[Economies[i]]]$inputs$mat) * 12
+        mat <- (ModelPara[[ModelType]][[Economies[i]]]$Inputs$mat) * 12
         J <- length(mat)
 
-        YieldData <- ModelPara[[ModelType]][[Economies[i]]]$inputs$Y
+        YieldData <- ModelPara[[ModelType]][[Economies[i]]]$Inputs$Y
         ModelFit <- NumOut$Fit[[ModelType]][[Economies[i]]]$`Yield Fit`
         ModelImplied <- NumOut$Fit[[ModelType]][[Economies[i]]]$`Yield Model Implied`
 
@@ -319,7 +319,7 @@ Fitgraphs <- function(ModelType, WishFitgraphs, ModelPara, NumOut, Economies, Pa
       if( !is.null(Folder2save)) { # useful command for the implementation of the autoplot method
       dir.create(paste(Folder2save, "/Outputs/", ModelType, "/Point Estimate/Fit", sep = "")) # Folder creation
       }
-        mat <- (ModelPara[[ModelType]]$inputs$mat) * 12
+        mat <- (ModelPara[[ModelType]]$Inputs$mat) * 12
       J <- length(mat)
 
       Idx0 <- 0
@@ -327,7 +327,7 @@ Fitgraphs <- function(ModelType, WishFitgraphs, ModelPara, NumOut, Economies, Pa
         Idx <- Idx0
         IdxGrpahs <- (Idx + 1):(Idx + J)
 
-        YieldData <- ModelPara[[ModelType]]$inputs$Y[IdxGrpahs, ]
+        YieldData <- ModelPara[[ModelType]]$Inputs$Y[IdxGrpahs, ]
         ModelFit <- NumOut$Fit$`Yield Fit`[IdxGrpahs, ]
         ModelImplied <- NumOut$Fit$`Yield Model Implied`[IdxGrpahs, ]
 
@@ -863,13 +863,13 @@ TPDecompGraph <- function(ModelType, NumOut, ModelPara, WishRPgraphs, UnitYields
   Para_Set <- ModelPara[[ModelType]]
 
   if (isSepQ) {
-    dt <- Para_Set[[Economies[1]]]$inputs$dt
-    mat <- Para_Set[[Economies[1]]]$inputs$mat
-    T_dim <- ncol(Para_Set[[Economies[1]]]$inputs$Y)
+    dt <- Para_Set[[Economies[1]]]$Inputs$dt
+    mat <- Para_Set[[Economies[1]]]$Inputs$mat
+    T_dim <- ncol(Para_Set[[Economies[1]]]$Inputs$Y)
   } else {
-    dt <- Para_Set$inputs$dt
-    mat <- Para_Set$inputs$mat
-    Yields <- Para_Set$inputs$Y
+    dt <- Para_Set$Inputs$dt
+    mat <- Para_Set$Inputss$mat
+    Yields <- Para_Set$Inputs$Y
     T_dim <- ncol(Yields)
     }
 
@@ -896,7 +896,7 @@ TPDecompGraph <- function(ModelType, NumOut, ModelPara, WishRPgraphs, UnitYields
       dir.create(paste(Folder2Save, "/Outputs/", ModelType, "/Point Estimate/Model ", Economies[i], "/TermPremia", sep = ""), showWarnings = FALSE)
       }
       GraphPath <- PathsGraphs[[ModelType]]$TermPremia[[Economies[i]]]
-      Yields <- Para_Set[[Economies[i]]]$inputs$Y
+      Yields <- Para_Set[[Economies[i]]]$Inputs$Y
       YieldData <- t(Yields) * 100
     } else {
       GraphPath <- PathsGraphs[[ModelType]]$TermPremia

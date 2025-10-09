@@ -45,8 +45,10 @@
 #'
 #'@references
 #' Bauer, Rudebusch and, Wu (2012). "Correcting Estimation Bias in Dynamic Term Structure Models" \cr
-#' An R implementation inspired by the methodology described therein. Related Matlab routines
-#' are available on Cynthia Wu's website (https://sites.google.com/view/jingcynthiawu/).
+#' This function offers an independent R implementation that is informed
+#' by the conceptual framework outlined in Bauer, Rudebusch and Wu (2012), but adapted to the
+#' present modeling context. Related Matlab routines are available on Cynthia Wu's
+#' website (https://sites.google.com/view/jingcynthiawu/).
 #'@export
 
 Bias_Correc_VAR  <- function(ModelType, BRWinputs, RiskFactors, Economies, FactorLabels, GVARinputs = NULL,

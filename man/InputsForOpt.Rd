@@ -113,7 +113,6 @@ ATSMInputs <- InputsForOpt(t0, tF, ModelType, Yields, GlobalMacroVar, DomesticMa
                            FactorLabels, Economies, DataFreq, GVARlist, CheckInputs = FALSE)
 
 # Example 3:
-if (requireNamespace('neldermead', quietly = TRUE)) {
 LoadData("CM_2024")
 
 ModelType <- "JLL original"
@@ -133,8 +132,5 @@ DataFrequency <- "Monthly"
 ATSMInputs <- InputsForOpt(t0, tF, ModelType, Yields, GlobalMacroVar, DomesticMacroVar,
                            FactorLabels, Economies, DataFreq, JLLlist = JLLinputs,
                            CheckInputs = FALSE)
-} else {
- message("skipping functionality due to missing Suggested dependency")
-}
 }
 }

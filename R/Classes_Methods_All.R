@@ -154,22 +154,22 @@ summary.ATSMModelOutputs <- function(object, ...) {
   if(info$ModelType %in% c("JPS original", "JPS global", "GVAR single")){
     for(i in 1:length(info$Economies)){
 
-      K1XQ <- info$Outs[[Economies[i]]]$ests$K1XQ
-      r0 <- info$Outs[[Economies[i]]]$ests$r0
-      K1Z <- info$Outs[[Economies[i]]]$ests$K1Z
+      K1XQ <- info$Outs[[Economies[i]]]$ModEst$Q$K1XQ
+      r0 <- info$Outs[[Economies[i]]]$ModEst$Q$r0
+      K1Z <- info$Outs[[Economies[i]]]$ModEst$P$K1Z
 
       cat("Model", info$Economies[i] , "\n")
       cat("General Model Outputs: \n")
       cat("------------------------------------------------------\n")
-      cat("1) Maximum Log-likelihood value:", mean(info$Outs[[Economies[i]]]$llk[[1]]), "\n")
+      cat("1) Maximum Log-likelihood value:", mean(info$Outs[[Economies[i]]]$ModEst$Max_llk), "\n")
 
       cat("\n 2) Key Features from the Q-measure: \n")
       cat(" a) Long run risk-neutral mean (r0):", round(r0, 5), "\n")
       cat(" b) Risk-neutral eigenvalues:", diag(round(K1XQ, 5)), "\n" )
       cat("\n c) Intercept matrix of loadings (Matrix A): \n")
-      print(round(info$Outs[[Economies[i]]]$rot$P$A, 6))
+      print(round(info$Outs[[Economies[i]]]$ModEst$Q$Load$P$A, 6))
       cat("\n d) Slope Matrix of Loadings (Matrix B) : \n")
-      print(round(info$Outs[[Economies[i]]]$rot$P$B, 6))
+      print(round(info$Outs[[Economies[i]]]$ModEst$Q$Load$P$B, 6))
 
       cat("\n 3) Key Features from the P-measure: \n")
       cat(" - Number of physical-measure eigenvalues greater than one:", Max_Eigen(K1Z), "\n")
@@ -183,13 +183,13 @@ summary.ATSMModelOutputs <- function(object, ...) {
     } else {
 
   # 2) Multicountry models
-  K1XQ <- info$Outs$ests$K1XQ
-  r0 <- info$Outs$ests$r0
-  K1Z <- info$Outs$ests$K1Z
+  K1XQ <- info$Outs$ModEst$Q$K1XQ
+  r0 <- info$Outs$ModEst$Q$r0
+  K1Z <- info$Outs$ModEst$P$K1Z
 
   cat("General Model Outputs: \n")
   cat("------------------------------------------------------\n")
-  cat("1) Maximum Log-likelihood value:", mean(info$Outs$llk[[1]]), "\n")
+  cat("1) Maximum Log-likelihood value:", mean(info$Outs$ModEst$Max_llk), "\n")
 
   cat("2) Key Features from the Q-measure: \n")
   cat(" \n a) Long run risk-neutral mean (r0): \n")
@@ -197,9 +197,9 @@ summary.ATSMModelOutputs <- function(object, ...) {
   cat(" \n b) Risk-neutral eigenvalues: \n" )
   print(Get_Q_Eigein(K1XQ, Economies))
   cat(" \n c) Intercept matrix of loadings (Matrix A): \n")
-  print(round(info$Outs$rot$P$A, 6))
+  print(round(info$Outs$ModEst$Q$Load$P$A, 6))
   cat(" \n d) Slope Matrix of Loadings (Matrix B) : \n")
-  print(round(info$Outs$rot$P$B, 6))
+  print(round(info$Outs$ModEst$Q$Load$P$B, 6))
 
   cat("\n 3) Key Features from the P-measure: \n")
   cat(" - Number of physical-measure eigenvalues greater than one:", Max_Eigen(K1Z), "\n")

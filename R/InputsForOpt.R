@@ -68,7 +68,6 @@
 #'                            FactorLabels, Economies, DataFreq, GVARlist, CheckInputs = FALSE)
 #'
 #' # Example 3:
-#' if (requireNamespace('neldermead', quietly = TRUE)) {
 #' LoadData("CM_2024")
 #'
 #' ModelType <- "JLL original"
@@ -88,9 +87,6 @@
 #' ATSMInputs <- InputsForOpt(t0, tF, ModelType, Yields, GlobalMacroVar, DomesticMacroVar,
 #'                            FactorLabels, Economies, DataFreq, JLLlist = JLLinputs,
 #'                            CheckInputs = FALSE)
-#' } else {
-#'  message("skipping functionality due to missing Suggested dependency")
-#' }
 #' }
 #' @export
 
@@ -619,7 +615,9 @@ GeneralMLEInputs <- function(Yields, RiskFactors, FactorLabels, mat, DataFrequen
 #' @references
 #' Le, A., & Singleton, K. J. (2018). Small Package of Matlab Routines for
 #' Estimation of Some Term Structure Models. EABCN Training School.\cr
-#' An R implementation inspired by the methodology described therein.
+#' This function offers an independent R implementation that is informed
+#' by the conceptual framework outlined in Le and Singleton (2018), but adapted to the
+#' present modeling context.
 #'
 #' @keywords internal
 
@@ -654,7 +652,6 @@ FeedMat_Q <- function(Yields, Spa_Fac, Economies, UnitYields, time_step, check_i
 
   return(K1XQ)
 }
-
 
 ###############################################################################
 #' Input validation for the 'FeedMat_Q' function

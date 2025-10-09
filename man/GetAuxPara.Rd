@@ -2,38 +2,29 @@
 % Please edit documentation in R/Buildx_xvec.R
 \name{GetAuxPara}
 \alias{GetAuxPara}
-\title{Map constrained parameters b to unconstrained auxiliary parameters a.}
+\title{Compute the auxiliary parameters a.}
 \usage{
 GetAuxPara(
   ParaValue,
   Const_Type_Full,
-  lb,
-  ub,
   Economies,
   FactorLabels,
   JLLinputs = NULL
 )
 }
 \arguments{
-\item{ParaValue}{Constrained parameter}
+\item{ParaValue}{Parameter value}
 
 \item{Const_Type_Full}{character-based vector that describes the constraints. Constraints are:
 \itemize{
-\item 'Jordan';
-\item 'Jordan; stationary'
-\item 'Jordan MultiCountry'
-\item 'Jordan MultiCountry; stationary'
-\item 'stationary'
-\item 'psd'
-\item 'BlockDiag'
-\item 'bounded'
-\item 'diag'
-\item 'JLLstructure'
+\item 'Jordan' for single-country models;
+\item 'Jordan; stationary' for single-country models;
+\item 'Jordan MultiCountry' for multicountry models;
+\item 'Jordan MultiCountry; stationary' for multicountry models;
+\item 'psd' for JPS-based models;
+\item 'BlockDiag' for GVAR-based models;
+\item 'JLLstructure' for JLL-based models;
   }}
-
-\item{lb}{lower bounds (a scalar or a matrix) of ParaValue (for the bounded case).}
-
-\item{ub}{upper bounds (a scalar or a matrix) of ParaValue (for the bounded case).}
 
 \item{Economies}{string-vector containing the names of the economies which are part of the economic system}
 
@@ -41,16 +32,7 @@ GetAuxPara(
 
 \item{JLLinputs}{list of necessary inputs for the estimation of JLL-based models (see "JLL" function)}
 }
-\value{
-unconstrained auxiliary matrix.
-}
 \description{
-Map constrained parameters b to unconstrained auxiliary parameters a.
-}
-\references{
-This function is a modified and extended version of the "true2aux" function by Le and Singleton (2018). \cr
- "A Small Package of Matlab Routines for the Estimation of Some Term Structure Models." \cr
- (Euro Area Business Cycle Network Training School - Term Structure Modelling).
- Available at: https://cepr.org/40029
+Compute the auxiliary parameters a.
 }
 \keyword{internal}

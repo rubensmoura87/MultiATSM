@@ -70,10 +70,10 @@ IRFandGIRFbs <- function(ModelType, ModelBootstrap, NumOutPE, InputsForOutputs, 
 
   # 3) Compute confidence bounds
   if (ModelType %in% c("JPS original", "JPS global", "GVAR single")) {
-    K <- nrow(ModelBootstrap$ParaDraws[[ModelType]][[Economies[1]]][[1]]$ests$K1Z)
+    K <- nrow(ModelBootstrap$ParaDraws[[ModelType]][[Economies[1]]][[1]]$ModEst$P$K1Z)
     NumOutBounds <- ComputeBounds_IRFandGIRF(ModelBootstrap, quants, K, J, ModelType, Economies, ndraws, Horiz)
   } else {
-    K <- nrow(ModelBootstrap$ParaDraws[[ModelType]][[1]]$ests$K1Z)
+    K <- nrow(ModelBootstrap$ParaDraws[[ModelType]][[1]]$ModEst$P$K1Z)
     NumOutBounds <- ComputeBounds_IRFandGIRF(ModelBootstrap, quants, K, C * J, ModelType, Economies, ndraws, Horiz)
   }
 
@@ -131,10 +131,10 @@ FEVDandGFEVDbs <- function(ModelType, ModelBootstrap, NumOutPE, InputsForOutputs
 
   # 3) Compute confidence bounds
   if (ModelType %in% c("JPS original", "JPS global", "GVAR single")) {
-    K <- nrow(ModelBootstrap$ParaDraws[[ModelType]][[Economies[1]]][[1]]$ests$K1Z)
+    K <- nrow(ModelBootstrap$ParaDraws[[ModelType]][[Economies[1]]][[1]]$ModEst$P$K1Z)
     NumOutBounds <- ComputeBounds_FEVDandGFEVD(ModelBootstrap, quants, K, J, ModelType, Economies, ndraws, Horiz)
   } else {
-    K <- nrow(ModelBootstrap$ParaDraws[[ModelType]][[1]]$ests$K1Z)
+    K <- nrow(ModelBootstrap$ParaDraws[[ModelType]][[1]]$ModEst$P$K1Z)
     NumOutBounds <- ComputeBounds_FEVDandGFEVD(ModelBootstrap, quants, K, C * J, ModelType, Economies, ndraws, Horiz)
   }
 

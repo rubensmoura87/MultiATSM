@@ -811,11 +811,19 @@ EstimationSigma_Ye <- function(SigmaUnres, res, M, G, Economies, DomUnit) {
 
   MLfunction <-  function(...) llk_JLL_Sigma(..., res = res, IdxNONzero = IdxNONzeroSigmaJLL, K = K)
 
-  iter <- "off" # hides the outputs of each iteration. If one wants to display these features then set 'iter'
-  options200 <- optimset(MaxFunEvals = 200000 * length(x), Display = iter,
-                                     MaxIter = 200000, GradObj = "off", TolFun = 10^-2, TolX = 10^-2)
+  res <- stats::optim(
+    par     = x,
+    fn      = function(par) ML_stable(x, MLfunction),
+    method  = "Nelder-Mead",
+    control = list(
+      maxit = 200000*length(x),
+      reltol = 1e-2,
+      trace = 0
+    )
+  )
 
-  Xmax <- fminsearch(MLfunction, x, options200)$optbase$xopt
+  Xmax <- res$par
+
   SIGMA_Ye <- matrix(0, K, K)
   SIGMA_Ye[IdxNONzeroSigmaJLL] <- Xmax # Cholesky term (orthogonalized factors)
 

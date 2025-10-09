@@ -1,29 +1,18 @@
-#' Perform the minimization of mean(f)
+#' Perform the minimization of ML function
 #'
-#' @param f vector-valued objective function (function)
-#' @param ListInputSet list contain starting values and constraints:
-#'                        for each input argument K (of f), we need four inputs that look like:
+#' @param ML_fun vector-valued objective ML function
+#' @param ListInputSet list containing :
 #'    \enumerate{
-#'        \item a starting value: K0
-#'        \item a variable label ('K0') followed by a ':' followed by a type of constraint. The constraint can be:
+#'        \item a starting value for K1XQ and/or SSZ
+#'        \item a variable label among the following:
 #'                  \itemize{
-#'                      \item 'bounded': bounded matrix;
-#'                      \item 'Jordan' or 'Jordan MultiCountry': a matrix of Jordan type;
-#'                      \item 'psd': psd matrix;
-#'                      \item 'stationary': largest eigenvalue of the risk-neutral feedback matrix is strictly smaller than 1;
-#'                      \item 'diag' or 'BlockDiag': a diagonal or block diagonal matrix.
-#'                      \item 'JLLstructure': to impose the zero-restrictions on the variance-variance matrix along
+#'                      \item 'Jordan' or 'Jordan; stationary' for single countries setups or
+#'                      'Jordan MultiCountry' or 'Jordan MultiCountry; stationary'.  All cases related to the computation of a K1XQ parameter;
+#'                      \item 'psd': PSD matrix, used for JPS-based models. It relates to the SSZ parameter;
+#'                      \item  'BlockDiag': block diagonal matrix, used for JPS-based models. It relates to the SSZ parameter.
+#'                      \item 'JLLstructure': to impose the zero-restrictions on the SSZ term along
 #'                              the lines of the JLL models
 #'                          }
-#'        \item a lower bound lb (lb <- NULL -> no lower bound)
-#'        \item an upper bound ub (ub <- NULL -> no upper bound)
-#'        \item Specification of the optimization settings:
-#'        \itemize{
-#'                  \item 'iter off': hide the printouts of the numerical optimization routines;
-#'                  \item 'fminunc only': only uses fminunc for the optimization;
-#'                  \item ''fminsearch only': only uses fminsearch for the optimization.
-#'
-#'   }
 #'   }
 #' @param FactorLabels A list of character vectors with labels for all variables in the model.
 #' @param Economies A character vector containing the names of the economies included in the system.
@@ -31,64 +20,40 @@
 #' @param JLLinputs List. Inputs for JLL model estimation (see \code{JLL}). Default is NULL.
 #' @param GVARinputs List. Inputs for GVAR model estimation (see \code{GVAR}). Default is NULL.
 #' @param tol convergence tolerance (scalar). Default value is 1e-4.
+#' @param EstType Available options are"BFGS" and/or "Nelder-Mead".
 #' @param TimeCount computes the required time for estimation of the model. Default is TRUE.
 #' @param verbose Logical flag controlling function messaging.
 #'
-#'@examples
-#'#' # See an example of implementation in the vignette file of this package (Section 4).
-#'
-#'
-#'
-#'@references
-#' This function is a conceptually based on the "LS__opt" function by Le and Singleton (2018). \cr
-#'  "A Small Package of Matlab Routines for the Estimation of Some Term Structure Models." \cr
-#'  (Euro Area Business Cycle Network Training School - Term Structure Modelling).
-#'  Available at: https://cepr.org/40029
-#'
 #'@keywords internal
 
-Optimization_PE <- function(f, ListInputSet, FactorLabels, Economies, ModelType, JLLinputs = NULL, GVARinputs= NULL,
-                            tol= 1e-4, TimeCount = TRUE, verbose){
+Optimization_PE <- function(ML_fun, ListInputSet, FactorLabels, Economies, ModelType, JLLinputs = NULL,
+                            GVARinputs= NULL, tol= 1e-4, EstType, TimeCount = TRUE, verbose){
 
-  # 1) Transform initial guesses of K1XQ and SSZ into auxiliary parameters that
-  # will NOT be concentrated out of the log-likelihood function (llk)
-  AuxVec_0 <- Build_xvec(ListInputSet, Economies, FactorLabels, JLLinputs)
+  # 1) Vectorize initial guesses from K1XQ and SSZ
+  x0 <- c()
+  for (i in seq_len(length(ListInputSet))){
+    Temp_x <- GetAuxPara(ListInputSet[[i]]$Value, ListInputSet[[i]]$Label, Economies, FactorLabels, JLLinputs)
+    x0 <- rbind(x0, t(t(as.vector(Temp_x))))
+  }
 
   # 2) Likelihood function:
-  FFvec <- function(...) Functionf_vectorized(..., sizex= AuxVec_0$Dim_x , f, con = 'concentration', ListInputSet,
-                                              ModelType, FactorLabels, Economies, JLLinputs, GVARinputs,
-                                              WithEstimation = TRUE)
+  MLvec <- function(...) FunctionML_vec(..., ML_fun, ListInputSet, ModelType, FactorLabels,
+                                              Economies, JLLinputs, GVARinputs, WithEstimation = TRUE)
 
   # 3) Optimization of the llk
   if (TimeCount) { start_time <- Sys.time() }
-  AuxVec_opt <- OptimizationSetup_ATSM(AuxVec_0, FFvec, ListInputSet$OptRun, tol, verbose)
+  x_opt <- OptimizationSetup_ATSM(x0, MLvec, EstType, tol, verbose)
   if (TimeCount) { Optimization_Time(start_time, verbose) }
 
   # 4) Build the full auxiliary vector, including concentrated parameters
-  Up_Temp <- Update_ParaList(AuxVec_opt$x0, sizex= AuxVec_opt$Dim_x, con= 'concentration', FactorLabels,
-                         Economies, JLLinputs, GVARinputs, ListInputSet) # update the parameter set which were NOT concentrated out after the optimization.
+  Up_Temp <- Update_ParaList(x_opt, ModelType, FactorLabels, Economies, JLLinputs, GVARinputs, ListInputSet)
 
-  FF_opt <- function(...) Functionf_vectorized(..., sizex= AuxVec_opt$Dim_x, f, con = 'concentration',
-                                               ListInputSet = Up_Temp, ModelType, FactorLabels, Economies,
-                                               JLLinputs, GVARinputs, WithEstimation = FALSE)
-
-  ParaLabels <- names(ListInputSet)
-  Up_Temp_Full <- ParaATSM_opt_ALL(Up_Temp, FF_opt, AuxVec_opt, ParaLabels)
-
-  # 5) Produce outputs to export:
-  OutExport <- Build_xvec(Up_Temp_Full, Economies, FactorLabels, JLLinputs)
-  x0_opt <-   OutExport$x0
-  sizex_AllPara <- OutExport$Dim_x
-
-  FF_export <- function(...) Functionf_vectorized(..., sizex = sizex_AllPara, f=f, con='', ListInputSet = Up_Temp_Full,
-                                                  ModelType, FactorLabels, Economies, JLLinputs, GVARinputs,
-                                                  WithEstimation = FALSE)
-
-   out <- FF_export(x=x0_opt)$out
+  ML_opt <- function(...) FunctionML_vec(..., ML_fun, ListInputSet = Up_Temp, ModelType, FactorLabels,
+                                                Economies, JLLinputs, GVARinputs, WithEstimation = FALSE)
+  out <- ML_opt(x=x_opt)
 
   return(out)
 }
-
 
 #############################################################################################################
 #' Perform the optimization of the log-likelihood function of the chosen ATSM
@@ -102,6 +67,7 @@ Optimization_PE <- function(f, ListInputSet, FactorLabels, Economies, ModelType,
 #' @param Economies A character vector containing the names of the economies included in the system.
 #' @param ModelType A character vector indicating the model type to be estimated.
 #' @param tol Convergence tolerance (scalar). The default is 1e-4.
+#' @param EstType Available options are"BFGS" and/or "Nelder-Mead".
 #' @param TimeCount Logical. If TRUE, computes the time required for model estimation. Default is TRUE.
 #' @param BS_outputs Logical. If TRUE, generates a simplified output list in the bootstrap setting. Default is FALSE.
 #' @param verbose Logical flag controlling function messaging. Default is TRUE.
@@ -131,15 +97,23 @@ Optimization_PE <- function(f, ListInputSet, FactorLabels, Economies, ModelType,
 #' - `summary(object)`
 #'
 #'@references
-#' This function is partially adapted from the \code{LS__opt} function by Le and Singleton (2018). \cr
-#'  "A Small Package of Matlab Routines for the Estimation of Some Term Structure Models." \cr
-#'  (Euro Area Business Cycle Network Training School - Term Structure Modelling).
-#'  Available at: https://cepr.org/40029
 #'
+#' \itemize{
+#'  \item Candelon, C. and Moura, R. (2024). “A Multicountry Model of the Term Structures of Interest Rates with a GVAR.”
+#'  Journal of Financial Econometrics 22 (5): 1558–87.
+#'  \item Jotikasthira, C; Le, A. and Lundblad, C (2015). “Why Do Term Structures in Different Currencies Co-Move?”
+#'  Journal of Financial Economics 115: 58–83.
+#'  \item Joslin, S,; Priebsch, M. and Singleton, K. (2014). “Risk Premiums in Dynamic Term Structure Models with Unspanned Macro Risks.”
+#'  Journal of Finance 69 (3): 1197–1233.
+#'  \item Joslin, S., Singleton, K. and Zhu, H. (2011). "A new perspective on Gaussian dynamic term structure models".
+#'  The Review of Financial Studies.
+#'  \item Le, A. and Singleton, K. (2018). "A Small Package of Matlab Routines for the Estimation of Some Term Structure Models."
+#'  Euro Area Business Cycle Network Training School - Term Structure Modelling.
+#'}
 #'@export
 
 Optimization <- function(MLEinputs, StatQ, DataFreq, FactorLabels, Economies, ModelType, tol= 1e-4,
-                            TimeCount = TRUE, BS_outputs = FALSE, verbose = TRUE){
+                         EstType = c("BFGS", "Nelder-Mead"), TimeCount = TRUE, BS_outputs = FALSE, verbose = TRUE){
   if (verbose) {
   message("2) ATSM ESTIMATION : POINT ESTIMATE ANALYSIS")
   message("2.1) Estimating ATSM ...")
@@ -151,30 +125,31 @@ Optimization <- function(MLEinputs, StatQ, DataFreq, FactorLabels, Economies, Mo
 ModelParaList <- list()
 
 if (any(ModelType ==c('JPS original', 'JPS global', "GVAR single"))){
-  C <- length(Economies)
-  for (i in 1:C){
+  for (i in 1:length(Economies)){
 
     MLEinputsCS <- MLEinputs[[Economies[i]]]
     Economy <- Economies[i]
     # 1) Build the objective function
-    f <- Functionf(MLEinputsCS, Economy, DataFreq, FactorLabels, ModelType, BS_outputs)
+    ML_fun <- MLFunction(MLEinputsCS, Economy, DataFreq, FactorLabels, ModelType, BS_outputs)
     # 2) Set the optimization settings
     VarLab <- ParaLabelsOpt(ModelType, StatQ, MLEinputsCS, BS_outputs)
 
     if (verbose) message(paste(" ... for country:", Economies[i], ". This may take several minutes."))
-    ModelParaList[[ModelType]][[Economies[i]]] <- Optimization_PE(f, VarLab, FactorLabels, Economies, ModelType,
-                                                                JLLinputs, GVARinputs, tol, TimeCount = TimeCount,
-                                                                verbose)}
+    ModelParaList[[ModelType]][[Economies[i]]] <- Optimization_PE(ML_fun, VarLab, FactorLabels, Economies, ModelType,
+                                                                JLLinputs, GVARinputs, tol, EstType,
+                                                                TimeCount = TimeCount, verbose)
+
+    }
 } else {
 
   # 1) Build the objective function
-  f <- Functionf(MLEinputs, Economies, DataFreq, FactorLabels, ModelType, BS_outputs)
+  ML_fun <- MLFunction(MLEinputs, Economies, DataFreq, FactorLabels, ModelType, BS_outputs)
   # 2) Set the optimization settings
   VarLab <- ParaLabelsOpt(ModelType, StatQ, MLEinputs, BS_outputs)
 
   if (verbose) message("... This may take several minutes.")
-  ModelParaList[[ModelType]] <- Optimization_PE(f, VarLab, FactorLabels, Economies, ModelType, JLLinputs,
-                                              GVARinputs, tol, TimeCount= TimeCount, verbose)
+  ModelParaList[[ModelType]] <- Optimization_PE(ML_fun, VarLab, FactorLabels, Economies, ModelType, JLLinputs,
+                                              GVARinputs, tol, EstType, TimeCount= TimeCount, verbose)
 }
 
 # Store metadata inside the class without explicitly exporting it
@@ -183,7 +158,6 @@ attr(ModelParaList, "ModelOutInfo") <- list( Outs = ModelParaList[[ModelType]], 
 
 return(structure(ModelParaList, class = "ATSMModelOutputs"))
 }
-
 
 
 ##############################################################################################
@@ -195,44 +169,13 @@ return(structure(ModelParaList, class = "ATSMModelOutputs"))
 #'@param MLEinputs Set of inputs that are necessary to the log-likelihood function
 #'@param BS_outputs Generates simplified output list in the bootstrap setting. Default is set to FALSE.
 #'
-#'@returns
-#' list containing starting values and constraints:
-#'                        for each input argument K (of f), we need four inputs that look like:
-#'    \enumerate{
-#'        \item a starting value: K0
-#'        \item a variable label ('K0') followed by a ':' followed by a type of constraint. The constraint can be:
-#'                  \itemize{
-#'                      \item 'bounded': bounded matrix;
-#'                      \item 'Jordan' or 'Jordan MultiCountry': a matrix of Jordan type;
-#'                      \item 'psd': psd matrix;
-#'                      \item 'stationary': largest eigenvalue of the risk-neutral feedback matrix is strictly smaller than 1;
-#'                      \item 'diag' or 'BlockDiag': a diagonal or block diagonal matrix.
-#'                      \item 'JLLstructure': to impose the zero-restrictions on the variance-voriance matrix along
-#'                              the lines of the JLL models
-#'                          }
-#'        \item a lower bound lb (lb <- NULL -> no lower bound)
-#'        \item an upper bound ub (ub <- NULL -> no upper bound)
-#'        \item Specification of the optimization settings:
-#'        \itemize{
-#'                  \item 'iter off': hide the printouts of the numerical optimization routines;
-#'                  \item 'fminunc only': only uses fminunc for the optimization;
-#'                  \item ''fminsearch only': only uses fminsearch for the optimization.
-#'
-#'   }
-#'   }
-#'
 #'@keywords internal
 
 ParaLabelsOpt <- function(ModelType, WishStationarityQ, MLEinputs, BS_outputs = FALSE){
 
   ParaLabelsList <- list()
 
-  ParaLabelsList[[ModelType]]$r0 <- "@r0: bounded"
-  ParaLabelsList[[ModelType]]$se <- "@se: bounded"
-  ParaLabelsList[[ModelType]]$K0Z <- "@K0Z: bounded"
-  ParaLabelsList[[ModelType]]$K1Z <- "@K1Z: bounded"
-
-  # K1XQ
+  # a) K1XQ
   K1XQType <- K1XQStationary(WishStationarityQ)$SepQ
 
   if (ModelType %in% c("JPS original", "JPS global", 'GVAR single')) {
@@ -241,31 +184,33 @@ ParaLabelsOpt <- function(ModelType, WishStationarityQ, MLEinputs, BS_outputs = 
     ParaLabelsList[[ModelType]]$K1XQ <- K1XQStationary(WishStationarityQ)$JointQ
   }
 
-
-  # SSZ
-  if (ModelType %in% c("JPS original", "JPS global", 'JPS multi')){ ParaLabelsList[[ModelType]]$SSZ <- "SSZ: psd" }
-  else if (ModelType %in% c("GVAR single", 'GVAR multi')){  ParaLabelsList[[ModelType]]$SSZ <- "SSZ: BlockDiag" }
-  else if (ModelType %in% c("JLL original", "JLL No DomUnit")){ ParaLabelsList[[ModelType]]$SSZ <- "@SSZ: bounded" } # Variance-covariance matrix is not estimated under Q
-  else if (ModelType == "JLL joint Sigma"){ ParaLabelsList[[ModelType]]$SSZ <- "SSZ: JLLstructure" }
+  # b) SSZ
+  if (ModelType %in% c("JPS original", "JPS global", 'JPS multi')){
+    ParaLabelsList[[ModelType]]$SSZ <- "SSZ: psd"
+  }  else if (ModelType %in% c("GVAR single", 'GVAR multi')){
+      ParaLabelsList[[ModelType]]$SSZ <- "SSZ: BlockDiag"
+  }  else if (ModelType == "JLL joint Sigma"){
+    ParaLabelsList[[ModelType]]$SSZ <- "SSZ: JLLstructure"
+  }
   # Ensures that the structure of the Variance-covariance matrix of the JLL is preserved
 
   # 3.2) Initial guesses for Variables that will be concentrated out of from the log-likelihood function
   K1XQ <- MLEinputs$K1XQ
-  if (ModelType  %in% c("JLL original", "JLL No DomUnit")){ SSZ <- NULL} else{SSZ <- MLEinputs$SSZ}
+  if (ModelType  %in% c("JLL original", "JLL No DomUnit")){
+    SSZ <- NULL
+  } else{
+    SSZ <- MLEinputs$SSZ
+  }
 
   # Prepare list for optimization
   VarArgList <- list()
-  VarArgList$K1XQ <- list(K1XQ, ParaLabelsList[[ModelType]]$K1XQ , NULL , NULL)
-  VarArgList$SSZ <- list(SSZ, ParaLabelsList[[ModelType]]$SSZ, NULL, NULL)
-  VarArgList$r0 <- list(NULL, ParaLabelsList[[ModelType]]$r0, NULL, NULL)
-  VarArgList$se <- list(NULL, ParaLabelsList[[ModelType]]$se, 1e-6, NULL)
-  VarArgList$K0Z <- list(NULL, ParaLabelsList[[ModelType]]$K0Z, NULL, NULL)
-  VarArgList$K1Z <- list(NULL, ParaLabelsList[[ModelType]]$K1Z, NULL, NULL)
+  VarArgList$K1XQ <- list(K1XQ, ParaLabelsList[[ModelType]]$K1XQ)
+  if (!(ModelType %in% c("JLL original", "JLL No DomUnit"))){
+    VarArgList$SSZ <- list(SSZ, ParaLabelsList[[ModelType]]$SSZ)
+  }
 
-  if (BS_outputs){VarArgList$OptRun <- "fminunc only"} else {  VarArgList$OptRun <- "iter off"}
-
-  LabelVar <- c('Value', 'Label', 'LB', 'UB') # Elements of each parameter
-  for (d in 1:(length(VarArgList)-1)){ names(VarArgList[[d]]) <-  LabelVar}
+  LabelVar <- c('Value', 'Label') # Elements of each parameter
+  for (d in 1:(length(VarArgList))){ names(VarArgList[[d]]) <-  LabelVar}
 
   return(VarArgList)
 }
@@ -296,78 +241,78 @@ K1XQStationary<- function(StationaryEigenvalues){
 #########################################################################################################
 #'Optimization routine for the entire selected ATSM
 #'
-#'@param AuxVecSet List containing features for estimation of the risk-neutral parameters.
+#'@param x0 List containing features for estimation of the risk-neutral parameters.
 #'@param FFvec Log-likelihood function
-#'@param EstType Estimation type
+#'@param EstType Estimation type. Available options: "BFGS" and "Nelder-Mead".
 #'@param tol convergence tolerance (scalar). Default value is set as 1e-4.
 #'@param verbose Logical flag controlling function messaging.
 #'
-#'@importFrom pracma fminunc
-#'
 #'@keywords internal
 
-OptimizationSetup_ATSM <- function(AuxVecSet, FFvec, EstType, tol= 1e-4, verbose){
+OptimizationSetup_ATSM <- function(x0, MLvec, EstType, tol = 1e-4, verbose = FALSE) {
 
-  # 1) Optimization settings
-  Max_AG_Iteration <- 1e4
-  Previous_Optimal_Obj <-  -1e20
-  options200 <- optimset(MaxFunEvals = 200*length(AuxVecSet$x0), Display =  "off",
-                                     MaxIter = 200, GradObj='off', TolFun= 10^-8, TolX= 10^-8)
-  options1000 <- options200
-  options1000$MaxIter <- 1000
+   # --- 1) Optimization Settings ---
+  max_global_iter <- 1e4
+  prev_best       <- -1e20
+  max_iter        <- 2000
+  converged       <- FALSE
+  old_val         <- mean(MLvec(x0))
+  count           <- 0
 
-  # 2) Initial checks
-  converged <-(tol>1e5)
-  oldF_value <- FF(AuxVecSet$x0, FFvec)
+  # --- 2) Gradient-based optimization (with scaling if required) ---
+  while (!converged) {
+    if ("BFGS" %in% EstType) {
 
-  scaling_vector <- NULL; count <- 0
-
-  # 3) Optimization loop
-  while (!converged){
-    if (!grepl('fminsearch only', EstType)){
-
-      if (!grepl('no rescaling', EstType)){
-        if (length(scaling_vector) == 0){
-          dFFvec <- df__dx(f=FFvec, x=AuxVecSet$x0) # first order derivative of the llK function for each point in time for the initial guess of the parameters which are NOT concentrated out of the llk.
-
-          vv <- 1/rowMeans(abs(dFFvec))
-          vv[is.infinite(vv)] <- max(vv[!is.infinite(vv)])
-          vv[vv==0] <- min(vv[vv>0])
-          scaling_vector <- t(t(vv))
+        if (count == 0){
+          D_MLvec <- Jac_approx(MLvec, x0)
+          scaling_factor <- scaling_from_jacobian(D_MLvec)
         }
 
-        FFtemp <- function(...) FFtemporary(..., scaling_vector = scaling_vector, FFvectorized = FFvec)
-        x1 <- fminunc(x0=AuxVecSet$x0/scaling_vector, FFtemp , gr = NULL, tol = options200$TolFun,
-                      maxiter = options200$MaxIter , maxfeval = options200$MaxFunEvals )
+        MLtemp <- function(par) MLtemporary(par, scaling_factor, MLvec)
 
-        x1 <- x1$par*scaling_vector
+        res <- stats::optim(
+          par     = x0 / scaling_factor,
+          fn      = MLtemp,
+          method  = "L-BFGS-B",
+          control = list(maxit = max_iter, factr = 1e7) # factr ≈ reltol
+        )
 
-      } else{
-        x1 <- fminunc(x0=AuxVecSet$x0, FF , gr = NULL, tol = options200$TolFun, maxiter = options200$MaxIter,
-                      maxfeval = options200$MaxFunEvals)
-        x1 <- x1$par
-      }
+        x1 <- res$par * scaling_factor
 
-      if (FF(x1, FFvec)<FF(AuxVecSet$x0, FFvec)){ AuxVecSet$x0 <- x1 }
-    }
-    if (!grepl('fminunc only', EstType)){
-      x1<- fminsearch(function(x) FF(x, FFvectorized = FFvec), AuxVecSet$x0, options1000)$optbase$xopt
-      if (FF(x1, FFvec)<FF(AuxVecSet$x0, FFvec)){ AuxVecSet$x0 <- x1 }
+      if (mean(MLvec(x1)) < mean(MLvec(x0))) x0 <- x1
     }
 
-    newF_value <- FF(AuxVecSet$x0, FFvec)
-    if (verbose) message(paste("   *** Estimation round", count+1, "completed ***"))
+    # --- 3) Nelder–Mead fallback ---
+    if ("Nelder-Mead" %in% EstType) {
 
-    converged <-   (abs(oldF_value - newF_value)<tol) ||(count>Max_AG_Iteration && newF_value > Previous_Optimal_Obj)
-    oldF_value <- newF_value
+      res <- stats::optim(
+        par     = x0,
+        fn      = function(par) ML_stable(par, MLvec),
+        method  = "Nelder-Mead",
+        control = list(maxit = 1000, reltol = 1e-8)
+      )
 
-    count <- count + 1
+      if (mean(MLvec(res$par)) < mean(MLvec(x0))) x0 <- res$par
+    }
 
+    # --- 4) Convergence checks ---
+    new_val <- mean(MLvec(x0))
+    if (verbose) {
+      message(paste("*** Estimation round", count + 1, "***" ))
+    }
+
+    converged <- (abs(old_val - new_val) < tol) ||
+      (count > max_global_iter && new_val > prev_best)
+
+    old_val <- new_val
+    count   <- count + 1
   }
-  if (verbose) message('-- Done!')
 
-  return(AuxVecSet)
-  }
+  if (verbose) message("-- Done!")
+
+  return(x0)
+}
+
 #######################################################################################################
 #' Set up the vector-valued objective function (Point estimate)
 #'
@@ -378,15 +323,12 @@ OptimizationSetup_ATSM <- function(AuxVecSet, FFvec, EstType, tol= 1e-4, verbose
 #' @param ModelType string-vector containing the label of the model to be estimated
 #' @param BS_outType Generates simplified output list in the bootstrap setting. Default is set to FALSE.
 #'
-#' @examples
-#' # See examples in the vignette file of this package (Section 4).
-#'
 #' @returns
 #'objective function
 #'
 #' @keywords internal
 
-Functionf <- function(MLEinputs, Economies, DataFrequency, FactorLabels, ModelType, BS_outType = FALSE){
+MLFunction <- function(MLEinputs, Economies, DataFrequency, FactorLabels, ModelType, BS_outType = FALSE){
 
   dt <- Getdt(DataFrequency)
   mat <- MLEinputs$mat
@@ -394,7 +336,7 @@ Functionf <- function(MLEinputs, Economies, DataFrequency, FactorLabels, ModelTy
   # 1) If one choose models in which the estimation is done country-by-country
   if (any(ModelType == c("JPS original", 'JPS global', "JPS multi", "GVAR single", "GVAR multi", "JLL joint Sigma"))){
 
-    f <- function(...) MLEdensity(..., r0 = NULL, MLEinputs$K0Z, MLEinputs$K1Z, se= NULL, MLEinputs$Gy.0, mat,
+    ML_Func <- function(...) MLEdensity(..., r0 = NULL, MLEinputs$K0Z, MLEinputs$K1Z, se= NULL, MLEinputs$Gy.0, mat,
                                   MLEinputs$Y, MLEinputs$RiskFactors, MLEinputs$SpaFact, MLEinputs$Wpca, MLEinputs$We,
                                   MLEinputs$WpcaFull, dt, Economies, FactorLabels, ModelType, MLEinputs$GVARinputs,
                                   MLEinputs$JLLinputs, BS_outType)
@@ -403,138 +345,159 @@ Functionf <- function(MLEinputs, Economies, DataFrequency, FactorLabels, ModelTy
     # 2) If one choose models in which the estimation is done jointly for all countries of the system with
     # the Sigma matrix estimated exclusively under the P-dynamics
 
-    f <- function(...) MLEdensity(..., r0 = NULL, MLEinputs$SSZ, MLEinputs$K0Z, MLEinputs$K1Z, se= NULL,
+    ML_Func <- function(...) MLEdensity(..., r0 = NULL, MLEinputs$SSZ, MLEinputs$K0Z, MLEinputs$K1Z, se= NULL,
                                   MLEinputs$Gy.0, mat, MLEinputs$Y, MLEinputs$RiskFactors, MLEinputs$SpaFact,
                                   MLEinputs$Wpca, MLEinputs$We, MLEinputs$WpcaFull, dt, Economies, FactorLabels,
                                   ModelType, MLEinputs$GVARinputs, MLEinputs$JLLinputs, BS_outType)
   }
 
-  return(f)
+  return(ML_Func)
 }
-#######################################################################################################
-#'mean of the llk function used in the estimation of the selected ATSM
-#'
-#'@param x0 vector of parameters to be estimated numerically
-#'@param FFvectorized log-likelihood function
-#'
-#'@keywords internal
-
-FF <- function(x0, FFvectorized) {
-  out <- mean(FFvectorized(x = x0))
-  return(out)
-  }
-
 ######################################################################################################"
 #'Mean of the llk function used in the estimation of the selected ATSM
 #'
 #'@param xtemp temporary vector of parameters to be estimated numerically
 #'@param scaling_vector scaling factor
-#'@param FFvectorized log-likelihood function
+#'@param MLvec log-likelihood function
 #'
 #'@keywords internal
 
-FFtemporary <- function(xtemp, scaling_vector, FFvectorized){
-    scaled_xtemp <- scaling_vector * xtemp
+MLtemporary <- function(xtemp, scaling_vector, MLvec){
 
-  return(FF(x0 = scaled_xtemp, FFvectorized = FFvectorized))  # Call FF with the scaled version
+  scaled_xtemp <- scaling_vector * xtemp
+  mean(MLvec(scaled_xtemp))
+}
+
+
+################################################################################################
+#' Prevents algorithm to end up in ill-defined likelihood
+#'
+#'@param par vector of parameters
+#'@param MLvec objective function
+#'
+#'@keywords internal
+
+ML_stable <- function(par, MLvec) {
+
+  val <- tryCatch(mean(MLvec(par)), error = function(e) NA)
+  if (!is.finite(val)) {
+    return(1e6)  # big penalty
   }
-
-####################################################################################################
-#' Update the list of parameters
-#'
-#'@param Update_Temp List of model parameter features updated
-#'@param FF_opt llk after optimization
-#'@param AuxVecSet_opt List containing features for estimation of several parameters after optimization
-#'@param ParaLabels Several variable labels
-#'
-#'@keywords internal
-
-ParaATSM_opt_ALL <- function(Update_Temp, FF_opt, AuxVecSet_opt, ParaLabels){
-
-  OptimalPara <- FF_opt(x=AuxVecSet_opt$x0)$out # computes the estimates of all parameters after the optimization.
-  VarLabInt <- intersect(ParaLabels, names(OptimalPara$ests))
-
-  Update_Temp <- stats::setNames(lapply(Update_Temp, function(elem) {
-
-    if (is.list(elem) && grepl("@", elem$Label)) {
-      namexi <- sub(".*@", "", elem$Label)  # Remove everything before '@'
-      elem$Label <- namexi  # Update label
-
-      si <- gregexpr(":", namexi)[[1]]
-      if (length(si) > 0 && si[1] != -1) {
-        namexi <- substr(namexi, 1, si - 1)  # Remove everything after ':'
-      }
-
-      if (namexi %in% VarLabInt) {
-        elem$Value <- OptimalPara$ests[[namexi]]  # Assign correct value based on label
-      }
-    }
-
-    return(elem)  # Return modified element
-  }), names(Update_Temp))  # Preserve original names
-
-  return(Update_Temp)
+  return(val)
 }
 
 ############################################################################################################
-#' Computes numerical first order derivative of f(x)
+#'Compute the time elapsed in the numerical optimization
 #'
-#' @param f function which contains vector (J x T) valued function handle
-#' @param x parameter values
+#'@param start_time Starting time
+#'@param verbose Logical flag controlling function messaging.
 #'
-#' @keywords internal
-#'
-#' @return
-#' transformed matrix (MN x JT)
-#' @references
-#' This function is based on the "df__dx" function by Le and Singleton (2018). \cr
-#'  "A Small Package of Matlab Routines for the Estimation of Some Term Structure Models." \cr
-#'  (Euro Area Business Cycle Network Training School - Term Structure Modelling).
-#'  Available at: https://cepr.org/40029
+#'@keywords internal
 
-df__dx <- function(f, x) {
+Optimization_Time <- function(start_time, verbose) {
 
-  h0 <- pmax(pmin(abs(x) * 1e-3, 1e-3), 1e-6) # delta
-
-  fx0_o <- f(x = x)  # Evaluate function at original x
-  fx0 <- fx0_o # Initialization
-
-  # Checking if f(x+h) and f(x-h) is admissible
-  hxp <- h0; hxm <- h0
-
-  for (i in seq_along(x)) {
-    hxp[i] <- adjust_delta(f, x, hxp[i], i, fx0, 1)
-    hxm[i] <- adjust_delta(f, x, hxm[i], i, fx0, -1)
-  }
-
-  # y <- matrix(NaN, nrow = length(x), ncol = length(f(x = x)))
-  # If f(x) returns a vector of length T, replace with T_dim
-  T_dim <- length(f(x = x))
-  y <- matrix(NaN, nrow = length(x), ncol = T_dim)
-
-  for (i in seq_along(x)) {
-    temp <- matrix(list(), 5, 5)
-    for (n in 1:5) {
-      dxp <- numeric(length(x))
-      dxm <- numeric(length(x))
-      dxp[i] <- hxp[i] / (2^(n - 1))
-      dxm[i] <- hxm[i] / (2^(n - 1))
-
-      temp[[n, 1]] <- (f(x = x + dxp) - f(x = x - dxm)) / (dxp[i] + dxm[i])
-
-      if (n > 1) {  # Ensure `n - 1` is always valid
-        for (k in 2:n) {  # Ensure `k - 1` is valid
-          temp[[n, k]] <- ((2^(k - 1)) * temp[[n, k - 1]] - temp[[n - 1, k - 1]]) / (2^(k - 1) - 1)
-        }
-      }
-    }
-
-    y[i, ] = temp[[5,5]]
-    }
-
-  return(y)
+elapsed <- as.numeric(difftime(Sys.time(), start_time, units = "secs"))
+units <- c("seconds", "minutes", "hours")
+scale <- c(1, 60, 3600)
+idx <- max(which(elapsed >= scale))
+if (verbose) message(sprintf("Elapsed time: %.2f %s", elapsed / scale[idx], units[idx]))
 }
 
+
+##########################################################################################################
+#' Richardson extrapolation
+#'
+#' @param f function to differentiate
+#' @param x evaluation point
+#' @param i coordinate index
+#' @param h base step size
+#' @param fx0 f(x), precomputed
+#' @param levels depth of extrapolation. Default is 5
+#'
+#'@keywords internal
+
+richardson_diff <- function(f, x, i, h, fx0, nlevels = 5L) {
+
+  nlevels <- as.integer(nlevels)
+
+  # Pre-allocate as a nested list
+  D <- vector("list", nlevels)
+  for (n in seq_len(nlevels)) {
+    D[[n]] <- vector("list", n)
+  }
+
+  for (n in seq_len(nlevels)) {
+    step <- h / (2^(n - 1))
+    dx   <- numeric(length(x))
+    dx[i] <- step
+
+    # vector-valued central difference
+    D[[n]][[1]] <- (f(x + dx) - f(x - dx)) / (2 * step)
+
+    if (n > 1) {
+      for (k in 2:n) {
+        D[[n]][[k]] <- ((2^(k - 1)) * D[[n]][[k - 1]] - D[[n - 1]][[k - 1]]) / (2^(k - 1) - 1)
+      }
+    }
+  }
+
+  D[[nlevels]][[nlevels]]  # return best Richardson estimate (vector)
+}
+##########################################################################################"
+#'  Main Jacobian approximation
+#'
+#' @param f function to differentiate
+#' @param x evaluation point
+#' @param nlevels depth of extrapolation. Default is 5.
+#'
+#'@references
+#' Le, A., & Singleton, K. J. (2018). Small Package of Matlab Routines for
+#' Estimation of Some Term Structure Models. EABCN Training School.\cr
+#' This function offers an independent R implementation that is informed
+#' by the conceptual framework outlined in Le and Singleton (2018), but adapted to the
+#' present modeling context.
+#'
+#'@keywords internal
+
+Jac_approx <- function(f, x, nlevels = 5L) {
+
+  h0 <- pmax(pmin(abs(x) * 1e-3, 1e-3), 1e-6)  # step size per coordinate
+  fx0 <- f(x)
+  T_dim <- length(fx0)
+
+  # Jacobian: nrow = #params, ncol = #outputs
+  Jacobian_apx <- matrix(NA_real_, nrow = length(x), ncol = T_dim)
+
+  for (i in seq_along(x)) {
+    h <- h0[i]
+    # one row is a vector of partial derivatives wrt x[i]
+    Jacobian_apx[i, ] <- richardson_diff(f, x, i, h, fx0, nlevels = nlevels)
+  }
+
+  return(Jacobian_apx)
+}
+
+##########################################################################################"
+#' Scaling vector computation
+#'
+#'@param J jacobian approximation term
+#'
+#'@keywords internal
+
+scaling_from_jacobian <- function(J) {
+
+  vec <- 1 / rowMeans(abs(J))
+
+  # Handle infinities and zeros
+  if (any(!is.finite(vec))) {
+    vec[!is.finite(vec)] <- max(vec[is.finite(vec)])
+  }
+  if (any(vec == 0)) {
+    vec[vec == 0] <- min(vec[vec > 0])
+  }
+
+  return(vec)
+}
 ############################################################################################################
 #' Adjust delta for numerical differentiation
 #'
@@ -570,21 +533,4 @@ adjust_delta <- function(f, x, delta, i, fx0, direction) {
   }
 
   return(delta)
-}
-
-############################################################################################################
-#'Compute the time elapsed in the numerical optimization
-#'
-#'@param start_time Starting time
-#'@param verbose Logical flag controlling function messaging.
-#'
-#'@keywords internal
-
-Optimization_Time <- function(start_time, verbose) {
-
-elapsed <- as.numeric(difftime(Sys.time(), start_time, units = "secs"))
-units <- c("seconds", "minutes", "hours")
-scale <- c(1, 60, 3600)
-idx <- max(which(elapsed >= scale))
-if (verbose) message(sprintf("Elapsed time: %.2f %s", elapsed / scale[idx], units[idx]))
 }

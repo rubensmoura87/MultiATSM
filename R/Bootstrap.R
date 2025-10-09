@@ -41,7 +41,6 @@
 #' \item Confidence bounds for the chosen level of significance
 #' }
 #'
-#'
 #' @export
 
 Bootstrap <- function(ModelType, ModelParaPE, NumOutPE, Economies, InputsForOutputs, FactorLabels, JLLlist,
@@ -67,9 +66,9 @@ Bootstrap <- function(ModelType, ModelParaPE, NumOutPE, Economies, InputsForOutp
 
   dt <- Getdt(DataFreq)
   mat <- if (any(ModelType == c("JPS original", "JPS global", "GVAR single"))) {
-    ModelParaPE[[ModelType]][[Economies[1]]]$inputs$mat
+    ModelParaPE[[ModelType]][[Economies[1]]]$Inputs$mat
   } else {
-    ModelParaPE[[ModelType]]$inputs$mat
+    ModelParaPE[[ModelType]]$Inputs$mat
   }
 
   ModelBootstrap <- list(GeneralInputs = list(mat = mat, dt = dt, N = N))
@@ -114,8 +113,8 @@ Bootstrap <- function(ModelType, ModelParaPE, NumOutPE, Economies, InputsForOutp
 
     # c) Run the optimization
     invisible(utils::capture.output(Draw_Opt <- Optimization(ATSMInputs_BS, StatQ, DataFreq, FactorLabels,
-                                                             Economies, ModelType, tol = 1e-1, TimeCount = FALSE,
-                                                             BS_outputs = TRUE, verbose = FALSE)))
+                                                             Economies, ModelType, tol = 1e-1, EstType = "Nelder-Mead",
+                                                             TimeCount = FALSE, BS_outputs = TRUE, verbose = FALSE)))
 
     ModelBootstrap <- AdjustOptm_BS(ModelType, ModelBootstrap, Draw_Opt, Economies, tt)
 
@@ -168,15 +167,15 @@ PdynResid_BS <- function(ModelType, Economies, ModelPara_PE) {
   # SepQ models
   if (ModelType %in% c("JPS original", "JPS global", "GVAR single")) {
     eZ <- stats::setNames(lapply(Economies, function(economy) {
-      Get_residuals(ModelPara_PE[[ModelType]][[economy]]$inputs$AllFactors,
-                        ModelPara_PE[[ModelType]][[economy]]$ests$K0Z,
-                        ModelPara_PE[[ModelType]][[economy]]$ests$K1Z)
+      Get_residuals(ModelPara_PE[[ModelType]][[economy]]$Inputs$AllFactors,
+                        ModelPara_PE[[ModelType]][[economy]]$ModEst$P$K0Z,
+                        ModelPara_PE[[ModelType]][[economy]]$ModEst$P$K1Z)
     }), Economies)
   } else {
     # JointQ models
-    eZ <- Get_residuals(ModelPara_PE[[ModelType]]$inputs$AllFactors,
-                            ModelPara_PE[[ModelType]]$ests$K0Z,
-                            ModelPara_PE[[ModelType]]$ests$K1Z)
+    eZ <- Get_residuals(ModelPara_PE[[ModelType]]$Inputs$AllFactors,
+                            ModelPara_PE[[ModelType]]$ModEst$P$K0Z,
+                            ModelPara_PE[[ModelType]]$ModEst$P$K1Z)
   }
 
   return(eZ)
@@ -258,13 +257,13 @@ residY_original <- function(ModelParaPE, BFull, ModelType, Economies) {
   if (sepQ_Labels) {
     residYie <- stats::setNames(lapply(Economies, function(economy) {
       params <- ModelParaPE[[ModelType]][[economy]]
-      compute_residuals(params$inputs$Y, params$inputs$AllFactors,
-                        params$rot$P$A, BFull[[economy]])
+      compute_residuals(params$Inputs$Y, params$Inputs$AllFactors,
+                        params$ModEst$Q$Load$P$A, BFull[[economy]])
     }), Economies)
   } else {
     params <- ModelParaPE[[ModelType]]
-    residYie <- compute_residuals(params$inputs$Y, params$inputs$AllFactors,
-                                  params$rot$P$A, BFull)
+    residYie <- compute_residuals(params$Inputs$Y, params$Inputs$AllFactors,
+                                  params$ModEst$Q$Load$P$A, BFull)
   }
 
   return(residYie)
@@ -291,13 +290,13 @@ Get_BFull <- function(ModelParaPE, FactorLabels, mat, Economies, ModelType) {
 
   # For models estimated separately
   if (any(ModelType == c("JPS original", "JPS global", "GVAR single"))) {
-    K <- nrow(ModelParaPE[[ModelType]][[Economies[1]]]$inputs$AllFactors)
+    K <- nrow(ModelParaPE[[ModelType]][[Economies[1]]]$Inputs$AllFactors)
     BFull <- lapply(Economies, function(economy) {
       B_CS <- matrix(0, nrow = J, ncol = K)
       LabelSpannedCS <- c(FactorLabels$Tables[[economy]][-(1:M)])
-      RiskFactorLabels <- rownames(ModelParaPE[[ModelType]][[economy]]$inputs$AllFactors)
+      RiskFactorLabels <- rownames(ModelParaPE[[ModelType]][[economy]]$Inputs$AllFactors)
       idxSpanned <- match(LabelSpannedCS, RiskFactorLabels)
-      B <- ModelParaPE[[ModelType]][[economy]]$rot$P$B
+      B <- ModelParaPE[[ModelType]][[economy]]$ModEst$Q$Load$P$B
       B_CS[, idxSpanned] <- B
       B_CS
     })
@@ -305,8 +304,8 @@ Get_BFull <- function(ModelParaPE, FactorLabels, mat, Economies, ModelType) {
   } else {
 
   # For models estimated jointly
-    K <- nrow(ModelParaPE[[ModelType]]$inputs$AllFactors)
-    B <- ModelParaPE[[ModelType]]$rot$P$B
+    K <- nrow(ModelParaPE[[ModelType]]$Inputs$AllFactors)
+    B <- ModelParaPE[[ModelType]]$ModEst$Q$Load$P$B
     BFull <- BUnspannedAdapJoint(G, M, N, C, J, B)
   }
 
@@ -361,7 +360,7 @@ BuildRiskFactors_BS <- function(ModelParaPE, residPdynOriginal, residYieOriginal
         resids_BS <- ResampleResiduals_BS(residPdynOriginal, residYieOriginal, InputsForOutputs, ModelType)
       }
 
-      RiskFactors <- params$inputs$AllFactors
+      RiskFactors <- params$Inputs$AllFactors
       T_dim <- ncol(RiskFactors)
       K <- nrow(RiskFactors)
 
@@ -375,7 +374,7 @@ BuildRiskFactors_BS <- function(ModelParaPE, residPdynOriginal, residYieOriginal
       LAGplus <- cbind(1, LAG)
 
       # 2.2) generate artificial series
-      Ft <- rbind(t(params$ests$K0Z), t(params$ests$K1Z))
+      Ft <- rbind(t(params$ModEst$P$K0Z), t(params$ModEst$P$K1Z))
       # From observation nlag+1 to nobs, compute the artificial data
       for (jj in (nlag+1):(T_dim-1+nlag)){
         for (mm in 1:K){
@@ -574,12 +573,12 @@ BuildYields_BS <- function(ModelParaPE, ModelType, RiskFactors_BS, BFull, BS_Set
     Y_listBS <- list()
 
     for (i in seq_along(Economies)) {
-      YieldsLabels <- rownames(ModelParaPE[[ModelType]][[Economies[i]]]$inputs$Y)
+      YieldsLabels <- rownames(ModelParaPE[[ModelType]][[Economies[i]]]$Inputs$Y)
 
       Y_CS <- matrix(NA, nrow = T_dim, ncol = length(YieldsLabels))
       dimnames(Y_CS) <- list(TS_Labels, YieldsLabels)
 
-      A <- ModelParaPE[[ModelType]][[Economies[i]]]$rot$P$A
+      A <- ModelParaPE[[ModelType]][[Economies[i]]]$ModEst$Q$Load$P$A
       ZZ_BS <- RiskFactors_BS[[Economies[i]]]
       Y_CS <- BS_Set$resids_BS[[Economies[i]]]$residYields + matrix(A, nrow = T_dim, ncol = length(YieldsLabels), byrow = TRUE) + ZZ_BS %*% t(BFull[[Economies[i]]])
       rownames(Y_CS) <- TS_Labels
@@ -594,12 +593,12 @@ BuildYields_BS <- function(ModelParaPE, ModelType, RiskFactors_BS, BFull, BS_Set
 
     T_dim <- nrow(RiskFactors_BS)
     TS_Labels <- rownames(RiskFactors_BS)
-    YieldsLabels  <- rownames(ModelParaPE[[ModelType]]$inputs$Y)
+    YieldsLabels  <- rownames(ModelParaPE[[ModelType]]$Inputs$Y)
 
     Y_BS <- matrix(NA, nrow= T_dim, ncol = length(YieldsLabels))
     dimnames(Y_BS) <- list(TS_Labels, YieldsLabels)
 
-    A <- ModelParaPE[[ModelType]]$rot$P$A
+    A <- ModelParaPE[[ModelType]]$ModEst$Q$Load$P$A
     Y_BS <-  BS_Set$resids_BS$residYields + matrix(A, nrow= T_dim, ncol=length(YieldsLabels), byrow = T_dim) + RiskFactors_BS%*%t(BFull)
     rownames(Y_BS) <-  TS_Labels
   }

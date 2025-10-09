@@ -1,98 +1,41 @@
-#' Obtain the auxiliary values corresponding to each parameter, its size and its name
-
-#'@param ListInputSet variable inputs used in the optimization (see "optimization" function)
-#'@param Economies string-vector containing the names of the economies which are part of the economic system
-#'@param FactorLabels list of necessary inputs for the estimation of JLL-based models (see \code{JLL} function)
-#'@param JLLinputs     Necessary inputs for the estimation of the JLL-based models
-#'
-#'
-#'@references
-#'  This function is a based on the "getx" function by Le and Singleton (2018). \cr
-#'  "A Small Package of Matlab Routines for the Estimation of Some Term Structure Models." \cr
-#'  (Euro Area Business Cycle Network Training School - Term Structure Modelling).
-#'
-#'@keywords internal
-
-
-Build_xvec <- function(ListInputSet, Economies, FactorLabels, JLLinputs = NULL){
-
-  # 0) Initializing the outputs
-  x <- c()
-  Dim_x <- c()
-  Name_x <- vector("character", length(ListInputSet) - 1)
-
-  # 1) Build list of interest
-  for (i in seq_len(length(ListInputSet) - 1)){
-    si <- unlist(gregexpr(":", ListInputSet[[i]]$Label))
-    Name_x[i] <- sub(".*@", "", substr(ListInputSet[[i]]$Label, start = 1, stop = si - 1)) # remove @ from variables name, if exists
-
-    Temp_x <- GetAuxPara(ListInputSet[[i]]$Value, ListInputSet[[i]]$Label, ListInputSet[[i]]$LB,
-                         ub = ListInputSet[[i]]$UB, Economies, FactorLabels, JLLinputs)
-
-    x <- rbind(x, t(t(as.vector(Temp_x))))
-    Dim_x <- rbind(Dim_x, dim(Temp_x))
-  }
-
-  Outputs <- list(x0 = x, Dim_x = Dim_x, Name_x = Name_x)
-  return(Outputs)
-}
-
 #################################################################################################################
-#################################################################################################################
-#' Map constrained parameters b to unconstrained auxiliary parameters a.
+#' Compute the auxiliary parameters a.
 #'
-#' @param ParaValue     Constrained parameter
+#' @param ParaValue     Parameter value
 #' @param Const_Type_Full    character-based vector that describes the constraints. Constraints are:
 #'                      \itemize{
-#'                      \item 'Jordan';
-#'                      \item 'Jordan; stationary'
-#'                      \item 'Jordan MultiCountry'
-#'                      \item 'Jordan MultiCountry; stationary'
-#'                      \item 'stationary'
-#'                      \item 'psd'
-#'                      \item 'BlockDiag'
-#'                      \item 'bounded'
-#'                      \item 'diag'
-#'                      \item 'JLLstructure'
+#'                      \item 'Jordan' for single-country models;
+#'                      \item 'Jordan; stationary' for single-country models;
+#'                      \item 'Jordan MultiCountry' for multicountry models;
+#'                      \item 'Jordan MultiCountry; stationary' for multicountry models;
+#'                      \item 'psd' for JPS-based models;
+#'                      \item 'BlockDiag' for GVAR-based models;
+#'                      \item 'JLLstructure' for JLL-based models;
 #'                        }
-#' @param lb            lower bounds (a scalar or a matrix) of ParaValue (for the bounded case).
-#' @param ub            upper bounds (a scalar or a matrix) of ParaValue (for the bounded case).
 #' @param Economies       string-vector containing the names of the economies which are part of the economic system
 #' @param FactorLabels   string-list based which contains the labels of all the variables present in the model
 #' @param JLLinputs     list of necessary inputs for the estimation of JLL-based models (see "JLL" function)
 #'
-#'
 #'@importFrom hablar s
 #'
 #'@keywords internal
-#'
-#'@return  unconstrained auxiliary matrix.
-#'
-#' @references
-#'  This function is a modified and extended version of the "true2aux" function by Le and Singleton (2018). \cr
-#'  "A Small Package of Matlab Routines for the Estimation of Some Term Structure Models." \cr
-#'  (Euro Area Business Cycle Network Training School - Term Structure Modelling).
-#'  Available at: https://cepr.org/40029
 
-GetAuxPara <- function(ParaValue, Const_Type_Full, lb, ub, Economies, FactorLabels, JLLinputs = NULL){
+GetAuxPara <- function(ParaValue, Const_Type_Full, Economies, FactorLabels, JLLinputs = NULL){
 
   Const_Type <- Adjust_Const_Type(Const_Type_Full)
 
-  # CASE 1 : Jordan-related constraints
+  # CASE 1 : Jordan-related constraints (K1XQ)
   if (grepl("Jordan", Const_Type)){
     a <- Aux_Jordan(ParaValue, Const_Type, FactorLabels, Economies, JLLinputs)
-  # CASE 2: psd matrix
+  # CASE 2: psd matrix (SSZ)
   } else if (Const_Type == "psd") {
     a <- Aux_PSD(ParaValue, Const_Type)
-  # CASE 3: Block diagonal matrix
+  # CASE 3: Block diagonal matrix (SSZ)
   } else if (Const_Type == "BlockDiag") {
     a <- Aux_BlockDiag(ParaValue, Const_Type, FactorLabels, Economies)
-  # CASE 4: JLL structure of Sigma matrix
+  # CASE 4: JLL structure of Sigma matrix (SSZ)
   } else if (Const_Type == "JLLstructure") {
     a <- Aux_JLLstruct(ParaValue, Const_Type, FactorLabels, Economies, JLLinputs)
-  # CASE 5: 'bounded' and diagonal matrix
-  } else if (Const_Type %in% c("bounded", "diag")) {
-    a <- Aux_BoundDiag(ParaValue, Const_Type, lb, ub)
   }
 
   for (j in seq_len(length(a)) ) {a[j] <- min(max(s(c(Re(a[j]), -1e20))), 1e20)}
@@ -109,13 +52,13 @@ GetAuxPara <- function(ParaValue, Const_Type_Full, lb, ub, Economies, FactorLabe
 Adjust_Const_Type<- function(Const_Type_Full){
 
   constraints <- c('Jordan MultiCountry; stationary', 'Jordan MultiCountry', 'Jordan; stationary', 'Jordan',
-                   'psd', 'BlockDiag', 'JLLstructure', 'bounded', 'diag')
+                   'psd', 'BlockDiag', 'JLLstructure')
   for (constraint in constraints) {
     if (grepl(constraint, Const_Type_Full)) {
       return(constraint)
     }
   }
-  return(Const_Type_Full)
+
 }
 
 ##########################################################################################################
@@ -127,46 +70,18 @@ Adjust_Const_Type<- function(Const_Type_Full){
 #'@param Economies string-vector containing the names of the economies which are part of the economic system
 #'@param JLLinputs list of necessary inputs for the estimation of JLL-based models (see "JLL" function)
 #'
+#'
 #'@keywords internal
 
 Aux_Jordan <- function(ParaValue, Const_Type, FactorLabels, Economies, JLLinputs){
 
   # 1) SINGLE COUNTRY SETUPS
   if (Const_Type %in% c("Jordan", "Jordan; stationary")){
-    K1Q <- ParaValue
-    x <- eigen(K1Q)$values
 
-    # a) Impose stationary restriction (if desired)
-    if (grepl('stationary', Const_Type)) {
-      x <- ImposeStat_Aux(x)
-    }
-
-    # b) Compute Jordan form
-    idx <- matrix(NaN, nrow=length(x), ncol=1)
-    for (j in 1:length(x)){ # Exclude eigenvalues with imaginary values
-      if (Im(x[j])==0 ){  idx [j] <- 1} else{  idx [j] <- 0} }
-
-    realx <- Re(x[which(idx == 1)])
-
-    # Select only the eigenvalues which are purely real
-    if (length(realx)%%2==0){
-      lQ <- c()
-    }else{
-      lQ <- realx[1]
-      realx <- realx[seq_len(max(0, length(realx) - 1)) + 1]
-    }
-
-    for (h in seq_len(length(realx)/2)){
-      lQ <- rbind(lQ, 0.5*(realx[2*h-1]+realx[2*h]), (0.5*(realx[2*h-1]- realx[2*h]))^2)
-    }
-
-    imagx <- t(x[Im(x)!=0]) # Select only the eigenvalues with imaginary values
-    for (h in seq_len(length(imagx)/2)){ lQ <- rbind(lQ, Re(imagx[2*h-1]), -abs(Im(imagx[2*h-1]))^2)   }
-
-    if(is.null(dim(lQ))){ lQ <- matrix(lQ) }
+    j_aux <- Aux_jordan_OneCountry(ParaValue, Const_Type)
 
   # 2) MULTI COUNTRY SETUPS (Jordan MultiCountry)
-  } else if  (any(Const_Type == c("Jordan MultiCountry", "Jordan MultiCountry; stationary"))){
+  } else if  (any(Const_Type == c("Jordan MultiCountry", "Jordan MultiCountry; stationary"))) {
 
     N <- length(FactorLabels$Spanned)
     C <- length(Economies)
@@ -174,72 +89,110 @@ Aux_Jordan <- function(ParaValue, Const_Type, FactorLabels, Economies, JLLinputs
     # Adjustment for JLL models
     if (!is.null(JLLinputs)){ ParaValue <- Jordan_JLL(ParaValue, C, N) }
 
+    all_blocks <- list()
     idx0 <- 0
-    for (i in 1:C){
-      idx1 <-  idx0 + N
 
-      K1Q <- ParaValue[(idx0+1):idx1, (idx0+1):idx1]
+    for (i in seq_len(C)) {
+      idx1 <- idx0 + N
 
-      x <- t(t(eigen(K1Q)$values))
+      K1Q <- ParaValue[(idx0 + 1):idx1, (idx0 + 1):idx1] # Extract submatrix for economy i
+      block_jordan <- Aux_jordan_OneCountry(K1Q, Const_Type) # Extract submatrix for economy i
 
-      # a) Impose stationary restriction (if desired)
-      if ( grepl('stationary', Const_Type) ){ x <- ImposeStat_Aux(x) }
-
-      # b) Compute Jordan form
-      idx <- matrix(NaN, nrow=length(x), ncol=1)
-      for (j in 1:length(x)){ # Exclude eigenvalues with imaginary values
-        if (Im(x[j])==0){   idx [j] <- 1  } else{   idx [j] <- 0 }
-      }
-      realx <- Re(x[which(idx==1)])
-
-      # Select only the eigenvalues which are purely real
-      if (length(realx)%%2==0){
-        lQ <- c()
-      }else{
-        lQ <- realx[1]
-        realx <- realx[seq_len(max(0, length(realx) - 1)) + 1]
-      }
-
-      for (h in seq_len(length(realx)/2)){
-        lQ <- rbind(lQ, 0.5*(realx[2*h-1]+realx[2*h]), (0.5*(realx[2*h-1]- realx[2*h]))^2)
-      }
-
-      imagx <- t(x[Im(x)!=0]) # Select only the eignenvalues with imaginary values
-      for (h in seq_len(length(imagx)/2)){ lQ <- rbind(lQ, Re(imagx[2*h-1]), -abs(Im(imagx[2*h-1]))^2) }
-
-      if (i==1) {a <- lQ }else{   a <- rbind(a,lQ) }
-
+      all_blocks[[i]] <- block_jordan
       idx0 <- idx1
     }
 
-    lQ <- a
+    # Stack all results into one matrix
+    j_aux <- do.call(rbind, all_blocks)
+
+    }
+
+  return(j_aux)
+}
+###########################################################################################################
+#' Auxiliary function for a single-country specification
+#'
+#'@param ParaValue Constrained parameter
+#'@param Const_Type Type of constraint
+#'
+#' @references
+#' Le, A., & Singleton, K. J. (2018). Small Package of Matlab Routines for
+#' Estimation of Some Term Structure Models. EABCN Training School.\cr
+#' This function offers an independent R implementation that is informed
+#' by the conceptual framework outlined in Le and Singleton (2018), but adapted to the
+#' present modeling context.
+#'
+#'@keywords internal
+
+Aux_jordan_OneCountry <- function(ParaValue, Const_Type) {
+
+  # a) Eigen decomposition
+  eig_vals <- eigen(ParaValue, only.values = TRUE)$values
+
+  # b) Impose stationarity restriction if requested
+  if (grepl('stationary', Const_Type)) {
+    eig_vals <- ImposeStat_Aux(eig_vals)
   }
 
-  return(lQ)
+  # c) Separate real and complex eigenvalues
+  real_vals <- Re(eig_vals[Im(eig_vals) == 0])
+  complex_vals <- eig_vals[Im(eig_vals) != 0]
+
+  # d) Handle odd number of real eigenvalues (keep one aside)
+  jordan_params <- numeric(0)
+
+  if (length(real_vals) %% 2 == 1) {
+    jordan_params <- c(jordan_params, real_vals[1])
+    real_vals <- real_vals[-1]  # remove the first element
+  }
+
+  # e) Process real eigenvalue pairs
+  if (length(real_vals) > 0) {
+    for (h in seq(1, length(real_vals), by = 2)) {
+      mean_pair <- 0.5 * (real_vals[h] + real_vals[h + 1])
+      diff_sq  <- (0.5 * (real_vals[h] - real_vals[h + 1]))^2
+      jordan_params <- c(jordan_params, mean_pair, diff_sq)
+    }
+  }
+
+  # f) Process complex eigenvalue pairs
+  if (length(complex_vals) > 0) {
+    for (h in seq(1, length(complex_vals), by = 2)) {
+      real_part <- Re(complex_vals[h])
+      neg_imag_sq <- -abs(Im(complex_vals[h]))^2
+      jordan_params <- c(jordan_params, real_part, neg_imag_sq)
+    }
+  }
+
+  # g) Ensure result is a column matrix
+  Jordan_mat <- matrix(jordan_params, ncol = 1)
+
+  return(Jordan_mat)
 }
 
 ###########################################################################################################
 #'Impose stationary constraint under the risk-neutral measure
 #'
 #'@param yy numerical vector before imposing stationary constraint
+#'@param ub upper bound
+#'@param lb lower bound
 #'
 #'@keywords internal
 
-ImposeStat_Aux <- function(yy){
+ImposeStat_Aux <- function(yy, ub = 0.9999, lb = 1e-4) {
 
-  dd <- max(abs(yy))
-  ub <- 0.9999
-  lb <- 0.0001
-  maxdds <- min(max(dd, lb), ub)
-  maxdd <- bound2x(maxdds, lb, ub)
+  max_val <- max(abs(yy))
+  clamped_val <- min(max(max_val, lb), ub)
+  bound <- (clamped_val - lb)/(ub - clamped_val)
+  max_adj <- bound + log1p(-expm1(-bound) - 1)
 
-  scaled <- maxdd / maxdds
-  yy <- yy * scaled
+  scale_factor <- max_adj / clamped_val
+  yy_scaled <- yy * scale_factor
 
-  if (any(is.nan(Im(yy)))){
-    yy[is.nan(Im(yy))] <- Re(yy[is.nan(Im(yy))]) + 0i # replaces the NaN in the imaginary part by 0
+  if (any(is.nan(Im(yy_scaled)))){
+    yy_scaled[is.nan(Im(yy_scaled))] <- Re(yy_scaled[is.nan(Im(yy_scaled))]) + 0i # replaces the NaN in the imaginary part by 0
   }
-  return(yy)
+  return(yy_scaled)
 }
 
 ##########################################################################################################
@@ -276,11 +229,24 @@ Aux_PSD <- function(ParaValue, Const_Type){
   # Compute auxiliary PSD matrix
   N <- dim(ParaValue)[1]
 
-  halfm <- sqrtm_robust(ParaValue) # sqrtm (): computes a matrix square root such that Y=X^(1/2)*X^(1/2).
-  MatOnes<- matrix(1 , nrow= N, ncol = N)
-  mat_psd <- t(t(halfm[which(MatOnes == 1 & lower.tri(MatOnes, diag = TRUE))]))
+  # Compute a matrix square root such that Y=X^(1/2)*X^(1/2)
+  MatSSZ <- as.matrix(ParaValue) # Useful for the case in which SSZ is a scalar
 
-  return(mat_psd)
+  eig <- eigen(MatSSZ)
+  V <- eig$vectors
+  vv <- eig$values
+  if (length(vv) == 1) {
+      D <- matrix(sqrt(abs(vv)), nrow = 1, ncol = 1)
+  } else {
+      D <- diag(sqrt(abs(vv)))
+  }
+  MatSSZ_Half <- V%*%D%*%solve(V) # V %*% D^(1/2) %*% V^(-1)
+
+  # Vectorize
+  MatOnes <- matrix(1 , nrow= N, ncol = N)
+  mat_SSZ_Half_vec <- t(t(MatSSZ_Half[which(MatOnes == 1 & lower.tri(MatOnes, diag = TRUE))]))
+
+  return(mat_SSZ_Half_vec)
 }
 
 ########################################################################################################"
@@ -308,7 +274,15 @@ Aux_JLLstruct <- function(ParaValue, Const_Type, FactorLabels, Economies, JLLinp
   MatOnes[ZeroIdxSigmaJLL] <- 0
   IdxNONzeroSigmaJLL <- which(MatOnes!=0 & MatOnes == 1 & lower.tri(MatOnes, diag = TRUE))
 
-  halfm <- sqrtm_robust(ParaValue) # sqrtm (): computes a matrix square root such that Y=X^(1/2)*X^(1/2).
+  # Compute a matrix square root such that Y=X^(1/2)*X^(1/2).
+  m <- as.matrix(ParaValue) # Useful for the case in which SSZ is a scalar
+  eig <- eigen(m)
+  V <- eig$vectors
+  vv <- eig$values
+  D <- diag(sqrt(abs(vv)))
+
+  halfm <- V%*%D%*%solve(V) # V %*% D^(1/2) %*% V^(-1)
+
   a <- t(t(halfm[IdxNONzeroSigmaJLL]))
 
   return(a)
@@ -355,9 +329,19 @@ Aux_BlockDiag <- function(ParaValue, Const_Type, FactorLabels, Economies) {
         ZeroIdx <- which(d == 0)
 
         atemp <- do.call(rbind, lapply(seq_len(M), function(i) {
-          halfm <- sqrtm_robust(d[, (N * (i - 1) + 1):(N * i)])
-          halfm[ZeroIdx] <- 0
-          ab <- halfm[lower.tri(Mat1s, diag = TRUE)]
+          MatSSZ <- as.matrix(d[, (N * (i - 1) + 1):(N * i)]) # Useful for the case in which SSZ is a scalar
+
+          eig <- eigen(MatSSZ)
+          V <- eig$vectors
+          vv <- eig$values
+          if (length(vv) == 1) {
+            D <- matrix(sqrt(abs(vv)), nrow = 1, ncol = 1)
+          } else {
+            D <- diag(sqrt(abs(vv)))
+          }
+          MatSSZ_Half <- V%*%D%*%solve(V) # V %*% D^(1/2) %*% V^(-1)
+          MatSSZ_Half[ZeroIdx] <- 0
+          ab <- MatSSZ_Half[lower.tri(Mat1s, diag = TRUE)]
           matrix(ab[ab != 0], ncol = 1)
         }))
 
@@ -369,78 +353,4 @@ Aux_BlockDiag <- function(ParaValue, Const_Type, FactorLabels, Economies) {
   }
 
   return(matrix(a, ncol = 1))
-}
-
-##########################################################################################################
-#'Transformation of the bounded parameters (auxiliary form)
-#'
-#'@param ParaValue Constrained parameter value
-#'@param Const_Type Type of constraint
-#'@param lb lower bound
-#'@param ub upper bound
-#'
-#'@importFrom hablar s
-#'
-#'@keywords internal
-
-Aux_BoundDiag <- function(ParaValue, Const_Type, lb, ub){
-
-  # Impose diagonal restriction (if desired)
-  if (grepl('diag', Const_Type)) {
-    i <- unlist(gregexpr("diag", Const_Type))
-    i <- i[1]
-    M <-as.numeric(substr(Const_Type, start= i+4, stop= nchar(Const_Type) ) )
-    if (is.na(M)) { M <- 1
-
-    J <- round(sqrt(length(ParaValue)/M))
-    bb <- matrix(NA, M*J, 1)
-    for (i in 1:M){
-      if ((i-1)*J+1 < i*J){ IdxSeq <- ((i-1)*J+1):(i*J) } else{ IdxSeq <- numeric()}
-      bb[IdxSeq ] <- diag(ParaValue[ , IdxSeq ])
-    }
-    ParaValue <- bb
-    }
-  }
-  # Ensures that the constraints are preserved
-  if (is.null(lb))  lb <- -Inf
-  if (is.null(ub))  ub <-  Inf
-
-  temp <- ParaValue
-  temp[] <- lb[]
-  lb <- temp
-
-  temp <- ParaValue
-  temp[] <- ub[]
-  ub <- temp
-
-  if (!is.null(dim(ParaValue)) || is.numeric(ParaValue)){
-    d <- as.matrix(ParaValue) # d is a necessary mean to build the variables a and b with correct dimensions (see the loop below)
-  }
-
-  if (length(ub) == 0 || length(lb) == 0  || (identical(ub,Inf) & identical(lb,Inf))){
-    ParaValue <- pmin(s(c(pmax(s(c(lb,ParaValue))) , ub)))
-  }else{
-    ParaValue <- min(s(c(max(s(c(lb,ParaValue))) , ub)))
-  }
-
-  if (is.na(ParaValue)  ){
-    a <- matrix(, nrow=0, ncol=0)
-  } else{
-    ParaValue <- matrix(ParaValue, nrow=dim(d)[1], ncol=dim(d)[2] )
-    a <- matrix(NA, nrow=dim(d)[1], ncol=dim(d)[2] )
-  }
-
-  tt <- is.infinite(lb)&  is.infinite(ub)
-  a[tt] <- ParaValue[tt]
-
-  tt <- !is.infinite(lb)  & is.infinite(ub)
-  if (identical(ParaValue[tt]-lb[tt],numeric(0))){ a[tt] <- pos2x(numeric(0)) }else{ a[tt] <- pos2x(max((c(ParaValue[tt]-lb[tt],0)))) }
-
-  tt <- is.infinite(lb) & !is.infinite(ub)
-  if (identical(ub[tt]-ParaValue[tt],numeric(0))){ a[tt] <- pos2x(numeric(0)) }else{ a[tt] <- - pos2x(max((c(ub[tt]-ParaValue[tt],0)))) }
-
-  tt<- !is.infinite(lb) & !is.infinite(ub)
-  a[tt] <- bound2x(max(s(c(min(s(c(ParaValue[tt], ub[tt]))), lb[tt])) ), lb[tt], ub[tt]  )
-
-  return(a)
 }

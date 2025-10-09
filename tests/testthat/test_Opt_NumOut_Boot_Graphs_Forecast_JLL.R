@@ -64,12 +64,13 @@ test_that("Optimization + Outputs + Graphs return correct structure (JLL model)"
   expect_true(length(out_summary) > 0)
   expect_type(out_summary, "character")
 
-  expect_true(all(c("inputs", "ests", "llk", "rot") %in% names(res_Opt[[ModelType]])))
+  expect_true(all(c("Inputs", "ModEst") %in% names(res_Opt[[ModelType]])))
   expect_true(all(c("Y", "AllFactors", "mat", "N", "dt", "Wpca") %in%
-                    names(res_Opt[[ModelType]]$inputs)))
-  expect_true(all(c("K1XQ", "SSZ", "SSP", "r0", "se", "K0Z", "K1Z", "Gy.0", "VarYields") %in%
-                    names(res_Opt[[ModelType]]$ests)))
-  expect_type(res_Opt[[ModelType]]$llk[[1]], "double")
+                    names(res_Opt[[ModelType]]$Inputs)))
+  expect_true(all(c("Max_llk", "Q", "P") %in% names(res_Opt[[ModelType]]$ModEst)))
+  expect_true(all(c("K1XQ", "r0", "se", "VarYields") %in% names(res_Opt[[ModelType]]$ModEst$Q)))
+  expect_true(all(c("SSZ", "K0Z", "K1Z", "Gy.0") %in% names(res_Opt[[ModelType]]$ModEst$P)))
+  expect_type(res_Opt[[ModelType]]$ModEst$Max_llk, "double")
 
   # --- B) Numerical outputs ---
   InputsForOutputs <- InputsForOutputs(ModelType, Horiz, DesiredGraphs, OutputLabel, StatQ, DataFreq, WGYields,

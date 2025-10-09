@@ -45,7 +45,7 @@ approach of JPS (2014), or *jointly* across all countries within the
 economic system, as developed in **JLL (2015)** by
 @JotikasthiraLeLundblad2015 and **CM (2024)** by @CandelonMoura2024.
 
-Due to peculiar features of JPS-based specifications, an efficient
+Due to peculiar features of JPS-based specifications (see @JoslinSingletonZhu2011), an efficient
 estimation of the parameters governing the risk-neutral ($Q$-measure)
 and the physical ($P$-measure) probability measures can be carried out
 rather independently. The only exception is the variance-covariance
@@ -810,32 +810,36 @@ JLLpara <- JLL(RiskFactors, N, JLLinputs, CheckInputs = TRUE)
 ## ATSM estimation
 
 ATSM estimation involves optimizing the log-likelihood function by
-optimally selecting the model parameters. The optimization structure in
-this package is based on routines from the term structure package by
-@LeSingleton2018. The ATSM otimization is carried out using the
-`Optimization()` function.
-
+optimally selecting the model parameters via the `Optimization()` function.
 Broadly, the unspanned risk framework from JPS (2014) (and, therefore,
-all its multi-country extensions) requires the estimation parameter set
-consisting of 6 elements, namely: the risk-neutral long-run mean of the
-short rate (*r0*), the risk-neutral feedback matrix (*K1XQ*), the
-variance-covariance matrix (*SSZ*) from the VAR processes, the standard
-deviation of the errors from the portfolios of yields observed with
-error (*se*), in addition to the intercept (*K0Z*) and the feedback
-(*K1Z*) matrices of the physical dynamics.
+all its multi-country extensions) follows a model parameterization similar to that proposed by @JoslinSingletonZhu2011. Specifically, it requires the estimation parameter set
+consisting of 6 elements, namely the: 
+
+1.    Risk-neutral long-run mean of the
+short rate (*r0*);
+
+2.    Risk-neutral feedback matrix (*K1XQ*); 
+
+3.    Variance-covariance matrix (*SSZ*) from the VAR processes;
+
+4.    The standard deviation of the errors from the portfolios of yields observed with
+error (*se*);
+
+5.    Intercept (*K0Z*);
+
+6.    Feedback matrices of the physical dynamics (*K1Z*). 
 
 The parameters *K0Z* and *K1Z* are estimated as part of the model's
 $P-$dynamics and are known in closed form. Likewise, *r0* and *se* have
 analytical solutions and can be factored out of the log-likelihood
 function. However, the remaining parameters (*K1XQ* and *SSZ*) require
-numerical estimation. @LeSingleton2018 provide standardized routines
-(integrated into this package) to set effective initial values,
-facilitating the optimization process.
+numerical estimation. This package provides standardized routines
+to set effective initial values, facilitating the optimization process.
 
-The *MultiATSM* package offers two optimization algorithms: *fminunc*
-and *fminsearch*. By default, both algorithms are run sequentially twice
+
+The *MultiATSM* package offers two optimization algorithms: *L-BFGS-B* and *Nelder-Mead*. By default, both algorithms are run sequentially twice
 to ensure the model reaches the global optimum. Specifically in the
-default bootstrap setup, only *fminunc* is used to save time.
+default bootstrap setup, only *Nelder-Mead* is used to save time.
 
 # Examples of full implementation of ATSMs {#S:SectionReplication}
 

@@ -138,17 +138,17 @@ VarianceExplained <- function(ModelType, ModelPara, FactorLabels, Economies) {
   # Models estimated individually
   if (any(ModelType == c("JPS original", "JPS global", "GVAR single"))) {
     for (i in 1:length(Economies)) {
-      H <- eigen(stats::cov(t(ModelPara[[ModelType]][[Economies[i]]]$inputs$Y)))$values
+      H <- eigen(stats::cov(t(ModelPara[[ModelType]][[Economies[i]]]$Inputs$Y)))$values
       percentages_explained <- cumsum(H) / sum(H)
       Total_Var_exp[[i]] <- percentages_explained[1:N]
     }
   } else {
     # Models estimated jointly
-    J <- length(ModelPara[[ModelType]]$inputs$mat)
+    J <- length(ModelPara[[ModelType]]$Inputs$mat)
     idx0 <- 0
     for (i in 1:length(Economies)) {
       idx1 <- idx0 + J
-      H <- eigen(stats::cov(t(ModelPara[[ModelType]]$inputs$Y[(idx0 + 1):idx1, ])))$values
+      H <- eigen(stats::cov(t(ModelPara[[ModelType]]$Inputs$Y[(idx0 + 1):idx1, ])))$values
       percentages_explained <- cumsum(H) / sum(H)
       Total_Var_exp[[i]] <- percentages_explained[1:N]
       idx0 <- idx1
@@ -205,19 +205,19 @@ YieldsFit <- function(ModelType, ModelPara, FactorLabels, Economies) {
 
   # I) Models estimated individually
   if (ModelType %in% c("JPS original", "JPS global", "GVAR single")) {
-    mat <- ModelPara[[ModelType]][[Economies[1]]]$inputs$mat
+    mat <- ModelPara[[ModelType]][[Economies[1]]]$Inputs$mat
     J <- length(mat)
 
     for (i in 1:C) {
       # Extract necessary data
       InfoSet <- ModelPara[[ModelType]][[Economies[i]]]
-      YieldData <- InfoSet$inputs$Y
-      Z <- InfoSet$inputs$AllFactors
+      YieldData <- InfoSet$Inputs$Y
+      Z <- InfoSet$Inputs$AllFactors
       T_dim <- ncol(Z)
-      Afull <- InfoSet$rot$P$A
-      Bspanned <- InfoSet$rot$P$B
-      K0Z <- InfoSet$ests$K0Z
-      K1Z <- InfoSet$ests$K1Z
+      Afull <- InfoSet$ModEst$Q$Load$P$A
+      Bspanned <- InfoSet$ModEst$Q$Load$P$B
+      K0Z <- InfoSet$ModEst$P$K0Z
+      K1Z <- InfoSet$ModEst$P$K1Z
 
       # Determine AllLabels and LabelSpannedCS
       if (ModelType == "JPS original") {
@@ -246,13 +246,13 @@ YieldsFit <- function(ModelType, ModelPara, FactorLabels, Economies) {
 
     # II) Models estimated jointly
     InfoSet <- ModelPara[[ModelType]]
-    Z <- InfoSet$inputs$AllFactors
-    YieldData <- InfoSet$inputs$Y
-    mat <- InfoSet$inputs$mat
-    Afull <- InfoSet$rot$P$A
-    Bspanned <- InfoSet$rot$P$B
-    K0Z <- InfoSet$ests$K0Z
-    K1Z <- InfoSet$ests$K1Z
+    Z <- InfoSet$Inputs$AllFactors
+    YieldData <- InfoSet$Inputs$Y
+    mat <- InfoSet$Inputs$mat
+    Afull <- InfoSet$ModEst$Q$Load$P$A
+    Bspanned <- InfoSet$ModEst$Q$Load$P$B
+    K0Z <- InfoSet$ModEst$P$K0Z
+    K1Z <- InfoSet$ModEst$P$K1Z
     J <- length(mat)
     T_dim <- ncol(Z)
 
@@ -311,13 +311,13 @@ IRFandGIRF <- function(ModelType, ModelPara, IRFhoriz, FactorLabels, Economies) 
 
   # Helper function to compute IRFs and GIRFs for a single country
   compute_single_country <- function(ModelType, Para_Set, Econ, Economies) {
-    J <- length(Para_Set[[Econ]]$inputs$mat)
-    K <- nrow(Para_Set[[Econ]]$inputs$AllFactors)
-    YieldsLabel <- rownames(Para_Set[[Econ]]$inputs$Y) # Yield labels
+    J <- length(Para_Set[[Econ]]$Inputs$mat)
+    K <- nrow(Para_Set[[Econ]]$Inputs$AllFactors)
+    YieldsLabel <- rownames(Para_Set[[Econ]]$Inputs$Y) # Yield labels
 
     # Summarize inputs for the IRFs
-    SIGMA <- Para_Set[[Econ]]$ests$SSZ # KxK (variance-covariance matrix)
-    K1Z <- Para_Set[[Econ]]$ests$K1Z # KxK (feedback matrix)
+    SIGMA <- Para_Set[[Econ]]$ModEst$P$SSZ # KxK (variance-covariance matrix)
+    K1Z <- Para_Set[[Econ]]$ModEst$P$K1Z # KxK (feedback matrix)
     B <- BUnspannedAdapSep(G, M, Para_Set, Economies, Econ, ModelType)
 
     # Compute IRFs
@@ -325,7 +325,7 @@ IRFandGIRF <- function(ModelType, ModelPara, IRFhoriz, FactorLabels, Economies) 
     IRFoutputs[[ModelType]][[Econ]] <- IRFs # Store Country specific IRFs
 
     # Compute GIRFs
-    G0.y <- Para_Set[[Econ]]$ests$Gy.0
+    G0.y <- Para_Set[[Econ]]$ModEst$P$Gy.0
     GIRFs <- ComputeGIRFs(SIGMA, K1Z, B, G0.y, FactorLabels, K, J, IRFhoriz, YieldsLabel, ModelType, Econ)
     GIRFoutputs[[ModelType]][[Econ]] <- GIRFs # Store Country specific GIRFs
 
@@ -336,37 +336,37 @@ IRFandGIRF <- function(ModelType, ModelPara, IRFhoriz, FactorLabels, Economies) 
   compute_joint_country <- function(ModelType, Para_Set, FactorLabels, Economies) {
 
     JLL_Label <- c("JLL original", "JLL No DomUnit", "JLL joint Sigma")
-    J <- length(Para_Set$inputs$mat)
-    K <- nrow(Para_Set$inputs$AllFactors)
-    YieldsLabel <- rownames(Para_Set$inputs$Y) # Yield labels
+    J <- length(Para_Set$Inputs$mat)
+    K <- nrow(Para_Set$Inputs$AllFactors)
+    YieldsLabel <- rownames(Para_Set$Inputs$Y) # Yield labels
 
     # Summarize inputs for the IRFs
     if (ModelType %in% JLL_Label) {
-      SIGMA <- Para_Set$ests$JLLoutcomes$Sigmas$Sigma_Y # For JLL models, we selected the cholesky factor, which won't be computed inside "ComputeIRFs"
+      SIGMA <- Para_Set$ModEst$P$JLLoutcomes$Sigmas$Sigma_Y # For JLL models, we selected the cholesky factor, which won't be computed inside "ComputeIRFs"
     } else {
-      SIGMA <- Para_Set$ests$SSZ # KxK (variance-covariance matrix)
+      SIGMA <- Para_Set$ModEst$P$SSZ # KxK (variance-covariance matrix)
     }
-    K1Z <- Para_Set$ests$K1Z # KxK (feedback matrix)
-    BSpanned <- Para_Set$rot$P$B
+    K1Z <- Para_Set$ModEst$P$K1Z # KxK (feedback matrix)
+    BSpanned <- Para_Set$ModEst$Q$Load$P$B
     B <- BUnspannedAdapJoint(G, M, N, C, J, BSpanned)
 
     # Compute IRFs
     IRFoutputs[[ModelType]] <- ComputeIRFs(SIGMA, K1Z, B, FactorLabels, K, C * J, IRFhoriz, YieldsLabel, ModelType)
 
     # Compute GIRFs
-    G0.y <- Para_Set$ests$Gy.0
+    G0.y <- Para_Set$ModEst$P$Gy.0
     if (ModelType %in% JLL_Label) {
-      SIGMA <- ModelPara[[ModelType]]$ests$JLLoutcomes$Sigmas$VarCov_NonOrtho
+      SIGMA <- ModelPara[[ModelType]]$ModEst$P$JLLoutcomes$Sigmas$VarCov_NonOrtho
     }
     GIRFs <- ComputeGIRFs(SIGMA, K1Z, B, G0.y, FactorLabels, K, C * J, IRFhoriz, YieldsLabel, ModelType)
     GIRFoutputs[[ModelType]] <- GIRFs # Store Country specific GIRFs
 
     # Compute orthogonalized IRFs and GIRFs for JLL-based models
     if (ModelType %in% JLL_Label) {
-      K1Ze <- Para_Set$ests$JLLoutcomes$k1_e # KxK (feedback matrix)
-      PI <- Para_Set$ests$JLLoutcomes$PI
-      Se <- Para_Set$ests$JLLoutcomes$Sigmas$Sigma_Ye
-      SIGMA_e <- Para_Set$ests$JLLoutcomes$Sigmas$VarCov_Ortho
+      K1Ze <- Para_Set$ModEst$P$JLLoutcomes$k1_e # KxK (feedback matrix)
+      PI <- Para_Set$ModEst$P$JLLoutcomes$PI
+      Se <- Para_Set$ModEst$P$JLLoutcomes$Sigmas$Sigma_Ye
+      SIGMA_e <- Para_Set$ModEst$P$JLLoutcomes$Sigmas$VarCov_Ortho
 
       # Compute IRFs orthogonalized
       IRFOrtho <- list()
@@ -439,14 +439,14 @@ FEVDandGFEVD <- function(ModelType, ModelPara, FEVDhoriz, FactorLabels, Economie
 
   # Helper function to compute FEVDs and GFEVDs for a single country
   compute_single_country <- function(ModelType, Para_Set, Econ, Economies) {
-    K <- nrow(Para_Set[[Econ]]$inputs$AllFactors)
-    J <- length(Para_Set[[Econ]]$inputs$mat)
-    YieldsLabel <- rownames(Para_Set[[Econ]]$inputs$Y) # Yield labels
+    K <- nrow(Para_Set[[Econ]]$Inputs$AllFactors)
+    J <- length(Para_Set[[Econ]]$Inputs$mat)
+    YieldsLabel <- rownames(Para_Set[[Econ]]$Inputs$Y) # Yield labels
 
     # Summarize inputs for the FEVDs
-    SIGMA <- Para_Set[[Econ]]$ests$SSZ
-    K1Z <- Para_Set[[Econ]]$ests$K1Z
-    G0 <- Para_Set[[Econ]]$ests$Gy.0
+    SIGMA <- Para_Set[[Econ]]$ModEst$P$SSZ
+    K1Z <- Para_Set[[Econ]]$ModEst$P$K1Z
+    G0 <- Para_Set[[Econ]]$ModEst$P$Gy.0
     B <- BUnspannedAdapSep(G, M, Para_Set, Economies, Econ, ModelType)
 
     # Compute FEVDs
@@ -461,20 +461,20 @@ FEVDandGFEVD <- function(ModelType, ModelPara, FEVDhoriz, FactorLabels, Economie
 
   # Helper function to compute FEVDs and GFEVDs for joint country models
   compute_joint_country <- function(ModelType, ParaSet, FactorLabels, Economies) {
-    J <- length(ParaSet$inputs$mat)
-    K <- nrow(ParaSet$inputs$AllFactors)
-    YieldsLabel <- rownames(ParaSet$inputs$Y) # Yield labels
+    J <- length(ParaSet$Inputs$mat)
+    K <- nrow(ParaSet$Inputs$AllFactors)
+    YieldsLabel <- rownames(ParaSet$Inputs$Y) # Yield labels
 
     # Summarize inputs for the FEVD
     if (any(ModelType == c("JLL original", "JLL No DomUnit", "JLL joint Sigma"))) {
-      Chol_Fac_JLL <- ParaSet$ests$JLLoutcomes$Sigmas$Sigma_Y
+      Chol_Fac_JLL <- ParaSet$ModEst$P$JLLoutcomes$Sigmas$Sigma_Y
     }
 
-    K1Z <- ParaSet$ests$K1Z # KxK (feedback matrix)
-    SIGMA <- ParaSet$ests$SSZ # KxK (variance-covariance matrix)
-    BSpanned <- ParaSet$rot$P$B
+    K1Z <- ParaSet$ModEst$P$K1Z # KxK (feedback matrix)
+    SIGMA <- ParaSet$ModEst$P$SSZ # KxK (variance-covariance matrix)
+    BSpanned <- ParaSet$ModEst$Q$Load$P$B
     B <- BUnspannedAdapJoint(G, M, N, C, J, BSpanned)
-    G0 <- ParaSet$ests$Gy.0
+    G0 <- ParaSet$ModEst$P$Gy.0
 
     # Compute FEVD
     FEVDoutputs[[ModelType]] <- ComputeFEVDs(SIGMA, K1Z, G0, B, FactorLabels, K, C * J, FEVDhoriz, YieldsLabel,
@@ -486,10 +486,10 @@ FEVDandGFEVD <- function(ModelType, ModelPara, FEVDhoriz, FactorLabels, Economie
 
     # Compute orthogonalized FEVDs and GFEVDs for JLL-based models
     if (any(ModelType == c("JLL original", "JLL No DomUnit", "JLL joint Sigma"))) {
-      K1Ze <- ParaSet$ests$JLLoutcomes$k1_e # KxK (feedback matrix)
-      PI <- ParaSet$ests$JLLoutcomes$PI
-      SIGMA_Ortho <- ParaSet$ests$JLLoutcomes$Sigmas$VarCov_Ortho
-      Chol_Fac_JLL_Ortho <- ParaSet$ests$JLLoutcomes$Sigmas$Sigma_Ye
+      K1Ze <- ParaSet$ModEst$P$JLLoutcomes$k1_e # KxK (feedback matrix)
+      PI <- ParaSet$ModEst$P$JLLoutcomes$PI
+      SIGMA_Ortho <- ParaSet$ModEst$P$JLLoutcomes$Sigmas$VarCov_Ortho
+      Chol_Fac_JLL_Ortho <- ParaSet$ModEst$P$JLLoutcomes$Sigmas$Sigma_Ye
 
       # Compute FEVDs orthogonalized
       FEVDOrtho <- list()
@@ -674,20 +674,20 @@ BUnspannedAdapSep <- function(G,M, ModelPara_Short, Economies, Economy, ModelTyp
 
   i <- match(Economy, Economies)
   C <- length(Economies)
-  N <- ModelPara_Short[[Economy]]$inputs$N
-  J <- length(ModelPara_Short[[Economy]]$inputs$mat)
+  N <- ModelPara_Short[[Economy]]$Inputs$N
+  J <- length(ModelPara_Short[[Economy]]$Inputs$mat)
 
 
   if( ModelType == "JPS original"){
     K <- N+M + G
     BUnspanned <- matrix(0, nrow = J, ncol= K)
-    BSpanned <- ModelPara_Short[[Economies[i]]]$rot$P$B
+    BSpanned <- ModelPara_Short[[Economies[i]]]$ModEst$Q$Load$P$B
     BUnspanned[ , (K-N+1):K] <-  BSpanned
 
   } else if ( ModelType %in% c("JPS global","GVAR single" )){
     K <- C*(N+M) + G
     BUnspanned <- matrix(0, nrow=J, ncol= K)
-    BSpanned <- ModelPara_Short[[Economies[i]]]$rot$P$B
+    BSpanned <- ModelPara_Short[[Economies[i]]]$ModEst$Q$Load$P$B
 
     IDX <- list()
     idx0 <- G+M
@@ -1115,7 +1115,7 @@ YieldsFitAll <- function(MatInt, ModelPara, FactorLabels, ModelType, Economies, 
   compute_fitted_yields <- function(MatInt, MatAll, K1XQ, ModelType, r0, SSX, X, T_dim, dt, Economies,
                                     Time_Labels, Yield_Labels) {
 
-    LoadingsLat <- A0N__BnAn(MatAll, K1XQ, ModelType, dX = NULL, r0, SSX, Economies)
+    LoadingsLat <- Get__BnXAnX(MatAll, K1XQ, ModelType, r0, SSX, Economies)
     AnXAll <- LoadingsLat$AnX / dt
     BnXAll <- LoadingsLat$BnX / dt
 
@@ -1155,33 +1155,33 @@ YieldsFitAll <- function(MatInt, ModelPara, FactorLabels, ModelType, Economies, 
 
   C <- length(Economies)
   Mod_ParaSet <- ModelPara[[ModelType]]
-  N <- if (ModelType %in% Joint_Lab) Mod_ParaSet$inputs$N else Mod_ParaSet[[Economies[1]]]$inputs$N
-  dt <- if (ModelType %in% Joint_Lab) Mod_ParaSet$inputs$dt else Mod_ParaSet[[Economies[1]]]$inputs$dt
-  mat <- if (ModelType %in% Joint_Lab) Mod_ParaSet$inputs$mat else Mod_ParaSet[[Economies[1]]]$inputs$mat
+  N <- if (ModelType %in% Joint_Lab) Mod_ParaSet$Inputs$N else Mod_ParaSet[[Economies[1]]]$Inputs$N
+  dt <- if (ModelType %in% Joint_Lab) Mod_ParaSet$Inputs$dt else Mod_ParaSet[[Economies[1]]]$Inputs$dt
+  mat <- if (ModelType %in% Joint_Lab) Mod_ParaSet$Inputs$mat else Mod_ParaSet[[Economies[1]]]$Inputs$mat
   J <- length(mat)
   M <- length(FactorLabels$Domestic) - N
   G <- length(FactorLabels$Global)
 
-  T_dim <- if (ModelType %in% Joint_Lab) ncol(Mod_ParaSet$inputs$AllFactors) else
-    ncol(Mod_ParaSet[[Economies[1]]]$inputs$AllFactors)
+  T_dim <- if (ModelType %in% Joint_Lab) ncol(Mod_ParaSet$Inputs$AllFactors) else
+    ncol(Mod_ParaSet[[Economies[1]]]$Inputs$AllFactors)
 
   # 2) Compute results for joint or separate models
   # a) JointQ models
   if (ModelType %in% Joint_Lab) {
-    BnX <- Mod_ParaSet$rot$X$B
-    AnX <- Mod_ParaSet$rot$X$A
-    K1XQ <- Mod_ParaSet$ests$K1XQ
-    SSX <- Mod_ParaSet$rot$X$SS
-    r0 <- Mod_ParaSet$ests$r0
-    Wpca <- Mod_ParaSet$inputs$Wpca
-    ZZ <- Mod_ParaSet$inputs$AllFactors
+    BnX <- Mod_ParaSet$ModEst$Q$Load$X$B
+    AnX <- Mod_ParaSet$ModEst$Q$Load$X$A
+    K1XQ <- Mod_ParaSet$ModEst$Q$K1XQ
+    SSX <- Mod_ParaSet$ModEst$Q$Load$X$SS
+    r0 <- Mod_ParaSet$ModEst$Q$r0
+    Wpca <- Mod_ParaSet$Inputs$Wpca
+    ZZ <- Mod_ParaSet$Inputs$AllFactors
 
     b <- IdxSpanned(G, M, N, C)
     PP <- ZZ[b, ]
     X <- compute_X(PP, Wpca, BnX, AnX, T_dim)
 
     MatAll <- 1:max(mat / dt)
-    Time_Labels <- colnames(Mod_ParaSet$inputs$AllFactors)
+    Time_Labels <- colnames(Mod_ParaSet$Inputs$AllFactors)
     Yield_Labels <- paste(MatInt, YLab, sep="")
     FittedYieldsPerMat <- compute_fitted_yields(MatInt, MatAll, K1XQ, ModelType, r0, SSX, X, T_dim, dt, Economies,
                                                 Time_Labels, Yield_Labels)
@@ -1204,13 +1204,13 @@ YieldsFitAll <- function(MatInt, ModelPara, FactorLabels, ModelType, Economies, 
     FittedYieldsPerMat <- list()
 
     for (i in 1:C) {
-      BnX <- Mod_ParaSet[[Economies[i]]]$rot$X$B
-      AnX <- Mod_ParaSet[[Economies[i]]]$rot$X$A
-      K1XQ <- Mod_ParaSet[[Economies[i]]]$ests$K1XQ
-      SSX <- Mod_ParaSet[[Economies[i]]]$rot$X$SS
-      r0 <- Mod_ParaSet[[Economies[i]]]$ests$r0
-      Wpca <- Mod_ParaSet[[Economies[i]]]$inputs$Wpca
-      ZZ <- Mod_ParaSet[[Economies[i]]]$inputs$AllFactors
+      BnX <- Mod_ParaSet[[Economies[i]]]$ModEst$Q$Load$X$B
+      AnX <- Mod_ParaSet[[Economies[i]]]$ModEst$Q$Load$X$A
+      K1XQ <- Mod_ParaSet[[Economies[i]]]$ModEst$Q$K1XQ
+      SSX <- Mod_ParaSet[[Economies[i]]]$ModEst$Q$Load$X$SS
+      r0 <- Mod_ParaSet[[Economies[i]]]$ModEst$Q$r0
+      Wpca <- Mod_ParaSet[[Economies[i]]]$Inputs$Wpca
+      ZZ <- Mod_ParaSet[[Economies[i]]]$Inputs$AllFactors
 
       if (ModelType == "JPS original") {
         AllLabels <- c(FactorLabels$Global, FactorLabels$Tables[[Economies[i]]])
@@ -1224,7 +1224,7 @@ YieldsFitAll <- function(MatInt, ModelPara, FactorLabels, ModelType, Economies, 
 
       X <- compute_X(PP, Wpca, BnX, AnX, T_dim)
       MatAll <- 1:max(mat / dt)
-      col_names <- colnames(Mod_ParaSet[[Economies[1]]]$inputs$AllFactors)
+      col_names <- colnames(Mod_ParaSet[[Economies[1]]]$Inputs$AllFactors)
       row_names <- paste(MatInt, YLab, sep="")
       FittedYieldsPerMat[[i]] <- compute_fitted_yields(MatInt, MatAll, K1XQ, ModelType, r0, SSX, X, T_dim, dt, Economies, col_names, row_names)
     }
@@ -1270,7 +1270,7 @@ ExpectedComponent <- function(ModelPara, InputsForOutputs, ModelType, Economies,
   UnitYields <- InputsForOutputs$UnitMatYields
 
   if ( any(ModelType == c("JPS original", "JPS global", "GVAR single"))){
-    mat <- ModelPara[[ModelType]][[1]]$inputs$mat} else{ mat <- ModelPara[[ModelType]]$inputs$mat}
+    mat <- ModelPara[[ModelType]][[1]]$Inputs$mat} else{ mat <- ModelPara[[ModelType]]$Inputs$mat}
 
   matAdjUnit <- MatAdjusted(mat, UnitYields)
 
@@ -1305,7 +1305,6 @@ ExpectedComponent <- function(ModelPara, InputsForOutputs, ModelType, Economies,
 #'
 #' @keywords internal
 
-
 rhoParas <- function(ModelPara, N, ModelType, Economies){
 
   # Compute the intercept and slope coefficients of the short rate expressed as a function of the spanned factors
@@ -1322,14 +1321,14 @@ rhoParas <- function(ModelPara, N, ModelType, Economies){
   names(rho0_PP) <- Economies
   names(rho1_PP) <- Economies
 
-  dt <- ModelPara[[ModelType]][[Economies[1]]]$inputs$dt
+  dt <- ModelPara[[ModelType]][[Economies[1]]]$Inputs$dt
 
   for (i in 1:length(Economies)) {
     Para_Set <- ModelPara[[ModelType]][[Economies[i]]]
-    BnX <- Para_Set$rot$X$B
-    AnX <- Para_Set$rot$X$A
-    Wpca <- Para_Set$inputs$Wpca
-    r0 <- Para_Set$ests$r0
+    BnX <- Para_Set$ModEst$Q$Load$X$B
+    AnX <- Para_Set$ModEst$Q$Load$X$A
+    Wpca <- Para_Set$Inputs$Wpca
+    r0 <- Para_Set$ModEst$Q$r0
 
     # Compute rhos
     rho1_X <- rep(1,N)
@@ -1341,11 +1340,11 @@ rhoParas <- function(ModelPara, N, ModelType, Economies){
 
     # 2) Models estimated for countries JOINTLY
     Para_Set <- ModelPara[[ModelType]]
-    dt <- Para_Set$inputs$dt
-    BnX <- Para_Set$rot$X$B
-    AnX <- Para_Set$rot$X$A
-    Wpca <- Para_Set$inputs$Wpca
-    r0 <- Para_Set$ests$r0
+    dt <- Para_Set$Inputs$dt
+    BnX <- Para_Set$ModEst$Q$Load$X$B
+    AnX <- Para_Set$ModEst$Q$Load$X$A
+    Wpca <- Para_Set$Inputs$Wpca
+    r0 <- Para_Set$ModEst$Q$r0
 
     # Compute rhos
     rho1_X_CS <- rep(1,N)
@@ -1389,8 +1388,8 @@ Compute_EP <- function(ModelPara, ModelType, UnitYields, matAdjUnit, N, rhoList,
   SepQ_Lab <- c("JPS original", "JPS global", "GVAR single")
   M <- length(FactorLabels$Domestic) - N
 
-  dt <- if (ModelType %in% SepQ_Lab) ModelPara[[ModelType]][[Economies[1]]]$inputs$dt
-  else ModelPara[[ModelType]]$inputs$dt
+  dt <- if (ModelType %in% SepQ_Lab) ModelPara[[ModelType]][[Economies[1]]]$Inputs$dt
+  else ModelPara[[ModelType]]$Inputs$dt
 
   k <- if (UnitYields == "Month") 12 else 1
   YLab <- if (UnitYields == "Month") "M" else "Y"
@@ -1407,9 +1406,9 @@ Compute_EP <- function(ModelPara, ModelType, UnitYields, matAdjUnit, N, rhoList,
   ParaSet <- ModelPara[[ModelType]]
    # jointQ models
   if (!(ModelType %in% SepQ_Lab)){
-    K0Z <- ParaSet$ests$K0Z
-    K1Z <- ParaSet$ests$K1Z
-    ZZ <- ParaSet$inputs$AllFactors
+    K0Z <- ParaSet$ModEst$P$K0Z
+    K1Z <- ParaSet$ModEst$P$K1Z
+    ZZ <- ParaSet$Inputs$AllFactors
   }
 
   avexp <- list()
@@ -1418,9 +1417,9 @@ Compute_EP <- function(ModelPara, ModelType, UnitYields, matAdjUnit, N, rhoList,
     econ <- Economies[i]
     # a) Pre-allocation
     if (ModelType %in% SepQ_Lab){ # SepQ models
-    K0Z <- ParaSet[[Economies[i]]]$ests$K0Z
-    K1Z <- ParaSet[[Economies[i]]]$ests$K1Z
-    ZZ <- ParaSet[[Economies[i]]]$inputs$AllFactors
+    K0Z <- ParaSet[[Economies[i]]]$ModEst$P$K0Z
+    K1Z <- ParaSet[[Economies[i]]]$ModEst$P$K1Z
+    ZZ <- ParaSet[[Economies[i]]]$Inputs$AllFactors
     }
 
     # b) Extract spanned factors from the list of unspanned factors
@@ -1490,7 +1489,7 @@ TermPremia <- function(ModelPara, avexp, ModelType, Economies){
   SepQ_Lab <- c("JPS original", "JPS global", "GVAR single")
 
   if(!ModelType %in% SepQ_Lab){
-    mat <- ModelPara[[ModelType]]$inputs$mat
+    mat <- ModelPara[[ModelType]]$Inputs$mat
     J <- length(mat)
   }
 
@@ -1498,11 +1497,11 @@ TermPremia <- function(ModelPara, avexp, ModelType, Economies){
   for (i in 1:length(Economies)){
 
     if(ModelType %in% SepQ_Lab){ # SepQ models
-      Y <- ModelPara[[ModelType]][[Economies[i]]]$inputs$Y
+      Y <- ModelPara[[ModelType]][[Economies[i]]]$Inputs$Y
       YieldData[[Economies[i]]] <- t(Y)*100
     } else{ # jointQ models
       IdxRP <- (1:J) +J*(i-1)
-      Y <- ModelPara[[ModelType]]$inputs$Y
+      Y <- ModelPara[[ModelType]]$Inputs$Y
       YieldData[[Economies[i]]] <- t(Y[IdxRP, ]*100)
     }
     TermPremium[[Economies[i]]] <- YieldData[[Economies[i]]] - avexp[[Economies[i]]]
@@ -1531,8 +1530,8 @@ ForwardPremia <- function(ModelPara, avexpFP, ModelType, FactorLabels, InputsFor
   # 0) Preliminary work: redefine necessary inputs
   SepQ_Lab <- c("JPS original", "JPS global", "GVAR single")
 
-  if (ModelType %in% SepQ_Lab){    mat <- ModelPara[[ModelType]][[1]]$inputs$mat
-  }else{ mat <- ModelPara[[ModelType]]$inputs$mat}
+  if (ModelType %in% SepQ_Lab){    mat <- ModelPara[[ModelType]][[1]]$Inputs$mat
+  }else{ mat <- ModelPara[[ModelType]]$Inputs$mat}
 
   J <- length(mat)
 
@@ -1564,8 +1563,8 @@ ForwardPremia <- function(ModelPara, avexpFP, ModelType, FactorLabels, InputsFor
 
     for (i in 1:length(Economies)){
 
-      if ( ModelType %in% SepQ_Lab){ Y <- ModelPara[[ModelType]][[Economies[i]]]$inputs$Y
-      } else{ Y <- ModelPara[[ModelType]]$inputs$Y }
+      if ( ModelType %in% SepQ_Lab){ Y <- ModelPara[[ModelType]][[Economies[i]]]$Inputs$Y
+      } else{ Y <- ModelPara[[ModelType]]$Inputs$Y }
 
       # b) If both maturities are missing
       if (length(MissingMat) == 2){
@@ -1604,7 +1603,7 @@ ForwardPremia <- function(ModelPara, avexpFP, ModelType, FactorLabels, InputsFor
 
       # SepQ models
       if (ModelType %in% SepQ_Lab){
-      Y <- ModelPara[[ModelType]][[Economies[i]]]$inputs$Y
+      Y <- ModelPara[[ModelType]][[Economies[i]]]$Inputs$Y
       YieldData[[Economies[i]]] <- t(Y)*100
 
       YieldMIN <- t(t(YieldData[[Economies[i]]][ , IDXMatMIN]))
@@ -1612,7 +1611,7 @@ ForwardPremia <- function(ModelPara, avexpFP, ModelType, FactorLabels, InputsFor
 
       }else{
       # jointQ models
-      Y <- ModelPara[[ModelType]]$inputs$Y
+      Y <- ModelPara[[ModelType]]$Inputs$Y
 
       IdxMinCS <- IDXMatMIN + J*(i-1)
       IdxMaxCS <- IDXMatMAX + J*(i-1)

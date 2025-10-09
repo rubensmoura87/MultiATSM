@@ -42,7 +42,11 @@ colnames(Tab) <- ColNames
 suppressWarnings(library(magrittr))
 
 
-kableExtra::kbl(Tab, align = "c", caption = "Model Features") %>%
+kableExtra::kbl(
+  Tab,
+  align = "c",
+  caption = "Model Features"   
+) %>%
   kableExtra::kable_classic("striped", full_width = F)  %>%
   kableExtra::row_spec(0, font_size = 10) %>%
   kableExtra::add_header_above(c(" "=2, "Unrestricted" = 1, "Restricted" = 1, "Unrestricted" = 1, "Restricted" = 2, " " = 11)) %>%

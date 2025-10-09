@@ -2,7 +2,7 @@
 % Please edit documentation in R/MLEdensity.R
 \name{Get_r0}
 \alias{Get_r0}
-\title{Compute r0 for the various models}
+\title{Compute long-run risk neutral mean (r0) for the various models}
 \usage{
 Get_r0(Y, P, N, mat, dt, B_list, Wpca, We, Economies, ModelType)
 }
@@ -28,6 +28,6 @@ Get_r0(Y, P, N, mat, dt, B_list, Wpca, We, Economies, ModelType)
 \item{ModelType}{string-vector containing the label of the model to be estimated}
 }
 \description{
-Compute r0 for the various models
+Compute long-run risk neutral mean (r0) for the various models
 }
 \keyword{internal}

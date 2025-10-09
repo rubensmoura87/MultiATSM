@@ -66,9 +66,9 @@ ForecastYields <- function(ModelType, ModelPara, InputsForOutputs, FactorLabels,
   t0Forecast <- forecast_info$t0Forecast
   H <- forecast_info$ForHoriz
   T_dim <- ncol(if (any(ModelType %in% c("JPS original", "JPS global", "GVAR single"))) {
-    ModelPara[[ModelType]][[Economies[1]]]$inputs$Y
+    ModelPara[[ModelType]][[Economies[1]]]$Inputs$Y
   } else {
-    ModelPara[[ModelType]]$inputs$Y
+    ModelPara[[ModelType]]$Inputs$Y
   })
 
   nForecasts <- T_dim - t0Forecast - H + 1 # Number of times that the model will be re-estimated
@@ -170,10 +170,10 @@ GetYields_AllCountries <- function(ModelPara, Economies, ModelType){
 
   if ( any(ModelType ==c("JPS original", "JPS global", "GVAR single"))){
     YieldsFull <- do.call(rbind, lapply(1:C, function(i) {
-      ModelPara[[ModelType]][[Economies[i]]]$inputs$Y
+      ModelPara[[ModelType]][[Economies[i]]]$Inputs$Y
     }))
   }else{
-    YieldsFull <- ModelPara[[ModelType]]$inputs$Y
+    YieldsFull <- ModelPara[[ModelType]]$Inputs$Y
   }
 
   return(YieldsFull)
@@ -220,15 +220,15 @@ Get_Unspanned <- function(ModelPara, FactorLabels, Economies, ModelType){
     C <- length(Economies)
 
     UnspannedFactors_CS <- function(Economy, G, N) {
-      AllFactors <- ModelPara[[ModelType]][[Economy]]$inputs$AllFactors
+      AllFactors <- ModelPara[[ModelType]][[Economy]]$Inputs$AllFactors
       AllFactors[(G + 1):(nrow(AllFactors) - N), , drop = FALSE]
     }
 
     DomesticMacroVar <- do.call(rbind, lapply(Economies, UnspannedFactors_CS, G, N))
-    GlobalMacroVar <- ModelPara[[ModelType]][[Economies[1]]]$inputs$AllFactors[seq_len(G), , drop = FALSE]
+    GlobalMacroVar <- ModelPara[[ModelType]][[Economies[1]]]$Inputs$AllFactors[seq_len(G), , drop = FALSE]
 
 } else{
-  ZZfull <- ModelPara[[ModelType]]$inputs$AllFactors
+  ZZfull <- ModelPara[[ModelType]]$Inputs$AllFactors
   Idxs <- Idx_UnspanFact(ZZfull, FactorLabels, Economies) # indexes of the variable of interest
   GlobalMacroVar <- ZZfull[Idxs$IdxGlobal, , drop = FALSE]
   DomesticMacroVar <- ZZfull[Idxs$IdxunSpa, , drop = FALSE]
@@ -305,29 +305,29 @@ YieldFor <- function(ModelParaList, ForHoriz, Economies, FactorLabels, ForLabels
   # Define general inputs
   if ( any(ModelType ==c("GVAR multi", "JPS multi", "JLL original", "JLL No DomUnit", "JLL joint Sigma"))){
 
-    J <- length(ModelParaList[[ModelType]]$inputs$mat)
-    A <- ModelParaList[[ModelType]]$rot$P$A
-    K0Z <- ModelParaList[[ModelType]]$ests$K0Z
-    K1Z <- ModelParaList[[ModelType]]$ests$K1Z
+    J <- length(ModelParaList[[ModelType]]$Inputs$mat)
+    A <- ModelParaList[[ModelType]]$ModEst$Q$Load$P$A
+    K0Z <- ModelParaList[[ModelType]]$ModEst$P$K0Z
+    K1Z <- ModelParaList[[ModelType]]$ModEst$P$K1Z
 
-    Bspanned <- ModelParaList[[ModelType]]$rot$P$B
+    Bspanned <- ModelParaList[[ModelType]]$ModEst$Q$Load$P$B
     Bfull <- BUnspannedAdapJoint(G, M, N, C, J, Bspanned)
-    ZZtemp <- ModelParaList[[ModelType]]$inputs$AllFactors
+    ZZtemp <- ModelParaList[[ModelType]]$Inputs$AllFactors
 
-    YiedlsLab <- rownames(ModelParaList[[ModelType]]$inputs$Y)
+    YiedlsLab <- rownames(ModelParaList[[ModelType]]$Inputs$Y)
     ForecastYields <- Gen_Forecast_Yields(K0Z, K1Z, A, Bfull, ZZtemp, C, J, YiedlsLab, ForLabels, ForHoriz, ModelType)
   } else {
 
-    J <- length(ModelParaList[[ModelType]][[Economies[1]]]$inputs$mat)
+    J <- length(ModelParaList[[ModelType]][[Economies[1]]]$Inputs$mat)
     ForecastYields <- list()
     for (i in 1:length(Economies)){
-    A <- ModelParaList[[ModelType]][[Economies[i]]]$rot$P$A
+    A <- ModelParaList[[ModelType]][[Economies[i]]]$ModEst$Q$Load$P$A
     Bfull <- BUnspannedAdapSep(G, M, ModelParaList[[ModelType]], Economies, Economy = Economies[i], ModelType)
-    K0Z <- ModelParaList[[ModelType]][[Economies[i]]]$ests$K0Z
-    K1Z <- ModelParaList[[ModelType]][[Economies[i]]]$ests$K1Z
+    K0Z <- ModelParaList[[ModelType]][[Economies[i]]]$ModEst$P$K0Z
+    K1Z <- ModelParaList[[ModelType]][[Economies[i]]]$ModEst$P$K1Z
 
-    ZZtemp <- ModelParaList[[ModelType]][[Economies[i]]]$inputs$AllFactors
-    YiedlsLab <- rownames(ModelParaList[[ModelType]][[Economies[i]]]$inputs$Y)
+    ZZtemp <- ModelParaList[[ModelType]][[Economies[i]]]$Inputs$AllFactors
+    YiedlsLab <- rownames(ModelParaList[[ModelType]][[Economies[i]]]$Inputs$Y)
     ForecastYields[[Economies[i]]] <- Gen_Forecast_Yields(K0Z, K1Z, A, Bfull, ZZtemp, C, J, YiedlsLab,
                                                           ForLabels, ForHoriz, ModelType)
     }

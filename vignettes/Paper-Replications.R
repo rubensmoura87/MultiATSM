@@ -1,52 +1,52 @@
 ## -----------------------------------------------------------------------------
 library(MultiATSM)
 
-## ----eval=FALSE---------------------------------------------------------------
-# # A) Load database data
-# LoadData("BR_2017")
-# 
-# # B) GENERAL model inputs
-# ModelType <- "JPS original"
-# 
-# Economies <- c("US") # Names of the economies from the economic system
-# GlobalVar <- c() # Global Variables
-# DomVar <- c("GRO", "INF") # Country-specific variables
-# N <- 3 # Number of spanned factors per country
-# 
-# t0_sample <- "January-1985"
-# tF_sample <- "December-2007"
-# 
-# DataFreq <- "Monthly" # Frequency of the data
-# 
-# StatQ <- 0 # Stationary condition
-# 
-# #########################################################################################################
-# ############################### NO NEED TO MAKE CHANGES FROM HERE #######################################
-# #########################################################################################################
-# # 2) Minor preliminary work
-# FactorLabels <- LabFac(N, DomVar, GlobalVar, Economies, ModelType)
-# 
-# Yields <- t(BR_jps_out$Y)
-# DomesticMacroVar <- t(BR_jps_out$M.o)
-# GlobalMacroVar <- c()
-# 
-# # 3) Prepare the inputs of the likelihood function
-# ATSMInputs <- InputsForOpt(t0_sample, tF_sample, ModelType, Yields, GlobalMacroVar, DomesticMacroVar,
-#                            FactorLabels, Economies, DataFreq)
-# 
-# # 4) Optimization of the model
-# ModelPara <- Optimization(ATSMInputs, StatQ, DataFreq, FactorLabels, Economies, ModelType)
+## -----------------------------------------------------------------------------
+# A) Load database data
+LoadData("BR_2017")
+
+# B) GENERAL model inputs
+ModelType <- "JPS original"
+
+Economies <- c("US") # Names of the economies from the economic system
+GlobalVar <- c() # Global Variables
+DomVar <- c("GRO", "INF") # Country-specific variables
+N <- 3 # Number of spanned factors per country
+
+t0_sample <- "January-1985"
+tF_sample <- "December-2007"
+
+DataFreq <- "Monthly" # Frequency of the data
+
+StatQ <- 0 # Stationary condition
+
+#########################################################################################################
+############################### NO NEED TO MAKE CHANGES FROM HERE #######################################
+#########################################################################################################
+# 2) Minor preliminary work
+FactorLabels <- LabFac(N, DomVar, GlobalVar, Economies, ModelType) 
+
+Yields <- t(BR_jps_out$Y)
+DomesticMacroVar <- t(BR_jps_out$M.o)
+GlobalMacroVar <- c()
+
+# 3) Prepare the inputs of the likelihood function
+ATSMInputs <- InputsForOpt(t0_sample, tF_sample, ModelType, Yields, GlobalMacroVar, DomesticMacroVar,
+                           FactorLabels, Economies, DataFreq, verbose = FALSE)
+
+# 4) Optimization of the model
+ModelPara <- Optimization(ATSMInputs, StatQ, DataFreq, FactorLabels, Economies, ModelType, 
+                          verbose = FALSE)
 
 ## ----echo= FALSE--------------------------------------------------------------
 options(scipen = 100) # eliminate the scientific notation
 data("BR_jps_gro_R3")
-data("JPSrep")
 
 RowsQ <- c("$r0$", "$\\lambda_1$", "$\\lambda_2$", "$\\lambda_3$" )
 TableQ <- data.frame(matrix(NA, ncol = 0, nrow =length(RowsQ)))
 row.names(TableQ) <- RowsQ
 
-PackageQ<- c(ModelPara$ests$r0, diag(ModelPara$ests$K1XQ))
+PackageQ<- c(ModelPara$`JPS original`$US$ModEst$Q$r0, diag(ModelPara$`JPS original`$US$ModEst$Q$K1XQ))
 BRq <- c(BR_jps_out$est.llk$rho0.cP, diag(BR_jps_out$est.llk$KQ.XX))
 TableQ$MultiATSM <- PackageQ
 TableQ$'BR (2017)' <- BRq
@@ -61,14 +61,13 @@ kableExtra::kbl(TableQ, align = "c", caption = "$Q$-dynamics parameters") %>%
   kableExtra::footnote(general = " $\\lambda$'s are the eigenvalues from the risk-neutral feedback matrix and $r0$ is the long-run mean of the short rate under Q.")
 
 ## ----PdynTab, echo= FALSE-----------------------------------------------------
-data("BR_jps_gro_R3")
-data("JPSrep")
+#data("BR_jps_gro_R3")
 
 RowsP <- c("PC1", "PC2", "PC3", "GRO", "INF")
 ColP <- c(" ", RowsP)
 
 # 1) K0Z and K1Z
-# Bauer and Rudebusch coefficients
+# a) Bauer and Rudebusch coefficients
 TablePbr <- data.frame(matrix(NA, ncol = length(ColP), nrow =length(RowsP)))
 row.names(TablePbr) <- RowsP
 colnames(TablePbr) <- ColP
@@ -78,15 +77,20 @@ for(j in 1:length(RowsP) ){TablePbr[[RowsP[j]]] <- BR_jps_out$est.llk$KP.ZZ[,j]}
 
 TablePbr <- round(TablePbr, digits = 5)
 
-# MultiATSM coefficients
+# b) MultiATSM coefficients
 TablePMultiATSM <- data.frame(matrix(NA, ncol = length(ColP), nrow =length(RowsP)))
 row.names(TablePMultiATSM) <- RowsP
 colnames(TablePMultiATSM) <- ColP
 
-IdxVar <- c(3:5, 1:2) # indexes to flip the order of the spanned and unspanned factors
-TablePMultiATSM[[ColP[1]]] <- ModelPara$ests$K0Z[IdxVar]
-ModelPara$ests$K1Z <- ModelPara$ests$K1Z[IdxVar,IdxVar]
-for(j in 1:length(RowsP) ){ TablePMultiATSM[[RowsP[j]]] <- ModelPara$ests$K1Z[,j]}
+# Estimate the P-dynamics using the weights provided by BR necessary for replication) 
+PP <- BR_jps_out$W[1:N, ]%*%Yields
+ZZ <- rbind(PP, DomesticMacroVar)
+Pdyncoef <- VAR(ZZ, 'unconstrained')
+
+#IdxVar <- c(3:5, 1:2) # indexes to flip the order of the spanned and unspanned factors
+TablePMultiATSM[[ColP[1]]] <- Pdyncoef$K0Z
+#ModelPara$`JPS original`$US$ModEst$P$K1Z <- ModelPara$`JPS original`$US$ModEst$P$K1Z[IdxVar,IdxVar]
+for(j in 1:length(RowsP) ){ TablePMultiATSM[[RowsP[j]]] <- Pdyncoef$K1Z[,j]}
 
 
 TablePMultiATSM <- round(TablePMultiATSM, digits = 5)
@@ -103,9 +107,8 @@ kableExtra::kbl(TableP, align = "c", caption = "$P$-dynamics parameters") %>%
 
 ## ----echo= FALSE--------------------------------------------------------------
 data("BR_jps_gro_R3")
-data("JPSrep")
 
-se <- data.frame(BR_jps_out$est.llk$sigma.e, ModelPara$ests$se )
+se <- data.frame(BR_jps_out$est.llk$sigma.e, ModelPara$`JPS original`$US$ModEst$Q$se)
 rownames(se) <- "se"
 colnames(se) <- c("MultiATSM","BR (2017)")
 se <- round(se, digits = 7)

@@ -26,7 +26,7 @@ MLEdensity(
   GVARinputs = NULL,
   JLLinputs = NULL,
   BS_outputs = FALSE,
-  nargout
+  ExportListOut = TRUE
 )
 }
 \arguments{
@@ -72,15 +72,23 @@ MLEdensity(
 
 \item{BS_outputs}{Generates simplified output list in the bootstrap setting. Default is set to FALSE.}
 
-\item{nargout}{if nargout == 1: provides only the values of the likelihood; if nargout == 2: complete ATSM outputs}
+\item{ExportListOut}{export the complete ATSM outputs. Default is TRUE.}
 }
 \description{
 Compute the maximum likelihood function of all models
 }
 \references{
-This function is modified version of the "A0N_MLEdensity_WOE" function by Le and Singleton (2018).\cr
- "A Small Package of Matlab Routines for the Estimation of Some Term Structure Models." \cr
- (Euro Area Business Cycle Network Training School - Term Structure Modelling).
- Available at: https://cepr.org/40029
+\itemize{
+ \item Candelon, C. and Moura, R. (2024). “A Multicountry Model of the Term Structures of Interest Rates with a GVAR.”
+ Journal of Financial Econometrics 22 (5): 1558–87.
+ \item Jotikasthira, C; Le, A. and Lundblad, C (2015). “Why Do Term Structures in Different Currencies Co-Move?”
+ Journal of Financial Economics 115: 58–83.
+ \item Joslin, S,; Priebsch, M. and Singleton, K. (2014). “Risk Premiums in Dynamic Term Structure Models with Unspanned Macro Risks.”
+ Journal of Finance 69 (3): 1197–1233.
+ \item Joslin, S., Singleton, K. and Zhu, H. (2011). "A new perspective on Gaussian dynamic term structure models".
+ The Review of Financial Studies.
+ \item Le, A. and Singleton, K. (2018). "A Small Package of Matlab Routines for the Estimation of Some Term Structure Models."
+ Euro Area Business Cycle Network Training School - Term Structure Modelling.
+}
 }
 \keyword{internal}

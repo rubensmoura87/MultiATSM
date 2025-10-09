@@ -2,10 +2,10 @@
 % Please edit documentation in R/Optimization.R
 \name{Optimization_PE}
 \alias{Optimization_PE}
-\title{Perform the minimization of mean(f)}
+\title{Perform the minimization of ML function}
 \usage{
 Optimization_PE(
-  f,
+  ML_fun,
   ListInputSet,
   FactorLabels,
   Economies,
@@ -13,37 +13,27 @@ Optimization_PE(
   JLLinputs = NULL,
   GVARinputs = NULL,
   tol = 1e-04,
+  EstType,
   TimeCount = TRUE,
   verbose
 )
 }
 \arguments{
-\item{f}{vector-valued objective function (function)}
+\item{ML_fun}{vector-valued objective ML function}
 
-\item{ListInputSet}{list contain starting values and constraints:
-                       for each input argument K (of f), we need four inputs that look like:
-   \enumerate{
-       \item a starting value: K0
-       \item a variable label ('K0') followed by a ':' followed by a type of constraint. The constraint can be:
-                 \itemize{
-                     \item 'bounded': bounded matrix;
-                     \item 'Jordan' or 'Jordan MultiCountry': a matrix of Jordan type;
-                     \item 'psd': psd matrix;
-                     \item 'stationary': largest eigenvalue of the risk-neutral feedback matrix is strictly smaller than 1;
-                     \item 'diag' or 'BlockDiag': a diagonal or block diagonal matrix.
-                     \item 'JLLstructure': to impose the zero-restrictions on the variance-variance matrix along
-                             the lines of the JLL models
-                         }
-       \item a lower bound lb (lb <- NULL -> no lower bound)
-       \item an upper bound ub (ub <- NULL -> no upper bound)
-       \item Specification of the optimization settings:
-       \itemize{
-                 \item 'iter off': hide the printouts of the numerical optimization routines;
-                 \item 'fminunc only': only uses fminunc for the optimization;
-                 \item ''fminsearch only': only uses fminsearch for the optimization.
-
-  }
-  }}
+\item{ListInputSet}{list containing :
+ \enumerate{
+     \item a starting value for K1XQ and/or SSZ
+     \item a variable label among the following:
+               \itemize{
+                   \item 'Jordan' or 'Jordan; stationary' for single countries setups or
+                   'Jordan MultiCountry' or 'Jordan MultiCountry; stationary'.  All cases related to the computation of a K1XQ parameter;
+                   \item 'psd': PSD matrix, used for JPS-based models. It relates to the SSZ parameter;
+                   \item  'BlockDiag': block diagonal matrix, used for JPS-based models. It relates to the SSZ parameter.
+                   \item 'JLLstructure': to impose the zero-restrictions on the SSZ term along
+                           the lines of the JLL models
+                       }
+}}
 
 \item{FactorLabels}{A list of character vectors with labels for all variables in the model.}
 
@@ -57,23 +47,13 @@ Optimization_PE(
 
 \item{tol}{convergence tolerance (scalar). Default value is 1e-4.}
 
+\item{EstType}{Available options are"BFGS" and/or "Nelder-Mead".}
+
 \item{TimeCount}{computes the required time for estimation of the model. Default is TRUE.}
 
 \item{verbose}{Logical flag controlling function messaging.}
 }
 \description{
-Perform the minimization of mean(f)
-}
-\examples{
-#' # See an example of implementation in the vignette file of this package (Section 4).
-
-
-
-}
-\references{
-This function is a conceptually based on the "LS__opt" function by Le and Singleton (2018). \cr
- "A Small Package of Matlab Routines for the Estimation of Some Term Structure Models." \cr
- (Euro Area Business Cycle Network Training School - Term Structure Modelling).
- Available at: https://cepr.org/40029
+Perform the minimization of ML function
 }
 \keyword{internal}

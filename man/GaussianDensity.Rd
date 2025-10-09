@@ -4,7 +4,7 @@
 \alias{GaussianDensity}
 \title{computes the density function of a gaussian process}
 \usage{
-GaussianDensity(res, SS)
+GaussianDensity(res, SSZ)
 }
 \arguments{
 \item{res}{matrix of residuals (N x T)}

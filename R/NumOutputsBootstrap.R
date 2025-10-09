@@ -52,14 +52,14 @@ IRFandGIRF_BS <- function(ModelType, ModelParaBoot, IRFhoriz, FactorLabels, Econ
       # a) Extract general parameters
       para_economy <- ModelParaBoot$ParaDraws[[ModelType]][[economy]]
       ndraws <- length(para_economy)
-      K <- nrow(para_economy[[1]]$ests$K1Z)
+      K <- nrow(para_economy[[1]]$ModEst$P$K1Z)
       J <- length(ModelParaBoot$GeneralInputs$mat)
-      YieldsLabel <- rownames(para_economy[[1]]$inputs$Y)
+      YieldsLabel <- rownames(para_economy[[1]]$Inputs$Y)
 
       # b) Compute IRFs and GIRFs
       results <- lapply(seq_len(ndraws), function(tt) {
         # Extract parameters of each draw
-        para_tt <- para_economy[[tt]]$ests
+        para_tt <- para_economy[[tt]]$ModEst$P
         SIGMA <- para_tt$SSZ # K x K (variance-covariance matrix)
         K1Z <- para_tt$K1Z # K x K (feedback matrix)
         G0.y <- para_tt$Gy.0
@@ -83,12 +83,12 @@ IRFandGIRF_BS <- function(ModelType, ModelParaBoot, IRFhoriz, FactorLabels, Econ
     JLL_label <- c("JLL original", "JLL No DomUnit", "JLL joint Sigma")
     ndraws <- length(ModelParaBoot$ParaDraws[[ModelType]])
     J <- length(ModelParaBoot$GeneralInputs$mat)
-    K <- nrow(ModelParaBoot$ParaDraws[[ModelType]][[1]]$ests$K1Z)
-    YieldsLabel <- rownames(ModelParaBoot$ParaDraws[[ModelType]][[1]]$inputs$Y) # Yield labels
+    K <- nrow(ModelParaBoot$ParaDraws[[ModelType]][[1]]$ModEst$P$K1Z)
+    YieldsLabel <- rownames(ModelParaBoot$ParaDraws[[ModelType]][[1]]$Inputs$Y) # Yield labels
 
     for (tt in seq_len(ndraws)) {
       # a) Summarize inputs for the IRFs
-      para_tt <- ModelParaBoot$ParaDraws[[ModelType]][[tt]]$ests
+      para_tt <- ModelParaBoot$ParaDraws[[ModelType]][[tt]]$ModEst$P
       K1Z <- para_tt$K1Z # KxK (feedback matrix)
       G0.y <- para_tt$Gy.0
       SIGMA <- if (ModelType %in% JLL_label) {
@@ -97,7 +97,7 @@ IRFandGIRF_BS <- function(ModelType, ModelParaBoot, IRFhoriz, FactorLabels, Econ
         para_tt$SSZ
       }
 
-      BSpanned <- ModelParaBoot$ParaDraws[[ModelType]][[tt]]$rot$P$B
+      BSpanned <- ModelParaBoot$ParaDraws[[ModelType]][[tt]]$ModEst$Q$Load$P$B
       B <- BUnspannedAdapJoint(G, M, N, C, J, BSpanned)
 
       # b) Compute IRFs
@@ -174,15 +174,15 @@ FEVDandGFEVD_BS <- function(ModelType, ModelParaBoot, FEVDhoriz, FactorLabels, E
       # a) Extract general parameters
       para_economy <- ModelParaBoot$ParaDraws[[ModelType]][[economy]]
       ndraws <- length(para_economy)
-      K <- nrow(para_economy[[1]]$ests$K1Z)
+      K <- nrow(para_economy[[1]]$ModEst$P$K1Z)
       J <- length(ModelParaBoot$GeneralInputs$mat)
-      YieldsLabel <- rownames(para_economy[[1]]$inputs$Y)
+      YieldsLabel <- rownames(para_economy[[1]]$Inputs$Y)
 
 
       # b) Compute FEVDs and GFEVDs
       results <- lapply(seq_len(ndraws), function(tt) {
         # Extract parameters of each draw
-        para_tt <- para_economy[[tt]]$ests
+        para_tt <- para_economy[[tt]]$ModEst$P
         SIGMA <- para_tt$SSZ # K x K (variance-covariance matrix)
         K1Z <- para_tt$K1Z # K x K (feedback matrix)
         G0 <- para_tt$Gy.0
@@ -204,12 +204,12 @@ FEVDandGFEVD_BS <- function(ModelType, ModelParaBoot, FEVDhoriz, FactorLabels, E
     # 2) JOINT COUNTRY MODELS
     ndraws <- length(ModelParaBoot$ParaDraws[[ModelType]])
     J <- length(ModelParaBoot$GeneralInputs$mat)
-    K <- nrow(ModelParaBoot$ParaDraws[[ModelType]][[1]]$ests$K1Z)
-    YieldsLabel<- rownames(ModelParaBoot$ParaDraws[[ModelType]][[1]]$inputs$Y) # Yield labels
+    K <- nrow(ModelParaBoot$ParaDraws[[ModelType]][[1]]$ModEst$P$K1Z)
+    YieldsLabel<- rownames(ModelParaBoot$ParaDraws[[ModelType]][[1]]$Inputs$Y) # Yield labels
 
     for (tt in 1:ndraws){
       # a) Extract relevant inputs
-      para_tt <- ModelParaBoot$ParaDraws[[ModelType]][[tt]]$ests
+      para_tt <- ModelParaBoot$ParaDraws[[ModelType]][[tt]]$ModEst$P
       K1Z <- para_tt$K1Z
       SIGMA <- para_tt$SSZ
       G0 <- para_tt$Gy.0
@@ -218,7 +218,7 @@ FEVDandGFEVD_BS <- function(ModelType, ModelParaBoot, FEVDhoriz, FactorLabels, E
         Chol_Fac_JLL <- para_tt$JLLoutcomes$Sigmas$Sigma_Y
       }
 
-      BSpanned <- ModelParaBoot$ParaDraws[[ModelType]][[tt]]$rot$P$B
+      BSpanned <- ModelParaBoot$ParaDraws[[ModelType]][[tt]]$ModEst$Q$Load$P$B
       B <- BUnspannedAdapJoint(G,M,N,C, J, BSpanned)
 
       # b) Compute FEVDs
@@ -289,8 +289,8 @@ BUnspannedAdapSep_BS <- function(G, M, ModelParaBoot, Economies, Economy, ModelT
 
   # Extract required structure once
   Para_tt <- ModelParaBoot$ParaDraws[[ModelType]][[Economy]][[tt]]
-  K <- nrow(Para_tt$ests$K1Z)
-  BSpanned <- Para_tt$rot$P$B
+  K <- nrow(Para_tt$ModEst$P$K1Z)
+  BSpanned <- Para_tt$ModEst$Q$Load$P$B
 
   # Pre-allocate zero matrix
   BUnspanned <- matrix(0, nrow = J, ncol = K)

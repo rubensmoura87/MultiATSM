@@ -95,8 +95,6 @@ GVAR <- function(GVARinputs, N, CheckInputs = FALSE) {
 #'@param res residuals from the VAR of a GVAR model (K x T)
 #'@param IdxVarRest index of the variable that is selected as strictly exogenous
 #'
-#'@importFrom neldermead optimset fminsearch
-#'
 #'@keywords internal
 #'@return  restricted version of the variance-covariance matrix a GVAR model (K x K)
 
@@ -117,12 +115,19 @@ EstimationSigma_GVARrest <- function(SigmaUnres, res, IdxVarRest){
 
   MLfunction <- function(...) llk_JLL_Sigma(..., res = res, IdxNONzero = IdxNONzeroGVAR, K = K)
 
-  iter <- 'off' # hides the outputs of each iteration. If one wants to display these features then set 'iter'
-  options200 <- optimset(MaxFunEvals = 200000*length(x), Display = iter,
-                                     MaxIter = 200000, GradObj='off', TolFun= 10^-2, TolX= 10^-2)
+  res <- stats::optim(
+    par     = x,
+    fn      = function(par) ML_stable(x, MLfunction),
+    method  = "Nelder-Mead",
+    control = list(
+      maxit = 200000*length(x),
+      reltol = 1e-2,
+      trace = 0
+    )
+  )
 
+  Xmax <- res$par
 
-  Xmax <- fminsearch(MLfunction, x, options200)$optbase$xopt
   SIGMA_Ye <- matrix(0, K,K)
   SIGMA_Ye[IdxNONzeroGVAR]<- Xmax # Cholesky term (orthogonalized factors)
   SIGMA_Res <- SIGMA_Ye%*%t(SIGMA_Ye)
@@ -149,6 +154,7 @@ EstimationSigma_GVARrest <- function(SigmaUnres, res, IdxVarRest){
 
 
 GVAR_PrepFactors <- function(GVARinputs, DomLabels, StarLabels, GlobalLabels, N){
+
   T_dim <- length(GVARinputs$GVARFactors[[GVARinputs$Economies[1]]]$Factors[[1]])
   C <- length(GVARinputs$Economies)
   G <- length(GlobalLabels)
@@ -605,66 +611,4 @@ CheckInputsGVAR <- function(GVARinputs, N){
     stop("GVARinputs$VARXtype must be 'unconstrained'or'constrained'.")
   }
 
-}
-
-###############################################################################################################
-#' Generates the star variables necessary for the GVAR estimation
-#'
-#'@param RiskFactors time series of the risk factors (F x T)
-#'@param Economies  string-vector containing the names of the economies which are part of the economic system
-#'@param W GVAR transition matrix (C x C)
-#'
-#'@return List contaning the star factors of each country of the economic system
-#'
-#'@keywords internal
-
-StarFactors <- function(RiskFactors, Economies, W){
-
-  C <- length(Economies)
-  T_dim <- ncol(RiskFactors)
-
-  StarLabel <- c()
-  ListFactors <- list()
-
-  # Re-arrange country-specific factors per country
-  for (i in 1:C){
-    IdxRF <- grepl(Economies[i], rownames(RiskFactors))
-    ListFactors[[Economies[i]]]$Factors <- RiskFactors[IdxRF,] # Country-specific factors
-
-    VarLabel <- rownames(RiskFactors)[IdxRF] # Label of the country-specific factors
-    if (i==1){
-      StarLabels <- paste(VarLabel, ".Star", sep="")
-    }else{
-      StarPrep<- paste(VarLabel, ".Star", sep="")
-      StarLabels <- append(StarLabels, StarPrep) # Label of the star-variables
-    }
-  }
-
-
-  NumDomFac <- length(IdxRF[IdxRF== TRUE])
-  Z <- list()
-
-  for (j in 1:NumDomFac){
-    X <- matrix(NA, nrow= C, ncol=T_dim)
-    for (i in 1:C){
-      X[i,] <- ListFactors[[Economies[i]]]$Factors[j,]
-      Z[[j]] <- X # Each element of the list contains the same country-specific variable of all countries
-    }
-  }
-
-
-  # Compute the star variables
-  StarVariables <- matrix(NA, nrow = C*NumDomFac, ncol = T_dim)
-  for (i in 1:C){
-    idxx <- (i-1)*NumDomFac
-    for (j in 1:NumDomFac){
-      StarVariables[idxx + j,]   <- t(W[i,]%*%Z[[j]])
-    }
-  }
-
-  rownames(StarVariables) <- StarLabels
-  colnames(StarVariables) <- colnames(RiskFactors)
-
-
-  return(StarVariables)
 }
