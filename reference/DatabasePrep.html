@@ -105,9 +105,9 @@
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Load data from excel</span></span></span>
-<span class="r-in"><span><span class="va">macro_data</span>  <span class="op">&lt;-</span> <span class="fu"><a href="Load_Excel_Data.html">Load_Excel_Data</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"MacroData.xlsx"</span>, package <span class="op">=</span> <span class="st">"MultiATSM"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">macro_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="Load_Excel_Data.html">Load_Excel_Data</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"MacroData.xlsx"</span>, package <span class="op">=</span> <span class="st">"MultiATSM"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">yields_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="Load_Excel_Data.html">Load_Excel_Data</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"YieldsData.xlsx"</span>, package <span class="op">=</span> <span class="st">"MultiATSM"</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">trade_data</span>  <span class="op">&lt;-</span> <span class="fu"><a href="Load_Excel_Data.html">Load_Excel_Data</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"TradeData.xlsx"</span>, package <span class="op">=</span> <span class="st">"MultiATSM"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">trade_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="Load_Excel_Data.html">Load_Excel_Data</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"TradeData.xlsx"</span>, package <span class="op">=</span> <span class="st">"MultiATSM"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> New names:</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> `` -&gt; `...1`</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> New names:</span>
@@ -121,10 +121,10 @@
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Adjust trade data</span></span></span>
 <span class="r-in"><span><span class="va">trade_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">trade_data</span>, <span class="kw">function</span><span class="op">(</span><span class="va">df</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span> <span class="va">countries</span> <span class="op">&lt;-</span> <span class="va">df</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></span></span>
-<span class="r-in"><span> <span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">df</span><span class="op">[</span><span class="op">-</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span></span></span>
-<span class="r-in"><span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">df</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">countries</span></span></span>
-<span class="r-in"><span> <span class="va">df</span></span></span>
+<span class="r-in"><span>  <span class="va">countries</span> <span class="op">&lt;-</span> <span class="va">df</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></span></span>
+<span class="r-in"><span>  <span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">df</span><span class="op">[</span><span class="op">-</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">df</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">countries</span></span></span>
+<span class="r-in"><span>  <span class="va">df</span></span></span>
 <span class="r-in"><span><span class="op">}</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Define features of interest</span></span></span>
@@ -138,13 +138,17 @@
 <span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Compute some inputs</span></span></span>
-<span class="r-in"><span><span class="va">FactorLabels</span> <span class="op">&lt;-</span>  <span class="fu"><a href="LabFac.html">LabFac</a></span><span class="op">(</span><span class="va">N</span>, <span class="va">DomVar</span>, <span class="va">GlobalVar</span>, <span class="va">Economies</span>, <span class="va">ModelType</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">Wgvar</span> <span class="op">&lt;-</span> <span class="fu"><a href="Transition_Matrix.html">Transition_Matrix</a></span><span class="op">(</span>t_First <span class="op">=</span> <span class="st">"2006"</span>, t_Last<span class="op">=</span> <span class="st">"2019"</span>, <span class="va">Economies</span>,</span></span>
-<span class="r-in"><span>                          type <span class="op">=</span> <span class="st">"Sample Mean"</span>, <span class="va">trade_data</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">FactorLabels</span> <span class="op">&lt;-</span> <span class="fu"><a href="LabFac.html">LabFac</a></span><span class="op">(</span><span class="va">N</span>, <span class="va">DomVar</span>, <span class="va">GlobalVar</span>, <span class="va">Economies</span>, <span class="va">ModelType</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">Wgvar</span> <span class="op">&lt;-</span> <span class="fu"><a href="Transition_Matrix.html">Transition_Matrix</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  t_First <span class="op">=</span> <span class="st">"2006"</span>, t_Last <span class="op">=</span> <span class="st">"2019"</span>, <span class="va">Economies</span>,</span></span>
+<span class="r-in"><span>  type <span class="op">=</span> <span class="st">"Sample Mean"</span>, <span class="va">trade_data</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Compute GVARFactors</span></span></span>
-<span class="r-in"><span><span class="va">GVARFactors</span> <span class="op">&lt;-</span> <span class="fu">DatabasePrep</span><span class="op">(</span><span class="va">t0</span>, <span class="va">tF</span>, <span class="va">Economies</span>, <span class="va">N</span>, <span class="va">FactorLabels</span>, <span class="va">ModelType</span>, <span class="va">macro_data</span>,</span></span>
-<span class="r-in"><span>                           <span class="va">yields_data</span>, <span class="va">Wgvar</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">GVARFactors</span> <span class="op">&lt;-</span> <span class="fu">DatabasePrep</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="va">t0</span>, <span class="va">tF</span>, <span class="va">Economies</span>, <span class="va">N</span>, <span class="va">FactorLabels</span>, <span class="va">ModelType</span>, <span class="va">macro_data</span>,</span></span>
+<span class="r-in"><span>  <span class="va">yields_data</span>, <span class="va">Wgvar</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

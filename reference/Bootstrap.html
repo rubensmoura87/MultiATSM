@@ -135,20 +135,24 @@
 <span class="r-in"><span><span class="va">FacLab</span> <span class="op">&lt;-</span> <span class="fu"><a href="LabFac.html">LabFac</a></span><span class="op">(</span>N <span class="op">=</span> <span class="fl">1</span>, DomVar <span class="op">=</span> <span class="st">"Eco_Act"</span>, GlobalVar <span class="op">=</span> <span class="st">"Gl_Eco_Act"</span>, <span class="va">Economy</span>, <span class="va">ModelType</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Adjust Forecasting setting</span></span></span>
-<span class="r-in"><span><span class="va">InpForOutEx</span><span class="op">[[</span><span class="va">ModelType</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">Bootstrap</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>WishBootstrap <span class="op">=</span> <span class="fl">1</span>, methodBS <span class="op">=</span> <span class="st">'bs'</span>, BlockLength <span class="op">=</span> <span class="fl">4</span>,</span></span>
-<span class="r-in"><span>                                          ndraws <span class="op">=</span> <span class="fl">5</span>, pctg <span class="op">=</span>  <span class="fl">95</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">InpForOutEx</span><span class="op">[[</span><span class="va">ModelType</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">Bootstrap</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  WishBootstrap <span class="op">=</span> <span class="fl">1</span>, methodBS <span class="op">=</span> <span class="st">"bs"</span>, BlockLength <span class="op">=</span> <span class="fl">4</span>,</span></span>
+<span class="r-in"><span>  ndraws <span class="op">=</span> <span class="fl">5</span>, pctg <span class="op">=</span> <span class="fl">95</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">Boot</span> <span class="op">&lt;-</span> <span class="fu">Bootstrap</span><span class="op">(</span><span class="va">ModelType</span>, <span class="va">ModelParaEx</span>, <span class="va">NumOutEx</span>, <span class="va">Economy</span>, <span class="va">InpForOutEx</span>, <span class="va">FacLab</span>, JLLlist <span class="op">=</span> <span class="cn">NULL</span>,</span></span>
-<span class="r-in"><span>                 GVARlist <span class="op">=</span> <span class="cn">NULL</span>, WishBC <span class="op">=</span> <span class="fl">0</span>, BRWlist <span class="op">=</span> <span class="cn">NULL</span>, Folder2save  <span class="op">=</span> <span class="cn">NULL</span>, verbose <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">Boot</span> <span class="op">&lt;-</span> <span class="fu">Bootstrap</span><span class="op">(</span><span class="va">ModelType</span>, <span class="va">ModelParaEx</span>, <span class="va">NumOutEx</span>, <span class="va">Economy</span>, <span class="va">InpForOutEx</span>, <span class="va">FacLab</span>,</span></span>
+<span class="r-in"><span>  JLLlist <span class="op">=</span> <span class="cn">NULL</span>,</span></span>
+<span class="r-in"><span>  GVARlist <span class="op">=</span> <span class="cn">NULL</span>, WishBC <span class="op">=</span> <span class="fl">0</span>, BRWlist <span class="op">=</span> <span class="cn">NULL</span>, Folder2save <span class="op">=</span> <span class="cn">NULL</span>, verbose <span class="op">=</span> <span class="cn">TRUE</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> 3) BOOTSTRAP ANALYSIS</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> 3.1) Estimating bootstrap setup. This may take several hours.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> -- Done!</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Elapsed time: 3.15 seconds</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Elapsed time: 3.68 seconds</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> 3.2) Computing numerical outputs.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> 3.3) Computing confidence bounds and producing graphical outputs.</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>cannot create dir '/tmp/RtmpqxpxJs/Outputs/JPS original/Bootstrap', reason 'No such file or directory'</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>cannot create dir '/tmp/RtmpqxpxJs/Outputs/JPS original/Bootstrap/Model Brazil', reason 'No such file or directory'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Desired graphs are saved in your chosen directory. Please, check: /tmp/RtmpqxpxJs </span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>cannot create dir '/tmp/RtmpJsnfyH/Outputs/JPS original/Bootstrap', reason 'No such file or directory'</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>cannot create dir '/tmp/RtmpJsnfyH/Outputs/JPS original/Bootstrap/Model Brazil', reason 'No such file or directory'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Desired graphs are saved in your chosen directory. Please, check: /tmp/RtmpJsnfyH </span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

@@ -67,25 +67,6 @@ smaller than 1. Otherwise set "0"</p></dd>
 <dd><p>Generates simplified output list in the bootstrap setting. Default is set to FALSE.</p></dd>
 
 </dl></div>
-    <div class="section level2">
-    <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>list containing starting values and constraints:
-                       for each input argument K (of f), we need four inputs that look like:</p><ol><li><p>a starting value: K0</p></li>
-<li><p>a variable label ('K0') followed by a ':' followed by a type of constraint. The constraint can be:</p><ul><li><p>'bounded': bounded matrix;</p></li>
-<li><p>'Jordan' or 'Jordan MultiCountry': a matrix of Jordan type;</p></li>
-<li><p>'psd': psd matrix;</p></li>
-<li><p>'stationary': largest eigenvalue of the risk-neutral feedback matrix is strictly smaller than 1;</p></li>
-<li><p>'diag' or 'BlockDiag': a diagonal or block diagonal matrix.</p></li>
-<li><p>'JLLstructure': to impose the zero-restrictions on the variance-voriance matrix along
-                             the lines of the JLL models</p></li>
-</ul></li>
-<li><p>a lower bound lb (lb &lt;- NULL -&gt; no lower bound)</p></li>
-<li><p>an upper bound ub (ub &lt;- NULL -&gt; no upper bound)</p></li>
-<li><p>Specification of the optimization settings:</p><ul><li><p>'iter off': hide the printouts of the numerical optimization routines;</p></li>
-<li><p>'fminunc only': only uses fminunc for the optimization;</p></li>
-<li><p>”fminsearch only': only uses fminsearch for the optimization.</p></li>
-</ul></li>
-</ol></div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>

@@ -43,23 +43,19 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">OptimizationSetup_ATSM</span><span class="op">(</span><span class="va">AuxVecSet</span>, <span class="va">FFvec</span>, <span class="va">EstType</span>, tol <span class="op">=</span> <span class="fl">1e-04</span>, <span class="va">verbose</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">OptimizationSetup_ATSM</span><span class="op">(</span><span class="va">x0</span>, <span class="va">MLvec</span>, <span class="va">EstType</span>, tol <span class="op">=</span> <span class="fl">1e-04</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
 
 
-<dl><dt id="arg-auxvecset">AuxVecSet<a class="anchor" aria-label="anchor" href="#arg-auxvecset"></a></dt>
+<dl><dt id="arg-x-">x0<a class="anchor" aria-label="anchor" href="#arg-x-"></a></dt>
 <dd><p>List containing features for estimation of the risk-neutral parameters.</p></dd>
 
 
-<dt id="arg-ffvec">FFvec<a class="anchor" aria-label="anchor" href="#arg-ffvec"></a></dt>
-<dd><p>Log-likelihood function</p></dd>
-
-
 <dt id="arg-esttype">EstType<a class="anchor" aria-label="anchor" href="#arg-esttype"></a></dt>
-<dd><p>Estimation type</p></dd>
+<dd><p>Estimation type. Available options: "BFGS" and "Nelder-Mead".</p></dd>
 
 
 <dt id="arg-tol">tol<a class="anchor" aria-label="anchor" href="#arg-tol"></a></dt>
@@ -68,6 +64,10 @@
 
 <dt id="arg-verbose">verbose<a class="anchor" aria-label="anchor" href="#arg-verbose"></a></dt>
 <dd><p>Logical flag controlling function messaging.</p></dd>
+
+
+<dt id="arg-ffvec">FFvec<a class="anchor" aria-label="anchor" href="#arg-ffvec"></a></dt>
+<dd><p>Log-likelihood function</p></dd>
 
 </dl></div>
 

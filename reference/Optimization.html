@@ -51,6 +51,7 @@
 <span>  <span class="va">Economies</span>,</span>
 <span>  <span class="va">ModelType</span>,</span>
 <span>  tol <span class="op">=</span> <span class="fl">1e-04</span>,</span>
+<span>  EstType <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"BFGS"</span>, <span class="st">"Nelder-Mead"</span><span class="op">)</span>,</span>
 <span>  TimeCount <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  BS_outputs <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">TRUE</span></span>
@@ -91,6 +92,10 @@ smaller than 1. Set to 1 to impose the restriction, or 0 otherwise.</p></dd>
 <dd><p>Convergence tolerance (scalar). The default is 1e-4.</p></dd>
 
 
+<dt id="arg-esttype">EstType<a class="anchor" aria-label="anchor" href="#arg-esttype"></a></dt>
+<dd><p>Available options are"BFGS" and/or "Nelder-Mead".</p></dd>
+
+
 <dt id="arg-timecount">TimeCount<a class="anchor" aria-label="anchor" href="#arg-timecount"></a></dt>
 <dd><p>Logical. If TRUE, computes the time required for model estimation. Default is TRUE.</p></dd>
 
@@ -115,11 +120,18 @@ smaller than 1. Set to 1 to impose the restriction, or 0 otherwise.</p></dd>
     </div>
     <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
-    <p>This function is partially adapted from the <code>LS__opt</code> function by Le and Singleton (2018). <br>
- "A Small Package of Matlab Routines for the Estimation of Some Term Structure Models." <br>
- (Euro Area Business Cycle Network Training School - Term Structure Modelling).
- Available at: https://cepr.org/40029</p>
-    </div>
+
+<ul><li><p>Candelon, C. and Moura, R. (2024). “A Multicountry Model of the Term Structures of Interest Rates with a GVAR.”
+ Journal of Financial Econometrics 22 (5): 1558–87.</p></li>
+<li><p>Jotikasthira, C; Le, A. and Lundblad, C (2015). “Why Do Term Structures in Different Currencies Co-Move?”
+ Journal of Financial Economics 115: 58–83.</p></li>
+<li><p>Joslin, S,; Priebsch, M. and Singleton, K. (2014). “Risk Premiums in Dynamic Term Structure Models with Unspanned Macro Risks.”
+ Journal of Finance 69 (3): 1197–1233.</p></li>
+<li><p>Joslin, S., Singleton, K. and Zhu, H. (2011). "A new perspective on Gaussian dynamic term structure models".
+ The Review of Financial Studies.</p></li>
+<li><p>Le, A. and Singleton, K. (2018). "A Small Package of Matlab Routines for the Estimation of Some Term Structure Models."
+ Euro Area Business Cycle Network Training School - Term Structure Modelling.</p></li>
+</ul></div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
@@ -136,7 +148,9 @@ smaller than 1. Set to 1 to impose the restriction, or 0 otherwise.</p></dd>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">FacLab</span> <span class="op">&lt;-</span> <span class="fu"><a href="LabFac.html">LabFac</a></span><span class="op">(</span><span class="va">N</span>, <span class="va">DomVar</span>, <span class="va">GlobalVar</span>, <span class="va">Economy</span>, <span class="va">ModelType</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">ATSMInputs</span> <span class="op">&lt;-</span> <span class="fu"><a href="InputsForOpt.html">InputsForOpt</a></span><span class="op">(</span><span class="va">t0</span>, <span class="va">tF</span>, <span class="va">ModelType</span>, <span class="va">Yields</span>, <span class="va">GlobalMacroVar</span>, <span class="va">DomesticMacroVar</span>,</span></span>
-<span class="r-in"><span>                           <span class="va">FacLab</span>, <span class="va">Economy</span>, <span class="va">DataFreq</span>, CheckInputs <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">FacLab</span>, <span class="va">Economy</span>, <span class="va">DataFreq</span>,</span></span>
+<span class="r-in"><span>  CheckInputs <span class="op">=</span> <span class="cn">FALSE</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> 1) PREPARING INPUTS FOR THE ESTIMATION OF THE MODEL: JPS original . SAMPLE PERIOD: 01-05-2007 - 01-12-2018</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> 1.1) Constructing the time-series of the risk factors</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> 1.2) Estimating model P-dynamics parameters:</span>
@@ -146,10 +160,10 @@ smaller than 1. Set to 1 to impose the restriction, or 0 otherwise.</p></dd>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> 2) ATSM ESTIMATION : POINT ESTIMATE ANALYSIS</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> 2.1) Estimating ATSM ...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>  ... for country: Brazil . This may take several minutes.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>    *** Estimation round 1 completed ***</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>    *** Estimation round 2 completed ***</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> *** Estimation round 1 ***</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> *** Estimation round 2 ***</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> -- Done!</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Elapsed time: 2.68 seconds</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Elapsed time: 1.11 seconds</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

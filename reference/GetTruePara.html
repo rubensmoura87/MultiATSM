@@ -33,7 +33,7 @@
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Map auxiliary (unconstrained) parameters a to constrained parameters b</h1>
-      <small class="dont-index">Source: <a href="https://github.com/rubensmoura87/MultiATSM/blob/main/R/Functionf_vectorized.R" class="external-link"><code>R/Functionf_vectorized.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/rubensmoura87/MultiATSM/blob/main/R/FunctionML_vec.R" class="external-link"><code>R/FunctionML_vec.R</code></a></small>
       <div class="d-none name"><code>GetTruePara.Rd</code></div>
     </div>
 
@@ -46,8 +46,6 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">GetTruePara</span><span class="op">(</span></span>
 <span>  <span class="va">ParaValue</span>,</span>
 <span>  <span class="va">Const_Type_Full</span>,</span>
-<span>  <span class="va">lb</span>,</span>
-<span>  <span class="va">ub</span>,</span>
 <span>  <span class="va">FactorLabels</span>,</span>
 <span>  <span class="va">Economies</span>,</span>
 <span>  JLLinputs <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -70,18 +68,8 @@
 <li><p>'Jordan MultiCountry; stationary'</p></li>
 <li><p>'psd';</p></li>
 <li><p>'BlockDiag'</p></li>
-<li><p>'bounded'</p></li>
-<li><p>'diag'</p></li>
 <li><p>'JLLstructure'</p></li>
 </ul></dd>
-
-
-<dt id="arg-lb">lb<a class="anchor" aria-label="anchor" href="#arg-lb"></a></dt>
-<dd><p>lower bounds of b (if option 'bounded' is chosen)</p></dd>
-
-
-<dt id="arg-ub">ub<a class="anchor" aria-label="anchor" href="#arg-ub"></a></dt>
-<dd><p>upper bounds of b (if option 'bounded' is chosen)</p></dd>
 
 
 <dt id="arg-factorlabels">FactorLabels<a class="anchor" aria-label="anchor" href="#arg-factorlabels"></a></dt>
@@ -100,13 +88,6 @@
 <dd><p>Inputs used in the estimation of the GVAR-based models</p></dd>
 
 </dl></div>
-    <div class="section level2">
-    <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
-    <p>This function is a modified and extended of the "aux2true" function by Le and Singleton (2018). <br>
-"A Small Package of Matlab Routines for the Estimation of Some Term Structure Models." <br>
-(Euro Area Business Cycle Network Training School - Term Structure Modelling).
-Available at: https://cepr.org/40029</p>
-    </div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>

@@ -60,7 +60,7 @@
                         <h4 data-toc-skip class="author">Rubens
 Moura</h4>
             
-            <h4 data-toc-skip class="date">2025-09-26</h4>
+            <h4 data-toc-skip class="date">2025-10-10</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/rubensmoura87/MultiATSM/blob/main/vignettes/Paper-Replications.Rmd" class="external-link"><code>vignettes/Paper-Replications.Rmd</code></a></small>
       <div class="d-none name"><code>Paper-Replications.Rmd</code></div>
@@ -130,7 +130,7 @@ using the <em>JPS original</em> modeling setup.</p>
 <span><span class="co">############################### NO NEED TO MAKE CHANGES FROM HERE #######################################</span></span>
 <span><span class="co">#########################################################################################################</span></span>
 <span><span class="co"># 2) Minor preliminary work</span></span>
-<span><span class="va">FactorLabels</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/LabFac.html">LabFac</a></span><span class="op">(</span><span class="va">N</span>, <span class="va">DomVar</span>, <span class="va">GlobalVar</span>, <span class="va">Economies</span>, <span class="va">ModelType</span><span class="op">)</span> </span>
+<span><span class="va">FactorLabels</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/LabFac.html">LabFac</a></span><span class="op">(</span><span class="va">N</span>, <span class="va">DomVar</span>, <span class="va">GlobalVar</span>, <span class="va">Economies</span>, <span class="va">ModelType</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">Yields</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="va">BR_jps_out</span><span class="op">$</span><span class="va">Y</span><span class="op">)</span></span>
 <span><span class="va">DomesticMacroVar</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="va">BR_jps_out</span><span class="op">$</span><span class="va">M.o</span><span class="op">)</span></span>
@@ -138,10 +138,14 @@ using the <em>JPS original</em> modeling setup.</p>
 <span></span>
 <span><span class="co"># 3) Prepare the inputs of the likelihood function</span></span>
 <span><span class="va">ATSMInputs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/InputsForOpt.html">InputsForOpt</a></span><span class="op">(</span><span class="va">t0_sample</span>, <span class="va">tF_sample</span>, <span class="va">ModelType</span>, <span class="va">Yields</span>, <span class="va">GlobalMacroVar</span>, <span class="va">DomesticMacroVar</span>,</span>
-<span>                           <span class="va">FactorLabels</span>, <span class="va">Economies</span>, <span class="va">DataFreq</span><span class="op">)</span></span>
+<span>  <span class="va">FactorLabels</span>, <span class="va">Economies</span>, <span class="va">DataFreq</span>,</span>
+<span>  verbose <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># 4) Optimization of the model</span></span>
-<span><span class="va">ModelPara</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/Optimization.html">Optimization</a></span><span class="op">(</span><span class="va">ATSMInputs</span>, <span class="va">StatQ</span>, <span class="va">DataFreq</span>, <span class="va">FactorLabels</span>, <span class="va">Economies</span>, <span class="va">ModelType</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">ModelPara</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/Optimization.html">Optimization</a></span><span class="op">(</span><span class="va">ATSMInputs</span>, <span class="va">StatQ</span>, <span class="va">DataFreq</span>, <span class="va">FactorLabels</span>, <span class="va">Economies</span>, <span class="va">ModelType</span>,</span>
+<span>  verbose <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <p>The tables below compare the ATSM parameter estimates generated from
 BR (2017) and the <em>MultiATSM</em>. Overall, one can note that the
 differences in the estimates are economically modest.</p>
@@ -608,25 +612,29 @@ Uruguay.</p>
 <span><span class="va">tF_sample</span> <span class="op">&lt;-</span> <span class="st">"01-01-2020"</span></span>
 <span></span>
 <span><span class="va">OutputLabel</span> <span class="op">&lt;-</span> <span class="st">"CM_jfec"</span></span>
-<span><span class="va">DataFreq</span> <span class="op">&lt;-</span><span class="st">"Monthly"</span></span>
+<span><span class="va">DataFreq</span> <span class="op">&lt;-</span> <span class="st">"Monthly"</span></span>
 <span><span class="va">Folder2Save</span> <span class="op">&lt;-</span> <span class="cn">NULL</span></span>
 <span></span>
 <span><span class="va">StatQ</span> <span class="op">&lt;-</span> <span class="fl">0</span></span>
 <span></span>
 <span><span class="co"># B.1) SPECIFIC model inputs</span></span>
 <span><span class="co">#################################### GVAR-based models ##################################################</span></span>
-<span><span class="va">GVARlist</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span> VARXtype <span class="op">=</span> <span class="st">"unconstrained"</span>, W_type <span class="op">=</span> <span class="st">"Sample Mean"</span>, t_First_Wgvar <span class="op">=</span> <span class="st">"2004"</span>,</span>
-<span>                  t_Last_Wgvar <span class="op">=</span> <span class="st">"2019"</span>, DataConnectedness <span class="op">=</span> <span class="va">TradeFlows</span> <span class="op">)</span></span>
+<span><span class="va">GVARlist</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>  VARXtype <span class="op">=</span> <span class="st">"unconstrained"</span>, W_type <span class="op">=</span> <span class="st">"Sample Mean"</span>, t_First_Wgvar <span class="op">=</span> <span class="st">"2004"</span>,</span>
+<span>  t_Last_Wgvar <span class="op">=</span> <span class="st">"2019"</span>, DataConnectedness <span class="op">=</span> <span class="va">TradeFlows</span></span>
+<span><span class="op">)</span></span>
 <span><span class="co">#################################### JLL-based models ###################################################</span></span>
-<span><span class="va">JLLlist</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>DomUnit <span class="op">=</span>  <span class="st">"China"</span><span class="op">)</span></span>
+<span><span class="va">JLLlist</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>DomUnit <span class="op">=</span> <span class="st">"China"</span><span class="op">)</span></span>
 <span><span class="co">###################################### BRW inputs  ######################################################</span></span>
 <span><span class="va">WishBC</span> <span class="op">&lt;-</span> <span class="fl">1</span></span>
-<span><span class="va">BRWlist</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/with.html" class="external-link">within</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>Cent_Measure <span class="op">=</span> <span class="st">"Mean"</span>, gamma <span class="op">=</span> <span class="fl">0.001</span>, N_iter <span class="op">=</span> <span class="fl">200</span>, B <span class="op">=</span> <span class="fl">50</span>, checkBRW <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>                       B_check <span class="op">=</span> <span class="fl">1000</span>, Eigen_rest <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>,  <span class="va">N_burn</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">N_iter</span> <span class="op">*</span> <span class="fl">0.15</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">BRWlist</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/with.html" class="external-link">within</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>  Cent_Measure <span class="op">=</span> <span class="st">"Mean"</span>, gamma <span class="op">=</span> <span class="fl">0.001</span>, N_iter <span class="op">=</span> <span class="fl">200</span>, B <span class="op">=</span> <span class="fl">50</span>, checkBRW <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  B_check <span class="op">=</span> <span class="fl">1000</span>, Eigen_rest <span class="op">=</span> <span class="fl">1</span></span>
+<span><span class="op">)</span>, <span class="va">N_burn</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">N_iter</span> <span class="op">*</span> <span class="fl">0.15</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># C) Decide on Settings for numerical outputs</span></span>
 <span><span class="va">WishFPremia</span> <span class="op">&lt;-</span> <span class="fl">1</span></span>
-<span><span class="va">FPmatLim</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">24</span>,<span class="fl">36</span><span class="op">)</span></span>
+<span><span class="va">FPmatLim</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">24</span>, <span class="fl">36</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">Horiz</span> <span class="op">&lt;-</span> <span class="fl">25</span></span>
 <span><span class="va">DesiredGraphs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"GIRF"</span>, <span class="st">"GFEVD"</span>, <span class="st">"TermPremia"</span><span class="op">)</span></span>
@@ -636,11 +644,11 @@ Uruguay.</p>
 <span></span>
 <span><span class="co"># D) Bootstrap settings</span></span>
 <span><span class="va">WishBootstrap</span> <span class="op">&lt;-</span> <span class="fl">0</span> <span class="co">#  Set it to 1, if bootstrap is desired</span></span>
-<span><span class="va">BootList</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>methodBS <span class="op">=</span> <span class="st">'bs'</span>, BlockLength <span class="op">=</span> <span class="fl">4</span>, ndraws <span class="op">=</span> <span class="fl">1000</span>, pctg <span class="op">=</span>  <span class="fl">95</span><span class="op">)</span></span>
+<span><span class="va">BootList</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>methodBS <span class="op">=</span> <span class="st">"bs"</span>, BlockLength <span class="op">=</span> <span class="fl">4</span>, ndraws <span class="op">=</span> <span class="fl">1000</span>, pctg <span class="op">=</span> <span class="fl">95</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># E) Out-of-sample forecast</span></span>
 <span><span class="va">WishForecast</span> <span class="op">&lt;-</span> <span class="fl">1</span></span>
-<span><span class="va">ForecastList</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>ForHoriz <span class="op">=</span> <span class="fl">12</span>,  t0Sample <span class="op">=</span> <span class="fl">1</span>, t0Forecast <span class="op">=</span> <span class="fl">100</span>, ForType <span class="op">=</span> <span class="st">"Rolling"</span><span class="op">)</span></span>
+<span><span class="va">ForecastList</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>ForHoriz <span class="op">=</span> <span class="fl">12</span>, t0Sample <span class="op">=</span> <span class="fl">1</span>, t0Forecast <span class="op">=</span> <span class="fl">100</span>, ForType <span class="op">=</span> <span class="st">"Rolling"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co">#########################################################################################################</span></span>
 <span><span class="co">############################### NO NEED TO MAKE CHANGES FROM HERE #######################################</span></span>
@@ -650,29 +658,39 @@ Uruguay.</p>
 <span><span class="va">FactorLabels</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/LabFac.html">LabFac</a></span><span class="op">(</span><span class="va">N</span>, <span class="va">DomVar</span>, <span class="va">GlobalVar</span>, <span class="va">Economies</span>, <span class="va">ModelType</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># 3) Prepare the inputs of the likelihood function</span></span>
-<span><span class="va">ATSMInputs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/InputsForOpt.html">InputsForOpt</a></span><span class="op">(</span><span class="va">t0_sample</span>, <span class="va">tF_sample</span>, <span class="va">ModelType</span>, <span class="va">Yields</span>, <span class="va">GlobalMacroVar</span>, <span class="va">DomesticMacroVar</span>,</span>
-<span>                           <span class="va">FactorLabels</span>, <span class="va">Economies</span>, <span class="va">DataFreq</span>, <span class="va">GVARlist</span>, <span class="va">JLLlist</span>, <span class="va">WishBC</span>, <span class="va">BRWlist</span><span class="op">)</span></span>
+<span><span class="va">ATSMInputs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/InputsForOpt.html">InputsForOpt</a></span><span class="op">(</span></span>
+<span>  <span class="va">t0_sample</span>, <span class="va">tF_sample</span>, <span class="va">ModelType</span>, <span class="va">Yields</span>, <span class="va">GlobalMacroVar</span>, <span class="va">DomesticMacroVar</span>,</span>
+<span>  <span class="va">FactorLabels</span>, <span class="va">Economies</span>, <span class="va">DataFreq</span>, <span class="va">GVARlist</span>, <span class="va">JLLlist</span>, <span class="va">WishBC</span>, <span class="va">BRWlist</span></span>
+<span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># 4) Optimization of the ATSM (Point Estimates)</span></span>
 <span><span class="va">ModelParaList</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/Optimization.html">Optimization</a></span><span class="op">(</span><span class="va">ATSMInputs</span>, <span class="va">StatQ</span>, <span class="va">DataFreq</span>, <span class="va">FactorLabels</span>, <span class="va">Economies</span>, <span class="va">ModelType</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># 5) Numerical and graphical outputs</span></span>
 <span><span class="co"># a) Prepare list of inputs for graphs and numerical outputs</span></span>
-<span><span class="va">InputsForOutputs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/InputsForOutputs.html">InputsForOutputs</a></span><span class="op">(</span><span class="va">ModelType</span>, <span class="va">Horiz</span>, <span class="va">DesiredGraphs</span>, <span class="va">OutputLabel</span>, <span class="va">StatQ</span>, <span class="va">DataFreq</span>,</span>
-<span>                                    <span class="va">WishGraphYields</span>, <span class="va">WishGraphRiskFac</span>, <span class="va">WishOrthoJLLgraphs</span>, <span class="va">WishFPremia</span>,</span>
-<span>                                    <span class="va">FPmatLim</span>, <span class="va">WishBootstrap</span>, <span class="va">BootList</span>, <span class="va">WishForecast</span>, <span class="va">ForecastList</span><span class="op">)</span></span>
+<span><span class="va">InputsForOutputs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/InputsForOutputs.html">InputsForOutputs</a></span><span class="op">(</span></span>
+<span>  <span class="va">ModelType</span>, <span class="va">Horiz</span>, <span class="va">DesiredGraphs</span>, <span class="va">OutputLabel</span>, <span class="va">StatQ</span>, <span class="va">DataFreq</span>,</span>
+<span>  <span class="va">WishGraphYields</span>, <span class="va">WishGraphRiskFac</span>, <span class="va">WishOrthoJLLgraphs</span>, <span class="va">WishFPremia</span>,</span>
+<span>  <span class="va">FPmatLim</span>, <span class="va">WishBootstrap</span>, <span class="va">BootList</span>, <span class="va">WishForecast</span>, <span class="va">ForecastList</span></span>
+<span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># b) Fit, IRF, FEVD, GIRF, GFEVD, and Term Premia</span></span>
-<span><span class="va">NumericalOutputs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/NumOutputs.html">NumOutputs</a></span><span class="op">(</span><span class="va">ModelType</span>, <span class="va">ModelParaList</span>, <span class="va">InputsForOutputs</span>, <span class="va">FactorLabels</span>, </span>
-<span>                               <span class="va">Economies</span>, <span class="va">Folder2Save</span><span class="op">)</span></span>
+<span><span class="va">NumericalOutputs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/NumOutputs.html">NumOutputs</a></span><span class="op">(</span></span>
+<span>  <span class="va">ModelType</span>, <span class="va">ModelParaList</span>, <span class="va">InputsForOutputs</span>, <span class="va">FactorLabels</span>,</span>
+<span>  <span class="va">Economies</span>, <span class="va">Folder2Save</span></span>
+<span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># c) Confidence intervals (bootstrap analysis)</span></span>
-<span><span class="va">BootstrapAnalysis</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/Bootstrap.html">Bootstrap</a></span><span class="op">(</span><span class="va">ModelType</span>, <span class="va">ModelParaList</span>, <span class="va">NumericalOutputs</span>, <span class="va">Economies</span>, <span class="va">InputsForOutputs</span>,</span>
-<span>                               <span class="va">FactorLabels</span>, <span class="va">JLLlist</span>, <span class="va">GVARlist</span>, <span class="va">WishBC</span>, <span class="va">BRWlist</span>, <span class="va">Folder2Save</span><span class="op">)</span></span>
+<span><span class="va">BootstrapAnalysis</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/Bootstrap.html">Bootstrap</a></span><span class="op">(</span></span>
+<span>  <span class="va">ModelType</span>, <span class="va">ModelParaList</span>, <span class="va">NumericalOutputs</span>, <span class="va">Economies</span>, <span class="va">InputsForOutputs</span>,</span>
+<span>  <span class="va">FactorLabels</span>, <span class="va">JLLlist</span>, <span class="va">GVARlist</span>, <span class="va">WishBC</span>, <span class="va">BRWlist</span>, <span class="va">Folder2Save</span></span>
+<span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># 6) Out-of-sample forecasting</span></span>
-<span><span class="va">Forecasts</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ForecastYields.html">ForecastYields</a></span><span class="op">(</span><span class="va">ModelType</span>, <span class="va">ModelParaList</span>, <span class="va">InputsForOutputs</span>, <span class="va">FactorLabels</span>, <span class="va">Economies</span>,</span>
-<span>                            <span class="va">JLLlist</span>, <span class="va">GVARlist</span>, <span class="va">WishBC</span>, <span class="va">BRWlist</span>, <span class="va">Folder2Save</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">Forecasts</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ForecastYields.html">ForecastYields</a></span><span class="op">(</span></span>
+<span>  <span class="va">ModelType</span>, <span class="va">ModelParaList</span>, <span class="va">InputsForOutputs</span>, <span class="va">FactorLabels</span>, <span class="va">Economies</span>,</span>
+<span>  <span class="va">JLLlist</span>, <span class="va">GVARlist</span>, <span class="va">WishBC</span>, <span class="va">BRWlist</span>, <span class="va">Folder2Save</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="candelon-and-moura-2023">Candelon and Moura (2023)<a class="anchor" aria-label="anchor" href="#candelon-and-moura-2023"></a>
@@ -698,28 +716,30 @@ pandemic.</p>
 <span></span>
 <span><span class="va">Economies</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Brazil"</span>, <span class="st">"India"</span>, <span class="st">"Russia"</span>, <span class="st">"Mexico"</span><span class="op">)</span></span>
 <span><span class="va">GlobalVar</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"US_Output_growth"</span>, <span class="st">"China_Output_growth"</span>, <span class="st">"SP500"</span><span class="op">)</span></span>
-<span><span class="va">DomVar</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Inflation"</span>,<span class="st">"Output_growth"</span>, <span class="st">"CDS"</span>, <span class="st">"COVID"</span><span class="op">)</span></span>
+<span><span class="va">DomVar</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Inflation"</span>, <span class="st">"Output_growth"</span>, <span class="st">"CDS"</span>, <span class="st">"COVID"</span><span class="op">)</span></span>
 <span><span class="va">N</span> <span class="op">&lt;-</span> <span class="fl">2</span></span>
 <span></span>
 <span><span class="va">t0_sample</span> <span class="op">&lt;-</span> <span class="st">"22-03-2020"</span></span>
 <span><span class="va">tF_sample</span> <span class="op">&lt;-</span> <span class="st">"26-09-2021"</span></span>
 <span></span>
 <span><span class="va">OutputLabel</span> <span class="op">&lt;-</span> <span class="st">"CM_EM"</span></span>
-<span><span class="va">DataFreq</span> <span class="op">&lt;-</span><span class="st">"Weekly"</span></span>
+<span><span class="va">DataFreq</span> <span class="op">&lt;-</span> <span class="st">"Weekly"</span></span>
 <span><span class="va">F2S</span> <span class="op">&lt;-</span> <span class="cn">NULL</span></span>
 <span></span>
 <span><span class="va">StatQ</span> <span class="op">&lt;-</span> <span class="fl">0</span></span>
 <span></span>
 <span><span class="co"># B.1) SPECIFIC model inputs</span></span>
 <span><span class="co">#################################### GVAR-based models ##################################################</span></span>
-<span><span class="va">GVARlist</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span> VARXtype <span class="op">=</span> <span class="st">"constrained: COVID"</span>, W_type <span class="op">=</span> <span class="st">"Sample Mean"</span>, t_First_Wgvar <span class="op">=</span> <span class="st">"2015"</span>,</span>
-<span>                  t_Last_Wgvar <span class="op">=</span> <span class="st">"2020"</span>, DataConnectedness <span class="op">=</span> <span class="va">Trade_Flows</span><span class="op">)</span></span>
+<span><span class="va">GVARlist</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>  VARXtype <span class="op">=</span> <span class="st">"constrained: COVID"</span>, W_type <span class="op">=</span> <span class="st">"Sample Mean"</span>, t_First_Wgvar <span class="op">=</span> <span class="st">"2015"</span>,</span>
+<span>  t_Last_Wgvar <span class="op">=</span> <span class="st">"2020"</span>, DataConnectedness <span class="op">=</span> <span class="va">Trade_Flows</span></span>
+<span><span class="op">)</span></span>
 <span><span class="co">###################################### BRW inputs  ######################################################</span></span>
 <span><span class="va">WishBC</span> <span class="op">&lt;-</span> <span class="fl">0</span></span>
 <span></span>
 <span><span class="co"># C) Decide on Settings for numerical outputs</span></span>
 <span><span class="va">WishFPremia</span> <span class="op">&lt;-</span> <span class="fl">1</span></span>
-<span><span class="va">FPmatLim</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">47</span>,<span class="fl">48</span><span class="op">)</span></span>
+<span><span class="va">FPmatLim</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">47</span>, <span class="fl">48</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">Horiz</span> <span class="op">&lt;-</span> <span class="fl">12</span></span>
 <span><span class="va">DesiredGraphs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"GIRF"</span>, <span class="st">"GFEVD"</span>, <span class="st">"TermPremia"</span><span class="op">)</span></span>
@@ -729,7 +749,7 @@ pandemic.</p>
 <span></span>
 <span><span class="co"># D) Bootstrap settings</span></span>
 <span><span class="va">WishBootstrap</span> <span class="op">&lt;-</span> <span class="fl">1</span> <span class="co">#  YES: 1; No = 0.</span></span>
-<span><span class="va">BootList</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>methodBS <span class="op">=</span> <span class="st">'bs'</span>, BlockLength <span class="op">=</span> <span class="fl">4</span>, ndraws <span class="op">=</span> <span class="fl">100</span>, pctg <span class="op">=</span>  <span class="fl">95</span><span class="op">)</span></span>
+<span><span class="va">BootList</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>methodBS <span class="op">=</span> <span class="st">"bs"</span>, BlockLength <span class="op">=</span> <span class="fl">4</span>, ndraws <span class="op">=</span> <span class="fl">100</span>, pctg <span class="op">=</span> <span class="fl">95</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co">#########################################################################################################</span></span>
 <span><span class="co">############################### NO NEED TO MAKE CHANGES FROM HERE #######################################</span></span>
@@ -739,25 +759,33 @@ pandemic.</p>
 <span><span class="va">FactorLabels</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/LabFac.html">LabFac</a></span><span class="op">(</span><span class="va">N</span>, <span class="va">DomVar</span>, <span class="va">GlobalVar</span>, <span class="va">Economies</span>, <span class="va">ModelType</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># 3) Prepare the inputs of the likelihood function</span></span>
-<span><span class="va">ATSMInputs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/InputsForOpt.html">InputsForOpt</a></span><span class="op">(</span><span class="va">t0_sample</span>, <span class="va">tF_sample</span>, <span class="va">ModelType</span>, <span class="va">Yields</span>, <span class="va">GlobalMacro</span>, <span class="va">DomMacro</span>, <span class="va">FactorLabels</span>,</span>
-<span>                           <span class="va">Economies</span>, <span class="va">DataFreq</span>, <span class="va">GVARlist</span><span class="op">)</span></span>
+<span><span class="va">ATSMInputs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/InputsForOpt.html">InputsForOpt</a></span><span class="op">(</span></span>
+<span>  <span class="va">t0_sample</span>, <span class="va">tF_sample</span>, <span class="va">ModelType</span>, <span class="va">Yields</span>, <span class="va">GlobalMacro</span>, <span class="va">DomMacro</span>, <span class="va">FactorLabels</span>,</span>
+<span>  <span class="va">Economies</span>, <span class="va">DataFreq</span>, <span class="va">GVARlist</span></span>
+<span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># 4) Optimization of the ATSM (Point Estimates)</span></span>
 <span><span class="va">ModelParaList</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/Optimization.html">Optimization</a></span><span class="op">(</span><span class="va">ATSMInputs</span>, <span class="va">StatQ</span>, <span class="va">DataFreq</span>, <span class="va">FactorLabels</span>, <span class="va">Economies</span>, <span class="va">ModelType</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># 5) Numerical and graphical outputs</span></span>
 <span><span class="co"># a) Prepare list of inputs for graphs and numerical outputs</span></span>
-<span><span class="va">InputsForOutputs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/InputsForOutputs.html">InputsForOutputs</a></span><span class="op">(</span><span class="va">ModelType</span>, <span class="va">Horiz</span>, <span class="va">DesiredGraphs</span>, <span class="va">OutputLabel</span>, <span class="va">StatQ</span>, <span class="va">DataFreq</span>,</span>
-<span>                                    <span class="va">WishGraphYields</span>, <span class="va">WishGraphRiskFac</span>, <span class="va">WishOrthoJLLgraphs</span>, <span class="va">WishFPremia</span>,</span>
-<span>                                    <span class="va">FPmatLim</span>, <span class="va">WishBootstrap</span>, <span class="va">BootList</span><span class="op">)</span></span>
+<span><span class="va">InputsForOutputs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/InputsForOutputs.html">InputsForOutputs</a></span><span class="op">(</span></span>
+<span>  <span class="va">ModelType</span>, <span class="va">Horiz</span>, <span class="va">DesiredGraphs</span>, <span class="va">OutputLabel</span>, <span class="va">StatQ</span>, <span class="va">DataFreq</span>,</span>
+<span>  <span class="va">WishGraphYields</span>, <span class="va">WishGraphRiskFac</span>, <span class="va">WishOrthoJLLgraphs</span>, <span class="va">WishFPremia</span>,</span>
+<span>  <span class="va">FPmatLim</span>, <span class="va">WishBootstrap</span>, <span class="va">BootList</span></span>
+<span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># b) Fit, IRF, FEVD, GIRF, GFEVD, and Term Premia</span></span>
-<span><span class="va">NumericalOutputs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/NumOutputs.html">NumOutputs</a></span><span class="op">(</span><span class="va">ModelType</span>, <span class="va">ModelParaList</span>, <span class="va">InputsForOutputs</span>, <span class="va">FactorLabels</span>, </span>
-<span>                               <span class="va">Economies</span>, <span class="va">F2S</span><span class="op">)</span></span>
+<span><span class="va">NumericalOutputs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/NumOutputs.html">NumOutputs</a></span><span class="op">(</span></span>
+<span>  <span class="va">ModelType</span>, <span class="va">ModelParaList</span>, <span class="va">InputsForOutputs</span>, <span class="va">FactorLabels</span>,</span>
+<span>  <span class="va">Economies</span>, <span class="va">F2S</span></span>
+<span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># c) Confidence intervals (bootstrap analysis)</span></span>
 <span><span class="va">BootstrapAnalysis</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/Bootstrap.html">Bootstrap</a></span><span class="op">(</span><span class="va">ModelType</span>, <span class="va">ModelParaList</span>, <span class="va">NumericalOutputs</span>, <span class="va">Economies</span>, <span class="va">InputsForOutputs</span>,</span>
-<span>                               <span class="va">FactorLabels</span>, JLLlist <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">GVARlist</span>, <span class="va">WishBC</span>, <span class="va">BRWlist</span>, <span class="va">F2S</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="va">FactorLabels</span>,</span>
+<span>  JLLlist <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">GVARlist</span>, <span class="va">WishBC</span>, <span class="va">BRWlist</span>, <span class="va">F2S</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 class="unnumbered" id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>

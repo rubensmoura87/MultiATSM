@@ -89,8 +89,10 @@
 <span class="r-in"><span><span class="va">RF_TS</span> <span class="op">&lt;-</span> <span class="va">RiskFactors</span></span></span>
 <span class="r-in"><span><span class="va">N</span> <span class="op">&lt;-</span> <span class="fl">3</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">JLLinputs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>Economies <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"China"</span>, <span class="st">"Brazil"</span>, <span class="st">"Mexico"</span>, <span class="st">"Uruguay"</span><span class="op">)</span>, DomUnit <span class="op">=</span> <span class="st">"China"</span>,</span></span>
-<span class="r-in"><span>                  WishSigmas <span class="op">=</span> <span class="fl">1</span>, SigmaNonOrtho <span class="op">=</span> <span class="cn">NULL</span>, JLLModelType <span class="op">=</span> <span class="st">"JLL original"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">JLLinputs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  Economies <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"China"</span>, <span class="st">"Brazil"</span>, <span class="st">"Mexico"</span>, <span class="st">"Uruguay"</span><span class="op">)</span>, DomUnit <span class="op">=</span> <span class="st">"China"</span>,</span></span>
+<span class="r-in"><span>  WishSigmas <span class="op">=</span> <span class="fl">1</span>, SigmaNonOrtho <span class="op">=</span> <span class="cn">NULL</span>, JLLModelType <span class="op">=</span> <span class="st">"JLL original"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">JLLPara</span> <span class="op">&lt;-</span> <span class="fu">JLL</span><span class="op">(</span><span class="va">RF_TS</span>, <span class="va">N</span>, <span class="va">JLLinputs</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
