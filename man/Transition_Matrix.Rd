@@ -34,36 +34,38 @@ then the transition matrix will include only NAs.
 }
 \examples{
 t_First <- "2006"
-t_Last <-  "2019"
+t_Last <- "2019"
 Economies <- c("China", "Brazil", "Mexico", "Uruguay")
 type <- "Sample Mean"
+## Load data if Connectedness data from excel, otherwise use pre-saved data
 GetExcelData <- FALSE
 
- if (GetExcelData) {
- if (!requireNamespace("readxl", quietly = TRUE)) {
- stop(
-   "Please install package \"readxl\" to use this feature.",
-   call. = FALSE
- )
-   DataPath <- system.file("extdata", "TradeData.xlsx", package = "MultiATSM")
-   tab_names_Trade <- readxl::excel_sheets(DataPath)
-   list_all_Trade <- suppressMessages(lapply(tab_names_Trade, function(x)
-                     readxl::read_excel(path = DataPath, sheet = x)))
-   names(list_all_Trade) <- tab_names_Trade
+if (GetExcelData) {
+  if (!requireNamespace("readxl", quietly = TRUE)) {
+    stop(
+      "Please install package \"readxl\" to use this feature.",
+      call. = FALSE
+    )
+    DataPath <- system.file("extdata", "TradeData.xlsx", package = "MultiATSM")
+    tab_names_Trade <- readxl::excel_sheets(DataPath)
+    list_all_Trade <- suppressMessages(lapply(tab_names_Trade, function(x) {
+      readxl::read_excel(path = DataPath, sheet = x)
+    }))
+    names(list_all_Trade) <- tab_names_Trade
 
-   L <- length(list_all_Trade)
+    L <- length(list_all_Trade)
 
-   for (i in 1:L) {
-     Countries <- list_all_Trade[[i]][[1]]
-     list_all_Trade[[i]] <- as.data.frame(list_all_Trade[[i]][,-1])
-     rownames(list_all_Trade[[i]]) <- Countries
-   }
+    for (i in 1:L) {
+      Countries <- list_all_Trade[[i]][[1]]
+      list_all_Trade[[i]] <- as.data.frame(list_all_Trade[[i]][, -1])
+      rownames(list_all_Trade[[i]]) <- Countries
+    }
 
-   DataConnectedness <- list_all_Trade
- }
+    DataConnectedness <- list_all_Trade
+  }
 } else {
- data(CM_Trade)
- DataConnectedness <- TradeFlows
+  data(CM_Trade)
+  DataConnectedness <- TradeFlows
 }
 
 W_mat <- Transition_Matrix(t_First, t_Last, Economies, type, DataConnectedness)

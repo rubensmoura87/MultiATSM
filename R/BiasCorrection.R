@@ -2,16 +2,16 @@
 #'
 #' @param ModelType A character vector indicating the model type to be estimated.
 #' @param BRWinputs A list containing the necessary inputs for the BRW model estimation:
-#'\enumerate{
-#'\item \code{Cent_Measure}: Determines whether "Mean" or "Median"-unbiased estimation is desired.
-#'\item \code{gamma}: Numeric. Adjustment parameter between 0 and 1. Default is 0.5.
-#'\item \code{N_iter}: Integer. Number of iterations for the stochastic approximation algorithm after burn-in. Default is 5,000.
-#'\item \code{N_burn}: Integer. Number of burn-in iterations. Default is 15% of \code{N_iter}.
-#'\item \code{B}: Integer. Number of bootstrap samples per iteration for calculating the noisy measure of the biased estimator's mean or median. Default is 50.
-#'\item \code{check}: Logical. Indicates whether to perform a closeness check. Default is TRUE.
-#'\item \code{B_check}: Integer. Number of bootstrap samples for the closeness check. Default is 100,000.
-#'\item \code{Eigen_rest}: Numeric. Restriction on the largest eigenvalue under the P-measure. Default is 1.
-#'}
+#' \enumerate{
+#' \item \code{Cent_Measure}: Determines whether "Mean" or "Median"-unbiased estimation is desired.
+#' \item \code{gamma}: Numeric. Adjustment parameter between 0 and 1. Default is 0.5.
+#' \item \code{N_iter}: Integer. Number of iterations for the stochastic approximation algorithm after burn-in. Default is 5,000.
+#' \item \code{N_burn}: Integer. Number of burn-in iterations. Default is 15% of \code{N_iter}.
+#' \item \code{B}: Integer. Number of bootstrap samples per iteration for calculating the noisy measure of the biased estimator's mean or median. Default is 50.
+#' \item \code{check}: Logical. Indicates whether to perform a closeness check. Default is TRUE.
+#' \item \code{B_check}: Integer. Number of bootstrap samples for the closeness check. Default is 100,000.
+#' \item \code{Eigen_rest}: Numeric. Restriction on the largest eigenvalue under the P-measure. Default is 1.
+#' }
 #' @param RiskFactors A numeric matrix (T x F) representing the time series of risk factors.
 #' @param Economies A character vector containing the names of the economies included in the system.
 #' @param FactorLabels A list of character vectors with labels for all variables in the model.
@@ -19,13 +19,15 @@
 #' @param JLLinputs List. Inputs for JLL model estimation (see \code{\link{JLL}} function). Default is NULL.
 #' @param verbose verbose Logical flag controlling function messaging. Default is TRUE.
 #'
-#'@examples
-#'\donttest{
+#' @examples
+#' \donttest{
 #' data(CM_Factors)
-#' Factors <- t(RiskFactors[1:7,])
+#' Factors <- t(RiskFactors[1:7, ])
 #'
-#' BRWinputs <- list(Cent_Measure = "Mean", gamma = 0.4, N_iter = 1000, N_burn = 100,
-#'                   B = 10, check = 1, B_check = 5000)
+#' BRWinputs <- list(
+#'   Cent_Measure = "Mean", gamma = 0.4, N_iter = 1000, N_burn = 100,
+#'   B = 10, check = 1, B_check = 5000
+#' )
 #'
 #' Economies <- "China"
 #' N <- 3
@@ -33,29 +35,27 @@
 #' FactorLabels <- NULL
 #'
 #' BRWpara <- Bias_Correc_VAR(ModelType, BRWinputs, Factors, Economies, FactorLabels)
-#'}
+#' }
 #'
-#'@return Bias-corrected VAR parameters based on the framework of Bauer, Rudebusch and Wu (2012). The list contains:
-#'\enumerate{
-#'\item \code{KOZ_BC}: estimated intercept (F x 1);
-#'\item \code{K1Z_BC}: estimated feedback matrix (F x F);
-#'\item \code{SSZ_BC}: estimated variance-covariance matrix (F x F);
-#'\item \code{dist}: root mean square distance (scalar);
-#'}
+#' @return Bias-corrected VAR parameters based on the framework of Bauer, Rudebusch and Wu (2012). The list contains:
+#' \enumerate{
+#' \item \code{KOZ_BC}: estimated intercept (F x 1);
+#' \item \code{K1Z_BC}: estimated feedback matrix (F x F);
+#' \item \code{SSZ_BC}: estimated variance-covariance matrix (F x F);
+#' \item \code{dist}: root mean square distance (scalar);
+#' }
 #'
-#'@references
+#' @references
 #' Bauer, Rudebusch and, Wu (2012). "Correcting Estimation Bias in Dynamic Term Structure Models" \cr
 #' This function offers an independent R implementation that is informed
 #' by the conceptual framework outlined in Bauer, Rudebusch and Wu (2012), but adapted to the
 #' present modeling context. Related Matlab routines are available on Cynthia Wu's
 #' website (https://sites.google.com/view/jingcynthiawu/).
-#'@export
+#' @export
 
-Bias_Correc_VAR  <- function(ModelType, BRWinputs, RiskFactors, Economies, FactorLabels, GVARinputs = NULL,
-                             JLLinputs = NULL, verbose = TRUE) {
-
-
-  if (BRWinputs$Cent_Measure == "Mean"){
+Bias_Correc_VAR <- function(ModelType, BRWinputs, RiskFactors, Economies, FactorLabels, GVARinputs = NULL,
+                            JLLinputs = NULL, verbose = TRUE) {
+  if (BRWinputs$Cent_Measure == "Mean") {
     Use_Mean <- TRUE
   }
 
@@ -71,16 +71,21 @@ Bias_Correc_VAR  <- function(ModelType, BRWinputs, RiskFactors, Economies, Facto
 
   # Step 1: Estimation of the P-dynamics feedback matrix (Without bias correction)
   K1Z_NoBC <- Get_FeedMat_NoBC(RiskFactors, ModelType, Economies, GVARinputs, JLLinputs, FactorLabels,
-                               CheckInpts = FALSE)
+    CheckInpts = FALSE
+  )
 
   # Step 2: stochastic approximation algorithm
-  K1Z_BC <- SA_algorithm(K1Z_NoBC, RiskFactors, BRWinputs, GVARinputs, JLLinputs, FactorLabels, Economies,
-                         ModelType, verbose)
+  K1Z_BC <- SA_algorithm(
+    K1Z_NoBC, RiskFactors, BRWinputs, GVARinputs, JLLinputs, FactorLabels, Economies,
+    ModelType, verbose
+  )
 
   # Step 3: Optional closeness check
-  if (check){
-    dist <- Check_comparison_NoBC(K1Z_BC, K1Z_NoBC, B_check, RiskFactors, GVARinputs, JLLinputs, FactorLabels,
-                                  Economies, ModelType, Use_Mean, verbose)
+  if (check) {
+    dist <- Check_comparison_NoBC(
+      K1Z_BC, K1Z_NoBC, B_check, RiskFactors, GVARinputs, JLLinputs, FactorLabels,
+      Economies, ModelType, Use_Mean, verbose
+    )
   } else {
     dist <- NaN
   }
@@ -102,7 +107,7 @@ Bias_Correc_VAR  <- function(ModelType, BRWinputs, RiskFactors, Economies, Facto
 #' @param value parameter to be checked
 #' @param default default value
 #'
-#'@keywords internal
+#' @keywords internal
 
 withDefault <- function(value, default) if (is.null(value)) default else value
 
@@ -120,34 +125,30 @@ withDefault <- function(value, default) if (is.null(value)) default else value
 
 Get_FeedMat_NoBC <- function(RiskFactors, ModelType, Economies, GVARinputs, JLLinputs, FactorLabels,
                              CheckInpts = FALSE) {
-
   D_RiskFactors <- scale(RiskFactors, scale = FALSE)
   N <- length(FactorLabels$Spanned)
 
   if (any(ModelType == c("JPS original", "JPS global"))) {
     T_dim <- nrow(D_RiskFactors)
-    Y <- t(D_RiskFactors[2:T_dim, , drop = FALSE])  # k × (T-1)
-    X <- t(cbind(1, D_RiskFactors[1:(T_dim-1), , drop = FALSE]))  # (k+1) × (T-1)
+    Y <- t(D_RiskFactors[2:T_dim, , drop = FALSE]) # k × (T-1)
+    X <- t(cbind(1, D_RiskFactors[1:(T_dim - 1), , drop = FALSE])) # (k+1) × (T-1)
 
     # OLS estimation: A = Y X^T (X X^T)^{-1}
     XXt <- X %*% t(X)
     Betas <- Y %*% t(X) %*% solve(XXt, tol = 1e-50)
-    K1Z_NoBC <- Betas[ , -1]
-
-  }  else if (ModelType== 'JPS multi'){
-    VARpara <- VAR(t(D_RiskFactors), VARtype = 'unconstrained')
+    K1Z_NoBC <- Betas[, -1]
+  } else if (ModelType == "JPS multi") {
+    VARpara <- VAR(t(D_RiskFactors), VARtype = "unconstrained")
     K1Z_NoBC <- VARpara$K1Z
-
-  } else if (any(ModelType == c("GVAR single", "GVAR multi"))){
+  } else if (any(ModelType == c("GVAR single", "GVAR multi"))) {
     GVARinputs$GVARFactors <- DataSet_BS(ModelType, t(D_RiskFactors), GVARinputs$Wgvar, Economies, FactorLabels)
     GVARpara <- GVAR(GVARinputs, N)
     K1Z_NoBC <- GVARpara$F1
-
   } else {
     JLLinputs$WishSigmas <- 0
     JLLPara <- JLL(t(D_RiskFactors), N, JLLinputs)
     K1Z_NoBC <- JLLPara$k1
-    }
+  }
 
   return(K1Z_NoBC)
 }
@@ -168,8 +169,7 @@ Get_FeedMat_NoBC <- function(RiskFactors, ModelType, Economies, GVARinputs, JLLi
 
 SA_algorithm <- function(K1Z_NoBC, RiskFactors, BRWlist, GVARinputs, JLLinputs, FactorLabels, Economies,
                          ModelType, verbose) {
-
-  if (BRWlist$Cent_Measure == "Mean"){
+  if (BRWlist$Cent_Measure == "Mean") {
     Use_Mean <- TRUE
   }
 
@@ -187,14 +187,15 @@ SA_algorithm <- function(K1Z_NoBC, RiskFactors, BRWlist, GVARinputs, JLLinputs, 
   w <- 1 # index for printing on screen
 
   while (j <= N_burn + N_iter - 1) {
-
     if (j == 100 * w) {
-      if (verbose) message(paste('iteration: ', j, ' / ', N_burn + N_iter - 1))
+      if (verbose) message(paste("iteration: ", j, " / ", N_burn + N_iter - 1))
       w <- w + 1
     }
 
-    K1Z_j_M <- FeedMat_M(K1Z_All[[j]], N_boot, RiskFactors, GVARinputs, JLLinputs, FactorLabels, Economies,
-                        ModelType, Use_Mean)
+    K1Z_j_M <- FeedMat_M(
+      K1Z_All[[j]], N_boot, RiskFactors, GVARinputs, JLLinputs, FactorLabels, Economies,
+      ModelType, Use_Mean
+    )
     d <- K1Z_NoBC - K1Z_j_M
     K1Z_All[[j + 1]] <- K1Z_All[[j]] + gamma * d
 
@@ -224,7 +225,6 @@ SA_algorithm <- function(K1Z_NoBC, RiskFactors, BRWlist, GVARinputs, JLLinputs, 
 
 FeedMat_M <- function(K1Z_j, N_boot, RiskFactors, GVARinputs, JLLinputs, FactorLabels, Economies,
                       ModelType, Use_Mean) {
-
   N <- length(FactorLabels$Spanned)
 
   # 1) Compute artificial series
@@ -259,7 +259,6 @@ FeedMat_M <- function(K1Z_j, N_boot, RiskFactors, GVARinputs, JLLinputs, FactorL
 #' @keywords internal
 
 Gen_art_series <- function(K1Z_j, N_Boot, RFs) {
-
   T_dim <- nrow(RFs)
   K <- ncol(RFs)
   RFs_mean <- colMeans(RFs)
@@ -271,7 +270,7 @@ Gen_art_series <- function(K1Z_j, N_Boot, RFs) {
   # Sample initial values
   RFs_art <- array(NA, dim = c(K, T_dim, N_Boot))
   IDX_0 <- sample(T_dim, N_Boot, replace = TRUE)
-  RFs_art[ , 1, ] <- t(RFs[IDX_0, , drop = FALSE])
+  RFs_art[, 1, ] <- t(RFs[IDX_0, , drop = FALSE])
 
   # Precompute the K1Z_j %*% RFs_mean term
   K1Z_mean <- K1Z_j %*% RFs_mean
@@ -308,7 +307,6 @@ Gen_art_series <- function(K1Z_j, N_Boot, RFs) {
 #' @keywords internal
 
 shrink_FeedMat_BC <- function(K1Z_BC, K1Z_NoBC, ev_restr) {
-
   # Extract eigenvalues
   ev_bc <- max(Mod(eigen(K1Z_BC, only.values = TRUE)$values))
   ev_Nobc <- max(Mod(eigen(K1Z_NoBC, only.values = TRUE)$values))
@@ -329,7 +327,7 @@ shrink_FeedMat_BC <- function(K1Z_BC, K1Z_NoBC, ev_restr) {
   delta_min <- 0
   delta_max <- 1
   delta <- 1
-  max_iter <- 200  # Prevent infinite loops
+  max_iter <- 200 # Prevent infinite loops
   iter <- 0
 
   while ((delta_max - delta_min) > 1e-6 && iter < max_iter) {
@@ -338,11 +336,11 @@ shrink_FeedMat_BC <- function(K1Z_BC, K1Z_NoBC, ev_restr) {
     ev_test <- max(Mod(eigen(K1Z_BC, only.values = TRUE)$values))
 
     if (ev_test <= ev_restr) {
-      delta_min <- delta  # This delta works, try larger
+      delta_min <- delta # This delta works, try larger
       K1Z_BC <- K1Z_test
       ev_bc <- ev_test
     } else {
-      delta_max <- delta  # This delta doesn't work, try smaller
+      delta_max <- delta # This delta doesn't work, try smaller
     }
     iter <- iter + 1
   }
@@ -364,17 +362,17 @@ shrink_FeedMat_BC <- function(K1Z_BC, K1Z_NoBC, ev_restr) {
 #' @param Use_Mean Choose between the mean or the median across the bootstrap iterations.
 #' @param verbose Logical flag controlling function messaging.
 #'
-#'@keywords internal
+#' @keywords internal
 
 Check_comparison_NoBC <- function(K1Z_BC, K1Z_NoBC, B_check, RiskFactors, GVARinputs, JLLinputs, FactorLabels,
-                                   Economies, ModelType, Use_Mean, verbose) {
-
-
-  K1Z_NoBC <- FeedMat_M(K1Z_BC, B_check, RiskFactors, GVARinputs, JLLinputs, FactorLabels, Economies,
-                       ModelType, Use_Mean)
+                                  Economies, ModelType, Use_Mean, verbose) {
+  K1Z_NoBC <- FeedMat_M(
+    K1Z_BC, B_check, RiskFactors, GVARinputs, JLLinputs, FactorLabels, Economies,
+    ModelType, Use_Mean
+  )
   dist <- sqrt(mean((K1Z_BC - K1Z_NoBC)^2))
-  if (verbose) message(paste('Root mean square distance: ', round(dist, 6)))
-  if (verbose) message('... Done! \n')
+  if (verbose) message(paste("Root mean square distance: ", round(dist, 6)))
+  if (verbose) message("... Done! \n")
 
   return(dist)
 }
@@ -383,31 +381,29 @@ Check_comparison_NoBC <- function(K1Z_BC, K1Z_NoBC, B_check, RiskFactors, GVARin
 ##############################################################################################################
 #' Compute the variance-covariance matrix after the bias correction procedure
 #'
-#'@param K1Z_BC Feedback matrix resulting from the bias-correction procedure
-#'@param RiskFactors time series of the risk factors (T x F)
-#'@param GVARinputs inputs used in the estimation of the GVAR-based models (see "GVAR" function). Default is set to NULL
-#'@param JLLinputs inputs used in the estimation of the JLL-based models (see "JLL" function). Default is set to NULL
-#'@param FactorLabels string-list based which contains the labels of all variables present in the model
-#'@param ModelType string-vector containing the label of the model to be estimated
+#' @param K1Z_BC Feedback matrix resulting from the bias-correction procedure
+#' @param RiskFactors time series of the risk factors (T x F)
+#' @param GVARinputs inputs used in the estimation of the GVAR-based models (see "GVAR" function). Default is set to NULL
+#' @param JLLinputs inputs used in the estimation of the JLL-based models (see "JLL" function). Default is set to NULL
+#' @param FactorLabels string-list based which contains the labels of all variables present in the model
+#' @param ModelType string-vector containing the label of the model to be estimated
 #'
 #'
-#'@keywords internal
+#' @keywords internal
 
-Get_SSZ_BC <- function(K1Z_BC, RiskFactors, GVARinputs, JLLinputs, FactorLabels, ModelType){
-
-
+Get_SSZ_BC <- function(K1Z_BC, RiskFactors, GVARinputs, JLLinputs, FactorLabels, ModelType) {
   N <- length(FactorLabels$Spanned)
 
-  if (any(ModelType == c("JPS original", "JPS global", "JPS multi"))){
+  if (any(ModelType == c("JPS original", "JPS global", "JPS multi"))) {
     T_dim <- nrow(RiskFactors)
     Xdem <- scale(RiskFactors, scale = FALSE)
     resid_tilde <- t(Xdem[2:T_dim, ]) - K1Z_BC %*% t(Xdem[1:(T_dim - 1), ])
     V_tilde <- resid_tilde %*% t(resid_tilde) / (T_dim - 1)
-  } else if (any(ModelType == c("GVAR single", "GVAR multi"))){
+  } else if (any(ModelType == c("GVAR single", "GVAR multi"))) {
     Economies <- GVARinputs$Economies # necessary to ensure that the code works for the "GVAR single" model
     GVARinputs$GVARFactors <- DataSet_BS(ModelType, t(RiskFactors), GVARinputs$Wgvar, Economies, FactorLabels)
     V_tilde <- GVAR(GVARinputs, N)$Sigma_y
-  } else if (any(ModelType == c("JLL original", "JLL No DomUnit", "JLL joint Sigma"))){
+  } else if (any(ModelType == c("JLL original", "JLL No DomUnit", "JLL joint Sigma"))) {
     JLLinputs$WishSigmas <- 1
     JLLPara <- JLL(t(RiskFactors), N, JLLinputs)
     V_tilde <- if (any(ModelType == c("JLL original", "JLL No DomUnit"))) JLLPara$Sigmas$VarCov_NonOrtho else JLLPara$Sigmas$VarCov_Ortho
@@ -415,5 +411,3 @@ Get_SSZ_BC <- function(K1Z_BC, RiskFactors, GVARinputs, JLLinputs, FactorLabels,
 
   return(V_tilde)
 }
-
-

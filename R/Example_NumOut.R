@@ -1,4 +1,4 @@
-#'@title Example of computed numerical outputs
+#' @title Example of computed numerical outputs
 #'
 #' @description Numerical outputs for JPS-based model using Brazilian data
 #' @name NumOutEx

@@ -16,15 +16,14 @@ Complete set of data from several papers.
 Loads data sets from several papers
 }
 \examples{
-#Example 1:
+# Example 1:
 LoadData("BR_2017")
 
-#Example 2:
+# Example 2:
 LoadData("CM_2023")
 
-#Example 3:
+# Example 3:
 LoadData("CM_2024")
-
 
 }
 \references{

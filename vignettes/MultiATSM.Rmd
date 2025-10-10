@@ -58,15 +58,17 @@ this package.
 <a id="tab-ModFea"></a>
 
 ```{r ModFea, message=FALSE, echo=FALSE}
-ModelLabels <- c("JPS original", "JPS global", "JPS multi", "GVAR single", "GVAR multi", 
-                 "JLL original", "JLL No DomUnit", "JLL joint Sigma")
+ModelLabels <- c(
+  "JPS original", "JPS global", "JPS multi", "GVAR single", "GVAR multi",
+  "JLL original", "JLL No DomUnit", "JLL joint Sigma"
+)
 
 # Rows
-Tab <- data.frame(matrix(nrow = length(ModelLabels), ncol = 0)) 
+Tab <- data.frame(matrix(nrow = length(ModelLabels), ncol = 0))
 rownames(Tab) <- ModelLabels
 
 # Empty columns
-EmptyCol <- c("", "", "", "", "", "", "", "") 
+EmptyCol <- c("", "", "", "", "", "", "", "")
 Tab$EmptyCol0 <- EmptyCol
 # P-dynamics + 2 empty spaces
 Tab$PdynIndUnco <- c("x", "", "", "", "", "", "", "")
@@ -77,12 +79,12 @@ Tab$PdynJointGVAR <- c("", "", "", "x", "x", "", "", "")
 Tab$EmptyCol1 <- EmptyCol
 Tab$EmptyCol2 <- EmptyCol
 # Q-dynamics + 2 empty spaces
-Tab$QdynInd <- c("x", "x", "", "x", "", "", "", "")   
-Tab$QdynJoint <- c("", "", "x", "", "x", "x", "x", "x") 
+Tab$QdynInd <- c("x", "x", "", "x", "", "", "", "")
+Tab$QdynJoint <- c("", "", "x", "", "x", "x", "x", "x")
 Tab$EmptyCol3 <- EmptyCol
 Tab$EmptyCol4 <- EmptyCol
 # Sigma + 2 empty spaces
-Tab$Ponly <-  c("", "", "", "", "", "x", "x", "")
+Tab$Ponly <- c("", "", "", "", "", "x", "x", "")
 Tab$PandQ <- c("x", "x", "x", "x", "x", "", "", "x")
 Tab$EmptyCol5 <- EmptyCol
 Tab$EmptyCol6 <- EmptyCol
@@ -90,7 +92,7 @@ Tab$EmptyCol6 <- EmptyCol
 Tab$DomUnit <- c("", "", "", "", "", "x", "", "x")
 
 # Adjust column names
-ColNames <- c("","","","","JLL", "GVAR", "", "", "", "", "", "", "","", "", "","")
+ColNames <- c("", "", "", "", "JLL", "GVAR", "", "", "", "", "", "", "", "", "", "", "")
 colnames(Tab) <- ColNames
 
 
@@ -101,16 +103,16 @@ suppressWarnings(library(magrittr))
 kableExtra::kbl(
   Tab,
   align = "c",
-  caption = "Model Features"   
+  caption = "Model Features"
 ) %>%
-  kableExtra::kable_classic("striped", full_width = F)  %>%
+  kableExtra::kable_classic("striped", full_width = F) %>%
   kableExtra::row_spec(0, font_size = 10) %>%
-  kableExtra::add_header_above(c(" "=2, "Unrestricted" = 1, "Restricted" = 1, "Unrestricted" = 1, "Restricted" = 2, " " = 11)) %>%
- kableExtra::add_header_above(c(" "=2, "Individual" = 2, "Joint" = 3, " "=2, "Individual" = 1, "Joint" = 1, " "=2, "P only" = 1, "P and Q" = 1, " " = 3))  %>%
-  kableExtra::add_header_above(c( " "=2, "P-dynamics"= 5, " "=2, "Q-dynamics"= 2, " "=2, "Sigma matrix estimation" = 2, " "=2, "Dominant Country"=1), bold = T) %>%
-kableExtra::pack_rows("Unrestricted VAR", 1, 3 , label_row_css = "background-color: #666; color: #fff;")  %>%
-kableExtra::pack_rows("Restricted VAR (GVAR)", 4, 5, label_row_css = "background-color: #666; color: #fff;") %>%
-kableExtra::pack_rows("Restricted VAR (JLL)", 6, 8, label_row_css = "background-color: #666; color: #fff;")
+  kableExtra::add_header_above(c(" " = 2, "Unrestricted" = 1, "Restricted" = 1, "Unrestricted" = 1, "Restricted" = 2, " " = 11)) %>%
+  kableExtra::add_header_above(c(" " = 2, "Individual" = 2, "Joint" = 3, " " = 2, "Individual" = 1, "Joint" = 1, " " = 2, "P only" = 1, "P and Q" = 1, " " = 3)) %>%
+  kableExtra::add_header_above(c(" " = 2, "P-dynamics" = 5, " " = 2, "Q-dynamics" = 2, " " = 2, "Sigma matrix estimation" = 2, " " = 2, "Dominant Country" = 1), bold = T) %>%
+  kableExtra::pack_rows("Unrestricted VAR", 1, 3, label_row_css = "background-color: #666; color: #fff;") %>%
+  kableExtra::pack_rows("Restricted VAR (GVAR)", 4, 5, label_row_css = "background-color: #666; color: #fff;") %>%
+  kableExtra::pack_rows("Restricted VAR (JLL)", 6, 8, label_row_css = "background-color: #666; color: #fff;")
 ```
 
 Some aspects of the multi-country frameworks are worth highlighting. As
@@ -168,7 +170,7 @@ handle this data manipulation themselves if needed. The data can also be retriev
 using:
 
 ```{r}
-data('CM_Yields')
+data("CM_Yields")
 ```
 
 Bond yield data are also used to construct the country-specific **spanned** factors,
@@ -184,7 +186,7 @@ yield data, these economic indicators must be constructed by the user.
 
 ```{r}
 data("CM_GlobalMacroFactors")
-data('CM_DomMacroFactors')
+data("CM_DomMacroFactors")
 ```
 
 The final dataset captures cross-country interconnectedness measures, proxied by 
@@ -196,7 +198,7 @@ and are expressed in U.S. dollars. These data are specifically used to
 construct the transition matrix of the GVAR models.
 
 ```{r}
-data('CM_Trade')
+data("CM_Trade")
 ```
 
 ## Import data from Excel files {#S:SectionImport}
@@ -215,9 +217,8 @@ The workflow is as follows:
 
   1. Retrieve the full dataset from excel files using `Load_Excel_Data()`:
 ```{r}
-
- MacroData  <- Load_Excel_Data(system.file("extdata", "MacroData.xlsx", package = "MultiATSM"))
- YieldData <- Load_Excel_Data(system.file("extdata", "YieldsData.xlsx", package = "MultiATSM"))
+MacroData <- Load_Excel_Data(system.file("extdata", "MacroData.xlsx", package = "MultiATSM"))
+YieldData <- Load_Excel_Data(system.file("extdata", "YieldsData.xlsx", package = "MultiATSM"))
 ```
 
   2. Specify a subset of the selected inputs. For instance,
@@ -227,7 +228,7 @@ Final_Date <- "2019-01-01" # Format "yyyy-mm-dd"
 DataFrequency <- "Monthly"
 GlobalVar <- c("GBC", "VIX") # Global Variables
 DomVar <- c("Eco_Act", "Inflation", "Com_Prices", "Exc_Rates") #  Domestic variables
-N <-  3 # Number of spanned factors per country
+N <- 3 # Number of spanned factors per country
 Economies <- c("China", "Mexico", "Uruguay", "Brazil", "Russia")
 ModelType <- "JPS original"
 ```
@@ -237,8 +238,10 @@ contains the full time series of risk factors required for the model.
 
 ```{r}
 FactorLabels <- LabFac(N, DomVar, GlobalVar, Economies, ModelType)
-RiskFac_TS <- DataForEstimation(Initial_Date, Final_Date, Economies, N, FactorLabels, ModelType,
-                                DataFrequency, MacroData, YieldData)
+RiskFac_TS <- DataForEstimation(
+  Initial_Date, Final_Date, Economies, N, FactorLabels, ModelType,
+  DataFrequency, MacroData, YieldData
+)
 ```
 
 # Required user inputs {#SectionInputs}
@@ -310,7 +313,7 @@ ModelType <- "JPS original"
 # 2) Risk factor set
 Economies <- c("China", "Brazil", "Mexico", "Uruguay")
 GlobalVar <- c("GBC", "CPI_OECD") # Global variables
-DomVar <- c("Eco_Act", "Inflation") # Domestic variables 
+DomVar <- c("Eco_Act", "Inflation") # Domestic variables
 N <- 3 # number of spanned factors per country
 
 # 3) Sample span
@@ -352,24 +355,26 @@ inputs to build the `transition matrix()` . An example of this list of
 inputs is
 
 ```{r}
-W_type <- 'Sample Mean' # Method to compute the transition matrix
+W_type <- "Sample Mean" # Method to compute the transition matrix
 t_First_Wgvar <- "2000" # First year of the sample
-t_Last_Wgvar <-  "2015" # Last year of the sample
+t_Last_Wgvar <- "2015" # Last year of the sample
 DataConnectedness <- TradeFlows # Measure of connectedness across countries
 ```
 
 Therefore, a complete *GVARlist* is
 
 ```{r}
-GVARlist <- list( VARXtype = "unconstrained", W_type = "Sample Mean", t_First_Wgvar = "2000",
-                   t_Last_Wgvar = "2015", DataConnectedness = TradeFlows) 
+GVARlist <- list(
+  VARXtype = "unconstrained", W_type = "Sample Mean", t_First_Wgvar = "2000",
+  t_Last_Wgvar = "2015", DataConnectedness = TradeFlows
+)
 ```
 
 Regarding the JLL-ATSM frameworks, it is sufficient to specify the name
 of the dominant economy (if applicable) within the economic system:
 
 ```{r}
-JLLlist <- list(DomUnit =  "China")
+JLLlist <- list(DomUnit = "China")
 ```
 
 ### BRWlist {#S:SectionBRWinputs}
@@ -421,8 +426,10 @@ model estimation along the lines of BRW (2012). They are:
      under the $P$-measure. Default is $1$.    
 
 ```{r}
-BRWlist <- within(list(Cent_Measure = "Mean", gamma = 0.2, N_iter = 500, B = 50, 
-                       checkBRW = TRUE, B_check = 1000, Eigen_rest = 1), N_burn <- round(N_iter * 0.15))
+BRWlist <- within(list(
+  Cent_Measure = "Mean", gamma = 0.2, N_iter = 500, B = 50,
+  checkBRW = TRUE, B_check = 1000, Eigen_rest = 1
+), N_burn <- round(N_iter * 0.15))
 ```
 
 ## The `InputsForOpt()` function
@@ -435,7 +442,7 @@ which are then directly utilized in the model optimization process. One
 possible use of `InputsForOpt()` is:
 
 ```{r, eval=FALSE} 
-LoadData("CM_2024") 
+LoadData("CM_2024")
 
 ModelType <- "JPS original"
 Economies <- "Mexico"
@@ -448,8 +455,10 @@ FactorLabels <- LabFac(N, DomVar, GlobalVar, Economies, ModelType)
 
 DataFreq <- "Monthly"
 
-ATSMInputs <- InputsForOpt(t0, tF, ModelType, Yields, GlobalMacroVar, DomesticMacroVar,  
-                           FactorLabels, Economies, DataFreq, CheckInputs = FALSE)
+ATSMInputs <- InputsForOpt(t0, tF, ModelType, Yields, GlobalMacroVar, DomesticMacroVar,
+  FactorLabels, Economies, DataFreq,
+  CheckInputs = FALSE
+)
 ```
 
 ## Additional inputs for numerical and graphical outputs
@@ -482,8 +491,8 @@ For the graphical outputs, the user must indicate the desired types of
 graphs in a string-based vector:
 
 ```{r}
-DesiredGraphs <- c("Fit", "GIRF", "GFEVD") # Available options are: "Fit", "IRF", "FEVD", "GIRF", 
-                                          # "GFEVD", "TermPremia".
+DesiredGraphs <- c("Fit", "GIRF", "GFEVD") # Available options are: "Fit", "IRF", "FEVD", "GIRF",
+# "GFEVD", "TermPremia".
 ```
 
 Moreover, the user must select the types of variables of interest
@@ -524,8 +533,8 @@ corresponding to the starting and ending dates of the bond maturity.
 Example:
 
 ```{r}
-    WishFPremia <- 1 # Wish to estimate the forward premia: YES: 1, NO:0 
-    FPmatLim <- c(60, 120)
+WishFPremia <- 1 # Wish to estimate the forward premia: YES: 1, NO:0
+FPmatLim <- c(60, 120)
 ```
 
 ### Bootstrap settings
@@ -543,7 +552,7 @@ Specifically, the list of inputs include:
 -   The confidence level expressed in percentage points (*pctg*).
 
 ```{r}
-Bootlist <- list(methodBS = 'block', BlockLength = 4, ndraws =  50, pctg   =  95)
+Bootlist <- list(methodBS = "block", BlockLength = 4, ndraws = 50, pctg = 95)
 ```
 
 ### Out-of-sample forecast settings
@@ -593,7 +602,7 @@ slope, and curvature.  This interpretation arises from the structure of
 the principal component (PC) weight matrix, as shown below :
 
 ```{r}
-w <- pca_weights_one_country(Yields, Economy = "Uruguay") 
+w <- pca_weights_one_country(Yields, Economy = "Uruguay")
 ```
 
 In matrix *w*, each row stores the weights used for constructing each
@@ -613,21 +622,24 @@ graphically illustrated below.
 ```{r, fig.cap = "Yield loadings on the spanned factors", echo=FALSE}
 LabSpaFac <- c("Level", "Slope", "Curvature")
 N <- length(LabSpaFac)
- 
-w_pca <- data.frame(t(w[1:N,]))
+
+w_pca <- data.frame(t(w[1:N, ]))
 colnames(w_pca) <- LabSpaFac
 w_pca$mat <- c(0.25, 0.5, 1, 3, 5, 10) # vector of maturitie
 
 # Prepare plots
 colors <- c("Level" = "blue", "Slope" = "green", "Curvature" = "red")
 
-g <-  ggplot2::ggplot(data = w_pca, ggplot2::aes(x=  mat)) +  
-    ggplot2::geom_line(ggplot2::aes(y = Level, color = "Level"), linewidth = 0.7) + 
-    ggplot2::geom_line(ggplot2::aes(y = Slope, color = "Slope"), linewidth = 0.7) +
-    ggplot2::geom_line(ggplot2::aes(y = Curvature, color = "Curvature"),  linewidth = 0.7) +
-      ggplot2::labs(color = "Legend") + ggplot2::scale_color_manual(values = colors) + ggplot2::theme_classic() +
-    ggplot2::theme(axis.title.y= ggplot2::element_blank(), legend.position="top", legend.title=ggplot2::element_blank(), legend.text= ggplot2::element_text(size=8) ) + 
-   ggplot2::xlab("Maturity (Years)") + ggplot2::geom_hline(yintercept=0)
+g <- ggplot2::ggplot(data = w_pca, ggplot2::aes(x = mat)) +
+  ggplot2::geom_line(ggplot2::aes(y = Level, color = "Level"), linewidth = 0.7) +
+  ggplot2::geom_line(ggplot2::aes(y = Slope, color = "Slope"), linewidth = 0.7) +
+  ggplot2::geom_line(ggplot2::aes(y = Curvature, color = "Curvature"), linewidth = 0.7) +
+  ggplot2::labs(color = "Legend") +
+  ggplot2::scale_color_manual(values = colors) +
+  ggplot2::theme_classic() +
+  ggplot2::theme(axis.title.y = ggplot2::element_blank(), legend.position = "top", legend.title = ggplot2::element_blank(), legend.text = ggplot2::element_text(size = 8)) +
+  ggplot2::xlab("Maturity (Years)") +
+  ggplot2::geom_hline(yintercept = 0)
 
 print(g)
 ```
@@ -637,7 +649,7 @@ factors, the user can use the `Spanned_Factors()` function as
 follows:
 
 ```{r}
-data('CM_Yields')
+data("CM_Yields")
 Economies <- c("China", "Brazil", "Mexico", "Uruguay")
 N <- 3
 SpaFact <- Spanned_Factors(Yields, Economies, N)
@@ -662,14 +674,14 @@ $P$-dynamics parameters is obtained as
 
 ```{r}
 data("CM_Factors")
-PdynPara <- VAR(RiskFactors, VARtype= "unconstrained")
+PdynPara <- VAR(RiskFactors, VARtype = "unconstrained")
 ```
 
 whereas the estimation of a *JPS original* model for China is
 
 ```{r}
 FactorsChina <- RiskFactors[1:7, ]
-PdynPara <- VAR(FactorsChina, VARtype= "unconstrained")
+PdynPara <- VAR(FactorsChina, VARtype = "unconstrained")
 ```
 
 In both cases, the outputs generated are the vector of intercepts and
@@ -707,8 +719,8 @@ elements:
     restricted least squares.
 
 ```{r}
-data('CM_Factors_GVAR')
-GVARinputs <- list(Economies = Economies, GVARFactors = FactorsGVAR, VARXtype ="constrained: Inflation")
+data("CM_Factors_GVAR")
+GVARinputs <- list(Economies = Economies, GVARFactors = FactorsGVAR, VARXtype = "constrained: Inflation")
 ```
 
 4.  *Transition matrix*: The estimation of a GVAR model requires
@@ -737,7 +749,7 @@ each row sums up to $1$.
 ```{r}
 data("CM_Trade")
 t_First <- "2006"
-t_Last <-  "2019"
+t_Last <- "2019"
 Economies <- c("China", "Brazil", "Mexico", "Uruguay")
 type <- "Sample Mean"
 W_gvar <- Transition_Matrix(t_First, t_Last, Economies, type, TradeFlows)
@@ -751,8 +763,10 @@ check on the inputs provided in *GVARinputs*.
 
 ```{r}
 data("CM_Factors_GVAR")
-GVARinputs <- list(Economies = Economies, GVARFactors = FactorsGVAR, VARXtype = "unconstrained", 
-                   Wgvar = W_gvar)
+GVARinputs <- list(
+  Economies = Economies, GVARFactors = FactorsGVAR, VARXtype = "unconstrained",
+  Wgvar = W_gvar
+)
 N <- 3
 
 GVARpara <- GVAR(GVARinputs, N, CheckInputs = TRUE)
@@ -793,9 +807,11 @@ country-specific spanned factors and *(iii)* the specification of the
 One possible list of *JLLinputs* is as follows:
 
 ```{r}
-ModelType <- "JLL original"   
-JLLinputs <- list(Economies = Economies, DomUnit = "China", WishSigmas = 1,  SigmaNonOrtho = NULL,
-                  JLLModelType = ModelType)
+ModelType <- "JLL original"
+JLLinputs <- list(
+  Economies = Economies, DomUnit = "China", WishSigmas = 1, SigmaNonOrtho = NULL,
+  JLLModelType = ModelType
+)
 ```
 
 As such, the $P-$dynamics dimension of a JLL-based setup can be computed
@@ -825,7 +841,7 @@ short rate (*r0*);
 4.    The standard deviation of the errors from the portfolios of yields observed with
 error (*se*);
 
-5.    Intercept (*K0Z*);
+5.    Intercept of the physical dynamics (*K0Z*);
 
 6.    Feedback matrices of the physical dynamics (*K1Z*). 
 
@@ -863,38 +879,42 @@ LoadData("CM_2024")
 
 # B) GENERAL model inputs
 ModelType <- "JPS original" # available options: "JPS original", "JPS global", "GVAR single", "JPS multi",
-                          #"GVAR multi", "JLL original", "JLL No DomUnit", "JLL joint Sigma".
+# "GVAR multi", "JLL original", "JLL No DomUnit", "JLL joint Sigma".
 
 Economies <- c("China", "Brazil") # Names of the economies from the economic system
-GlobalVar <- c("Gl_Eco_Act")# Global Variables
+GlobalVar <- c("Gl_Eco_Act") # Global Variables
 DomVar <- c("Eco_Act") # Country-specific variables
-N <- 2  # Number of spanned factors per country
+N <- 2 # Number of spanned factors per country
 
 t0_sample <- "01-12-2007" # Format: "dd-mm-yyyy"
 tF_sample <- "01-12-2019" # Format: "dd-mm-yyyy"
 
 OutputLabel <- "Test" # label of the model for saving the file
-DataFreq <-"Monthly" # Frequency of the data
+DataFreq <- "Monthly" # Frequency of the data
 
 Folder2Save <- NULL # Folder to save the required graphical outputs. NULL -> temporary directory
 StatQ <- 0 # Wish to impose stationary condition for the eigenvalues of each country: YES: 1,NO:0
 
 # B.1) SPECIFIC model inputs
 #################################### GVAR-based models ##################################################
-GVARlist <- list( VARXtype = "unconstrained", W_type = "Sample Mean", t_First_Wgvar = "2005",
-                  t_Last_Wgvar = "2019", DataConnectedness = TradeFlows ) 
+GVARlist <- list(
+  VARXtype = "unconstrained", W_type = "Sample Mean", t_First_Wgvar = "2005",
+  t_Last_Wgvar = "2019", DataConnectedness = TradeFlows
+)
 # VARXtype: Available options "unconstrained" or "constrained" (VARX)
 # W_type: Method to compute the transition matrix. Options:"Time-varying" or "Sample Mean"
 # t_First_Wgvar: First year of the sample (transition matrix)
 # t_Last_Wgvar:  Last year of the sample (transition matrix)
 # DataConnectedness: measure of connectedness across countries
 #################################### JLL-based models ###################################################
-JLLlist <- list(DomUnit =  "China")
+JLLlist <- list(DomUnit = "China")
 # DomUnit: name of the economy of the economic system, or "None" for the model "JLL No DomUnit"
 ###################################### BRW inputs  ######################################################
 WishBC <- 0 # Wish to estimate the model with the bias correction method of BRW (2012): #YES: 1, NO:0
-BRWlist <- within(list(Cent_Measure = "Mean", gamma = 0.05, N_iter = 250, B = 50, checkBRW = TRUE,
-                       B_check = 1000, Eigen_rest = 1),  N_burn <- round(N_iter * 0.15))
+BRWlist <- within(list(
+  Cent_Measure = "Mean", gamma = 0.05, N_iter = 250, B = 50, checkBRW = TRUE,
+  B_check = 1000, Eigen_rest = 1
+), N_burn <- round(N_iter * 0.15))
 # Cent_Measure: "Mean" = compute the mean; "Median" = compute the median
 # gamma: Adjustment parameter
 # N_iter:  Number of iteration to be conserved
@@ -905,8 +925,8 @@ BRWlist <- within(list(Cent_Measure = "Mean", gamma = 0.05, N_iter = 250, B = 50
 
 # C) Decide on Settings for numerical outputs
 WishFPremia <- 1 # Wish to estimate the forward premia: YES: 1, NO:0
-FPmatLim <- c(60,120) #  If the forward premia is desired, then choose the Min and max maturities of the
-                      # forward premia. Otherwise set NA
+FPmatLim <- c(60, 120) #  If the forward premia is desired, then choose the Min and max maturities of the
+# forward premia. Otherwise set NA
 Horiz <- 30
 DesiredGraphs <- c("Fit", "IRF", "TermPremia") # "Fit", "IRF", "FEVD", "GIRF", "GFEVD", "TermPremia"
 WishGraphRiskFac <- 0
@@ -915,7 +935,7 @@ WishOrthoJLLgraphs <- 0
 
 # D) Bootstrap settings
 WishBootstrap <- 1 #  YES: 1; No = 0.
-BootList <- list(methodBS = 'bs', BlockLength = 4, ndraws = 4, pctg =  95)
+BootList <- list(methodBS = "bs", BlockLength = 4, ndraws = 4, pctg = 95)
 # methodBS: bootstrap method. Available options: (i) 'bs' ; (ii) 'wild'; (iii) 'block'
 # BlockLength: Block length, necessary input for the block bootstrap method
 # ndraws: number of bootstrap draws
@@ -923,15 +943,15 @@ BootList <- list(methodBS = 'bs', BlockLength = 4, ndraws = 4, pctg =  95)
 
 # E) Out-of-sample forecast
 WishForecast <- 1 #  YES: 1; No = 0.
-ForecastList <- list(ForHoriz = 12,  t0Sample = 1, t0Forecast = 131, ForType = "Rolling")
+ForecastList <- list(ForHoriz = 12, t0Sample = 1, t0Forecast = 131, ForType = "Rolling")
 # ForHoriz: forecast horizon
 # t0Sample:   initial sample date
 # t0Forecast:  last sample date for the first forecast
 # ForType: Available options are "Rolling" or "Expanding"
 
 #########################################################################################################
-## NO NEED TO MAKE CHANGES FROM HERE: 
-## The sections below automatically process the inputs provided above, run the model 
+## NO NEED TO MAKE CHANGES FROM HERE:
+## The sections below automatically process the inputs provided above, run the model
 ## estimation, generate the numerical and graphical outputs, and save results.
 #########################################################################################################
 
@@ -939,29 +959,39 @@ ForecastList <- list(ForHoriz = 12,  t0Sample = 1, t0Forecast = 131, ForType = "
 FactorLabels <- LabFac(N, DomVar, GlobalVar, Economies, ModelType)
 
 # 3) Prepare the inputs of the likelihood function
-ATSMInputs <- InputsForOpt(t0_sample, tF_sample, ModelType, Yields, GlobalMacroVar, DomesticMacroVar,
-                           FactorLabels, Economies, DataFreq, GVARlist, JLLlist, WishBC, BRWlist)
+ATSMInputs <- InputsForOpt(
+  t0_sample, tF_sample, ModelType, Yields, GlobalMacroVar, DomesticMacroVar,
+  FactorLabels, Economies, DataFreq, GVARlist, JLLlist, WishBC, BRWlist
+)
 
 # 4) Optimization of the ATSM (Point Estimates)
 ModelParaList <- Optimization(ATSMInputs, StatQ, DataFreq, FactorLabels, Economies, ModelType)
 
 # 5) Numerical and graphical outputs
 # a) Prepare list of inputs for graphs and numerical outputs
-InputsForOutputs <- InputsForOutputs(ModelType, Horiz, DesiredGraphs, OutputLabel, StatQ, DataFreq,
-                                    WishGraphYields, WishGraphRiskFac, WishOrthoJLLgraphs, WishFPremia,
-                                    FPmatLim, WishBootstrap, BootList, WishForecast, ForecastList)
+InputsForOutputs <- InputsForOutputs(
+  ModelType, Horiz, DesiredGraphs, OutputLabel, StatQ, DataFreq,
+  WishGraphYields, WishGraphRiskFac, WishOrthoJLLgraphs, WishFPremia,
+  FPmatLim, WishBootstrap, BootList, WishForecast, ForecastList
+)
 
 # b) Fit, IRF, FEVD, GIRF, GFEVD, and Term Premia
-NumericalOutputs <- NumOutputs(ModelType, ModelParaList, InputsForOutputs, FactorLabels, Economies,   
-                               Folder2Save)
+NumericalOutputs <- NumOutputs(
+  ModelType, ModelParaList, InputsForOutputs, FactorLabels, Economies,
+  Folder2Save
+)
 
 # c) Confidence intervals (bootstrap analysis)
-BootstrapAnalysis <- Bootstrap(ModelType, ModelParaList, NumericalOutputs, Economies, InputsForOutputs,
-                               FactorLabels, JLLlist, GVARlist, WishBC, BRWlist, Folder2Save)
+BootstrapAnalysis <- Bootstrap(
+  ModelType, ModelParaList, NumericalOutputs, Economies, InputsForOutputs,
+  FactorLabels, JLLlist, GVARlist, WishBC, BRWlist, Folder2Save
+)
 
 # 6) Out-of-sample forecasting
-Forecasts <- ForecastYields(ModelType, ModelParaList, InputsForOutputs, FactorLabels, Economies,
-                            JLLlist, GVARlist, WishBC, BRWlist, Folder2Save)
+Forecasts <- ForecastYields(
+  ModelType, ModelParaList, InputsForOutputs, FactorLabels, Economies,
+  JLLlist, GVARlist, WishBC, BRWlist, Folder2Save
+)
 ```
 
 ## User-Friendly Inspection of Key Elements in the Selected ATSM Specification 
@@ -978,7 +1008,7 @@ print(Out$ATSMInputs)
 ```
 
 ```{r}
-summary(Out$ATSMInputs) 
+summary(Out$ATSMInputs)
 ```
 
 
@@ -987,7 +1017,7 @@ The `Optimization()` function returns an object of class *'ATSMModelOutputs'*, w
 optimization process, including the maximum log-likelihood value, the intercept and slope coefficients from the model’s cross-sectional dimension, and the count of physical-measure eigenvalues greater than one—an indicator of potential explosive behavior in the model’s time series dimension. 
 
 ```{r}
-summary(Out$ModelPara) 
+summary(Out$ModelPara)
 ```
 
 ### Graphical outputs
@@ -1014,7 +1044,7 @@ In this context, the `autoplot()` method requires two additional inputs beyond t
 The `ForecastYields()` function returns an object of class *'ATSMModelForecast'*, which can be visualized using the `plot()` $S3$ method. This method generates a graphical representation of the RMSEs across different countries and forecast horizons.
 
 ```{r  fig.alt="Root mean square error (RMSE)"}
-plot(Out$Forecasts) 
+plot(Out$Forecasts)
 ```
 
 # References

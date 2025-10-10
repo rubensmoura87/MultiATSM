@@ -16,5 +16,6 @@ This is a re-submission. In this version I have:
 * made several improvements in the optimization routines. This includes: (i) the development of the *safe_solve* function to help with the inversion of ill-defined matrices; (ii) the implementation of the *check_numeric* function that helps to identify numerical issues along the optimization process; (iii) the replacement of package-based optimization algorithms to base R one, therefore the packages *neldermead* and *fminunc* were removed from *Imports*; (iv) the addition of a new input to the *Optimization* function, so the user can now decide between *L-BFGS-B* and *Nelder-Mead* algorithms or both;
 * removed *StarFactor* function since this is no longer needed for the estimation of GVAR setups;
 * removed the dataset named *JPSrep*, since this is no longer needed;
+* reformatted the whole package using the *styler* package; 
 
 

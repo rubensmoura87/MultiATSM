@@ -68,7 +68,9 @@ StatQ <- 0
 
 FacLab <- LabFac(N, DomVar, GlobalVar, Economy, ModelType)
 ATSMInputs <- InputsForOpt(t0, tF, ModelType, Yields, GlobalMacroVar, DomesticMacroVar,
-                           FacLab, Economy, DataFreq, CheckInputs = FALSE)
+  FacLab, Economy, DataFreq,
+  CheckInputs = FALSE
+)
 
 OptPara <- Optimization(ATSMInputs, StatQ, DataFreq, FacLab, Economy, ModelType)
 

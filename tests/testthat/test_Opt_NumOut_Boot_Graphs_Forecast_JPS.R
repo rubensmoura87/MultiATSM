@@ -8,7 +8,9 @@ extract_ggplots <- function(x) {
     list(x)
   } else if (is.list(x)) {
     unlist(lapply(x, extract_ggplots), recursive = FALSE)
-  } else list()
+  } else {
+    list()
+  }
 }
 
 # Inputs required for the optimization
@@ -36,21 +38,21 @@ WGJLL <- 0
 
 # Bootstrap settings
 WishBoot <- 1
-BootList <- list(methodBS = 'bs', BlockLength = 4, ndraws = 5, pctg =  95)
+BootList <- list(methodBS = "bs", BlockLength = 4, ndraws = 5, pctg = 95)
 
 # Forecasting setting
 WishFor <- 1
-ForList <- list(ForHoriz = 6,  t0Sample = 1, t0Forecast = 131, ForType = "Expanding")
+ForList <- list(ForHoriz = 6, t0Sample = 1, t0Forecast = 131, ForType = "Expanding")
 
 
 # 1) Set of tests
 test_that("Optimization + Outputs + Graphs return correct structure (JPS model)", {
-
   # Run optimization
   FacLab <- LabFac(N, DomVar, GlobalVar, Economy, ModelType)
   ATSMInputs <- InputsForOpt(
     t0, tF, ModelType, Yields, GlobalMacroVar, DomesticMacroVar,
-    FacLab, Economy, DataFreq, CheckInputs = FALSE, verbose = FALSE
+    FacLab, Economy, DataFreq,
+    CheckInputs = FALSE, verbose = FALSE
   )
 
   res_Opt <- Optimization(ATSMInputs, StatQ, DataFreq, FacLab, Economy, ModelType, verbose = FALSE)
@@ -64,15 +66,17 @@ test_that("Optimization + Outputs + Graphs return correct structure (JPS model)"
 
   expect_true(all(c("Inputs", "ModEst") %in% names(res_Opt[[ModelType]][[Economy]])))
   expect_true(all(c("Y", "AllFactors", "mat", "N", "dt", "Wpca") %in%
-                    names(res_Opt[[ModelType]][[Economy]]$Inputs)))
+    names(res_Opt[[ModelType]][[Economy]]$Inputs)))
   expect_true(all(c("Max_llk", "Q", "P") %in% names(res_Opt[[ModelType]][[Economy]]$ModEst)))
   expect_true(all(c("K1XQ", "r0", "se", "VarYields") %in% names(res_Opt[[ModelType]][[Economy]]$ModEst$Q)))
   expect_true(all(c("SSZ", "K0Z", "K1Z", "Gy.0") %in% names(res_Opt[[ModelType]][[Economy]]$ModEst$P)))
   expect_type(res_Opt[[ModelType]][[Economy]]$ModEst$Max_llk, "double")
 
   # --- B) Numerical outputs ---
-  InputsForOutputs <- InputsForOutputs(ModelType, Horiz, DesiredGraphs, OutputLabel, StatQ, DataFreq, WGYields,
-                                       WGFac, WGJLL, WishFP, FPLim, WishBoot, BootList, WishFor, ForList)
+  InputsForOutputs <- InputsForOutputs(
+    ModelType, Horiz, DesiredGraphs, OutputLabel, StatQ, DataFreq, WGYields,
+    WGFac, WGJLL, WishFP, FPLim, WishBoot, BootList, WishFor, ForList
+  )
   res_NumOut <- NumOutputs(ModelType, res_Opt, InputsForOutputs, FacLab, Economy, verbose = FALSE)
 
   expect_type(res_NumOut, "list")
@@ -96,9 +100,11 @@ test_that("Optimization + Outputs + Graphs return correct structure (JPS model)"
   }
 
   # --- C) Graphs ---
-  plot_types <- c("RiskFactors", "Fit", "IRF_Factors", "IRF_Yields",
-                  "GIRF_Factors", "GIRF_Yields", "FEVD_Factors",
-                  "FEVD_Yields", "GFEVD_Factors", "GFEVD_Yields", "TermPremia")
+  plot_types <- c(
+    "RiskFactors", "Fit", "IRF_Factors", "IRF_Yields",
+    "GIRF_Factors", "GIRF_Yields", "FEVD_Factors",
+    "FEVD_Yields", "GFEVD_Factors", "GFEVD_Yields", "TermPremia"
+  )
 
   plot_list <- lapply(plot_types, function(tp) autoplot(res_NumOut, type = tp))
 
@@ -110,12 +116,15 @@ test_that("Optimization + Outputs + Graphs return correct structure (JPS model)"
 
   # --- D) Bootstrap analysis ---
   res_Boot <- Bootstrap(ModelType, res_Opt, res_NumOut, Economy, InputsForOutputs, FacLab,
-                                JLLlist = NULL, GVARlist = NULL, WishBC, BRWlist = NULL, verbose = FALSE)
+    JLLlist = NULL, GVARlist = NULL, WishBC, BRWlist = NULL, verbose = FALSE
+  )
   expect_type(res_Boot, "list")
   expect_s3_class(res_Boot, "ATSMModelBoot")
 
-  plot_types_Boot <- c("IRF_Factors_Boot", "IRF_Yields_Boot",  "GIRF_Factors_Boot", "GIRF_Yields_Boot",
-                       "FEVD_Factors_Boot", "FEVD_Yields_Boot", "GFEVD_Factors_Boot", "GFEVD_Yields_Boot")
+  plot_types_Boot <- c(
+    "IRF_Factors_Boot", "IRF_Yields_Boot", "GIRF_Factors_Boot", "GIRF_Yields_Boot",
+    "FEVD_Factors_Boot", "FEVD_Yields_Boot", "GFEVD_Factors_Boot", "GFEVD_Yields_Boot"
+  )
 
   plot_list_Boot <- lapply(plot_types_Boot, function(tp) autoplot(res_Boot, res_NumOut, type = tp))
 
@@ -133,6 +142,4 @@ test_that("Optimization + Outputs + Graphs return correct structure (JPS model)"
   out_plot <- capture.output(print(res_For))
   expect_true(length(out_plot) > 0)
   expect_type(out_plot, "character")
-
-  })
-
+})

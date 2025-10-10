@@ -1,4 +1,4 @@
-#'@title Data: Risk Factors - Candelon and Moura (2024, JFEC)
+#' @title Data: Risk Factors - Candelon and Moura (2024, JFEC)
 #'
 #' @description Risk factors data used in Candelon and Moura (2024, JFEC)
 #' @name DomesticMacroVar

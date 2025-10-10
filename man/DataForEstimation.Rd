@@ -66,22 +66,24 @@ Retrieves data from Excel and build the database used in the model estimation
 }
 \examples{
 
- DomVar <- c("Eco_Act", "Inflation")
- GlobalVar <- c("GBC", "CPI_OECD")
- t0 <- "2006-09-01"
- tF <-  "2019-01-01"
- Economies <- c("China", "Brazil", "Mexico", "Uruguay", "Russia")
- N <- 2
- ModelType <- "JPS original"
- FactorLabels <-  LabFac(N, DomVar, GlobalVar, Economies, ModelType)
- DataFrequency <- "Monthly"
+DomVar <- c("Eco_Act", "Inflation")
+GlobalVar <- c("GBC", "CPI_OECD")
+t0 <- "2006-09-01"
+tF <- "2019-01-01"
+Economies <- c("China", "Brazil", "Mexico", "Uruguay", "Russia")
+N <- 2
+ModelType <- "JPS original"
+FactorLabels <- LabFac(N, DomVar, GlobalVar, Economies, ModelType)
+DataFrequency <- "Monthly"
 
 #  Retrieve data from excel files
-MacroData  <- Load_Excel_Data(system.file("extdata", "MacroData.xlsx", package = "MultiATSM"))
+MacroData <- Load_Excel_Data(system.file("extdata", "MacroData.xlsx", package = "MultiATSM"))
 YieldData <- Load_Excel_Data(system.file("extdata", "YieldsData.xlsx", package = "MultiATSM"))
 
- DataModel <- DataForEstimation(t0, tF, Economies, N, FactorLabels, ModelType, DataFrequency,
-                                MacroData, YieldData)
+DataModel <- DataForEstimation(
+  t0, tF, Economies, N, FactorLabels, ModelType, DataFrequency,
+  MacroData, YieldData
+)
 
 }
 \seealso{

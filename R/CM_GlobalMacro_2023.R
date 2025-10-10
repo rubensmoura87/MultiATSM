@@ -1,4 +1,4 @@
-#'@title Data: Risk Factors - Candelon and Moura (2023)
+#' @title Data: Risk Factors - Candelon and Moura (2023)
 #'
 #' @description Risk factors data used in Candelon and Moura (2023)
 #' @name GlobalMacro

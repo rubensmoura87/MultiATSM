@@ -36,8 +36,10 @@ data(CM_Factors)
 RF_TS <- RiskFactors
 N <- 3
 
-JLLinputs <- list(Economies = c("China", "Brazil", "Mexico", "Uruguay"), DomUnit = "China",
-                  WishSigmas = 1, SigmaNonOrtho = NULL, JLLModelType = "JLL original")
+JLLinputs <- list(
+  Economies = c("China", "Brazil", "Mexico", "Uruguay"), DomUnit = "China",
+  WishSigmas = 1, SigmaNonOrtho = NULL, JLLModelType = "JLL original"
+)
 
 JLLPara <- JLL(RF_TS, N, JLLinputs)
 }

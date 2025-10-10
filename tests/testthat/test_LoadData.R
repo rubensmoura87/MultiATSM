@@ -8,6 +8,5 @@ test_that("LoadData loads correct datasets for each paper", {
 
   for (case in valid_cases) {
     expect_silent(LoadData(case))
-
   }
 })

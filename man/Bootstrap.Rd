@@ -70,11 +70,15 @@ Economy <- "Brazil"
 FacLab <- LabFac(N = 1, DomVar = "Eco_Act", GlobalVar = "Gl_Eco_Act", Economy, ModelType)
 
 # Adjust Forecasting setting
-InpForOutEx[[ModelType]]$Bootstrap <- list(WishBootstrap = 1, methodBS = 'bs', BlockLength = 4,
-                                          ndraws = 5, pctg =  95)
+InpForOutEx[[ModelType]]$Bootstrap <- list(
+  WishBootstrap = 1, methodBS = "bs", BlockLength = 4,
+  ndraws = 5, pctg = 95
+)
 
-Boot <- Bootstrap(ModelType, ModelParaEx, NumOutEx, Economy, InpForOutEx, FacLab, JLLlist = NULL,
-                 GVARlist = NULL, WishBC = 0, BRWlist = NULL, Folder2save  = NULL, verbose = TRUE)
+Boot <- Bootstrap(ModelType, ModelParaEx, NumOutEx, Economy, InpForOutEx, FacLab,
+  JLLlist = NULL,
+  GVARlist = NULL, WishBC = 0, BRWlist = NULL, Folder2save = NULL, verbose = TRUE
+)
 }
 
 }

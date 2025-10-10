@@ -13,13 +13,13 @@ Load_Excel_Data(ExcelFilePath)
 Read data from Excel files and transform them into a dataframe
 }
 \examples{
- if (!requireNamespace("readxl", quietly = TRUE)) {
- stop(
-   "Please install package \"readxl\" to use this feature.",
-   call. = FALSE
- )
+if (!requireNamespace("readxl", quietly = TRUE)) {
+  stop(
+    "Please install package \"readxl\" to use this feature.",
+    call. = FALSE
+  )
 
-Load_Excel_Data(system.file("extdata", "MacroData.xlsx", package = "MultiATSM"))
-Load_Excel_Data(system.file("extdata", "YieldsData.xlsx", package = "MultiATSM"))
- }
+  Load_Excel_Data(system.file("extdata", "MacroData.xlsx", package = "MultiATSM"))
+  Load_Excel_Data(system.file("extdata", "YieldsData.xlsx", package = "MultiATSM"))
+}
 }

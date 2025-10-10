@@ -6,8 +6,10 @@ data(CM_Factors)
 RF_TS <- RiskFactors[1:12, ]
 N <- 3
 
-JLLinputs <- list(Economies = c("China", "Brazil"), DomUnit = "China",
-                  WishSigmas = 1, SigmaNonOrtho = NULL, JLLModelType = "JLL original")
+JLLinputs <- list(
+  Economies = c("China", "Brazil"), DomUnit = "China",
+  WishSigmas = 1, SigmaNonOrtho = NULL, JLLModelType = "JLL original"
+)
 
 
 # 1) Test output structure
@@ -16,7 +18,7 @@ test_that("JLL returns correct output structure", {
   res <- JLL(RF_TS, N, JLLinputs)
   expect_type(res, "list")
   expect_true(all(c("a_W", "a_DU_CS", "b", "c", "PIb", "PIac", "PI", "Ye", "k0_e", "k1_e", "k0", "k1", "Sigmas")
-                  %in% names(res)))
+  %in% names(res)))
   expect_equal(dim(res$k0), c(K, 1))
   expect_equal(dim(res$k1), c(K, K))
   expect_equal(dim(res$PI), c(K, K))

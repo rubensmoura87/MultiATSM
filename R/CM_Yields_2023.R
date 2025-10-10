@@ -1,4 +1,4 @@
-#'@title Data: Yields - Candelon and Moura (2023)
+#' @title Data: Yields - Candelon and Moura (2023)
 #'
 #' @description Bond yield data used in Candelon and Moura (2023)
 #' @name Yields

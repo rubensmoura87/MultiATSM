@@ -44,16 +44,16 @@ Gather data of several countries in a list. Particularly useful for GVAR-based s
 \examples{
 
 # Load data from excel
-macro_data  <- Load_Excel_Data(system.file("extdata", "MacroData.xlsx", package = "MultiATSM"))
+macro_data <- Load_Excel_Data(system.file("extdata", "MacroData.xlsx", package = "MultiATSM"))
 yields_data <- Load_Excel_Data(system.file("extdata", "YieldsData.xlsx", package = "MultiATSM"))
-trade_data  <- Load_Excel_Data(system.file("extdata", "TradeData.xlsx", package = "MultiATSM"))
+trade_data <- Load_Excel_Data(system.file("extdata", "TradeData.xlsx", package = "MultiATSM"))
 
 # Adjust trade data
 trade_data <- lapply(trade_data, function(df) {
- countries <- df[[1]]
- df <- as.data.frame(df[-1])
- rownames(df) <- countries
- df
+  countries <- df[[1]]
+  df <- as.data.frame(df[-1])
+  rownames(df) <- countries
+  df
 })
 
 # Define features of interest
@@ -67,12 +67,16 @@ tF <- "2019-01-01"
 
 
 # Compute some inputs
-FactorLabels <-  LabFac(N, DomVar, GlobalVar, Economies, ModelType)
-Wgvar <- Transition_Matrix(t_First = "2006", t_Last= "2019", Economies,
-                          type = "Sample Mean", trade_data)
+FactorLabels <- LabFac(N, DomVar, GlobalVar, Economies, ModelType)
+Wgvar <- Transition_Matrix(
+  t_First = "2006", t_Last = "2019", Economies,
+  type = "Sample Mean", trade_data
+)
 
 # Compute GVARFactors
-GVARFactors <- DatabasePrep(t0, tF, Economies, N, FactorLabels, ModelType, macro_data,
-                           yields_data, Wgvar)
+GVARFactors <- DatabasePrep(
+  t0, tF, Economies, N, FactorLabels, ModelType, macro_data,
+  yields_data, Wgvar
+)
 
 }

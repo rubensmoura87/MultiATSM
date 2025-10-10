@@ -1,4 +1,4 @@
-#'@title Data: Risk Factors for the GVAR - Candelon and Moura (2023)
+#' @title Data: Risk Factors for the GVAR - Candelon and Moura (2023)
 #'
 #' @description Risk factors data used in the GVAR models - Candelon and Moura (2023)
 #' @name DomMacro

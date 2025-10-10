@@ -51,7 +51,9 @@ ModelType <- "JPS original"
 Economy <- "Brazil"
 UnitYields <- "Month"
 
-TPDecompGraph(ModelType, NumOutEx, ModelParaEx, WishRPgraphs = 1, UnitYields, Economy,
-             PathsGraphs = NULL, Folder2Save = NULL, verbose = FALSE)
+TPDecompGraph(ModelType, NumOutEx, ModelParaEx,
+  WishRPgraphs = 1, UnitYields, Economy,
+  PathsGraphs = NULL, Folder2Save = NULL, verbose = FALSE
+)
 
 }

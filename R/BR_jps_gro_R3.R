@@ -1,4 +1,4 @@
-#'@title Replications of the JPS (2014) outputs by Bauer and Rudebusch (2017)
+#' @title Replications of the JPS (2014) outputs by Bauer and Rudebusch (2017)
 #'
 #' @description Unspanned macro risk model outputs by Bauer and Rudebusch (2017)
 #' @name BR_jps_out

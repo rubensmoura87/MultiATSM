@@ -1,4 +1,4 @@
-#'@title Data: Risk Factors for the GVAR - Candelon and Moura (2024, JFEC)
+#' @title Data: Risk Factors for the GVAR - Candelon and Moura (2024, JFEC)
 #'
 #' @description Risk factors data used in the GVAR models - Candelon and Moura (2024, JFEC)
 #' @name FactorsGVAR

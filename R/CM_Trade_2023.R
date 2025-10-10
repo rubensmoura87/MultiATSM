@@ -1,4 +1,4 @@
-#'@title Data: Trade Flows - Candelon and Moura (2023)
+#' @title Data: Trade Flows - Candelon and Moura (2023)
 #'
 #' @description Trade Flows data used in Candelon and Moura (2023)
 #' @name Trade_Flows

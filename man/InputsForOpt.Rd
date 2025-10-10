@@ -90,7 +90,9 @@ FactorLabels <- LabFac(N, DomVar, GlobalVar, Economies, ModelType)
 DataFreq <- "Monthly"
 
 ATSMInputs <- InputsForOpt(t0, tF, ModelType, Yields, GlobalMacroVar, DomesticMacroVar,
-                             FactorLabels, Economies, DataFreq, CheckInputs = FALSE)
+  FactorLabels, Economies, DataFreq,
+  CheckInputs = FALSE
+)
 
 # Example 2:
 LoadData("CM_2024")
@@ -106,11 +108,15 @@ DomVar <- c("Inflation") # Domestic Variables
 FactorLabels <- LabFac(N, DomVar, GlobalVar, Economies, ModelType)
 
 DataFreq <- "Monthly"
-GVARlist <- list(VARXtype = "unconstrained", W_type = "Sample Mean",
-                 t_First_Wgvar = "2007", t_Last_Wgvar = "2019", DataConnectedness = TradeFlows)
+GVARlist <- list(
+  VARXtype = "unconstrained", W_type = "Sample Mean",
+  t_First_Wgvar = "2007", t_Last_Wgvar = "2019", DataConnectedness = TradeFlows
+)
 
 ATSMInputs <- InputsForOpt(t0, tF, ModelType, Yields, GlobalMacroVar, DomesticMacroVar,
-                           FactorLabels, Economies, DataFreq, GVARlist, CheckInputs = FALSE)
+  FactorLabels, Economies, DataFreq, GVARlist,
+  CheckInputs = FALSE
+)
 
 # Example 3:
 LoadData("CM_2024")
@@ -130,7 +136,9 @@ JLLinputs <- list(DomUnit = "China")
 DataFrequency <- "Monthly"
 
 ATSMInputs <- InputsForOpt(t0, tF, ModelType, Yields, GlobalMacroVar, DomesticMacroVar,
-                           FactorLabels, Economies, DataFreq, JLLlist = JLLinputs,
-                           CheckInputs = FALSE)
+  FactorLabels, Economies, DataFreq,
+  JLLlist = JLLinputs,
+  CheckInputs = FALSE
+)
 }
 }

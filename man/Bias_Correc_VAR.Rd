@@ -57,10 +57,12 @@ Estimates an unbiased VAR(1) using stochastic approximation (Bauer, Rudebusch an
 \examples{
 \donttest{
 data(CM_Factors)
-Factors <- t(RiskFactors[1:7,])
+Factors <- t(RiskFactors[1:7, ])
 
-BRWinputs <- list(Cent_Measure = "Mean", gamma = 0.4, N_iter = 1000, N_burn = 100,
-                  B = 10, check = 1, B_check = 5000)
+BRWinputs <- list(
+  Cent_Measure = "Mean", gamma = 0.4, N_iter = 1000, N_burn = 100,
+  B = 10, check = 1, B_check = 5000
+)
 
 Economies <- "China"
 N <- 3

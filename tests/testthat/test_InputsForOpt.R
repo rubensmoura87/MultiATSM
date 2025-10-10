@@ -18,11 +18,15 @@ test_that("InputsForOpt returns correct output structure (JPS model)", {
   Economies <- "Mexico"
   FactorLabels <- LabFac(N, DomVar, GlobalVar, Economies, ModelType)
   res <- InputsForOpt(InitialSampleDate, FinalSampleDate, ModelType, Yields, GlobalMacroVar, DomesticMacroVar,
-                      FactorLabels, Economies, DataFrequency, CheckInputs = FALSE, verbose = FALSE)
+    FactorLabels, Economies, DataFrequency,
+    CheckInputs = FALSE, verbose = FALSE
+  )
   expect_type(res, "list")
   expect_s3_class(res, "ATSMModelInputs")
-  expect_true(all(c("mat", "Wpca", "We", "WpcaFull", "Yields", "SpaFact", "RiskFactors", "Gy.0", "K1XQ",
-                    "SSZ", "K0Z", "K1Z") %in% names(res$Mexico)))
+  expect_true(all(c(
+    "mat", "Wpca", "We", "WpcaFull", "Yields", "SpaFact", "RiskFactors", "Gy.0", "K1XQ",
+    "SSZ", "K0Z", "K1Z"
+  ) %in% names(res$Mexico)))
 
   # Test methods
   out_print <- capture.output(print(res))
@@ -36,21 +40,26 @@ test_that("InputsForOpt returns correct output structure (JPS model)", {
 
 # b) With bias correction
 test_that("InputsForOpt returns correct output structure (JPS model with bias correction)", {
-ModelType <- "JPS original"
-Economies <- "Mexico"
-WishBC <- 1
-BRWlist <- within(list(Cent_Measure = "Mean", gamma = 0.1, N_iter = 10, B = 20, checkBRW = TRUE,
-                       B_check = 1000, Eigen_rest = 1),  N_burn <- round(N_iter * 0.15))
+  ModelType <- "JPS original"
+  Economies <- "Mexico"
+  WishBC <- 1
+  BRWlist <- within(list(
+    Cent_Measure = "Mean", gamma = 0.1, N_iter = 10, B = 20, checkBRW = TRUE,
+    B_check = 1000, Eigen_rest = 1
+  ), N_burn <- round(N_iter * 0.15))
 
-FactorLabels <- LabFac(N, DomVar, GlobalVar, Economies, ModelType)
-res <- InputsForOpt(InitialSampleDate, FinalSampleDate, ModelType, Yields, GlobalMacroVar, DomesticMacroVar,
-                    FactorLabels, Economies, DataFrequency, WishBRW = 1, BRWlist = BRWlist,
-                    CheckInputs = FALSE, verbose = FALSE)
-expect_type(res, "list")
-expect_s3_class(res, "ATSMModelInputs")
-expect_true(all(c("mat", "Wpca", "We", "WpcaFull", "Yields", "SpaFact", "RiskFactors", "Gy.0", "K1XQ",
-                  "SSZ", "K0Z", "K1Z") %in% names(res$Mexico)))
-
+  FactorLabels <- LabFac(N, DomVar, GlobalVar, Economies, ModelType)
+  res <- InputsForOpt(InitialSampleDate, FinalSampleDate, ModelType, Yields, GlobalMacroVar, DomesticMacroVar,
+    FactorLabels, Economies, DataFrequency,
+    WishBRW = 1, BRWlist = BRWlist,
+    CheckInputs = FALSE, verbose = FALSE
+  )
+  expect_type(res, "list")
+  expect_s3_class(res, "ATSMModelInputs")
+  expect_true(all(c(
+    "mat", "Wpca", "We", "WpcaFull", "Yields", "SpaFact", "RiskFactors", "Gy.0", "K1XQ",
+    "SSZ", "K0Z", "K1Z"
+  ) %in% names(res$Mexico)))
 })
 
 
@@ -60,7 +69,9 @@ test_that("InputsForOpt throws error for inconsistent input (ModelType mispelled
   ModelType <- "JPS Original" # Typo, capital o in "original"
   Economies <- "Mexico"
   expect_error(InputsForOpt(InitialSampleDate, FinalSampleDate, ModelType, Yields, GlobalMacroVar, DomesticMacroVar,
-                            FactorLabels, Economies, DataFrequency, CheckInputs = TRUE, verbose = FALSE))
+    FactorLabels, Economies, DataFrequency,
+    CheckInputs = TRUE, verbose = FALSE
+  ))
 })
 
 # Example 2
@@ -70,7 +81,9 @@ test_that("InputsForOpt throws error for inconsistent input (date mispecified)",
   Economies <- "Mexico"
   FactorLabels <- LabFac(N, DomVar, GlobalVar, Economies, ModelType)
   expect_error(InputsForOpt(InitialSampleDate, FinalSampleDate, ModelType, Yields, GlobalMacroVar, DomesticMacroVar,
-                            FactorLabels, Economies, DataFrequency, CheckInputs = TRUE, verbose = FALSE))
+    FactorLabels, Economies, DataFrequency,
+    CheckInputs = TRUE, verbose = FALSE
+  ))
 })
 
 # Example 3
@@ -81,7 +94,9 @@ test_that("InputsForOpt throws error for inconsistent input (frequency mispecifi
   DataFrequency <- "Bi-annual" # unavailable option
   FactorLabels <- LabFac(N, DomVar, GlobalVar, Economies, ModelType)
   expect_error(InputsForOpt(InitialSampleDate, FinalSampleDate, ModelType, Yields, GlobalMacroVar, DomesticMacroVar,
-                            FactorLabels, Economies, DataFrequency, CheckInputs = TRUE, verbose = FALSE))
+    FactorLabels, Economies, DataFrequency,
+    CheckInputs = TRUE, verbose = FALSE
+  ))
 })
 
 
@@ -90,55 +105,75 @@ test_that("InputsForOpt throws error for inconsistent input (frequency mispecifi
 test_that("InputsForOpt returns correct output structure (GVAR single model)", {
   ModelType <- "GVAR single"
   Economies <- c("China", "Mexico")
-  GVARlist <- list( VARXtype = "unconstrained", W_type = "Sample Mean", t_First_Wgvar = "2005",
-                    t_Last_Wgvar = "2019", DataConnectedness = TradeFlows)
+  GVARlist <- list(
+    VARXtype = "unconstrained", W_type = "Sample Mean", t_First_Wgvar = "2005",
+    t_Last_Wgvar = "2019", DataConnectedness = TradeFlows
+  )
   FactorLabels <- LabFac(N, DomVar, GlobalVar, Economies, ModelType)
 
   res <- InputsForOpt(InitialSampleDate, FinalSampleDate, ModelType, Yields, GlobalMacroVar, DomesticMacroVar,
-                      FactorLabels, Economies, DataFrequency, GVARlist, CheckInputs = FALSE, verbose = FALSE)
+    FactorLabels, Economies, DataFrequency, GVARlist,
+    CheckInputs = FALSE, verbose = FALSE
+  )
   expect_type(res$China, "list")
   expect_s3_class(res, "ATSMModelInputs")
-  expect_true(all(c("mat", "Wpca", "We", "WpcaFull", "Yields", "SpaFact", "RiskFactors", "Gy.0", "K1XQ", "SSZ",
-                    "K0Z", "K1Z") %in% names(res$China)))
-  expect_type(res$China$GVARinputs,"list")
+  expect_true(all(c(
+    "mat", "Wpca", "We", "WpcaFull", "Yields", "SpaFact", "RiskFactors", "Gy.0", "K1XQ", "SSZ",
+    "K0Z", "K1Z"
+  ) %in% names(res$China)))
+  expect_type(res$China$GVARinputs, "list")
 })
 
 # b) version 2
 test_that("InputsForOpt returns correct output structure (GVAR multi model)", {
   ModelType <- "GVAR multi"
   Economies <- c("China", "Mexico")
-  GVARlist <- list( VARXtype = "unconstrained", W_type = "Sample Mean", t_First_Wgvar = "2005",
-                    t_Last_Wgvar = "2019", DataConnectedness = TradeFlows)
+  GVARlist <- list(
+    VARXtype = "unconstrained", W_type = "Sample Mean", t_First_Wgvar = "2005",
+    t_Last_Wgvar = "2019", DataConnectedness = TradeFlows
+  )
   FactorLabels <- LabFac(N, DomVar, GlobalVar, Economies, ModelType)
 
   res <- InputsForOpt(InitialSampleDate, FinalSampleDate, ModelType, Yields, GlobalMacroVar, DomesticMacroVar,
-                      FactorLabels, Economies, DataFrequency, GVARlist, CheckInputs = FALSE, verbose = FALSE)
+    FactorLabels, Economies, DataFrequency, GVARlist,
+    CheckInputs = FALSE, verbose = FALSE
+  )
   expect_type(res, "list")
   expect_s3_class(res, "ATSMModelInputs")
-  expect_true(all(c("mat", "Wpca", "We", "WpcaFull", "Yields", "SpaFact", "RiskFactors", "Gy.0", "K1XQ", "SSZ",
-                    "K0Z", "K1Z") %in% names(res)))
-  expect_type(res$GVARinputs,"list")
+  expect_true(all(c(
+    "mat", "Wpca", "We", "WpcaFull", "Yields", "SpaFact", "RiskFactors", "Gy.0", "K1XQ", "SSZ",
+    "K0Z", "K1Z"
+  ) %in% names(res)))
+  expect_type(res$GVARinputs, "list")
 })
 
 # c) With bias correction
 test_that("InputsForOpt returns correct output structure (GVAR multi model with bias correction)", {
   ModelType <- "GVAR multi"
   Economies <- c("China", "Mexico")
-  GVARlist <- list( VARXtype = "unconstrained", W_type = "Sample Mean", t_First_Wgvar = "2005",
-                    t_Last_Wgvar = "2019", DataConnectedness = TradeFlows)
+  GVARlist <- list(
+    VARXtype = "unconstrained", W_type = "Sample Mean", t_First_Wgvar = "2005",
+    t_Last_Wgvar = "2019", DataConnectedness = TradeFlows
+  )
   WishBC <- 1
-  BRWlist <- within(list(Cent_Measure = "Mean", gamma = 0.1, N_iter = 10, B = 20, checkBRW = TRUE,
-                         B_check = 1000, Eigen_rest = 1),  N_burn <- round(N_iter * 0.15))
+  BRWlist <- within(list(
+    Cent_Measure = "Mean", gamma = 0.1, N_iter = 10, B = 20, checkBRW = TRUE,
+    B_check = 1000, Eigen_rest = 1
+  ), N_burn <- round(N_iter * 0.15))
 
   FactorLabels <- LabFac(N, DomVar, GlobalVar, Economies, ModelType)
   res <- InputsForOpt(InitialSampleDate, FinalSampleDate, ModelType, Yields, GlobalMacroVar, DomesticMacroVar,
-                      FactorLabels, Economies, DataFrequency, GVARlist, WishBRW = 1, BRWlist = BRWlist,
-                      CheckInputs = FALSE, verbose = FALSE)
+    FactorLabels, Economies, DataFrequency, GVARlist,
+    WishBRW = 1, BRWlist = BRWlist,
+    CheckInputs = FALSE, verbose = FALSE
+  )
   expect_type(res, "list")
   expect_s3_class(res, "ATSMModelInputs")
-  expect_true(all(c("mat", "Wpca", "We", "WpcaFull", "Yields", "SpaFact", "RiskFactors", "Gy.0", "K1XQ", "SSZ",
-                    "K0Z", "K1Z") %in% names(res)))
-  expect_type(res$GVARinputs,"list")
+  expect_true(all(c(
+    "mat", "Wpca", "We", "WpcaFull", "Yields", "SpaFact", "RiskFactors", "Gy.0", "K1XQ", "SSZ",
+    "K0Z", "K1Z"
+  ) %in% names(res)))
+  expect_type(res$GVARinputs, "list")
 })
 
 
@@ -146,16 +181,20 @@ test_that("InputsForOpt returns correct output structure (GVAR multi model with 
 test_that("InputsForOpt returns correct output structure (JLL model)", {
   ModelType <- "JLL original"
   Economies <- c("China", "Mexico")
-  JLLlist <- list(DomUnit =  "China")
+  JLLlist <- list(DomUnit = "China")
   GVARlist <- NULL
 
   FactorLabels <- LabFac(N, DomVar, GlobalVar, Economies, ModelType)
 
   res <- InputsForOpt(InitialSampleDate, FinalSampleDate, ModelType, Yields, GlobalMacroVar, DomesticMacroVar,
-                      FactorLabels, Economies, DataFrequency, GVARlist, JLLlist, CheckInputs = FALSE, verbose = FALSE)
+    FactorLabels, Economies, DataFrequency, GVARlist, JLLlist,
+    CheckInputs = FALSE, verbose = FALSE
+  )
   expect_type(res, "list")
   expect_s3_class(res, "ATSMModelInputs")
-  expect_true(all(c("mat", "Wpca", "We", "WpcaFull", "Yields", "SpaFact", "RiskFactors", "Gy.0", "K1XQ", "SSZ",
-                    "K0Z", "K1Z") %in% names(res)))
-  expect_type(res$JLLinputs,"list")
+  expect_true(all(c(
+    "mat", "Wpca", "We", "WpcaFull", "Yields", "SpaFact", "RiskFactors", "Gy.0", "K1XQ", "SSZ",
+    "K0Z", "K1Z"
+  ) %in% names(res)))
+  expect_type(res$JLLinputs, "list")
 })

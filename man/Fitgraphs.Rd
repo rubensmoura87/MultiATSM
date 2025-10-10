@@ -46,7 +46,9 @@ data("NumOutEx")
 ModelType <- "JPS original"
 Economy <- "Brazil"
 
-Fitgraphs(ModelType, WishFitgraphs = 1, ModelParaEx, NumOutEx, Economy, PathsGraphs = NULL,
-          Folder2save = NULL, verbose = FALSE)
+Fitgraphs(ModelType,
+  WishFitgraphs = 1, ModelParaEx, NumOutEx, Economy, PathsGraphs = NULL,
+  Folder2save = NULL, verbose = FALSE
+)
 
 }

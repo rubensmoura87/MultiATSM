@@ -65,10 +65,13 @@ data("InpForOutEx")
 ModelType <- "JPS original"
 Economy <- "Brazil"
 FacLab <- LabFac(N = 1, DomVar = "Eco_Act", GlobalVar = "Gl_Eco_Act", Economy, ModelType)
-InpForOutEx[[ModelType]]$Forecasting <- list(WishForecast = 1, ForHoriz = 12,  t0Sample = 1,
-                                            t0Forecast = 143, ForType = "Expanding")
+InpForOutEx[[ModelType]]$Forecasting <- list(
+  WishForecast = 1, ForHoriz = 12, t0Sample = 1,
+  t0Forecast = 143, ForType = "Expanding"
+)
 
 Forecast <- ForecastYields(ModelType, ModelParaEx, InpForOutEx, FacLab, Economy,
-                          WishBRW = 0, verbose = TRUE)
+  WishBRW = 0, verbose = TRUE
+)
 }
 }

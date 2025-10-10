@@ -19,37 +19,38 @@
 #'
 #' @examples
 #' t_First <- "2006"
-#' t_Last <-  "2019"
+#' t_Last <- "2019"
 #' Economies <- c("China", "Brazil", "Mexico", "Uruguay")
 #' type <- "Sample Mean"
-# # Load data if Connectedness data from excel, otherwise use pre-saved data
+#' ## Load data if Connectedness data from excel, otherwise use pre-saved data
 #' GetExcelData <- FALSE
 #'
-#'  if (GetExcelData) {
-#'  if (!requireNamespace("readxl", quietly = TRUE)) {
-#'  stop(
-#'    "Please install package \"readxl\" to use this feature.",
-#'    call. = FALSE
-#'  )
-#'    DataPath <- system.file("extdata", "TradeData.xlsx", package = "MultiATSM")
-#'    tab_names_Trade <- readxl::excel_sheets(DataPath)
-#'    list_all_Trade <- suppressMessages(lapply(tab_names_Trade, function(x)
-#'                      readxl::read_excel(path = DataPath, sheet = x)))
-#'    names(list_all_Trade) <- tab_names_Trade
+#' if (GetExcelData) {
+#'   if (!requireNamespace("readxl", quietly = TRUE)) {
+#'     stop(
+#'       "Please install package \"readxl\" to use this feature.",
+#'       call. = FALSE
+#'     )
+#'     DataPath <- system.file("extdata", "TradeData.xlsx", package = "MultiATSM")
+#'     tab_names_Trade <- readxl::excel_sheets(DataPath)
+#'     list_all_Trade <- suppressMessages(lapply(tab_names_Trade, function(x) {
+#'       readxl::read_excel(path = DataPath, sheet = x)
+#'     }))
+#'     names(list_all_Trade) <- tab_names_Trade
 #'
-#'    L <- length(list_all_Trade)
+#'     L <- length(list_all_Trade)
 #'
-#'    for (i in 1:L) {
-#'      Countries <- list_all_Trade[[i]][[1]]
-#'      list_all_Trade[[i]] <- as.data.frame(list_all_Trade[[i]][,-1])
-#'      rownames(list_all_Trade[[i]]) <- Countries
-#'    }
+#'     for (i in 1:L) {
+#'       Countries <- list_all_Trade[[i]][[1]]
+#'       list_all_Trade[[i]] <- as.data.frame(list_all_Trade[[i]][, -1])
+#'       rownames(list_all_Trade[[i]]) <- Countries
+#'     }
 #'
-#'    DataConnectedness <- list_all_Trade
-#'  }
-#'} else {
-#'  data(CM_Trade)
-#'  DataConnectedness <- TradeFlows
+#'     DataConnectedness <- list_all_Trade
+#'   }
+#' } else {
+#'   data(CM_Trade)
+#'   DataConnectedness <- TradeFlows
 #' }
 #'
 #' W_mat <- Transition_Matrix(t_First, t_Last, Economies, type, DataConnectedness)
@@ -57,29 +58,27 @@
 #' @export
 
 Transition_Matrix <- function(t_First, t_Last, Economies, type, DataConnectedness) {
-
-
   # 1) Pre-allocation of variables
   DataAdj <- lapply(DataConnectedness, function(x) as.data.frame(t(x)))
   C <- length(Economies)
   T_dim <- ncol(DataConnectedness[[1]])
-  WgvarAllYears <- vector(mode='list', length = T_dim)
+  WgvarAllYears <- vector(mode = "list", length = T_dim)
   names(WgvarAllYears) <- colnames(DataConnectedness[[1]])
-  num <- matrix(NA, nrow = C, ncol= C)
+  num <- matrix(NA, nrow = C, ncol = C)
   dem <- c()
-  Wyear <- matrix(NA, nrow = C, ncol= C)
+  Wyear <- matrix(NA, nrow = C, ncol = C)
 
   # 2) Generate the matrix of weights year-by-year
   for (k in 1:T_dim) {
     for (h in 1:C) {
       for (j in 1:C) {
-        num[h,j] <- DataAdj[[Economies[h]]][[Economies[j]]][k]
+        num[h, j] <- DataAdj[[Economies[h]]][[Economies[j]]][k]
       }
-      dem[h] <- sum(num[h,])
-      Wyear[h,] <- num[h,] / dem[h]
+      dem[h] <- sum(num[h, ])
+      Wyear[h, ] <- num[h, ] / dem[h]
     }
     if (any(is.na(Wyear))) { # If there is missing data for any country of the system for that particularly year, then return a matrix of NAs.
-      Wyear <- matrix(NA, nrow = C, ncol= C)
+      Wyear <- matrix(NA, nrow = C, ncol = C)
     }
     WgvarAllYears[[k]] <- Wyear
   }
@@ -91,8 +90,8 @@ Transition_Matrix <- function(t_First, t_Last, Economies, type, DataConnectednes
   }
   # b) Sample Mean
   else if (type == "Sample Mean") {
-    Y_First <- substring(t_First, 1,4)
-    Y_Last <- substring(t_Last, 1,4)
+    Y_First <- substring(t_First, 1, 4)
+    Y_Last <- substring(t_Last, 1, 4)
     TimeLable <- colnames(DataConnectedness[[1]])
     idx0 <- which(TimeLable == Y_First)
     idx1 <- which(TimeLable == Y_Last)
@@ -112,4 +111,3 @@ Transition_Matrix <- function(t_First, t_Last, Economies, type, DataConnectednes
 
   return(Wgvar)
 }
-

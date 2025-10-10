@@ -42,9 +42,11 @@ data("ParaSetEx")
 # Adapt factor labels according to the example
 ModelType <- "JPS original"
 Economy <- "Brazil"
-FacLab <- LabFac(N = 1, DomVar ="Eco_Act" , GlobalVar = "Gl_Eco_Act", Economy, ModelType)
+FacLab <- LabFac(N = 1, DomVar = "Eco_Act", GlobalVar = "Gl_Eco_Act", Economy, ModelType)
 
-RiskFactorsGraphs(ModelType, WishRFgraphs = 1, ModelParaEx, Economy, FacLab,
-                  Folder2save = NULL, verbose = FALSE)
+RiskFactorsGraphs(ModelType,
+  WishRFgraphs = 1, ModelParaEx, Economy, FacLab,
+  Folder2save = NULL, verbose = FALSE
+)
 
 }

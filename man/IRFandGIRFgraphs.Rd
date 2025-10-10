@@ -56,8 +56,10 @@ data("NumOutEx")
 ModelType <- "JPS original"
 Economy <- "Brazil"
 IRFhoriz <- 20
-IRFandGIRFgraphs(ModelType, NumOutEx, WishPdynamicsgraphs = 0, WishYieldsgraphs = 1, IRFhoriz,
-                PathsGraphs = NULL, OutputType = "GIRF", Economy, Folder2save = NULL,
-                verbose = FALSE)
+IRFandGIRFgraphs(ModelType, NumOutEx,
+  WishPdynamicsgraphs = 0, WishYieldsgraphs = 1, IRFhoriz,
+  PathsGraphs = NULL, OutputType = "GIRF", Economy, Folder2save = NULL,
+  verbose = FALSE
+)
 
 }

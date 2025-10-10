@@ -57,9 +57,10 @@ ModelType <- "JPS original"
 Economy <- "Brazil"
 FEVDhoriz <- 20
 
-FEVDandGFEVDgraphs(ModelType, NumOutEx, WishPdynamicsgraphs = 0, WishYieldsgraphs= 1, FEVDhoriz,
-                  PathsGraphs = NULL, OutputType = "FEVD", Economy,
-                  Folder2save = NULL, verbose = FALSE)
-
+FEVDandGFEVDgraphs(ModelType, NumOutEx,
+  WishPdynamicsgraphs = 0, WishYieldsgraphs = 1, FEVDhoriz,
+  PathsGraphs = NULL, OutputType = "FEVD", Economy,
+  Folder2save = NULL, verbose = FALSE
+)
 
 }

@@ -1,4 +1,4 @@
-#'@title Data: Yields - Candelon and Moura (2024, JFEC)
+#' @title Data: Yields - Candelon and Moura (2024, JFEC)
 #'
 #' @description Yields data used in Candelon and Moura (2024, JFEC)
 #' @name Yields

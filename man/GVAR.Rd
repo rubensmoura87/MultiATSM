@@ -55,13 +55,17 @@ Estimates a GVAR(1) and a VARX(1,1,1) models
 \examples{
 data(CM_Factors_GVAR)
 
-GVARinputs <- list( Economies = c("China", "Brazil", "Mexico", "Uruguay"),
-                    GVARFactors = FactorsGVAR, VARXtype = "unconstrained")
+GVARinputs <- list(
+  Economies = c("China", "Brazil", "Mexico", "Uruguay"),
+  GVARFactors = FactorsGVAR, VARXtype = "unconstrained"
+)
 
-GVARinputs$Wgvar <- matrix( c(0, 0.83, 0.86, 0.38,
-                              0.65, 0, 0.13, 0.55,
-                              0.32, 0.12, 0, 0.07,
-                              0.03, 0.05, 0.01, 0), nrow = 4, ncol = 4)
+GVARinputs$Wgvar <- matrix(c(
+  0, 0.83, 0.86, 0.38,
+  0.65, 0, 0.13, 0.55,
+  0.32, 0.12, 0, 0.07,
+  0.03, 0.05, 0.01, 0
+), nrow = 4, ncol = 4)
 N <- 3
 
 GVARPara <- GVAR(GVARinputs, N)

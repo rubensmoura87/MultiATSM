@@ -31,33 +31,34 @@
 #'
 #' @examples
 #'
-#'  DomVar <- c("Eco_Act", "Inflation")
-#'  GlobalVar <- c("GBC", "CPI_OECD")
-#'  t0 <- "2006-09-01"
-#'  tF <-  "2019-01-01"
-#'  Economies <- c("China", "Brazil", "Mexico", "Uruguay", "Russia")
-#'  N <- 2
-#'  ModelType <- "JPS original"
-#'  FactorLabels <-  LabFac(N, DomVar, GlobalVar, Economies, ModelType)
-#'  DataFrequency <- "Monthly"
+#' DomVar <- c("Eco_Act", "Inflation")
+#' GlobalVar <- c("GBC", "CPI_OECD")
+#' t0 <- "2006-09-01"
+#' tF <- "2019-01-01"
+#' Economies <- c("China", "Brazil", "Mexico", "Uruguay", "Russia")
+#' N <- 2
+#' ModelType <- "JPS original"
+#' FactorLabels <- LabFac(N, DomVar, GlobalVar, Economies, ModelType)
+#' DataFrequency <- "Monthly"
 #'
-#'#  Retrieve data from excel files
-#' MacroData  <- Load_Excel_Data(system.file("extdata", "MacroData.xlsx", package = "MultiATSM"))
+#' #  Retrieve data from excel files
+#' MacroData <- Load_Excel_Data(system.file("extdata", "MacroData.xlsx", package = "MultiATSM"))
 #' YieldData <- Load_Excel_Data(system.file("extdata", "YieldsData.xlsx", package = "MultiATSM"))
 #'
-#'  DataModel <- DataForEstimation(t0, tF, Economies, N, FactorLabels, ModelType, DataFrequency,
-#'                                 MacroData, YieldData)
+#' DataModel <- DataForEstimation(
+#'   t0, tF, Economies, N, FactorLabels, ModelType, DataFrequency,
+#'   MacroData, YieldData
+#' )
 #'
 #' @export
 
 DataForEstimation <- function(t0, tF, Economies, N, FactorLabels, ModelType, DataFrequency, Macro_FullData,
-                              Yields_FullData, DataConnect = NULL, W_type= NULL, t_First_Wgvar= NULL,
+                              Yields_FullData, DataConnect = NULL, W_type = NULL, t_First_Wgvar = NULL,
                               t_Last_Wgvar = NULL) {
-
   C <- length(Economies)
 
   # Compute the transition matrix if the model is GVAR-based
-  if (any(ModelType == c('GVAR single','GVAR multi'))) {
+  if (any(ModelType == c("GVAR single", "GVAR multi"))) {
     Wgvar <- Transition_Matrix(t_First_Wgvar, t_Last_Wgvar, Economies, W_type, DataConnect)
   }
 
@@ -78,7 +79,7 @@ DataForEstimation <- function(t0, tF, Economies, N, FactorLabels, ModelType, Dat
   RiskFactors <- RiskFactorsPrep(FactorSet, Economies, FactorLabels, t0, tF, DataFrequency)
 
   # Gather the factors used in the GVAR estimation
-  if (any(ModelType == c('GVAR single', 'GVAR multi'))) {
+  if (any(ModelType == c("GVAR single", "GVAR multi"))) {
     GVARFactors <- DataSet_BS(ModelType, RiskFactors, Wgvar, Economies, FactorLabels)
   } else {
     GVARFactors <- NULL
@@ -93,19 +94,19 @@ DataForEstimation <- function(t0, tF, Economies, N, FactorLabels, ModelType, Dat
 ##########################################################################################################
 #' Read data from Excel files and transform them into a dataframe
 #'
-#'@param ExcelFilePath Path of the excel file
+#' @param ExcelFilePath Path of the excel file
 #'
-#'@examples
-#'  if (!requireNamespace("readxl", quietly = TRUE)) {
-#'  stop(
-#'    "Please install package \"readxl\" to use this feature.",
-#'    call. = FALSE
-#'  )
+#' @examples
+#' if (!requireNamespace("readxl", quietly = TRUE)) {
+#'   stop(
+#'     "Please install package \"readxl\" to use this feature.",
+#'     call. = FALSE
+#'   )
 #'
-#' Load_Excel_Data(system.file("extdata", "MacroData.xlsx", package = "MultiATSM"))
-#' Load_Excel_Data(system.file("extdata", "YieldsData.xlsx", package = "MultiATSM"))
-#'  }
-#'@export
+#'   Load_Excel_Data(system.file("extdata", "MacroData.xlsx", package = "MultiATSM"))
+#'   Load_Excel_Data(system.file("extdata", "YieldsData.xlsx", package = "MultiATSM"))
+#' }
+#' @export
 
 Load_Excel_Data <- function(ExcelFilePath) {
   sheets <- readxl::excel_sheets(ExcelFilePath)

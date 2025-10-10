@@ -58,10 +58,11 @@ data("InpForOutEx")
 # Adjust inputs according to the loaded features
 ModelType <- "JPS original"
 Economy <- "Brazil"
-FacLab <- LabFac(N = 1, DomVar ="Eco_Act" , GlobalVar = "Gl_Eco_Act", Economy, ModelType)
+FacLab <- LabFac(N = 1, DomVar = "Eco_Act", GlobalVar = "Gl_Eco_Act", Economy, ModelType)
 
 NumOut <- NumOutputs(ModelType, ModelParaEx, InpForOutEx, FacLab, Economy,
-                     Folder2save = NULL, verbose = FALSE)
+  Folder2save = NULL, verbose = FALSE
+)
 
 }
 \references{

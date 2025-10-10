@@ -14,8 +14,10 @@ test_that("LabFac generates correct labels for typical input", {
   expect_equal(res$Spanned, c("Level", "Slope"))
   expect_equal(res$Domestic, c("inflation", "Output gap", "Level", "Slope"))
   expect_equal(res$Global, "Commodity Prices")
-  expect_equal(res$Tables$AllCountries, c("inflation U.S.", "Output gap U.S.", "Level U.S.", "Slope U.S.",
-                                          "inflation Canada", "Output gap Canada", "Level Canada","Slope Canada"))
+  expect_equal(res$Tables$AllCountries, c(
+    "inflation U.S.", "Output gap U.S.", "Level U.S.", "Slope U.S.",
+    "inflation Canada", "Output gap Canada", "Level Canada", "Slope Canada"
+  ))
 })
 
 
@@ -42,5 +44,4 @@ test_that("LabFac generates JLL labels when ModelType is JLL", {
   expect_equal(res$Spanned, c("Level"))
   expect_equal(res$Domestic, c("inflation", "Level"))
   expect_equal(res$Tables$AllCountriesJLL, c("inflation U.S. JLL", "Level U.S. JLL"))
-
 })

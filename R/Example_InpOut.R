@@ -1,4 +1,4 @@
-#'@title Example of list inputs used in the construction of several model outputs
+#' @title Example of list inputs used in the construction of several model outputs
 #'
 #' @description List of inputs of a JPS-based model for Brazilian data
 #' @name InpForOutEx

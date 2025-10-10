@@ -9,7 +9,6 @@
 #' @keywords internal
 
 NumOutputs_Bootstrap <- function(ModelType, ModelParaBoot, InputsForOutputs, FactorLabels, Economies) {
-
   # IRF and GIRF
   IRFout <- IRFandGIRF_BS(ModelType, ModelParaBoot, InputsForOutputs[[ModelType]]$IRF$horiz, FactorLabels, Economies)
   # FEVD and GFEVD
@@ -35,7 +34,6 @@ NumOutputs_Bootstrap <- function(ModelType, ModelParaBoot, InputsForOutputs, Fac
 #' @keywords internal
 
 IRFandGIRF_BS <- function(ModelType, ModelParaBoot, IRFhoriz, FactorLabels, Economies) {
-
   C <- length(Economies)
   N <- length(FactorLabels$Spanned)
   G <- length(FactorLabels$Global)
@@ -47,7 +45,6 @@ IRFandGIRF_BS <- function(ModelType, ModelParaBoot, IRFhoriz, FactorLabels, Econ
 
   # 1) SINGLE COUNTRY MODELS
   if (ModelType %in% c("JPS original", "JPS global", "GVAR single")) {
-
     for (economy in Economies) {
       # a) Extract general parameters
       para_economy <- ModelParaBoot$ParaDraws[[ModelType]][[economy]]
@@ -78,7 +75,6 @@ IRFandGIRF_BS <- function(ModelType, ModelParaBoot, IRFhoriz, FactorLabels, Econ
       GIRFoutputs[[ModelType]][[economy]] <- lapply(results, `[[`, "GIRFs")
     }
   } else {
-
     # 2) JOINT COUNTRY MODELS
     JLL_label <- c("JLL original", "JLL No DomUnit", "JLL joint Sigma")
     ndraws <- length(ModelParaBoot$ParaDraws[[ModelType]])
@@ -104,12 +100,13 @@ IRFandGIRF_BS <- function(ModelType, ModelParaBoot, IRFhoriz, FactorLabels, Econ
       IRFoutputs[[ModelType]][[tt]] <- ComputeIRFs(SIGMA, K1Z, B, FactorLabels, K, C * J, IRFhoriz, YieldsLabel, ModelType)
 
       # c) Compute GIRFs
-      if (ModelType %in% JLL_label){ SIGMA <- para_tt$JLLoutcomes$Sigmas$VarCov_NonOrtho}
+      if (ModelType %in% JLL_label) {
+        SIGMA <- para_tt$JLLoutcomes$Sigmas$VarCov_NonOrtho
+      }
       GIRFoutputs[[ModelType]][[tt]] <- ComputeGIRFs(SIGMA, K1Z, B, G0.y, FactorLabels, K, C * J, IRFhoriz, YieldsLabel, ModelType)
 
       # 3) JLL-BASED MODELS (orthogonalized outputs)
       if (ModelType %in% c("JLL original", "JLL No DomUnit", "JLL joint Sigma")) {
-
         # Summarize inputs for the IRFs
         K1Ze <- para_tt$JLLoutcomes$k1_e # KxK (feedback matrix)
         PI <- para_tt$JLLoutcomes$PI
@@ -118,7 +115,8 @@ IRFandGIRF_BS <- function(ModelType, ModelParaBoot, IRFhoriz, FactorLabels, Econ
 
         # Compute orthogonalized IRFs
         IRFOrtho <- ComputeIRFs(Se, K1Ze, B, FactorLabels, K, C * J, IRFhoriz, YieldsLabel, ModelType,
-                                PI = PI, Mode = "Ortho")
+          PI = PI, Mode = "Ortho"
+        )
         # Store  IRFs
         IRFoutputs[[ModelType]][[tt]] <- list(
           Factors = list(NonOrtho = IRFoutputs[[ModelType]][[tt]]$Factors, Ortho = IRFOrtho$Factors),
@@ -127,7 +125,8 @@ IRFandGIRF_BS <- function(ModelType, ModelParaBoot, IRFhoriz, FactorLabels, Econ
 
         # Compute orthogonalized GIRFs
         GIRFsOrtho <- ComputeGIRFs(SIGMA_e, K1Ze, B, G0.y, FactorLabels, K, C * J, IRFhoriz, YieldsLabel, ModelType,
-                                   PI = PI, Mode = "Ortho")
+          PI = PI, Mode = "Ortho"
+        )
         # Store GIRFs
         GIRFoutputs[[ModelType]][[tt]] <- list(
           Factors = list(NonOrtho = GIRFoutputs[[ModelType]][[tt]]$Factors, Ortho = GIRFsOrtho$Factors),
@@ -155,7 +154,6 @@ IRFandGIRF_BS <- function(ModelType, ModelParaBoot, IRFhoriz, FactorLabels, Econ
 #' @keywords internal
 
 FEVDandGFEVD_BS <- function(ModelType, ModelParaBoot, FEVDhoriz, FactorLabels, Economies) {
-
   C <- length(Economies)
   N <- length(FactorLabels$Spanned)
   G <- length(FactorLabels$Global)
@@ -169,7 +167,6 @@ FEVDandGFEVD_BS <- function(ModelType, ModelParaBoot, FEVDhoriz, FactorLabels, E
 
   # 1) SINGLE COUNTRY MODELS
   if (ModelType %in% c("JPS original", "JPS global", "GVAR single")) {
-
     for (economy in Economies) {
       # a) Extract general parameters
       para_economy <- ModelParaBoot$ParaDraws[[ModelType]][[economy]]
@@ -200,34 +197,38 @@ FEVDandGFEVD_BS <- function(ModelType, ModelParaBoot, FEVDhoriz, FactorLabels, E
       FEVDoutputs[[ModelType]][[economy]] <- lapply(results, `[[`, "FEVDs")
       GFEVDoutputs[[ModelType]][[economy]] <- lapply(results, `[[`, "GFEVDs")
     }
-  } else{
+  } else {
     # 2) JOINT COUNTRY MODELS
     ndraws <- length(ModelParaBoot$ParaDraws[[ModelType]])
     J <- length(ModelParaBoot$GeneralInputs$mat)
     K <- nrow(ModelParaBoot$ParaDraws[[ModelType]][[1]]$ModEst$P$K1Z)
-    YieldsLabel<- rownames(ModelParaBoot$ParaDraws[[ModelType]][[1]]$Inputs$Y) # Yield labels
+    YieldsLabel <- rownames(ModelParaBoot$ParaDraws[[ModelType]][[1]]$Inputs$Y) # Yield labels
 
-    for (tt in 1:ndraws){
+    for (tt in 1:ndraws) {
       # a) Extract relevant inputs
       para_tt <- ModelParaBoot$ParaDraws[[ModelType]][[tt]]$ModEst$P
       K1Z <- para_tt$K1Z
       SIGMA <- para_tt$SSZ
       G0 <- para_tt$Gy.0
 
-      if ( ModelType %in% c("JLL original", "JLL No DomUnit", "JLL joint Sigma")){
+      if (ModelType %in% c("JLL original", "JLL No DomUnit", "JLL joint Sigma")) {
         Chol_Fac_JLL <- para_tt$JLLoutcomes$Sigmas$Sigma_Y
       }
 
       BSpanned <- ModelParaBoot$ParaDraws[[ModelType]][[tt]]$ModEst$Q$Load$P$B
-      B <- BUnspannedAdapJoint(G,M,N,C, J, BSpanned)
+      B <- BUnspannedAdapJoint(G, M, N, C, J, BSpanned)
 
       # b) Compute FEVDs
       FEVDoutputs[[ModelType]][[tt]] <- ComputeFEVDs(SIGMA, K1Z, G0, B, FactorLabels, K, C * J, FEVDhoriz, YieldsLabel,
-                                                     ModelType, CholFac_JLL = Chol_Fac_JLL)
+        ModelType,
+        CholFac_JLL = Chol_Fac_JLL
+      )
 
       # c) Compute GFEVDs
-      GFEVDoutputs[[ModelType]][[tt]] <- ComputeGFEVDs(SIGMA, K1Z, G0, B, FactorLabels, K, C * J, FEVDhoriz,
-                                                       YieldsLabel, ModelType)
+      GFEVDoutputs[[ModelType]][[tt]] <- ComputeGFEVDs(
+        SIGMA, K1Z, G0, B, FactorLabels, K, C * J, FEVDhoriz,
+        YieldsLabel, ModelType
+      )
 
       # 3) JLL-BASED MODELS (orthogonalized outputs)
       if (ModelType %in% c("JLL original", "JLL No DomUnit", "JLL joint Sigma")) {
@@ -238,25 +239,37 @@ FEVDandGFEVD_BS <- function(ModelType, ModelParaBoot, FEVDhoriz, FactorLabels, E
         Chol_Fac_JLL_Ortho <- para_tt$JLLoutcomes$Sigmas$Sigma_Ye
 
         # a) Compute FEVDs orthogonalized
-        FEVDOrtho[[ModelType]][[tt]] <- ComputeFEVDs(SIGMA_Ortho, K1Ze, G0, B, FactorLabels, K, C*J, FEVDhoriz,
-                                                     YieldsLabel, ModelType, CholFac_JLL = Chol_Fac_JLL_Ortho, PI = PI,
-                                                     Mode= "Ortho")
+        FEVDOrtho[[ModelType]][[tt]] <- ComputeFEVDs(SIGMA_Ortho, K1Ze, G0, B, FactorLabels, K, C * J, FEVDhoriz,
+          YieldsLabel, ModelType,
+          CholFac_JLL = Chol_Fac_JLL_Ortho, PI = PI,
+          Mode = "Ortho"
+        )
 
         # Gather Outputs
-        FEVDoutputs[[ModelType]][[tt]]$Factors <- list(NonOrtho = FEVDoutputs[[ModelType]][[tt]]$Factors,
-                                                       Ortho = FEVDOrtho[[ModelType]][[tt]]$Factors)
-        FEVDoutputs[[ModelType]][[tt]]$Yields <- list(NonOrtho = FEVDoutputs[[ModelType]][[tt]]$Yields,
-                                                      Ortho = FEVDOrtho[[ModelType]][[tt]]$Yields)
+        FEVDoutputs[[ModelType]][[tt]]$Factors <- list(
+          NonOrtho = FEVDoutputs[[ModelType]][[tt]]$Factors,
+          Ortho = FEVDOrtho[[ModelType]][[tt]]$Factors
+        )
+        FEVDoutputs[[ModelType]][[tt]]$Yields <- list(
+          NonOrtho = FEVDoutputs[[ModelType]][[tt]]$Yields,
+          Ortho = FEVDOrtho[[ModelType]][[tt]]$Yields
+        )
 
         # b) Compute GFEVDs orthogonalized
-        GFEVDOrtho[[ModelType]][[tt]] <- ComputeGFEVDs(SIGMA_Ortho, K1Ze, G0, B, FactorLabels, K, C*J, FEVDhoriz,
-                                                        YieldsLabel, ModelType, PI = PI, Mode = "Ortho")
+        GFEVDOrtho[[ModelType]][[tt]] <- ComputeGFEVDs(SIGMA_Ortho, K1Ze, G0, B, FactorLabels, K, C * J, FEVDhoriz,
+          YieldsLabel, ModelType,
+          PI = PI, Mode = "Ortho"
+        )
 
         # Gather Outputs
-        GFEVDoutputs[[ModelType]][[tt]]$Factors <- list(NonOrtho = GFEVDoutputs[[ModelType]][[tt]]$Factors,
-                                                        Ortho = GFEVDOrtho[[ModelType]][[tt]]$Factors)
-        GFEVDoutputs[[ModelType]][[tt]]$Yields <- list(NonOrtho = GFEVDoutputs[[ModelType]][[tt]]$Yields,
-                                                       Ortho = GFEVDOrtho[[ModelType]][[tt]]$Yields)
+        GFEVDoutputs[[ModelType]][[tt]]$Factors <- list(
+          NonOrtho = GFEVDoutputs[[ModelType]][[tt]]$Factors,
+          Ortho = GFEVDOrtho[[ModelType]][[tt]]$Factors
+        )
+        GFEVDoutputs[[ModelType]][[tt]]$Yields <- list(
+          NonOrtho = GFEVDoutputs[[ModelType]][[tt]]$Yields,
+          Ortho = GFEVDOrtho[[ModelType]][[tt]]$Yields
+        )
       }
     }
   }
@@ -281,7 +294,6 @@ FEVDandGFEVD_BS <- function(ModelType, ModelParaBoot, FEVDhoriz, FactorLabels, E
 #' @keywords internal
 
 BUnspannedAdapSep_BS <- function(G, M, ModelParaBoot, Economies, Economy, ModelType, tt) {
-
   C <- length(Economies)
   J <- length(ModelParaBoot$GeneralInputs$mat)
   i <- match(Economy, Economies)

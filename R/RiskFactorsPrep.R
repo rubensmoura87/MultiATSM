@@ -9,15 +9,14 @@
 #'                      "Weekly", "Monthly", "Quarterly", "Annually".
 #'
 #'
-#'@keywords internal
+#' @keywords internal
 #'
 #' @return
 #' Risk factors used in the estimation of the desired ATSM
 #'
 
 
-RiskFactorsPrep <- function(FactorSet, Economies, FactorLabels, Initial_Date, Final_Date, DataFrequency){
-
+RiskFactorsPrep <- function(FactorSet, Economies, FactorLabels, Initial_Date, Final_Date, DataFrequency) {
   Initial_Date <- as.Date(Initial_Date)
   Final_Date <- as.Date(Final_Date)
 
@@ -28,56 +27,56 @@ RiskFactorsPrep <- function(FactorSet, Economies, FactorLabels, Initial_Date, Fi
   T_dim <- length(FactorSet[[1]][[1]][[1]])
 
 
-  ZZfull <- matrix(NA, nrow= C*(N+M)+G, ncol = T_dim)
-  ZZfull[seq_len(G),] <- do.call(rbind,lapply(FactorSet$Global, matrix, ncol=T_dim))
+  ZZfull <- matrix(NA, nrow = C * (N + M) + G, ncol = T_dim)
+  ZZfull[seq_len(G), ] <- do.call(rbind, lapply(FactorSet$Global, matrix, ncol = T_dim))
 
   # 1) Assign variables:
   idx0 <- G
-  for (i in 1:C){
-    idx1 <- idx0 + N+M
-    ZZfull[(idx0+1):idx1,] <- do.call(rbind,lapply(FactorSet[[Economies[i]]]$Factors[1:(N+M)], matrix, ncol=T_dim))
+  for (i in 1:C) {
+    idx1 <- idx0 + N + M
+    ZZfull[(idx0 + 1):idx1, ] <- do.call(rbind, lapply(FactorSet[[Economies[i]]]$Factors[1:(N + M)], matrix, ncol = T_dim))
     idx0 <- idx1
   }
 
   # 2) Assign labels:
   # a) Factor names
   idx0 <- 0
-  LabCountries <- rep(NA, times = C*(N+M))
-  for (i in 1:C){
-    idx1 <- idx0 + N+M
-    LabCountries[(idx0+1):idx1] <- FactorLabels$Tables[[Economies[i]]]
+  LabCountries <- rep(NA, times = C * (N + M))
+  for (i in 1:C) {
+    idx1 <- idx0 + N + M
+    LabCountries[(idx0 + 1):idx1] <- FactorLabels$Tables[[Economies[i]]]
     idx0 <- idx1
   }
 
-  rownames(ZZfull) <- c(FactorLabels$Global,LabCountries)
+  rownames(ZZfull) <- c(FactorLabels$Global, LabCountries)
 
   # b) Time series labels
   # (i) Daily All Days data
-  if (DataFrequency== "Daily All Days"){
+  if (DataFrequency == "Daily All Days") {
     DAD <- seq(Initial_Date, Final_Date, by = "1 day")
     DateLabels <- format(DAD, "%d-%m-%Y")
   }
   # (ii) Daily Business Days data
-  if (DataFrequency== "Daily Business Days"){
+  if (DataFrequency == "Daily Business Days") {
     DateLabels <- 1:T_dim
   }
   # (iii) Weekly data
-  if (DataFrequency== "Weekly"){
+  if (DataFrequency == "Weekly") {
     week <- seq(Initial_Date, Final_Date, by = "1 week")
     DateLabels <- format(week, "%d-%m-%Y")
   }
   # (iv) Monthly data
-  if (DataFrequency== "Monthly"){
-  month <- seq(Initial_Date, Final_Date, by = "1 month")
-  DateLabels <- format(month, "%d-%m-%Y")
+  if (DataFrequency == "Monthly") {
+    month <- seq(Initial_Date, Final_Date, by = "1 month")
+    DateLabels <- format(month, "%d-%m-%Y")
   }
   # (v) Quarterly data
-  if (DataFrequency== "Quarterly"){
+  if (DataFrequency == "Quarterly") {
     quarter <- seq(Initial_Date, Final_Date, by = "1 quarter")
     DateLabels <- format(quarter, "%m-%Y")
   }
   # (vi) Annually data
-  if (DataFrequency== "Annually"){
+  if (DataFrequency == "Annually") {
     year <- seq(Initial_Date, Final_Date, by = "1 year")
     DateLabels <- format(year, "%Y")
   }

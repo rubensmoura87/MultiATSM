@@ -87,5 +87,3 @@ LabelsStar <- function(FactorLabels) {
   Label <- paste(FactorLabels, ".Star", sep = "")
   return(Label)
 }
-
-

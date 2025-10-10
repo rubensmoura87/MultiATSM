@@ -40,7 +40,6 @@ test_that("Load_Excel_Data handles invalid inputs", {
 })
 
 test_that("Load_Excel_Data returns correct structure", {
-
   macro_file <- system.file("extdata", "MacroData.xlsx", package = "MultiATSM")
   skip_if_not(file.exists(macro_file))
 
@@ -60,7 +59,7 @@ test_that("Load_Excel_Data preserves sheet names and order", {
 
   # First, check what sheets exist in the actual file
   actual_sheets <- readxl::excel_sheets(test_file)
-  skip_if(length(actual_sheets) < 2)  # Skip if file doesn't have multiple sheets
+  skip_if(length(actual_sheets) < 2) # Skip if file doesn't have multiple sheets
 
   result <- Load_Excel_Data(test_file)
 
@@ -84,6 +83,5 @@ test_that("Load_Excel_Data integrates with package workflow", {
   # Test that data has expected financial/time series structure
   first_sheet <- macro_data[[1]]
   expect_true(any(grepl("date|Date|TIME|Time", names(first_sheet), ignore.case = TRUE)) ||
-                nrow(first_sheet) > 1)  # Either has date column or is time series data
+    nrow(first_sheet) > 1) # Either has date column or is time series data
 })
-

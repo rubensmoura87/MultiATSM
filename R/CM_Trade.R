@@ -1,4 +1,4 @@
-#'@title Data: Trade Flows - Candelon and Moura (2024, JFEC)
+#' @title Data: Trade Flows - Candelon and Moura (2024, JFEC)
 #'
 #' @description Trade Flows data used in Candelon and Moura (2024, JFEC)
 #' @name TradeFlows

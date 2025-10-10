@@ -1,4 +1,4 @@
-#'@title Example of parameter set after optimization
+#' @title Example of parameter set after optimization
 #'
 #' @description JPS-based model for Brazilian data
 #' @name ModelParaEx

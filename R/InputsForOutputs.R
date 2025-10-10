@@ -43,8 +43,10 @@
 #' WishGraphRiskFac <- 0
 #' WishGraphYields <- 1
 #'
-#' InputsList <- InputsForOutputs(ModelType, Horiz, DesiredOutputGraphs, OutputLabel,
-#'                               WishStationarityQ, WishGraphYields, WishGraphRiskFac)
+#' InputsList <- InputsForOutputs(
+#'   ModelType, Horiz, DesiredOutputGraphs, OutputLabel,
+#'   WishStationarityQ, WishGraphYields, WishGraphRiskFac
+#' )
 #' @returns
 #' List of necessary inputs to generate the graphs of the outputs of the desired model
 #' @export
@@ -52,107 +54,113 @@
 InputsForOutputs <- function(ModelType, Horiz, ListOutputWished, OutputLabel, WishStationarityQ, DataFrequency,
                              WishGraphYields = 0, WishGraphRiskFactors = 0, WishOrthoJLLgraphs = 0,
                              WishForwardPremia = 0, LimFP = NULL, WishBootstrap = 0, ListBoot = NULL,
-                            WishForecast = 0, ListForecast = NULL, UnitYields = "Month") {
-
+                             WishForecast = 0, ListForecast = NULL, UnitYields = "Month") {
   OutputTypeSet <- c("RiskFactors", "Fit", "IRF", "FEVD", "GIRF", "GFEVD", "TermPremia", "ForwardPremia")
   IdxWishOut <- match(ListOutputWished, OutputTypeSet)
 
-  if ('RiskFactors' %in% ListOutputWished) {WishRFGraph <- 1}
-  if ('Fit' %in% ListOutputWished) {WishFitGraph <- 1}
-  if ('TermPremia' %in% ListOutputWished) {WishTPGraph <- 1}
+  if ("RiskFactors" %in% ListOutputWished) {
+    WishRFGraph <- 1
+  }
+  if ("Fit" %in% ListOutputWished) {
+    WishFitGraph <- 1
+  }
+  if ("TermPremia" %in% ListOutputWished) {
+    WishTPGraph <- 1
+  }
 
   InputsForOutputs <- list(
-    'Label Outputs' = OutputLabel,
+    "Label Outputs" = OutputLabel,
     StationaryQ = WishStationarityQ,
     UnitMatYields = UnitYields,
     DataFreq = DataFrequency,
     ForwardPremia = WishForwardPremia
   )
 
-# Initialization
-for (h in 1:length(OutputTypeSet)){
+  # Initialization
+  for (h in 1:length(OutputTypeSet)) {
+    if (h == 1) {
+      InputsForOutputs[[ModelType]]$RiskFactors$WishGraphs <- 0
+    }
+    if (h == 2) {
+      InputsForOutputs[[ModelType]]$Fit$WishGraphs <- 0
+    }
+    if (h >= 3 & h <= 6) {
+      InputsForOutputs[[ModelType]][[OutputTypeSet[h]]]$horiz <- Horiz
 
-  if (h == 1){InputsForOutputs[[ModelType]]$RiskFactors$WishGraphs <- 0}
-  if (h == 2){InputsForOutputs[[ModelType]]$Fit$WishGraphs <- 0}
-  if(h>=3 & h <=6){
+      InputsForOutputs[[ModelType]][[OutputTypeSet[h]]]$WishGraphs$RiskFactors <- 0
+      InputsForOutputs[[ModelType]][[OutputTypeSet[h]]]$WishGraphs$Yields <- 0
+      InputsForOutputs[[ModelType]][[OutputTypeSet[h]]]$WishGraphs$RiskFactorsBootstrap <- 0
+      InputsForOutputs[[ModelType]][[OutputTypeSet[h]]]$WishGraphs$YieldsBootstrap <- 0
+
+      if (any(ModelType == c("JLL original", "JLL No DomUnit", "JLL joint Sigma"))) {
+        InputsForOutputs[[ModelType]][[OutputTypeSet[h]]]$WishGraphsOrtho$RiskFactors <- 0
+        InputsForOutputs[[ModelType]][[OutputTypeSet[h]]]$WishGraphsOrtho$Yields <- 0
+        InputsForOutputs[[ModelType]][[OutputTypeSet[h]]]$WishGraphsOrtho$RiskFactorsBootstrap <- 0
+        InputsForOutputs[[ModelType]][[OutputTypeSet[h]]]$WishGraphsOrtho$YieldsBootstrap <- 0
+      }
+    }
+    if (h > 6) {
+      InputsForOutputs[[ModelType]]$RiskPremia$WishGraphs <- 0
+      InputsForOutputs[[ModelType]]$ForwardPremia$Limits <- LimFP
+    }
+  }
 
 
-  InputsForOutputs[[ModelType]][[OutputTypeSet[h]]]$horiz <- Horiz
-
-  InputsForOutputs[[ModelType]][[OutputTypeSet[h]]]$WishGraphs$RiskFactors <- 0
-  InputsForOutputs[[ModelType]][[OutputTypeSet[h]]]$WishGraphs$Yields <- 0
-  InputsForOutputs[[ModelType]][[OutputTypeSet[h]]]$WishGraphs$RiskFactorsBootstrap <- 0
-  InputsForOutputs[[ModelType]][[OutputTypeSet[h]]]$WishGraphs$YieldsBootstrap <- 0
-
-  if (any(ModelType == c("JLL original", "JLL No DomUnit", "JLL joint Sigma" ))){
-    InputsForOutputs[[ModelType]][[OutputTypeSet[h]]]$WishGraphsOrtho$RiskFactors <- 0
-    InputsForOutputs[[ModelType]][[OutputTypeSet[h]]]$WishGraphsOrtho$Yields <- 0
-    InputsForOutputs[[ModelType]][[OutputTypeSet[h]]]$WishGraphsOrtho$RiskFactorsBootstrap <- 0
-    InputsForOutputs[[ModelType]][[OutputTypeSet[h]]]$WishGraphsOrtho$YieldsBootstrap <- 0
+  # Filling up the desired outputs
+  for (h in IdxWishOut) {
+    if (h == 1) {
+      InputsForOutputs[[ModelType]]$RiskFactors$WishGraphs <- WishRFGraph
+    }
+    if (h == 2) {
+      InputsForOutputs[[ModelType]]$Fit$WishGraphs <- WishFitGraph
     }
 
+    if (h >= 3 & h <= 6) {
+      InputsForOutputs[[ModelType]][[OutputTypeSet[h]]]$horiz <- Horiz
+
+      InputsForOutputs[[ModelType]][[OutputTypeSet[h]]]$WishGraphs$RiskFactors <- WishGraphRiskFactors
+      InputsForOutputs[[ModelType]][[OutputTypeSet[h]]]$WishGraphs$Yields <- WishGraphYields
+      if (WishBootstrap == 1) {
+        InputsForOutputs[[ModelType]][[OutputTypeSet[h]]]$WishGraphs$RiskFactorsBootstrap <- WishGraphRiskFactors
+        InputsForOutputs[[ModelType]][[OutputTypeSet[h]]]$WishGraphs$YieldsBootstrap <- WishGraphYields
+      }
+
+      if (any(ModelType == c("JLL original", "JLL No DomUnit", "JLL joint Sigma"))) {
+        if (WishOrthoJLLgraphs == 1) {
+          InputsForOutputs[[ModelType]][[OutputTypeSet[h]]]$WishGraphsOrtho$RiskFactors <- WishGraphRiskFactors
+          InputsForOutputs[[ModelType]][[OutputTypeSet[h]]]$WishGraphsOrtho$Yields <- WishGraphYields
+          if (WishBootstrap == 1) {
+            InputsForOutputs[[ModelType]][[OutputTypeSet[h]]]$WishGraphsOrtho$RiskFactorsBootstrap <- WishGraphRiskFactors
+            InputsForOutputs[[ModelType]][[OutputTypeSet[h]]]$WishGraphsOrtho$YieldsBootstrap <- WishGraphYields
+          }
+        }
+      }
+    }
+
+    if (h == 7) {
+      InputsForOutputs[[ModelType]]$RiskPremia$WishGraphs <- WishTPGraph
+    }
   }
-  if(h > 6){
-  InputsForOutputs[[ModelType]]$RiskPremia$WishGraphs <- 0
-  InputsForOutputs[[ModelType]]$ForwardPremia$Limits <- LimFP
+
+  # 2) Bootstrap list
+  if (WishBootstrap == 0) {
+    InputsForOutputs[[ModelType]]$Bootstrap$WishBoot <- 0
+  } else {
+    InputsForOutputs[[ModelType]]$Bootstrap <- WishBootstrap
+    names(InputsForOutputs[[ModelType]]$Bootstrap) <- "WishBoot"
+    InputsForOutputs[[ModelType]]$Bootstrap <- append(InputsForOutputs[[ModelType]]$Bootstrap, ListBoot)
   }
-}
 
 
-# Filling up the desired outputs
-for (h in IdxWishOut){
-
-  if (h==1){InputsForOutputs[[ModelType]]$RiskFactors$WishGraphs <- WishRFGraph}
-  if (h==2){InputsForOutputs[[ModelType]]$Fit$WishGraphs <- WishFitGraph}
-
-  if(h>=3 & h <=6){
-
-InputsForOutputs[[ModelType]][[OutputTypeSet[h]]]$horiz <- Horiz
-
-InputsForOutputs[[ModelType]][[OutputTypeSet[h]]]$WishGraphs$RiskFactors <- WishGraphRiskFactors
-InputsForOutputs[[ModelType]][[OutputTypeSet[h]]]$WishGraphs$Yields <- WishGraphYields
-if (WishBootstrap ==1){
-InputsForOutputs[[ModelType]][[OutputTypeSet[h]]]$WishGraphs$RiskFactorsBootstrap <- WishGraphRiskFactors
-InputsForOutputs[[ModelType]][[OutputTypeSet[h]]]$WishGraphs$YieldsBootstrap <- WishGraphYields
-}
-
-if (any(ModelType == c("JLL original", "JLL No DomUnit", "JLL joint Sigma" ))){
-if (WishOrthoJLLgraphs==1){
-InputsForOutputs[[ModelType]][[OutputTypeSet[h]]]$WishGraphsOrtho$RiskFactors <- WishGraphRiskFactors
-InputsForOutputs[[ModelType]][[OutputTypeSet[h]]]$WishGraphsOrtho$Yields <- WishGraphYields
-if (WishBootstrap ==1){
-InputsForOutputs[[ModelType]][[OutputTypeSet[h]]]$WishGraphsOrtho$RiskFactorsBootstrap <- WishGraphRiskFactors
-InputsForOutputs[[ModelType]][[OutputTypeSet[h]]]$WishGraphsOrtho$YieldsBootstrap <- WishGraphYields
-}
-}
-}
-}
-
-  if(h == 7){InputsForOutputs[[ModelType]]$RiskPremia$WishGraphs <- WishTPGraph}
-
-}
-
-# 2) Bootstrap list
-if (WishBootstrap==0){
-  InputsForOutputs[[ModelType]]$Bootstrap$WishBoot <- 0
-}else{
-  InputsForOutputs[[ModelType]]$Bootstrap <- WishBootstrap
-  names(InputsForOutputs[[ModelType]]$Bootstrap) <- "WishBoot"
-  InputsForOutputs[[ModelType]]$Bootstrap <- append(InputsForOutputs[[ModelType]]$Bootstrap, ListBoot)
-}
-
-
-# 3) Forecasting list
-if (WishForecast==0){
-  InputsForOutputs[[ModelType]]$Forecasting$WishForecast <- 0
-}else{
-  InputsForOutputs[[ModelType]]$Forecasting <- WishForecast
-  names(InputsForOutputs[[ModelType]]$Forecasting) <- "WishForecast"
-  InputsForOutputs[[ModelType]]$Forecasting <- append(InputsForOutputs[[ModelType]]$Forecasting, ListForecast)
-}
+  # 3) Forecasting list
+  if (WishForecast == 0) {
+    InputsForOutputs[[ModelType]]$Forecasting$WishForecast <- 0
+  } else {
+    InputsForOutputs[[ModelType]]$Forecasting <- WishForecast
+    names(InputsForOutputs[[ModelType]]$Forecasting) <- "WishForecast"
+    InputsForOutputs[[ModelType]]$Forecasting <- append(InputsForOutputs[[ModelType]]$Forecasting, ListForecast)
+  }
 
 
   return(InputsForOutputs)
 }
-
-

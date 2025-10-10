@@ -1,4 +1,4 @@
-#'@title Complete list of several outputs from an ATSM
+#' @title Complete list of several outputs from an ATSM
 #'
 #' @description Example for illustration used in the package vignette
 #' @name Out
