@@ -60,7 +60,7 @@
                         <h4 data-toc-skip class="author">Rubens
 Moura</h4>
             
-            <h4 data-toc-skip class="date">2025-10-10</h4>
+            <h4 data-toc-skip class="date">2025-10-12</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/rubensmoura87/MultiATSM/blob/main/vignettes/MultiATSM.Rmd" class="external-link"><code>vignettes/MultiATSM.Rmd</code></a></small>
       <div class="d-none name"><code>MultiATSM.Rmd</code></div>
@@ -781,17 +781,14 @@ Business Days”</em>, and <em>“Daily All Days”</em>.</li>
 <p><strong>5. Stationary constraint under the</strong>
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>Q</mi><annotation encoding="application/x-tex">Q</annotation></semantics></math>-<strong>dynamics</strong>:</p>
 <ul>
-<li>A binary variable that equals
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>1</mn><annotation encoding="application/x-tex">1</annotation></semantics></math>
-if the user wishes to impose the constraint that the largest eigenvalue
-under the
+<li>A logical variable. Choose <em>TRUE</em> to impose the constraint
+that the largest eigenvalue under the
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>Q</mi><annotation encoding="application/x-tex">Q</annotation></semantics></math>-measure
 is strictly less than
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>1</mn><annotation encoding="application/x-tex">1</annotation></semantics></math>
-otherwise, it should be set to
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0</mn><annotation encoding="application/x-tex">0</annotation></semantics></math>.
-While enforcing this stationary constraint may prolong model estimation,
-it can improve the convergence of the model.</li>
+otherwise, it should be set to <em>FALSE</em>. While enforcing this
+stationary constraint may prolong model estimation, it can improve the
+convergence of the model.</li>
 </ul>
 <p><strong>6. Selected folder to save outputs</strong></p>
 <ul>
@@ -823,7 +820,7 @@ that stores the model outputs.</li>
 <span><span class="va">DataFrequency</span> <span class="op">&lt;-</span> <span class="st">"Monthly"</span></span>
 <span></span>
 <span><span class="co"># 5) Risk-neutral stationary constraint</span></span>
-<span><span class="va">StationarityUnderQ</span> <span class="op">&lt;-</span> <span class="fl">0</span> <span class="co"># 1 = set stationary condition under the Q; 0 = no stationary condition</span></span>
+<span><span class="va">StationarityUnderQ</span> <span class="op">&lt;-</span> <span class="cn">FALSE</span></span>
 <span></span>
 <span><span class="co"># 6) Path to save outputs</span></span>
 <span><span class="va">Folder2Save</span> <span class="op">&lt;-</span> <span class="cn">NULL</span></span>
@@ -983,9 +980,9 @@ of graphs in a string-based vector:</p>
 (yields, risk factors or both) and, for the JLL type of models, whether
 the orthogonalized version should be additionally included</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">WishGraphRiskFac</span> <span class="op">&lt;-</span> <span class="fl">0</span> <span class="co">#   YES: 1; No = 0.</span></span>
-<span><span class="va">WishGraphYields</span> <span class="op">&lt;-</span> <span class="fl">1</span> <span class="co">#    YES: 1; No = 0.</span></span>
-<span><span class="va">WishOrthoJLLgraphs</span> <span class="op">&lt;-</span> <span class="fl">0</span> <span class="co"># YES: 1; No = 0.</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">WishGraphRiskFac</span> <span class="op">&lt;-</span> <span class="cn">FALSE</span> </span>
+<span><span class="va">WishGraphYields</span> <span class="op">&lt;-</span> <span class="cn">TRUE</span> </span>
+<span><span class="va">WishOrthoJLLgraphs</span> <span class="op">&lt;-</span> <span class="cn">FALSE</span> </span></code></pre></div>
 <p>The function <code><a href="../reference/InputsForOutputs.html">InputsForOutputs()</a></code> can provide some
 guidance for customizing the features of the wished outputs. Conditional
 to these settings, individual folders are created at the selected
@@ -1021,17 +1018,13 @@ specifically
 where
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>F</mi><msubsup><mi>P</mi><mi>t</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></msubsup></mrow><annotation encoding="application/x-tex">FP_t^{(n)}</annotation></semantics></math>
 corresponds to the forward premia. In this case, the user must specify a
-binary variable set to
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>1</mn><annotation encoding="application/x-tex">1</annotation></semantics></math>
-if the computation of forward premia is desired, or
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0</mn><annotation encoding="application/x-tex">0</annotation></semantics></math>
-otherwise. If set to
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>1</mn><annotation encoding="application/x-tex">1</annotation></semantics></math>,
+logical variable set to <em>TRUE</em> if the computation of forward
+premia is desired, or <em>FALSE</em> otherwise. If set to <em>TRUE</em>,
 the user must also provide a two-element numerical vector containing the
 maturities corresponding to the starting and ending dates of the bond
 maturity. Example:</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">WishFPremia</span> <span class="op">&lt;-</span> <span class="fl">1</span> <span class="co"># Wish to estimate the forward premia: YES: 1, NO:0</span></span>
+<code class="sourceCode R"><span><span class="va">WishFPremia</span> <span class="op">&lt;-</span> <span class="cn">TRUE</span></span>
 <span><span class="va">FPmatLim</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">60</span>, <span class="fl">120</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level4">
@@ -1280,13 +1273,11 @@ the economy which is assigned as the dominant country (applicable for
 the <em>JLL original</em> and <em>JLL joint Sigma</em> models) or
 <em>None</em> (applicable for the <em>JLL No DomUnit</em>);</p></li>
 <li><p><em>Wish the estimation of the sigmas matrices</em>: this is a
-binary variable which assumes value equal to
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>1</mn><annotation encoding="application/x-tex">1</annotation></semantics></math>
-if the user wishes the estimation of all JLL sigma matrices
+logical variable which assumes value equal to <em>TRUE</em> if the user
+wishes the estimation of all JLL sigma matrices
 (i.e. variance-covariance and the Cholesky factorization matrices) and,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0</mn><annotation encoding="application/x-tex">0</annotation></semantics></math>
-otherwise. Since this estimation is done numerically, its estimation can
-take several minutes;</p></li>
+<em>FALSE</em> otherwise. Since this estimation is done numerically, its
+estimation can take several minutes;</p></li>
 <li><p><em>Sigma of the non-orthogonalized variance-covariance
 matrix</em>: to save time, the user may provide the variance-covariance
 matrix from the non-orthogonalized dynamics. Otherwise, this input
@@ -1298,7 +1289,7 @@ JLL model to be estimated according to the features described in <a href="#tab-M
 <div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ModelType</span> <span class="op">&lt;-</span> <span class="st">"JLL original"</span></span>
 <span><span class="va">JLLinputs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>  Economies <span class="op">=</span> <span class="va">Economies</span>, DomUnit <span class="op">=</span> <span class="st">"China"</span>, WishSigmas <span class="op">=</span> <span class="fl">1</span>, SigmaNonOrtho <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  Economies <span class="op">=</span> <span class="va">Economies</span>, DomUnit <span class="op">=</span> <span class="st">"China"</span>, WishSigmas <span class="op">=</span> <span class="cn">TRUE</span>, SigmaNonOrtho <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  JLLModelType <span class="op">=</span> <span class="va">ModelType</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p>As such, the
@@ -1386,7 +1377,7 @@ package for a detailed reproduction.</p>
 <span><span class="va">DataFreq</span> <span class="op">&lt;-</span> <span class="st">"Monthly"</span> <span class="co"># Frequency of the data</span></span>
 <span></span>
 <span><span class="va">Folder2Save</span> <span class="op">&lt;-</span> <span class="cn">NULL</span> <span class="co"># Folder to save the required graphical outputs. NULL -&gt; temporary directory</span></span>
-<span><span class="va">StatQ</span> <span class="op">&lt;-</span> <span class="fl">0</span> <span class="co"># Wish to impose stationary condition for the eigenvalues of each country: YES: 1,NO:0</span></span>
+<span><span class="va">StatQ</span> <span class="op">&lt;-</span> <span class="cn">FALSE</span> <span class="co"># Wish to impose stationary condition for the eigenvalues of each country</span></span>
 <span></span>
 <span><span class="co"># B.1) SPECIFIC model inputs</span></span>
 <span><span class="co">#################################### GVAR-based models ##################################################</span></span>
@@ -1403,7 +1394,7 @@ package for a detailed reproduction.</p>
 <span><span class="va">JLLlist</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>DomUnit <span class="op">=</span> <span class="st">"China"</span><span class="op">)</span></span>
 <span><span class="co"># DomUnit: name of the economy of the economic system, or "None" for the model "JLL No DomUnit"</span></span>
 <span><span class="co">###################################### BRW inputs  ######################################################</span></span>
-<span><span class="va">WishBC</span> <span class="op">&lt;-</span> <span class="fl">0</span> <span class="co"># Wish to estimate the model with the bias correction method of BRW (2012): #YES: 1, NO:0</span></span>
+<span><span class="va">WishBC</span> <span class="op">&lt;-</span> <span class="cn">FALSE</span> <span class="co"># Wish to estimate the model with the bias correction method of BRW (2012)</span></span>
 <span><span class="va">BRWlist</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/with.html" class="external-link">within</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  Cent_Measure <span class="op">=</span> <span class="st">"Mean"</span>, gamma <span class="op">=</span> <span class="fl">0.05</span>, N_iter <span class="op">=</span> <span class="fl">250</span>, B <span class="op">=</span> <span class="fl">50</span>, checkBRW <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  B_check <span class="op">=</span> <span class="fl">1000</span>, Eigen_rest <span class="op">=</span> <span class="fl">1</span></span>
@@ -1417,17 +1408,17 @@ package for a detailed reproduction.</p>
 <span><span class="co"># B_check: If checkBRW is chosen as TRUE, then choose number of bootstrap samples used in the check</span></span>
 <span></span>
 <span><span class="co"># C) Decide on Settings for numerical outputs</span></span>
-<span><span class="va">WishFPremia</span> <span class="op">&lt;-</span> <span class="fl">1</span> <span class="co"># Wish to estimate the forward premia: YES: 1, NO:0</span></span>
+<span><span class="va">WishFPremia</span> <span class="op">&lt;-</span> <span class="cn">TRUE</span> <span class="co"># Wish to estimate the forward premia</span></span>
 <span><span class="va">FPmatLim</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">60</span>, <span class="fl">120</span><span class="op">)</span> <span class="co">#  If the forward premia is desired, then choose the Min and max maturities of the</span></span>
 <span><span class="co"># forward premia. Otherwise set NA</span></span>
 <span><span class="va">Horiz</span> <span class="op">&lt;-</span> <span class="fl">30</span></span>
 <span><span class="va">DesiredGraphs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Fit"</span>, <span class="st">"IRF"</span>, <span class="st">"TermPremia"</span><span class="op">)</span> <span class="co"># "Fit", "IRF", "FEVD", "GIRF", "GFEVD", "TermPremia"</span></span>
-<span><span class="va">WishGraphRiskFac</span> <span class="op">&lt;-</span> <span class="fl">0</span></span>
-<span><span class="va">WishGraphYields</span> <span class="op">&lt;-</span> <span class="fl">1</span></span>
-<span><span class="va">WishOrthoJLLgraphs</span> <span class="op">&lt;-</span> <span class="fl">0</span></span>
+<span><span class="va">WishGraphRiskFac</span> <span class="op">&lt;-</span> <span class="cn">FALSE</span></span>
+<span><span class="va">WishGraphYields</span> <span class="op">&lt;-</span> <span class="cn">TRUE</span></span>
+<span><span class="va">WishOrthoJLLgraphs</span> <span class="op">&lt;-</span> <span class="cn">FALSE</span></span>
 <span></span>
 <span><span class="co"># D) Bootstrap settings</span></span>
-<span><span class="va">WishBootstrap</span> <span class="op">&lt;-</span> <span class="fl">1</span> <span class="co">#  YES: 1; No = 0.</span></span>
+<span><span class="va">WishBootstrap</span> <span class="op">&lt;-</span> <span class="cn">TRUE</span> </span>
 <span><span class="va">BootList</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>methodBS <span class="op">=</span> <span class="st">"bs"</span>, BlockLength <span class="op">=</span> <span class="fl">4</span>, ndraws <span class="op">=</span> <span class="fl">4</span>, pctg <span class="op">=</span> <span class="fl">95</span><span class="op">)</span></span>
 <span><span class="co"># methodBS: bootstrap method. Available options: (i) 'bs' ; (ii) 'wild'; (iii) 'block'</span></span>
 <span><span class="co"># BlockLength: Block length, necessary input for the block bootstrap method</span></span>
@@ -1435,7 +1426,7 @@ package for a detailed reproduction.</p>
 <span><span class="co"># pctg: confidence level</span></span>
 <span></span>
 <span><span class="co"># E) Out-of-sample forecast</span></span>
-<span><span class="va">WishForecast</span> <span class="op">&lt;-</span> <span class="fl">1</span> <span class="co">#  YES: 1; No = 0.</span></span>
+<span><span class="va">WishForecast</span> <span class="op">&lt;-</span> <span class="cn">TRUE</span> </span>
 <span><span class="va">ForecastList</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>ForHoriz <span class="op">=</span> <span class="fl">12</span>, t0Sample <span class="op">=</span> <span class="fl">1</span>, t0Forecast <span class="op">=</span> <span class="fl">131</span>, ForType <span class="op">=</span> <span class="st">"Rolling"</span><span class="op">)</span></span>
 <span><span class="co"># ForHoriz: forecast horizon</span></span>
 <span><span class="co"># t0Sample:   initial sample date</span></span>

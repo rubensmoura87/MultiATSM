@@ -51,7 +51,7 @@
 <span>  <span class="va">Economies</span>,</span>
 <span>  JLLlist <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  GVARlist <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  <span class="va">WishBRW</span>,</span>
+<span>  WishBRW <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  BRWlist <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  Folder2save <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">TRUE</span></span>
@@ -63,47 +63,47 @@
 
 
 <dl><dt id="arg-modeltype">ModelType<a class="anchor" aria-label="anchor" href="#arg-modeltype"></a></dt>
-<dd><p>A character vector indicating the model type to be estimated.</p></dd>
+<dd><p>character. Model type to be estimated. Permissible choices: "JPS original", "JPS global", "GVAR single", "JPS multi", "GVAR multi", "JLL original", "JLL No DomUnit", "JLL joint Sigma".</p></dd>
 
 
 <dt id="arg-modelpara">ModelPara<a class="anchor" aria-label="anchor" href="#arg-modelpara"></a></dt>
-<dd><p>A list containing the point estimates of the model parameters. For details, refer to the outputs from the <code><a href="Optimization.html">Optimization</a></code> function.</p></dd>
+<dd><p>list. Point estimates of the model parameters. See outputs from <code><a href="Optimization.html">Optimization</a></code>.</p></dd>
 
 
 <dt id="arg-inputsforoutputs">InputsForOutputs<a class="anchor" aria-label="anchor" href="#arg-inputsforoutputs"></a></dt>
-<dd><p>A list containing the necessary inputs for generating IRFs, GIRFs, FEVDs, GFEVDs and Term Premia.</p></dd>
+<dd><p>list. Inputs for generating IRFs, GIRFs, FEVDs, GFEVDs, and Term Premia.</p></dd>
 
 
 <dt id="arg-factorlabels">FactorLabels<a class="anchor" aria-label="anchor" href="#arg-factorlabels"></a></dt>
-<dd><p>A list of character vectors with labels for all variables in the model.</p></dd>
+<dd><p>list. Labels for all variables present in the model, as returned by <code><a href="LabFac.html">LabFac</a></code>.</p></dd>
 
 
 <dt id="arg-economies">Economies<a class="anchor" aria-label="anchor" href="#arg-economies"></a></dt>
-<dd><p>A character vector containing the names of the economies included in the system.</p></dd>
+<dd><p>character vector. Names of the economies included in the system.</p></dd>
 
 
 <dt id="arg-jlllist">JLLlist<a class="anchor" aria-label="anchor" href="#arg-jlllist"></a></dt>
-<dd><p>A list of necessary inputs for the estimation of JLL-based models (see the <code><a href="JLL.html">JLL</a></code> function).</p></dd>
+<dd><p>list. Inputs for JLL model estimation (see <code><a href="JLL.html">JLL</a></code>). Default is NULL.</p></dd>
 
 
 <dt id="arg-gvarlist">GVARlist<a class="anchor" aria-label="anchor" href="#arg-gvarlist"></a></dt>
-<dd><p>A list containing the necessary inputs for the estimation of GVAR-based models (see the <code><a href="GVAR.html">GVAR</a></code> function).</p></dd>
+<dd><p>list. Inputs for GVAR model estimation (see <code><a href="GVAR.html">GVAR</a></code>). Default is NULL.</p></dd>
 
 
 <dt id="arg-wishbrw">WishBRW<a class="anchor" aria-label="anchor" href="#arg-wishbrw"></a></dt>
-<dd><p>Whether to estimate the physical parameter model with bias correction, based on the method by Bauer, Rudebusch and Wu (2012) (see <code><a href="Bias_Correc_VAR.html">Bias_Correc_VAR</a></code> function). Default is set to 0.</p></dd>
+<dd><p>logical. Whether to estimate the physical parameter model with bias correction (see <code><a href="Bias_Correc_VAR.html">Bias_Correc_VAR</a></code>). Default is FALSE.</p></dd>
 
 
 <dt id="arg-brwlist">BRWlist<a class="anchor" aria-label="anchor" href="#arg-brwlist"></a></dt>
-<dd><p>List of necessary inputs for performing the bias-corrected estimation (see <code><a href="Bias_Correc_VAR.html">Bias_Correc_VAR</a></code> function).</p></dd>
+<dd><p>list. Inputs for bias-corrected estimation (see <code><a href="Bias_Correc_VAR.html">Bias_Correc_VAR</a></code>).</p></dd>
 
 
 <dt id="arg-folder-save">Folder2save<a class="anchor" aria-label="anchor" href="#arg-folder-save"></a></dt>
-<dd><p>Folder path where the outputs will be stored. Default option saves the outputs in a temporary directory.</p></dd>
+<dd><p>character. Folder path where outputs will be stored. Default saves outputs in a temporary directory.</p></dd>
 
 
 <dt id="arg-verbose">verbose<a class="anchor" aria-label="anchor" href="#arg-verbose"></a></dt>
-<dd><p>Logical flag controlling function messaging. Default is TRUE.</p></dd>
+<dd><p>logical. Print progress messages. Default is TRUE.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -112,6 +112,15 @@
 <li><p>Out-of-sample forecast errors of bond yields per forecast horizon</p></li>
 <li><p>Root mean square errors per forecast horizon</p></li>
 </ol></div>
+    <div class="section level2">
+    <h2 id="permissible-options-forecast-list-inputsforoutputs-input-">Permissible options - forecast list (<code>InputsForOutputs</code> input)<a class="anchor" aria-label="anchor" href="#permissible-options-forecast-list-inputsforoutputs-input-"></a></h2>
+
+
+<ul><li><p><strong>ForHoriz</strong>: forecast horizon. Must be a positive integer.</p></li>
+<li><p><strong>t0Sample</strong>:   initial sample date. Must be a positive integer smaller than the time series dimension of the model (Td)</p></li>
+<li><p><strong>t0Forecast</strong>:  last sample date for the first forecast. Note that Td &gt; t0Forecast + ForHoriz.</p></li>
+<li><p><strong>ForType</strong>: <code>"Rolling"</code> (rolling window forecast) or <code>"Expanding"</code> (for expanding window forecast)</p></li>
+</ul></div>
     <div class="section level2">
     <h2 id="available-methods">Available Methods<a class="anchor" aria-label="anchor" href="#available-methods"></a></h2>
 
@@ -134,13 +143,13 @@
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">Forecast</span> <span class="op">&lt;-</span> <span class="fu">ForecastYields</span><span class="op">(</span><span class="va">ModelType</span>, <span class="va">ModelParaEx</span>, <span class="va">InpForOutEx</span>, <span class="va">FacLab</span>, <span class="va">Economy</span>,</span></span>
-<span class="r-in"><span>  WishBRW <span class="op">=</span> <span class="fl">0</span>, verbose <span class="op">=</span> <span class="cn">TRUE</span></span></span>
+<span class="r-in"><span>  WishBRW <span class="op">=</span> <span class="cn">FALSE</span>, verbose <span class="op">=</span> <span class="cn">TRUE</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> 4) OUT-OF-SAMPLE FORECASTING ANALYSIS</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Out-of-sample forecast for the information set: 01-07-2006 || 01-05-2018 </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Out-of-sample forecast for the information set: 01-07-2006 || 01-06-2018 </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Out-of-sample forecast for the information set: 01-07-2006 || 01-07-2018 </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Elapsed time: 3.22 seconds</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Elapsed time: 3.52 seconds</span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
     </div>

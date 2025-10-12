@@ -60,7 +60,7 @@
                         <h4 data-toc-skip class="author">Rubens
 Moura</h4>
             
-            <h4 data-toc-skip class="date">2025-10-10</h4>
+            <h4 data-toc-skip class="date">2025-10-12</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/rubensmoura87/MultiATSM/blob/main/vignettes/Paper-Replications.Rmd" class="external-link"><code>vignettes/Paper-Replications.Rmd</code></a></small>
       <div class="d-none name"><code>Paper-Replications.Rmd</code></div>
@@ -124,7 +124,7 @@ using the <em>JPS original</em> modeling setup.</p>
 <span></span>
 <span><span class="va">DataFreq</span> <span class="op">&lt;-</span> <span class="st">"Monthly"</span> <span class="co"># Frequency of the data</span></span>
 <span></span>
-<span><span class="va">StatQ</span> <span class="op">&lt;-</span> <span class="fl">0</span> <span class="co"># Stationary condition</span></span>
+<span><span class="va">StatQ</span> <span class="op">&lt;-</span> <span class="cn">FALSE</span> <span class="co"># Stationary condition</span></span>
 <span></span>
 <span><span class="co">#########################################################################################################</span></span>
 <span><span class="co">############################### NO NEED TO MAKE CHANGES FROM HERE #######################################</span></span>
@@ -615,7 +615,7 @@ Uruguay.</p>
 <span><span class="va">DataFreq</span> <span class="op">&lt;-</span> <span class="st">"Monthly"</span></span>
 <span><span class="va">Folder2Save</span> <span class="op">&lt;-</span> <span class="cn">NULL</span></span>
 <span></span>
-<span><span class="va">StatQ</span> <span class="op">&lt;-</span> <span class="fl">0</span></span>
+<span><span class="va">StatQ</span> <span class="op">&lt;-</span> <span class="cn">FALSE</span></span>
 <span></span>
 <span><span class="co"># B.1) SPECIFIC model inputs</span></span>
 <span><span class="co">#################################### GVAR-based models ##################################################</span></span>
@@ -626,28 +626,28 @@ Uruguay.</p>
 <span><span class="co">#################################### JLL-based models ###################################################</span></span>
 <span><span class="va">JLLlist</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>DomUnit <span class="op">=</span> <span class="st">"China"</span><span class="op">)</span></span>
 <span><span class="co">###################################### BRW inputs  ######################################################</span></span>
-<span><span class="va">WishBC</span> <span class="op">&lt;-</span> <span class="fl">1</span></span>
+<span><span class="va">WishBC</span> <span class="op">&lt;-</span> <span class="cn">TRUE</span></span>
 <span><span class="va">BRWlist</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/with.html" class="external-link">within</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  Cent_Measure <span class="op">=</span> <span class="st">"Mean"</span>, gamma <span class="op">=</span> <span class="fl">0.001</span>, N_iter <span class="op">=</span> <span class="fl">200</span>, B <span class="op">=</span> <span class="fl">50</span>, checkBRW <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  B_check <span class="op">=</span> <span class="fl">1000</span>, Eigen_rest <span class="op">=</span> <span class="fl">1</span></span>
 <span><span class="op">)</span>, <span class="va">N_burn</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">N_iter</span> <span class="op">*</span> <span class="fl">0.15</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># C) Decide on Settings for numerical outputs</span></span>
-<span><span class="va">WishFPremia</span> <span class="op">&lt;-</span> <span class="fl">1</span></span>
+<span><span class="va">WishFPremia</span> <span class="op">&lt;-</span> <span class="cn">TRUE</span></span>
 <span><span class="va">FPmatLim</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">24</span>, <span class="fl">36</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">Horiz</span> <span class="op">&lt;-</span> <span class="fl">25</span></span>
 <span><span class="va">DesiredGraphs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"GIRF"</span>, <span class="st">"GFEVD"</span>, <span class="st">"TermPremia"</span><span class="op">)</span></span>
-<span><span class="va">WishGraphRiskFac</span> <span class="op">&lt;-</span> <span class="fl">0</span></span>
-<span><span class="va">WishGraphYields</span> <span class="op">&lt;-</span> <span class="fl">1</span></span>
-<span><span class="va">WishOrthoJLLgraphs</span> <span class="op">&lt;-</span> <span class="fl">1</span></span>
+<span><span class="va">WishGraphRiskFac</span> <span class="op">&lt;-</span> <span class="cn">FALSE</span></span>
+<span><span class="va">WishGraphYields</span> <span class="op">&lt;-</span> <span class="cn">TRUE</span></span>
+<span><span class="va">WishOrthoJLLgraphs</span> <span class="op">&lt;-</span> <span class="cn">TRUE</span></span>
 <span></span>
 <span><span class="co"># D) Bootstrap settings</span></span>
-<span><span class="va">WishBootstrap</span> <span class="op">&lt;-</span> <span class="fl">0</span> <span class="co">#  Set it to 1, if bootstrap is desired</span></span>
+<span><span class="va">WishBootstrap</span> <span class="op">&lt;-</span> <span class="cn">FALSE</span> <span class="co">#  Set it to TRUE, if bootstrap is desired</span></span>
 <span><span class="va">BootList</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>methodBS <span class="op">=</span> <span class="st">"bs"</span>, BlockLength <span class="op">=</span> <span class="fl">4</span>, ndraws <span class="op">=</span> <span class="fl">1000</span>, pctg <span class="op">=</span> <span class="fl">95</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># E) Out-of-sample forecast</span></span>
-<span><span class="va">WishForecast</span> <span class="op">&lt;-</span> <span class="fl">1</span></span>
+<span><span class="va">WishForecast</span> <span class="op">&lt;-</span> <span class="cn">TRUE</span></span>
 <span><span class="va">ForecastList</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>ForHoriz <span class="op">=</span> <span class="fl">12</span>, t0Sample <span class="op">=</span> <span class="fl">1</span>, t0Forecast <span class="op">=</span> <span class="fl">100</span>, ForType <span class="op">=</span> <span class="st">"Rolling"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co">#########################################################################################################</span></span>
@@ -726,7 +726,7 @@ pandemic.</p>
 <span><span class="va">DataFreq</span> <span class="op">&lt;-</span> <span class="st">"Weekly"</span></span>
 <span><span class="va">F2S</span> <span class="op">&lt;-</span> <span class="cn">NULL</span></span>
 <span></span>
-<span><span class="va">StatQ</span> <span class="op">&lt;-</span> <span class="fl">0</span></span>
+<span><span class="va">StatQ</span> <span class="op">&lt;-</span> <span class="cn">FALSE</span></span>
 <span></span>
 <span><span class="co"># B.1) SPECIFIC model inputs</span></span>
 <span><span class="co">#################################### GVAR-based models ##################################################</span></span>
@@ -735,20 +735,20 @@ pandemic.</p>
 <span>  t_Last_Wgvar <span class="op">=</span> <span class="st">"2020"</span>, DataConnectedness <span class="op">=</span> <span class="va">Trade_Flows</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">###################################### BRW inputs  ######################################################</span></span>
-<span><span class="va">WishBC</span> <span class="op">&lt;-</span> <span class="fl">0</span></span>
+<span><span class="va">WishBC</span> <span class="op">&lt;-</span> <span class="cn">FALSE</span></span>
 <span></span>
 <span><span class="co"># C) Decide on Settings for numerical outputs</span></span>
-<span><span class="va">WishFPremia</span> <span class="op">&lt;-</span> <span class="fl">1</span></span>
+<span><span class="va">WishFPremia</span> <span class="op">&lt;-</span> <span class="cn">TRUE</span></span>
 <span><span class="va">FPmatLim</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">47</span>, <span class="fl">48</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">Horiz</span> <span class="op">&lt;-</span> <span class="fl">12</span></span>
 <span><span class="va">DesiredGraphs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"GIRF"</span>, <span class="st">"GFEVD"</span>, <span class="st">"TermPremia"</span><span class="op">)</span></span>
-<span><span class="va">WishGraphRiskFac</span> <span class="op">&lt;-</span> <span class="fl">0</span></span>
-<span><span class="va">WishGraphYields</span> <span class="op">&lt;-</span> <span class="fl">1</span></span>
-<span><span class="va">WishOrthoJLLgraphs</span> <span class="op">&lt;-</span> <span class="fl">0</span></span>
+<span><span class="va">WishGraphRiskFac</span> <span class="op">&lt;-</span> <span class="cn">FALSE</span></span>
+<span><span class="va">WishGraphYields</span> <span class="op">&lt;-</span> <span class="cn">TRUE</span></span>
+<span><span class="va">WishOrthoJLLgraphs</span> <span class="op">&lt;-</span> <span class="cn">FALSE</span></span>
 <span></span>
 <span><span class="co"># D) Bootstrap settings</span></span>
-<span><span class="va">WishBootstrap</span> <span class="op">&lt;-</span> <span class="fl">1</span> <span class="co">#  YES: 1; No = 0.</span></span>
+<span><span class="va">WishBootstrap</span> <span class="op">&lt;-</span> <span class="cn">TRUE</span> <span class="co">#  YES: 1; No = 0.</span></span>
 <span><span class="va">BootList</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>methodBS <span class="op">=</span> <span class="st">"bs"</span>, BlockLength <span class="op">=</span> <span class="fl">4</span>, ndraws <span class="op">=</span> <span class="fl">100</span>, pctg <span class="op">=</span> <span class="fl">95</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co">#########################################################################################################</span></span>

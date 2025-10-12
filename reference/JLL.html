@@ -51,32 +51,37 @@
 
 
 <dl><dt id="arg-nonorthofactors">NonOrthoFactors<a class="anchor" aria-label="anchor" href="#arg-nonorthofactors"></a></dt>
-<dd><p>A numeric matrix (F x T) representing the time series of risk factors before the orthogonalization process.</p></dd>
+<dd><p>numeric matrix (K x Td). Time series of risk factors before orthogonalization.</p></dd>
 
 
 <dt id="arg-n">N<a class="anchor" aria-label="anchor" href="#arg-n"></a></dt>
-<dd><p>Integer. Number of country-specific spanned factors.</p></dd>
+<dd><p>positive integer. Number of country-specific spanned factors.</p></dd>
 
 
 <dt id="arg-jllinputs">JLLinputs<a class="anchor" aria-label="anchor" href="#arg-jllinputs"></a></dt>
-<dd><p>List of necessary inputs to estimate JLL models:</p><ol><li><p>Economies:  set of economies that are part of the economic system (string-vector)</p></li>
-<li><p><code>DomUnit</code>: A string specifying the name of the economy assigned as the dominant unit. <br>
-                 If no dominant unit is assigned, set this variable to "None".</p></li>
-<li><p><code>WishSigmas</code>: Set to "1" if the user wishes to estimate the variance-covariance matrices and Cholesky factorizations <br>
-                 (this can take a long time). Set to "0" if not.</p></li>
-<li><p><code>SigmaNonOrtho</code>: A NULL value or an F x F matrix from the non-orthogonalized dynamics.</p></li>
-<li><p><code>JLLModelType</code>: A string specifying the type of JLL model. Available options are: "JLL original", "JLL joint Sigma", or "JLL No DomUnit".</p></li>
+<dd><p>list. Necessary inputs to estimate JLL models:</p><ol><li><p><code>Economies</code>: character vector. Set of economies in the system.</p></li>
+<li><p><code>DomUnit</code>: character. Name of the dominant economy, or "None" if not assigned (for "JLL No DomUnit" models).</p></li>
+<li><p><code>WishSigmas</code>: logical. TRUE to estimate variance-covariance matrices and Cholesky factorizations; FALSE otherwise.</p></li>
+<li><p><code>SigmaNonOrtho</code>: NULL or F x F matrix from non-orthogonalized dynamics.</p></li>
+<li><p><code>JLLModelType</code>: character. Permissible choices: "JLL original", "JLL joint Sigma", "JLL No DomUnit".</p></li>
 </ol></dd>
 
 
 <dt id="arg-checkinputs">CheckInputs<a class="anchor" aria-label="anchor" href="#arg-checkinputs"></a></dt>
-<dd><p>A logical flag to indicate whether to perform a prior consistency check on the inputs provided in <code>JLLinputs</code>. The default is set to FALSE</p></dd>
+<dd><p>logical. Whether to perform a prior consistency check on the inputs provided in <code>JLLinputs</code>. Default is FALSE.</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>List of model parameters from both the orthogonalized and non-orthogonalized versions of the JLL's based models</p>
+    <p>List of model parameters from both the orthogonalized and non-orthogonalized versions of the JLL-based models</p>
     </div>
+    <div class="section level2">
+    <h2 id="general-notation">General Notation<a class="anchor" aria-label="anchor" href="#general-notation"></a></h2>
+
+
+<ul><li><p><code>Td</code>: model time series dimension</p></li>
+<li><p><code>K</code>: total number of risk factors</p></li>
+</ul></div>
     <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
     <p>Jotiskhatira, Le and Lundblad (2015). "Why do interest rates in different currencies co-move?" (Journal of Financial Economics)</p>
@@ -88,12 +93,10 @@
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">CM_Factors</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">RF_TS</span> <span class="op">&lt;-</span> <span class="va">RiskFactors</span></span></span>
 <span class="r-in"><span><span class="va">N</span> <span class="op">&lt;-</span> <span class="fl">3</span></span></span>
-<span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">JLLinputs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>  Economies <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"China"</span>, <span class="st">"Brazil"</span>, <span class="st">"Mexico"</span>, <span class="st">"Uruguay"</span><span class="op">)</span>, DomUnit <span class="op">=</span> <span class="st">"China"</span>,</span></span>
-<span class="r-in"><span>  WishSigmas <span class="op">=</span> <span class="fl">1</span>, SigmaNonOrtho <span class="op">=</span> <span class="cn">NULL</span>, JLLModelType <span class="op">=</span> <span class="st">"JLL original"</span></span></span>
+<span class="r-in"><span>  WishSigmas <span class="op">=</span> <span class="cn">TRUE</span>, SigmaNonOrtho <span class="op">=</span> <span class="cn">NULL</span>, JLLModelType <span class="op">=</span> <span class="st">"JLL original"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">JLLPara</span> <span class="op">&lt;-</span> <span class="fu">JLL</span><span class="op">(</span><span class="va">RF_TS</span>, <span class="va">N</span>, <span class="va">JLLinputs</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>

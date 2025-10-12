@@ -77,69 +77,108 @@
 
 
 <dt id="arg-modeltype">ModelType<a class="anchor" aria-label="anchor" href="#arg-modeltype"></a></dt>
-<dd><p>A character vector indicating the model type to be estimated. Available options: "JPS original", "JPS global", "GVAR single", "JPS multi", "GVAR multi", "JLL original", "JLL No DomUnit", "JLL joint Sigma".</p></dd>
+<dd><p>character. Model type to be estimated. Permissible choices: "JPS original", "JPS global", "GVAR single", "JPS multi", "GVAR multi", "JLL original", "JLL No DomUnit", "JLL joint Sigma".</p></dd>
 
 
 <dt id="arg-yields">Yields<a class="anchor" aria-label="anchor" href="#arg-yields"></a></dt>
-<dd><p>A numerical matrix with time series of yields (J x T or CJ x T)</p></dd>
+<dd><p>numerical matrix with time series of yields (J x Td or CJ x Td)</p></dd>
 
 
 <dt id="arg-globalmacro">GlobalMacro<a class="anchor" aria-label="anchor" href="#arg-globalmacro"></a></dt>
-<dd><p>A numerical matrix with time series of the global risk factors (G x T)</p></dd>
+<dd><p>numerical matrix with time series of the global risk factors (G x Td)</p></dd>
 
 
 <dt id="arg-dommacro">DomMacro<a class="anchor" aria-label="anchor" href="#arg-dommacro"></a></dt>
-<dd><p>A numerical matrix with time series of the country-specific risk factors for all C countries (CM x T)</p></dd>
+<dd><p>numerical matrix with time series of the country-specific risk factors for all C countries (C X Td or CM x Td)</p></dd>
 
 
 <dt id="arg-factorlabels">FactorLabels<a class="anchor" aria-label="anchor" href="#arg-factorlabels"></a></dt>
-<dd><p>A list of character vectors with labels for all variables in the model.</p></dd>
+<dd><p>list. Labels for all variables present in the model.</p></dd>
 
 
 <dt id="arg-economies">Economies<a class="anchor" aria-label="anchor" href="#arg-economies"></a></dt>
-<dd><p>A character vector containing the names of the economies included in the system.</p></dd>
+<dd><p>character vector. Names of the economies included in the system.</p></dd>
 
 
 <dt id="arg-datafrequency">DataFrequency<a class="anchor" aria-label="anchor" href="#arg-datafrequency"></a></dt>
-<dd><p>A character vector specifying the frequency of the data. Available options are: "Daily All Days", "Daily Business Days", "Weekly", "Monthly", "Quarterly", or "Annually".</p></dd>
+<dd><p>character. Data frequency. Permissible choices: "Daily All Days", "Daily Business Days", "Weekly", "Monthly", "Quarterly", "Annually".</p></dd>
 
 
 <dt id="arg-gvarlist">GVARlist<a class="anchor" aria-label="anchor" href="#arg-gvarlist"></a></dt>
-<dd><p>A list containing the necessary inputs for the estimation of GVAR-based models</p></dd>
+<dd><p>list. Inputs for GVAR model estimation. See details below.</p></dd>
 
 
 <dt id="arg-jlllist">JLLlist<a class="anchor" aria-label="anchor" href="#arg-jlllist"></a></dt>
-<dd><p>A list of necessary inputs for the estimation of JLL-based models. If the chosen model is "JLL original" or "JLL joint Sigma", then a dominant unit economy must be chosen. Otherwise, this list must be set as 'None'.</p></dd>
+<dd><p>list. Inputs for JLL model estimation. See details below.</p></dd>
 
 
 <dt id="arg-wishbrw">WishBRW<a class="anchor" aria-label="anchor" href="#arg-wishbrw"></a></dt>
-<dd><p>Logical. Whether to estimate the physical parameter model with bias correction, based on the method by Bauer, Rudebusch and Wu (2012). Default is FALSE.</p></dd>
+<dd><p>logical. Whether to estimate the physical parameter model with bias correction (see <code><a href="Bias_Correc_VAR.html">Bias_Correc_VAR</a></code>). Default is FALSE.</p></dd>
 
 
 <dt id="arg-brwlist">BRWlist<a class="anchor" aria-label="anchor" href="#arg-brwlist"></a></dt>
-<dd><p>List of necessary inputs for performing the bias-corrected estimation.</p></dd>
+<dd><p>list. Inputs for bias-corrected estimation.</p></dd>
 
 
 <dt id="arg-unityields">UnitYields<a class="anchor" aria-label="anchor" href="#arg-unityields"></a></dt>
-<dd><p>A character string indicating the maturity unit of yields. Options are: "Month" for yields expressed in months, or "Year" for yields expressed in years. Default is "Month".</p></dd>
+<dd><p>character. Maturity unit of yields. Permissible choices: "Month" or "Year". Default is "Month".</p></dd>
 
 
 <dt id="arg-checkinputs">CheckInputs<a class="anchor" aria-label="anchor" href="#arg-checkinputs"></a></dt>
-<dd><p>Logical. Whether to perform a prior check on the consistency of the provided input list. Default is TRUE.</p></dd>
+<dd><p>logical. Whether to perform a prior check on the consistency of the provided input list. Default is TRUE.</p></dd>
 
 
 <dt id="arg-bs-adj">BS_Adj<a class="anchor" aria-label="anchor" href="#arg-bs-adj"></a></dt>
-<dd><p>Logical. Whether to adjust the global series for the sepQ models in the Bootstrap setting. Default is FALSE.</p></dd>
+<dd><p>logical. Whether to adjust the global series for the sepQ models in the Bootstrap setting. Default is FALSE.</p></dd>
 
 
 <dt id="arg-verbose">verbose<a class="anchor" aria-label="anchor" href="#arg-verbose"></a></dt>
-<dd><p>Logical flag controlling function messaging. Default is TRUE.</p></dd>
+<dd><p>logical. Print progress messages. Default is TRUE.</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>An object of class 'ATSMModelInputs' containing the necessary inputs for performing the model optimization.</p>
     </div>
+    <div class="section level2">
+    <h2 id="permissible-options-for-gvarlist">Permissible options for GVARlist<a class="anchor" aria-label="anchor" href="#permissible-options-for-gvarlist"></a></h2>
+
+
+<ul><li><p><strong>VARXtype</strong>: "unconstrained" or "constrained"</p></li>
+<li><p><strong>W_type</strong>: "Time-varying" or "Sample Mean"</p></li>
+<li><p><strong>t_First_Wgvar</strong>, <strong>t_Last_Wgvar</strong>: year as character</p></li>
+</ul></div>
+    <div class="section level2">
+    <h2 id="permissible-options-for-jlllist">Permissible options for JLLlist<a class="anchor" aria-label="anchor" href="#permissible-options-for-jlllist"></a></h2>
+
+
+<ul><li><p><strong>DomUnit</strong>: name of the dominant economy or "None"</p></li>
+<li><p><strong>WishSigmas</strong>: 1 (estimate variance-covariance matrices) or 0</p></li>
+<li><p><strong>SigmaNonOrtho</strong>: NULL or F x F matrix</p></li>
+</ul></div>
+    <div class="section level2">
+    <h2 id="permissible-options-for-brwlist">Permissible options for BRWlist<a class="anchor" aria-label="anchor" href="#permissible-options-for-brwlist"></a></h2>
+
+
+<ul><li><p><strong>BiasCorrection</strong>: 1 (bias-corrected) or 0</p></li>
+<li><p><strong>flag_mean</strong>: TRUE (mean) or FALSE (median)</p></li>
+<li><p><strong>gamma</strong>: numeric adjustment parameter</p></li>
+<li><p><strong>N_iter</strong>: number of iterations</p></li>
+<li><p><strong>N_burn</strong>: number of burn-in iterations</p></li>
+<li><p><strong>B</strong>: number of bootstrap samples</p></li>
+<li><p><strong>checkBRW</strong>: TRUE or FALSE</p></li>
+<li><p><strong>B_check</strong>: number of bootstrap samples for closeness check</p></li>
+</ul></div>
+    <div class="section level2">
+    <h2 id="general-notation">General Notation<a class="anchor" aria-label="anchor" href="#general-notation"></a></h2>
+
+
+<ul><li><p><code>Td</code> model time series dimension.</p></li>
+<li><p><code>C</code> number of countries in the system.</p></li>
+<li><p><code>G</code> number of global unspanned factors.</p></li>
+<li><p><code>M</code> number of country-specific unspanned factors.</p></li>
+<li><p><code>J</code> number of bond yields per country used in estimation.</p></li>
+</ul></div>
     <div class="section level2">
     <h2 id="available-methods">Available Methods<a class="anchor" aria-label="anchor" href="#available-methods"></a></h2>
 

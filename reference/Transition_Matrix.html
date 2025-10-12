@@ -51,36 +51,35 @@
 
 
 <dl><dt id="arg-t-first">t_First<a class="anchor" aria-label="anchor" href="#arg-t-first"></a></dt>
-<dd><p>Sample starting date (in the format: yyyy).</p></dd>
+<dd><p>character. Sample starting date (format: yyyy).</p></dd>
 
 
 <dt id="arg-t-last">t_Last<a class="anchor" aria-label="anchor" href="#arg-t-last"></a></dt>
-<dd><p>Sample ending date (in the format: yyyy).</p></dd>
+<dd><p>character. Sample ending date (format: yyyy).</p></dd>
 
 
 <dt id="arg-economies">Economies<a class="anchor" aria-label="anchor" href="#arg-economies"></a></dt>
-<dd><p>A character vector containing the names of the economies included in the system.</p></dd>
+<dd><p>character vector. Names of the economies included in the system.</p></dd>
 
 
 <dt id="arg-type">type<a class="anchor" aria-label="anchor" href="#arg-type"></a></dt>
-<dd><p>A character string indicating the method for computing interdependence. Possible options include:</p><ul><li><p><code>Time-varying</code>: Computes time-varying interdependence and returns the weight matrices for each year based on available data (may extrapolate the sample period).</p></li>
-<li><p><code>Sample Mean</code>: Returns a single weight matrix containing the average weights over the entire sample period, suitable for time-invariant interdependence.</p></li>
-<li><p>A specific year (e.g., "1998", "2005"): Used to compute time-invariant interdependence for the specified year.</p></li>
+<dd><p>character. Method for computing interdependence. Possible options:</p><ul><li><p><code>"Time-varying"</code>: Computes time-varying interdependence and returns weight matrices for each year.</p></li>
+<li><p><code>"Sample Mean"</code>: Returns a single weight matrix with average weights over the sample period.</p></li>
+<li><p>Specific year (e.g., "1998", "2005"): Computes time-invariant interdependence for the specified year.</p></li>
 </ul></dd>
 
 
 <dt id="arg-dataconnectedness">DataConnectedness<a class="anchor" aria-label="anchor" href="#arg-dataconnectedness"></a></dt>
-<dd><p>Data used to compute the transition matrix.</p></dd>
+<dd><p>list or data frame. Data used to compute the transition matrix (e.g., trade flows).</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>matrix or list of matrices</p>
+    <p>matrix or list of matrices. Time-varying or time-invariant transition matrix depending on 'type'.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>If there is missing data for any country of the system for that particularly year,
-then the transition matrix will include only NAs.</p>
+    <p>If there is missing data for any country in a particular year, the transition matrix will include only NAs.</p>
     </div>
 
     <div class="section level2">
@@ -89,7 +88,7 @@ then the transition matrix will include only NAs.</p>
 <span class="r-in"><span><span class="va">t_Last</span> <span class="op">&lt;-</span> <span class="st">"2019"</span></span></span>
 <span class="r-in"><span><span class="va">Economies</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"China"</span>, <span class="st">"Brazil"</span>, <span class="st">"Mexico"</span>, <span class="st">"Uruguay"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">type</span> <span class="op">&lt;-</span> <span class="st">"Sample Mean"</span></span></span>
-<span class="r-in"><span><span class="co">## Load data if Connectedness data from excel, otherwise use pre-saved data</span></span></span>
+<span class="r-in"><span><span class="co"># Load data if Connectedness data from excel, otherwise use pre-saved data</span></span></span>
 <span class="r-in"><span><span class="va">GetExcelData</span> <span class="op">&lt;-</span> <span class="cn">FALSE</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="va">GetExcelData</span><span class="op">)</span> <span class="op">{</span></span></span>

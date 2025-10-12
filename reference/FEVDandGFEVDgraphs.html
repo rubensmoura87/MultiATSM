@@ -62,43 +62,43 @@
 
 
 <dl><dt id="arg-modeltype">ModelType<a class="anchor" aria-label="anchor" href="#arg-modeltype"></a></dt>
-<dd><p>A character vector indicating the  estimated model type</p></dd>
+<dd><p>character. Estimated model type.</p></dd>
 
 
 <dt id="arg-numout">NumOut<a class="anchor" aria-label="anchor" href="#arg-numout"></a></dt>
-<dd><p>list of computed outputs containing the model fit, IRFs, FEVDs, GIRFs, GFEVDs and Term premia</p></dd>
+<dd><p>list. Computed outputs containing model fit, IRFs, FEVDs, GIRFs, GFEVDs and Term premia.</p></dd>
 
 
 <dt id="arg-wishpdynamicsgraphs">WishPdynamicsgraphs<a class="anchor" aria-label="anchor" href="#arg-wishpdynamicsgraphs"></a></dt>
-<dd><p>binary variable: set 1, if the user wishes graphs to be generated; or set 0, otherwise</p></dd>
+<dd><p>logical. Set TRUE to generate risk factor graphs, FALSE otherwise.</p></dd>
 
 
 <dt id="arg-wishyieldsgraphs">WishYieldsgraphs<a class="anchor" aria-label="anchor" href="#arg-wishyieldsgraphs"></a></dt>
-<dd><p>binary variable: set 1, if the user wishes graphs to be generated; or set 0, otherwise</p></dd>
+<dd><p>logical. Set TRUE to generate bond yield graphs, FALSE otherwise.</p></dd>
 
 
 <dt id="arg-fevdhoriz">FEVDhoriz<a class="anchor" aria-label="anchor" href="#arg-fevdhoriz"></a></dt>
-<dd><p>single numerical vector containing the desired horizon of analysis for the FEVDs</p></dd>
+<dd><p>integer. Desired horizon of analysis for the FEVDs.</p></dd>
 
 
 <dt id="arg-pathsgraphs">PathsGraphs<a class="anchor" aria-label="anchor" href="#arg-pathsgraphs"></a></dt>
-<dd><p>Path of the folder in which the graphs will be saved</p></dd>
+<dd><p>character. Path of the folder in which the graphs will be saved.</p></dd>
 
 
 <dt id="arg-outputtype">OutputType<a class="anchor" aria-label="anchor" href="#arg-outputtype"></a></dt>
-<dd><p>Available options are 'FEVD' and 'GFEVD'</p></dd>
+<dd><p>character. Available options: "FEVD", "GFEVD", "FEVD Ortho", "GFEVD Ortho".</p></dd>
 
 
 <dt id="arg-economies">Economies<a class="anchor" aria-label="anchor" href="#arg-economies"></a></dt>
-<dd><p>A character vector containing the names of the economies included in the system.</p></dd>
+<dd><p>character vector. Names of the economies included in the system.</p></dd>
 
 
 <dt id="arg-folder-save">Folder2save<a class="anchor" aria-label="anchor" href="#arg-folder-save"></a></dt>
-<dd><p>Folder path where the outputs will be stored.</p></dd>
+<dd><p>character. Folder path where the outputs will be stored.</p></dd>
 
 
 <dt id="arg-verbose">verbose<a class="anchor" aria-label="anchor" href="#arg-verbose"></a></dt>
-<dd><p>Logical flag controlling function messaging.</p></dd>
+<dd><p>logical. Flag controlling function messaging.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -106,9 +106,9 @@
 
 
 <p>- `autoplot(object, type = "FEVD_Factor")`, `autoplot(object, type = "FEVD_Yields")`,
-  `autoplot(object, type = "GFEVD_Yields")`, `autoplot(object, type = "GFEVD_Yields")`. <br></p>
-<p>- For JLL-based models other option available are: `autoplot(object, type = "FEVD_Factor-_Ortho")`,
- `autoplot(object, type = "FEVD_Yields_Ortho")`, `autoplot(object, type = "GFEVD_Yields_Ortho")`,
+  `autoplot(object, type = "GFEVD_Yields")`, `autoplot(object, type = "GFEVD_Yields")`.
+  For JLL-based models: `autoplot(object, type = "FEVD_Factor-_Ortho")`,
+  `autoplot(object, type = "FEVD_Yields_Ortho")`, `autoplot(object, type = "GFEVD_Yields_Ortho")`,
   `autoplot(object, type = "GFEVD_Yields_Ortho")`.</p>
     </div>
 
@@ -118,9 +118,8 @@
 <span class="r-in"><span><span class="va">ModelType</span> <span class="op">&lt;-</span> <span class="st">"JPS original"</span></span></span>
 <span class="r-in"><span><span class="va">Economy</span> <span class="op">&lt;-</span> <span class="st">"Brazil"</span></span></span>
 <span class="r-in"><span><span class="va">FEVDhoriz</span> <span class="op">&lt;-</span> <span class="fl">20</span></span></span>
-<span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">FEVDandGFEVDgraphs</span><span class="op">(</span><span class="va">ModelType</span>, <span class="va">NumOutEx</span>,</span></span>
-<span class="r-in"><span>  WishPdynamicsgraphs <span class="op">=</span> <span class="fl">0</span>, WishYieldsgraphs <span class="op">=</span> <span class="fl">1</span>, <span class="va">FEVDhoriz</span>,</span></span>
+<span class="r-in"><span>  WishPdynamicsgraphs <span class="op">=</span> <span class="cn">FALSE</span>, WishYieldsgraphs <span class="op">=</span> <span class="cn">TRUE</span>, <span class="va">FEVDhoriz</span>,</span></span>
 <span class="r-in"><span>  PathsGraphs <span class="op">=</span> <span class="cn">NULL</span>, OutputType <span class="op">=</span> <span class="st">"FEVD"</span>, <span class="va">Economy</span>,</span></span>
 <span class="r-in"><span>  Folder2save <span class="op">=</span> <span class="cn">NULL</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>

@@ -51,21 +51,30 @@
 
 
 <dl><dt id="arg-yields">Yields<a class="anchor" aria-label="anchor" href="#arg-yields"></a></dt>
-<dd><p>A matrix  (J x T), where J is the number of maturities and T is the length of the time series.</p></dd>
+<dd><p>matrix (J x Td). Bond yields for all countries.</p></dd>
 
 
 <dt id="arg-economies">Economies<a class="anchor" aria-label="anchor" href="#arg-economies"></a></dt>
-<dd><p>A character vector containing the names of the economies included in the system.</p></dd>
+<dd><p>character vector. Names of the economies included in the system.</p></dd>
 
 
 <dt id="arg-n">N<a class="anchor" aria-label="anchor" href="#arg-n"></a></dt>
-<dd><p>Scalar representing the desired number of country-specific spanned factors (maximum allowed is N = J).</p></dd>
+<dd><p>integer. Desired number of country-specific spanned factors (maximum allowed is N = J).</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>Matrix containing the N spanned factors for all the countries of the system  (CJ x T)</p>
+    <p>matrix. Contains the N spanned factors for all countries in the system (CJ x Td).</p>
     </div>
+    <div class="section level2">
+    <h2 id="general-notation">General Notation<a class="anchor" aria-label="anchor" href="#general-notation"></a></h2>
+
+
+<ul><li><p><code>Td</code>: model time series dimension</p></li>
+<li><p><code>C</code>: number of countries in the system</p></li>
+<li><p><code>N</code>: number of country-specific spanned factors</p></li>
+<li><p><code>J</code>: number of bond yields per country used in estimation</p></li>
+</ul></div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>

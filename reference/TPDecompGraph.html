@@ -61,40 +61,39 @@
 
 
 <dl><dt id="arg-modeltype">ModelType<a class="anchor" aria-label="anchor" href="#arg-modeltype"></a></dt>
-<dd><p>A character vector indicating the  estimated model type</p></dd>
+<dd><p>character. Estimated model type.</p></dd>
 
 
 <dt id="arg-numout">NumOut<a class="anchor" aria-label="anchor" href="#arg-numout"></a></dt>
-<dd><p>list of computed outputs containing the model fit, IRFs, FEVDs, GIRFs, GFEVDs and Risk premia</p></dd>
+<dd><p>list. Computed outputs containing model fit, IRFs, FEVDs, GIRFs, GFEVDs and risk premia.</p></dd>
 
 
 <dt id="arg-modelpara">ModelPara<a class="anchor" aria-label="anchor" href="#arg-modelpara"></a></dt>
-<dd><p>list of model parameter estimates (See the <code><a href="Optimization.html">Optimization</a></code> function)</p></dd>
+<dd><p>list. Model parameter estimates (see <code><a href="Optimization.html">Optimization</a></code>).</p></dd>
 
 
 <dt id="arg-wishrpgraphs">WishRPgraphs<a class="anchor" aria-label="anchor" href="#arg-wishrpgraphs"></a></dt>
-<dd><p>binary variable: set 1, if the user wishes graphs to be generated; or set 0, otherwise</p></dd>
+<dd><p>logical. Set TRUE to generate term premia graphs, FALSE otherwise.</p></dd>
 
 
 <dt id="arg-unityields">UnitYields<a class="anchor" aria-label="anchor" href="#arg-unityields"></a></dt>
-<dd><p>(i) "Month": if maturity of yields are expressed in months or
-(ii) "Year": if maturity of yields are expressed in years</p></dd>
+<dd><p>character. "Month" if yields are in months, "Year" if in years.</p></dd>
 
 
 <dt id="arg-economies">Economies<a class="anchor" aria-label="anchor" href="#arg-economies"></a></dt>
-<dd><p>A character vector containing the names of the economies included in the system.</p></dd>
+<dd><p>character vector. Names of the economies included in the system.</p></dd>
 
 
 <dt id="arg-pathsgraphs">PathsGraphs<a class="anchor" aria-label="anchor" href="#arg-pathsgraphs"></a></dt>
-<dd><p>Path of the folder in which the graphs will be saved</p></dd>
+<dd><p>character. Path of the folder in which the graphs will be saved.</p></dd>
 
 
 <dt id="arg-folder-save">Folder2Save<a class="anchor" aria-label="anchor" href="#arg-folder-save"></a></dt>
-<dd><p>Folder path where the outputs will be stored.</p></dd>
+<dd><p>character. Folder path where the outputs will be stored.</p></dd>
 
 
 <dt id="arg-verbose">verbose<a class="anchor" aria-label="anchor" href="#arg-verbose"></a></dt>
-<dd><p>description  Logical flag controlling function messaging.</p></dd>
+<dd><p>logical. Flag controlling function messaging.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -111,14 +110,10 @@
 <span class="r-in"><span><span class="va">ModelType</span> <span class="op">&lt;-</span> <span class="st">"JPS original"</span></span></span>
 <span class="r-in"><span><span class="va">Economy</span> <span class="op">&lt;-</span> <span class="st">"Brazil"</span></span></span>
 <span class="r-in"><span><span class="va">UnitYields</span> <span class="op">&lt;-</span> <span class="st">"Month"</span></span></span>
-<span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">TPDecompGraph</span><span class="op">(</span><span class="va">ModelType</span>, <span class="va">NumOutEx</span>, <span class="va">ModelParaEx</span>,</span></span>
-<span class="r-in"><span>  WishRPgraphs <span class="op">=</span> <span class="fl">1</span>, <span class="va">UnitYields</span>, <span class="va">Economy</span>,</span></span>
+<span class="r-in"><span>  WishRPgraphs <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">UnitYields</span>, <span class="va">Economy</span>,</span></span>
 <span class="r-in"><span>  PathsGraphs <span class="op">=</span> <span class="cn">NULL</span>, Folder2Save <span class="op">=</span> <span class="cn">NULL</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $Brazil</span>
-<span class="r-plt img"><img src="TPDecompGraph-1.png" alt="" width="700" height="433"></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

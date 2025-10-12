@@ -51,17 +51,24 @@
 
 
 <dl><dt id="arg-yields">Yields<a class="anchor" aria-label="anchor" href="#arg-yields"></a></dt>
-<dd><p>A matrix of bond yields (J x T) for a single country, where J is the number of maturities and T is the time series length.</p></dd>
+<dd><p>matrix (J x Td). Bond yields for a single country.</p></dd>
 
 
 <dt id="arg-economy">Economy<a class="anchor" aria-label="anchor" href="#arg-economy"></a></dt>
-<dd><p>A character string indicating the name of the economy.</p></dd>
+<dd><p>character. Name of the economy.</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A matrix (J x J) that corresponds to the eigenvectors of the variance-covariance matrix of yields</p>
+    <p>matrix (J x J). Eigenvectors of the variance-covariance matrix of yields.</p>
     </div>
+    <div class="section level2">
+    <h2 id="general-notation">General Notation<a class="anchor" aria-label="anchor" href="#general-notation"></a></h2>
+
+
+<ul><li><p><code>Td</code>: model time series dimension</p></li>
+<li><p><code>J</code>: number of bond yields per country used in estimation</p></li>
+</ul></div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>

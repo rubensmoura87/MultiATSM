@@ -60,52 +60,59 @@
 
 
 <dl><dt id="arg-modeltype">ModelType<a class="anchor" aria-label="anchor" href="#arg-modeltype"></a></dt>
-<dd><p>A character vector indicating the model type to be estimated.</p></dd>
+<dd><p>character. Model type to be estimated. Permissible choices: "JPS original", "JPS global", "GVAR single", "JPS multi", "GVAR multi", "JLL original", "JLL No DomUnit", "JLL joint Sigma".</p></dd>
 
 
 <dt id="arg-brwinputs">BRWinputs<a class="anchor" aria-label="anchor" href="#arg-brwinputs"></a></dt>
-<dd><p>A list containing the necessary inputs for the BRW model estimation:</p><ol><li><p><code>Cent_Measure</code>: Determines whether "Mean" or "Median"-unbiased estimation is desired.</p></li>
+<dd><p>list. Contains the necessary inputs for the BRW model estimation:</p><ol><li><p><code>Cent_Measure</code>: "Mean" or "Median" (unbiased estimation type)</p></li>
 <li><p><code>gamma</code>: Numeric. Adjustment parameter between 0 and 1. Default is 0.5.</p></li>
-<li><p><code>N_iter</code>: Integer. Number of iterations for the stochastic approximation algorithm after burn-in. Default is 5,000.</p></li>
+<li><p><code>N_iter</code>: Integer. Number of iterations for the stochastic approximation algorithm after burn-in. Default is 5000.</p></li>
 <li><p><code>N_burn</code>: Integer. Number of burn-in iterations. Default is 15<!-- % of \code{N_iter}. --></p></li>
 <li><p><code>B</code>: Integer. Number of bootstrap samples per iteration for calculating the noisy measure of the biased estimator's mean or median. Default is 50.</p></li>
 <li><p><code>check</code>: Logical. Indicates whether to perform a closeness check. Default is TRUE.</p></li>
-<li><p><code>B_check</code>: Integer. Number of bootstrap samples for the closeness check. Default is 100,000.</p></li>
+<li><p><code>B_check</code>: Integer. Number of bootstrap samples for the closeness check. Default is 100000.</p></li>
 <li><p><code>Eigen_rest</code>: Numeric. Restriction on the largest eigenvalue under the P-measure. Default is 1.</p></li>
 </ol></dd>
 
 
 <dt id="arg-riskfactors">RiskFactors<a class="anchor" aria-label="anchor" href="#arg-riskfactors"></a></dt>
-<dd><p>A numeric matrix (T x F) representing the time series of risk factors.</p></dd>
+<dd><p>numeric matrix (Td x K). Time series of risk factors.</p></dd>
 
 
 <dt id="arg-economies">Economies<a class="anchor" aria-label="anchor" href="#arg-economies"></a></dt>
-<dd><p>A character vector containing the names of the economies included in the system.</p></dd>
+<dd><p>character vector. Names of the economies included in the system.</p></dd>
 
 
 <dt id="arg-factorlabels">FactorLabels<a class="anchor" aria-label="anchor" href="#arg-factorlabels"></a></dt>
-<dd><p>A list of character vectors with labels for all variables in the model.</p></dd>
+<dd><p>list. Labels for all variables in the model.</p></dd>
 
 
 <dt id="arg-gvarinputs">GVARinputs<a class="anchor" aria-label="anchor" href="#arg-gvarinputs"></a></dt>
-<dd><p>List. Inputs for GVAR model estimation (see <code><a href="GVAR.html">GVAR</a></code> function). Default is NULL.</p></dd>
+<dd><p>list. Inputs for GVAR model estimation (see <code><a href="GVAR.html">GVAR</a></code>). Default is NULL.</p></dd>
 
 
 <dt id="arg-jllinputs">JLLinputs<a class="anchor" aria-label="anchor" href="#arg-jllinputs"></a></dt>
-<dd><p>List. Inputs for JLL model estimation (see <code><a href="JLL.html">JLL</a></code> function). Default is NULL.</p></dd>
+<dd><p>list. Inputs for JLL model estimation (see <code><a href="JLL.html">JLL</a></code>). Default is NULL.</p></dd>
 
 
 <dt id="arg-verbose">verbose<a class="anchor" aria-label="anchor" href="#arg-verbose"></a></dt>
-<dd><p>verbose Logical flag controlling function messaging. Default is TRUE.</p></dd>
+<dd><p>logical. Flag controlling function messaging. Default TRUE.</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>Bias-corrected VAR parameters based on the framework of Bauer, Rudebusch and Wu (2012). The list contains:</p><ol><li><p><code>KOZ_BC</code>: estimated intercept (F x 1);</p></li>
-<li><p><code>K1Z_BC</code>: estimated feedback matrix (F x F);</p></li>
-<li><p><code>SSZ_BC</code>: estimated variance-covariance matrix (F x F);</p></li>
+    <p>Bias-corrected VAR parameters based on the framework of Bauer, Rudebusch and Wu (2012). The list contains:</p><ol><li><p><code>KOZ_BC</code>: estimated intercept (K x 1);</p></li>
+<li><p><code>K1Z_BC</code>: estimated feedback matrix (K x K);</p></li>
+<li><p><code>SSZ_BC</code>: estimated variance-covariance matrix (K x K);</p></li>
 <li><p><code>dist</code>: root mean square distance (scalar);</p></li>
 </ol></div>
+    <div class="section level2">
+    <h2 id="general-notation">General Notation<a class="anchor" aria-label="anchor" href="#general-notation"></a></h2>
+
+
+<ul><li><p><code>Td</code> denotes the model time series dimension.</p></li>
+<li><p><code>K</code> denotes the total number of risk factors.</p></li>
+</ul></div>
     <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
     <p>Bauer, Rudebusch and, Wu (2012). "Correcting Estimation Bias in Dynamic Term Structure Models" <br>
@@ -131,19 +138,7 @@ website (https://sites.google.com/view/jingcynthiawu/).</p>
 <span class="r-in"><span><span class="va">ModelType</span> <span class="op">&lt;-</span> <span class="st">"JPS original"</span></span></span>
 <span class="r-in"><span><span class="va">FactorLabels</span> <span class="op">&lt;-</span> <span class="cn">NULL</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">BRWpara</span> <span class="op">&lt;-</span> <span class="fu">Bias_Correc_VAR</span><span class="op">(</span><span class="va">ModelType</span>, <span class="va">BRWinputs</span>, <span class="va">Factors</span>, <span class="va">Economies</span>, <span class="va">FactorLabels</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> iteration:  100  /  1099</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> iteration:  200  /  1099</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> iteration:  300  /  1099</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> iteration:  400  /  1099</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> iteration:  500  /  1099</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> iteration:  600  /  1099</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> iteration:  700  /  1099</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> iteration:  800  /  1099</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> iteration:  900  /  1099</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> iteration:  1000  /  1099</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Root mean square distance:  0.048839</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> ... Done! </span>
+<span class="r-in"><span><span class="va">BRWpara</span> <span class="op">&lt;-</span> <span class="fu">Bias_Correc_VAR</span><span class="op">(</span><span class="va">ModelType</span>, <span class="va">BRWinputs</span>, <span class="va">Factors</span>, <span class="va">Economies</span>, <span class="va">FactorLabels</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

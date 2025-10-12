@@ -67,8 +67,8 @@
 
 
 <dt id="arg-statq">StatQ<a class="anchor" aria-label="anchor" href="#arg-statq"></a></dt>
-<dd><p>A binary variable (1 or 0) indicating whether to impose that the largest eigenvalue under Q is strictly
-smaller than 1. Set to 1 to impose the restriction, or 0 otherwise.</p></dd>
+<dd><p>A logical value indicating whether to impose that the largest eigenvalue under Q is strictly
+smaller than 1. Set TRUE to impose this restriction.</p></dd>
 
 
 <dt id="arg-datafreq">DataFreq<a class="anchor" aria-label="anchor" href="#arg-datafreq"></a></dt>
@@ -144,26 +144,15 @@ smaller than 1. Set to 1 to impose the restriction, or 0 otherwise.</p></dd>
 <span class="r-in"><span><span class="va">GlobalVar</span> <span class="op">&lt;-</span> <span class="st">"Gl_Eco_Act"</span> <span class="co"># Global Variables</span></span></span>
 <span class="r-in"><span><span class="va">DomVar</span> <span class="op">&lt;-</span> <span class="st">"Eco_Act"</span> <span class="co"># Domestic Variables</span></span></span>
 <span class="r-in"><span><span class="va">DataFreq</span> <span class="op">&lt;-</span> <span class="st">"Monthly"</span></span></span>
-<span class="r-in"><span><span class="va">StatQ</span> <span class="op">&lt;-</span> <span class="fl">0</span></span></span>
+<span class="r-in"><span><span class="va">StatQ</span> <span class="op">&lt;-</span> <span class="cn">FALSE</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">FacLab</span> <span class="op">&lt;-</span> <span class="fu"><a href="LabFac.html">LabFac</a></span><span class="op">(</span><span class="va">N</span>, <span class="va">DomVar</span>, <span class="va">GlobalVar</span>, <span class="va">Economy</span>, <span class="va">ModelType</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">ATSMInputs</span> <span class="op">&lt;-</span> <span class="fu"><a href="InputsForOpt.html">InputsForOpt</a></span><span class="op">(</span><span class="va">t0</span>, <span class="va">tF</span>, <span class="va">ModelType</span>, <span class="va">Yields</span>, <span class="va">GlobalMacroVar</span>, <span class="va">DomesticMacroVar</span>,</span></span>
 <span class="r-in"><span>  <span class="va">FacLab</span>, <span class="va">Economy</span>, <span class="va">DataFreq</span>,</span></span>
-<span class="r-in"><span>  CheckInputs <span class="op">=</span> <span class="cn">FALSE</span></span></span>
+<span class="r-in"><span>  CheckInputs <span class="op">=</span> <span class="cn">FALSE</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 1) PREPARING INPUTS FOR THE ESTIMATION OF THE MODEL: JPS original . SAMPLE PERIOD: 01-05-2007 - 01-12-2018</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 1.1) Constructing the time-series of the risk factors</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 1.2) Estimating model P-dynamics parameters:</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> - Without the bias-correction procedure </span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">OptPara</span> <span class="op">&lt;-</span> <span class="fu">Optimization</span><span class="op">(</span><span class="va">ATSMInputs</span>, <span class="va">StatQ</span>, <span class="va">DataFreq</span>, <span class="va">FacLab</span>, <span class="va">Economy</span>, <span class="va">ModelType</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 2) ATSM ESTIMATION : POINT ESTIMATE ANALYSIS</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 2.1) Estimating ATSM ...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>  ... for country: Brazil . This may take several minutes.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> *** Estimation round 1 ***</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> *** Estimation round 2 ***</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> -- Done!</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Elapsed time: 1.11 seconds</span>
+<span class="r-in"><span><span class="va">OptPara</span> <span class="op">&lt;-</span> <span class="fu">Optimization</span><span class="op">(</span><span class="va">ATSMInputs</span>, <span class="va">StatQ</span>, <span class="va">DataFreq</span>, <span class="va">FacLab</span>, <span class="va">Economy</span>, <span class="va">ModelType</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

@@ -52,8 +52,8 @@
 <span>  <span class="va">FactorLabels</span>,</span>
 <span>  <span class="va">JLLlist</span>,</span>
 <span>  <span class="va">GVARlist</span>,</span>
-<span>  <span class="va">WishBC</span>,</span>
-<span>  <span class="va">BRWlist</span>,</span>
+<span>  WishBC <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  BRWlist <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  Folder2save <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -64,64 +64,73 @@
 
 
 <dl><dt id="arg-modeltype">ModelType<a class="anchor" aria-label="anchor" href="#arg-modeltype"></a></dt>
-<dd><p>A character vector indicating the model type to be estimated.</p></dd>
+<dd><p>character. Model type to be estimated. Permissible choices: "JPS original", "JPS global", "GVAR single", "JPS multi", "GVAR multi", "JLL original", "JLL No DomUnit", "JLL joint Sigma".</p></dd>
 
 
 <dt id="arg-modelparape">ModelParaPE<a class="anchor" aria-label="anchor" href="#arg-modelparape"></a></dt>
-<dd><p>A list containing the point estimates of the model parameters. For details, refer to the outputs from the <code><a href="Optimization.html">Optimization</a></code> function.</p></dd>
+<dd><p>list. Point estimates of the model parameters. See outputs from <code><a href="Optimization.html">Optimization</a></code>.</p></dd>
 
 
 <dt id="arg-numoutpe">NumOutPE<a class="anchor" aria-label="anchor" href="#arg-numoutpe"></a></dt>
-<dd><p>The point estimate derived from numerical outputs. See the outputs from the <code><a href="NumOutputs.html">NumOutputs</a></code> function for further information.</p></dd>
+<dd><p>list. Point estimates from numerical outputs. See outputs from <code><a href="NumOutputs.html">NumOutputs</a></code>.</p></dd>
 
 
 <dt id="arg-economies">Economies<a class="anchor" aria-label="anchor" href="#arg-economies"></a></dt>
-<dd><p>A character vector containing the names of the economies included in the system.</p></dd>
+<dd><p>character vector. Names of the economies included in the system.</p></dd>
 
 
 <dt id="arg-inputsforoutputs">InputsForOutputs<a class="anchor" aria-label="anchor" href="#arg-inputsforoutputs"></a></dt>
-<dd><p>A list containing the necessary inputs for generating IRFs, GIRFs, FEVDs, GFEVDs and Term Premia.</p></dd>
+<dd><p>list. Inputs for generating IRFs, GIRFs, FEVDs, GFEVDs, and Term Premia.</p></dd>
 
 
 <dt id="arg-factorlabels">FactorLabels<a class="anchor" aria-label="anchor" href="#arg-factorlabels"></a></dt>
-<dd><p>A list of character vectors with labels for all variables in the model.</p></dd>
+<dd><p>list. Labels for all variables present in the model, as returned by <code><a href="LabFac.html">LabFac</a></code>.</p></dd>
 
 
 <dt id="arg-jlllist">JLLlist<a class="anchor" aria-label="anchor" href="#arg-jlllist"></a></dt>
-<dd><p>List. Inputs for JLL model estimation (see <code><a href="JLL.html">JLL</a></code> function). Default is NULL.</p></dd>
+<dd><p>list. Inputs for JLL model estimation (see <code><a href="JLL.html">JLL</a></code>). Default is NULL.</p></dd>
 
 
 <dt id="arg-gvarlist">GVARlist<a class="anchor" aria-label="anchor" href="#arg-gvarlist"></a></dt>
-<dd><p>List. Inputs for GVAR model estimation (see <code><a href="GVAR.html">GVAR</a></code> function). Default is NULL.</p></dd>
+<dd><p>list. Inputs for GVAR model estimation (see <code><a href="GVAR.html">GVAR</a></code>). Default is NULL.</p></dd>
 
 
 <dt id="arg-wishbc">WishBC<a class="anchor" aria-label="anchor" href="#arg-wishbc"></a></dt>
-<dd><p>Whether to estimate the physical parameter model with bias correction, based on the method by Bauer, Rudebusch and Wu (2012) (see <code><a href="Bias_Correc_VAR.html">Bias_Correc_VAR</a></code> function). Default is set to 0.</p></dd>
+<dd><p>logical. Whether to estimate the physical parameter model with bias correction (see <code><a href="Bias_Correc_VAR.html">Bias_Correc_VAR</a></code>). Default is FALSE.</p></dd>
 
 
 <dt id="arg-brwlist">BRWlist<a class="anchor" aria-label="anchor" href="#arg-brwlist"></a></dt>
-<dd><p>List of necessary inputs for performing the bias-corrected estimation (see <code><a href="Bias_Correc_VAR.html">Bias_Correc_VAR</a></code> function).</p></dd>
+<dd><p>list. Inputs for bias-corrected estimation (see <code><a href="Bias_Correc_VAR.html">Bias_Correc_VAR</a></code>).</p></dd>
 
 
 <dt id="arg-folder-save">Folder2save<a class="anchor" aria-label="anchor" href="#arg-folder-save"></a></dt>
-<dd><p>Folder path where the outputs will be stored. Default option saves the outputs in a temporary directory.</p></dd>
+<dd><p>character. Folder path where outputs will be stored. Default saves outputs in a temporary directory.</p></dd>
 
 
 <dt id="arg-verbose">verbose<a class="anchor" aria-label="anchor" href="#arg-verbose"></a></dt>
-<dd><p>Logical flag controlling function messaging. Default is TRUE.</p></dd>
+<dd><p>logical. Print progress messages. Default is TRUE.</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>An object of class 'ATSMModelBoot' containing the following keys elements:</p><ul><li><p>List of model parameters for each draw</p></li>
-<li><p>List of numerical outputs (IRFs, GIRFs, FEVDs and GFEVDs) for each draw</p></li>
+    <p>An object of class 'ATSMModelBoot' containing:</p><ul><li><p>List of model parameters for each draw</p></li>
+<li><p>List of numerical outputs (IRFs, GIRFs, FEVDs, GFEVDs) for each draw</p></li>
 <li><p>Confidence bounds for the chosen level of significance</p></li>
+</ul></div>
+    <div class="section level2">
+    <h2 id="permissible-options-bootstrap-list-inputsforoutputs-input-">Permissible options - Bootstrap list (<code>InputsForOutputs</code> input)<a class="anchor" aria-label="anchor" href="#permissible-options-bootstrap-list-inputsforoutputs-input-"></a></h2>
+
+
+<ul><li><p><strong>methodBS</strong> : <code>"bs"</code> (standard bootstrap), <code>"wild"</code> (wild bootstrap), <code>"block"</code> (block bootstrap)</p></li>
+<li><p><strong>BlockLength</strong> : required input for the block bootstrap method. Block length must be larger than 0 and smallar than the model time series dimension (Td).</p></li>
+<li><p><strong>ndraws</strong>: number of draws. must be a positive integer.</p></li>
+<li><p><strong>pctg</strong> : confidence level. must be a positive integer. Common choices are: 68, 90 and  95.</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="available-methods">Available methods<a class="anchor" aria-label="anchor" href="#available-methods"></a></h2>
 
 
-<p>- `autoplot(object, NumOutPE, type)`</p>
+<p>- <code>autoplot(object, NumOutPE, type)</code></p>
     </div>
 
     <div class="section level2">
@@ -142,18 +151,19 @@
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">Boot</span> <span class="op">&lt;-</span> <span class="fu">Bootstrap</span><span class="op">(</span><span class="va">ModelType</span>, <span class="va">ModelParaEx</span>, <span class="va">NumOutEx</span>, <span class="va">Economy</span>, <span class="va">InpForOutEx</span>, <span class="va">FacLab</span>,</span></span>
 <span class="r-in"><span>  JLLlist <span class="op">=</span> <span class="cn">NULL</span>,</span></span>
-<span class="r-in"><span>  GVARlist <span class="op">=</span> <span class="cn">NULL</span>, WishBC <span class="op">=</span> <span class="fl">0</span>, BRWlist <span class="op">=</span> <span class="cn">NULL</span>, Folder2save <span class="op">=</span> <span class="cn">NULL</span>, verbose <span class="op">=</span> <span class="cn">TRUE</span></span></span>
+<span class="r-in"><span>  GVARlist <span class="op">=</span> <span class="cn">NULL</span>, WishBC <span class="op">=</span> <span class="cn">FALSE</span>, BRWlist <span class="op">=</span> <span class="cn">NULL</span>, Folder2save <span class="op">=</span> <span class="cn">NULL</span>, verbose <span class="op">=</span> <span class="cn">TRUE</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> 3) BOOTSTRAP ANALYSIS</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> 3.1) Estimating bootstrap setup. This may take several hours.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> -- Done!</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Elapsed time: 3.68 seconds</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Elapsed time: 3.86 seconds</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> 3.2) Computing numerical outputs.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> 3.3) Computing confidence bounds and producing graphical outputs.</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>cannot create dir '/tmp/RtmpJsnfyH/Outputs/JPS original/Bootstrap', reason 'No such file or directory'</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>cannot create dir '/tmp/RtmpJsnfyH/Outputs/JPS original/Bootstrap/Model Brazil', reason 'No such file or directory'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Desired graphs are saved in your chosen directory. Please, check: /tmp/RtmpJsnfyH </span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>cannot create dir '/tmp/RtmplRf8Q6/Outputs/JPS original/Bootstrap', reason 'No such file or directory'</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>cannot create dir '/tmp/RtmplRf8Q6/Outputs/JPS original/Bootstrap/Model Brazil', reason 'No such file or directory'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Desired graphs are saved in your chosen directory. Please, check: /tmp/RtmplRf8Q6 </span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
+<span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

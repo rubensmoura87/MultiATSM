@@ -61,45 +61,52 @@
 
 
 <dl><dt id="arg-t-first">t_First<a class="anchor" aria-label="anchor" href="#arg-t-first"></a></dt>
-<dd><p>Start date of the sample period in the format yyyy-mm-dd.</p></dd>
+<dd><p>character. Start date of the sample period in the format yyyy-mm-dd.</p></dd>
 
 
 <dt id="arg-t-last">t_Last<a class="anchor" aria-label="anchor" href="#arg-t-last"></a></dt>
-<dd><p>End date of the sample period in the format yyyy-mm-dd.</p></dd>
+<dd><p>character. End date of the sample period in the format yyyy-mm-dd.</p></dd>
 
 
 <dt id="arg-economies">Economies<a class="anchor" aria-label="anchor" href="#arg-economies"></a></dt>
-<dd><p>A character vector containing the names of the economies included in the system.</p></dd>
+<dd><p>character vector. Names of the economies included in the system.</p></dd>
 
 
 <dt id="arg-n">N<a class="anchor" aria-label="anchor" href="#arg-n"></a></dt>
-<dd><p>Integer. Number of country-specific spanned factors.</p></dd>
+<dd><p>positive integer. Number of country-specific spanned factors per country.</p></dd>
 
 
 <dt id="arg-factorlabels">FactorLabels<a class="anchor" aria-label="anchor" href="#arg-factorlabels"></a></dt>
-<dd><p>A list of character vectors with labels for all variables in the model.</p></dd>
+<dd><p>list. Labels for all variables present in the model, as returned by <code><a href="LabFac.html">LabFac</a></code>.</p></dd>
 
 
 <dt id="arg-modeltype">ModelType<a class="anchor" aria-label="anchor" href="#arg-modeltype"></a></dt>
-<dd><p>A character vector indicating the model type to be estimated.</p></dd>
+<dd><p>character. Model type to be estimated. Permissible choices: "JPS original", "JPS global", "GVAR single", "JPS multi", "GVAR multi", "JLL original", "JLL No DomUnit", "JLL joint Sigma".</p></dd>
 
 
 <dt id="arg-macro-fulldata">Macro_FullData<a class="anchor" aria-label="anchor" href="#arg-macro-fulldata"></a></dt>
-<dd><p>List containing a full set of macroeconomic data.</p></dd>
+<dd><p>list. Full set of macroeconomic data, as returned by <code><a href="Load_Excel_Data.html">Load_Excel_Data</a></code>.</p></dd>
 
 
 <dt id="arg-yields-fulldata">Yields_FullData<a class="anchor" aria-label="anchor" href="#arg-yields-fulldata"></a></dt>
-<dd><p>List containing a full set of bond yield data</p></dd>
+<dd><p>list. Full set of bond yield data, as returned by <code><a href="Load_Excel_Data.html">Load_Excel_Data</a></code>.</p></dd>
 
 
 <dt id="arg-wgvar">Wgvar<a class="anchor" aria-label="anchor" href="#arg-wgvar"></a></dt>
-<dd><p>GVAR transition matrix of size C x C, applicable if a GVAR-type model is selected. Default is NULL.</p></dd>
+<dd><p>GVAR transition matrix. For GVAR models, either a matrix (C x C) for fixed weights, or a named list of matrices for time-varying weights. Default is NULL. Required for GVAR models.</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>List containing the risk factor set. This list is particularly useful for the estimation of the GVAR-based models.</p>
+    <p>List containing the risk factor set for all countries and global factors. Particularly useful for GVAR-based models.</p>
     </div>
+    <div class="section level2">
+    <h2 id="general-notation">General Notation<a class="anchor" aria-label="anchor" href="#general-notation"></a></h2>
+
+
+<p></p><ul><li><p>C: number of countries in the system.</p></li>
+<li><p>N: number of country-specific spanned factors.</p></li>
+</ul></div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
