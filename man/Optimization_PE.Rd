@@ -35,15 +35,15 @@ Optimization_PE(
                        }
 }}
 
-\item{FactorLabels}{A list of character vectors with labels for all variables in the model.}
+\item{FactorLabels}{list. Labels for all variables present in the model, as returned by \code{\link{LabFac}}.}
 
-\item{Economies}{A character vector containing the names of the economies included in the system.}
+\item{Economies}{character vector. Names of the economies included in the system.}
 
-\item{ModelType}{A character vector indicating the model type to be estimated.}
+\item{ModelType}{character. Model type to be estimated. Permissible choices: "JPS original", "JPS global", "GVAR single", "JPS multi", "GVAR multi", "JLL original", "JLL No DomUnit", "JLL joint Sigma".}
 
-\item{JLLinputs}{List. Inputs for JLL model estimation (see \code{JLL}). Default is NULL.}
+\item{JLLinputs}{List. Inputs for JLL model estimation (see \code{\link{JLL}}). Default is NULL.}
 
-\item{GVARinputs}{List. Inputs for GVAR model estimation (see \code{GVAR}). Default is NULL.}
+\item{GVARinputs}{List. Inputs for GVAR model estimation (see \code{\link{GVAR}}). Default is NULL.}
 
 \item{tol}{convergence tolerance (scalar). Default value is 1e-4.}
 

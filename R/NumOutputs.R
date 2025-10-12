@@ -1,10 +1,10 @@
-#' Constructs the model numerical outputs (model fit, IRFs, GIRFs, FEVDs, GFEVDs, and term premia decomposition)
+#' Constructs the model numerical outputs (model fit, IRFs, GIRFs, FEVDs, GFEVDs, and term premia)
 #'
-#' @param ModelType A character vector indicating the model type to be estimated.
-#' @param ModelPara A list containing the point estimates of the model parameters. For details, refer to the outputs from the \code{\link{Optimization}} function.
-#' @param InputsForOutputs A list containing the necessary inputs for generating IRFs, GIRFs, FEVDs, GFEVDs and Term Premia.
-#' @param FactorLabels A list of character vectors with labels for all variables in the model.
-#' @param Economies A character vector containing the names of the economies included in the system.
+#' @param ModelType character. Model type to be estimated. Permissible choices: "JPS original", "JPS global", "GVAR single", "JPS multi", "GVAR multi", "JLL original", "JLL No DomUnit", "JLL joint Sigma".
+#' @param ModelPara list. Point estimates of the model parameters. See outputs from \code{\link{Optimization}}
+#' @param InputsForOutputs list. Inputs for generating IRFs, GIRFs, FEVDs, GFEVDs, and Term Premia.
+#' @param FactorLabels list. Labels for all variables present in the model, as returned by \code{\link{LabFac}}.
+#' @param Economies character vector. Names of the economies included in the system.
 #' @param Folder2save Folder path where the outputs will be stored. Default option saves the outputs in a temporary directory.
 #' @param verbose Logical flag controlling function messaging. Default is TRUE.
 #'

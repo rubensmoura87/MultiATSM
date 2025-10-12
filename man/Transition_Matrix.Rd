@@ -7,37 +7,36 @@
 Transition_Matrix(t_First, t_Last, Economies, type, DataConnectedness)
 }
 \arguments{
-\item{t_First}{Sample starting date (in the format: yyyy).}
+\item{t_First}{character. Sample starting date (format: yyyy).}
 
-\item{t_Last}{Sample ending date (in the format: yyyy).}
+\item{t_Last}{character. Sample ending date (format: yyyy).}
 
-\item{Economies}{A character vector containing the names of the economies included in the system.}
+\item{Economies}{character vector. Names of the economies included in the system.}
 
-\item{type}{A character string indicating the method for computing interdependence. Possible options include:
+\item{type}{character. Method for computing interdependence. Possible options:
 \itemize{
-     \item \code{Time-varying}: Computes time-varying interdependence and returns the weight matrices for each year based on available data (may extrapolate the sample period).
-     \item \code{Sample Mean}: Returns a single weight matrix containing the average weights over the entire sample period, suitable for time-invariant interdependence.
-     \item A specific year (e.g., "1998", "2005"): Used to compute time-invariant interdependence for the specified year.
+  \item \code{"Time-varying"}: Computes time-varying interdependence and returns weight matrices for each year.
+  \item \code{"Sample Mean"}: Returns a single weight matrix with average weights over the sample period.
+  \item Specific year (e.g., "1998", "2005"): Computes time-invariant interdependence for the specified year.
 }}
 
-\item{DataConnectedness}{Data used to compute the transition matrix.}
+\item{DataConnectedness}{list or data frame. Data used to compute the transition matrix (e.g., trade flows).}
 }
 \value{
-matrix or list of matrices
+matrix or list of matrices. Time-varying or time-invariant transition matrix depending on 'type'.
 }
 \description{
 Computes the transition matrix required in the estimation of the GVAR model
 }
 \details{
-If there is missing data for any country of the system for that particularly year,
-then the transition matrix will include only NAs.
+If there is missing data for any country in a particular year, the transition matrix will include only NAs.
 }
 \examples{
 t_First <- "2006"
 t_Last <- "2019"
 Economies <- c("China", "Brazil", "Mexico", "Uruguay")
 type <- "Sample Mean"
-## Load data if Connectedness data from excel, otherwise use pre-saved data
+# Load data if Connectedness data from excel, otherwise use pre-saved data
 GetExcelData <- FALSE
 
 if (GetExcelData) {

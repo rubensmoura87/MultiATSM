@@ -17,24 +17,23 @@ TPDecompGraph(
 )
 }
 \arguments{
-\item{ModelType}{A character vector indicating the  estimated model type}
+\item{ModelType}{character. Estimated model type.}
 
-\item{NumOut}{list of computed outputs containing the model fit, IRFs, FEVDs, GIRFs, GFEVDs and Risk premia}
+\item{NumOut}{list. Computed outputs containing model fit, IRFs, FEVDs, GIRFs, GFEVDs and risk premia.}
 
-\item{ModelPara}{list of model parameter estimates (See the \code{\link{Optimization}} function)}
+\item{ModelPara}{list. Model parameter estimates (see \code{\link{Optimization}}).}
 
-\item{WishRPgraphs}{binary variable: set 1, if the user wishes graphs to be generated; or set 0, otherwise}
+\item{WishRPgraphs}{logical. Set TRUE to generate term premia graphs, FALSE otherwise.}
 
-\item{UnitYields}{(i) "Month": if maturity of yields are expressed in months or
-(ii) "Year": if maturity of yields are expressed in years}
+\item{UnitYields}{character. "Month" if yields are in months, "Year" if in years.}
 
-\item{Economies}{A character vector containing the names of the economies included in the system.}
+\item{Economies}{character vector. Names of the economies included in the system.}
 
-\item{PathsGraphs}{Path of the folder in which the graphs will be saved}
+\item{PathsGraphs}{character. Path of the folder in which the graphs will be saved.}
 
-\item{Folder2Save}{Folder path where the outputs will be stored.}
+\item{Folder2Save}{character. Folder path where the outputs will be stored.}
 
-\item{verbose}{description  Logical flag controlling function messaging.}
+\item{verbose}{logical. Flag controlling function messaging.}
 }
 \description{
 Term Premia decomposition graphs for all models
@@ -50,9 +49,8 @@ data("NumOutEx")
 ModelType <- "JPS original"
 Economy <- "Brazil"
 UnitYields <- "Month"
-
 TPDecompGraph(ModelType, NumOutEx, ModelParaEx,
-  WishRPgraphs = 1, UnitYields, Economy,
+  WishRPgraphs = FALSE, UnitYields, Economy,
   PathsGraphs = NULL, Folder2Save = NULL, verbose = FALSE
 )
 

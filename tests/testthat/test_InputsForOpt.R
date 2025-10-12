@@ -42,7 +42,7 @@ test_that("InputsForOpt returns correct output structure (JPS model)", {
 test_that("InputsForOpt returns correct output structure (JPS model with bias correction)", {
   ModelType <- "JPS original"
   Economies <- "Mexico"
-  WishBC <- 1
+  WishBC <- TRUE
   BRWlist <- within(list(
     Cent_Measure = "Mean", gamma = 0.1, N_iter = 10, B = 20, checkBRW = TRUE,
     B_check = 1000, Eigen_rest = 1
@@ -51,7 +51,7 @@ test_that("InputsForOpt returns correct output structure (JPS model with bias co
   FactorLabels <- LabFac(N, DomVar, GlobalVar, Economies, ModelType)
   res <- InputsForOpt(InitialSampleDate, FinalSampleDate, ModelType, Yields, GlobalMacroVar, DomesticMacroVar,
     FactorLabels, Economies, DataFrequency,
-    WishBRW = 1, BRWlist = BRWlist,
+    WishBRW = TRUE, BRWlist = BRWlist,
     CheckInputs = FALSE, verbose = FALSE
   )
   expect_type(res, "list")
@@ -155,7 +155,7 @@ test_that("InputsForOpt returns correct output structure (GVAR multi model with 
     VARXtype = "unconstrained", W_type = "Sample Mean", t_First_Wgvar = "2005",
     t_Last_Wgvar = "2019", DataConnectedness = TradeFlows
   )
-  WishBC <- 1
+  WishBC <- TRUE
   BRWlist <- within(list(
     Cent_Measure = "Mean", gamma = 0.1, N_iter = 10, B = 20, checkBRW = TRUE,
     B_check = 1000, Eigen_rest = 1
@@ -164,7 +164,7 @@ test_that("InputsForOpt returns correct output structure (GVAR multi model with 
   FactorLabels <- LabFac(N, DomVar, GlobalVar, Economies, ModelType)
   res <- InputsForOpt(InitialSampleDate, FinalSampleDate, ModelType, Yields, GlobalMacroVar, DomesticMacroVar,
     FactorLabels, Economies, DataFrequency, GVARlist,
-    WishBRW = 1, BRWlist = BRWlist,
+    WishBRW = TRUE, BRWlist = BRWlist,
     CheckInputs = FALSE, verbose = FALSE
   )
   expect_type(res, "list")

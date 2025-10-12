@@ -18,7 +18,7 @@ tF_sample <- "December-2007"
 
 DataFreq <- "Monthly" # Frequency of the data
 
-StatQ <- 0 # Stationary condition
+StatQ <- FALSE # Stationary condition
 
 #########################################################################################################
 ############################### NO NEED TO MAKE CHANGES FROM HERE #######################################
@@ -64,8 +64,6 @@ kableExtra::kbl(TableQ, align = "c", caption = "$Q$-dynamics parameters") %>%
   kableExtra::footnote(general = " $\\lambda$'s are the eigenvalues from the risk-neutral feedback matrix and $r0$ is the long-run mean of the short rate under Q.")
 
 ## ----PdynTab, echo= FALSE-----------------------------------------------------
-# data("BR_jps_gro_R3")
-
 RowsP <- c("PC1", "PC2", "PC3", "GRO", "INF")
 ColP <- c(" ", RowsP)
 
@@ -111,7 +109,7 @@ kableExtra::kbl(TableP, align = "c", caption = "$P$-dynamics parameters") %>%
   kableExtra::footnote(general = " $K0Z$ is the intercept and $K1Z$ is feedback matrix from the $P$-dynamics.")
 
 ## ----echo= FALSE--------------------------------------------------------------
-data("BR_jps_gro_R3")
+#data("BR_jps_gro_R3")
 
 se <- data.frame(BR_jps_out$est.llk$sigma.e, ModelPara$`JPS original`$US$ModEst$Q$se)
 rownames(se) <- "se"
@@ -142,7 +140,7 @@ kableExtra::kbl(se, align = "c", caption = "Portfolio of yields with errors") %>
 # DataFreq <- "Monthly"
 # Folder2Save <- NULL
 # 
-# StatQ <- 0
+# StatQ <- FALSE
 # 
 # # B.1) SPECIFIC model inputs
 # #################################### GVAR-based models ##################################################
@@ -153,28 +151,28 @@ kableExtra::kbl(se, align = "c", caption = "Portfolio of yields with errors") %>
 # #################################### JLL-based models ###################################################
 # JLLlist <- list(DomUnit = "China")
 # ###################################### BRW inputs  ######################################################
-# WishBC <- 1
+# WishBC <- TRUE
 # BRWlist <- within(list(
 #   Cent_Measure = "Mean", gamma = 0.001, N_iter = 200, B = 50, checkBRW = TRUE,
 #   B_check = 1000, Eigen_rest = 1
 # ), N_burn <- round(N_iter * 0.15))
 # 
 # # C) Decide on Settings for numerical outputs
-# WishFPremia <- 1
+# WishFPremia <- TRUE
 # FPmatLim <- c(24, 36)
 # 
 # Horiz <- 25
 # DesiredGraphs <- c("GIRF", "GFEVD", "TermPremia")
-# WishGraphRiskFac <- 0
-# WishGraphYields <- 1
-# WishOrthoJLLgraphs <- 1
+# WishGraphRiskFac <- FALSE
+# WishGraphYields <- TRUE
+# WishOrthoJLLgraphs <- TRUE
 # 
 # # D) Bootstrap settings
-# WishBootstrap <- 0 #  Set it to 1, if bootstrap is desired
+# WishBootstrap <- FALSE #  Set it to TRUE, if bootstrap is desired
 # BootList <- list(methodBS = "bs", BlockLength = 4, ndraws = 1000, pctg = 95)
 # 
 # # E) Out-of-sample forecast
-# WishForecast <- 1
+# WishForecast <- TRUE
 # ForecastList <- list(ForHoriz = 12, t0Sample = 1, t0Forecast = 100, ForType = "Rolling")
 # 
 # #########################################################################################################
@@ -238,7 +236,7 @@ kableExtra::kbl(se, align = "c", caption = "Portfolio of yields with errors") %>
 # DataFreq <- "Weekly"
 # F2S <- NULL
 # 
-# StatQ <- 0
+# StatQ <- FALSE
 # 
 # # B.1) SPECIFIC model inputs
 # #################################### GVAR-based models ##################################################
@@ -247,20 +245,20 @@ kableExtra::kbl(se, align = "c", caption = "Portfolio of yields with errors") %>
 #   t_Last_Wgvar = "2020", DataConnectedness = Trade_Flows
 # )
 # ###################################### BRW inputs  ######################################################
-# WishBC <- 0
+# WishBC <- FALSE
 # 
 # # C) Decide on Settings for numerical outputs
-# WishFPremia <- 1
+# WishFPremia <- TRUE
 # FPmatLim <- c(47, 48)
 # 
 # Horiz <- 12
 # DesiredGraphs <- c("GIRF", "GFEVD", "TermPremia")
-# WishGraphRiskFac <- 0
-# WishGraphYields <- 1
-# WishOrthoJLLgraphs <- 0
+# WishGraphRiskFac <- FALSE
+# WishGraphYields <- TRUE
+# WishOrthoJLLgraphs <- FALSE
 # 
 # # D) Bootstrap settings
-# WishBootstrap <- 1 #  YES: 1; No = 0.
+# WishBootstrap <- TRUE #  YES: 1; No = 0.
 # BootList <- list(methodBS = "bs", BlockLength = 4, ndraws = 100, pctg = 95)
 # 
 # #########################################################################################################

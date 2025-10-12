@@ -1,36 +1,38 @@
-#' Retrieves data from Excel and build the database used in the model estimation
+#' Retrieves data from Excel and builds the database used in the model estimation
 #'
-#' @param t0 Start date of the sample period in the format yyyy-mm-dd. Day form must be "01"
-#' @param tF End date of the sample period in the format yyyy-mm-dd. Day form must be "01".
-#' @param Economies A character vector containing the names of the economies included in the system.
-#' @param N Integer. Number of country-specific spanned factors.
-#' @param FactorLabels String-list based which contains the labels of all the variables present in the model
-#' @param ModelType String-vector containing the label of the model to be estimated
-#' @param DataFrequency Character-based-vector. Available options are: "Daily All Days", "Daily Business Days", "Weekly", "Monthly", "Quarterly", "Annually"
-#' @param Macro_FullData  List containing a full set of macroeconomic data.
-#' @param Yields_FullData List containing a full set of bond yield data
-#' @param DataConnect List containing data for computing bilateral contentedness measures. Default is NULL.
-#' @param W_type Three possibilities:
-#' \itemize{
-#'      \item \code{Full Sample}: if one wishes ALL weight matrices of each year from which data is available (it may extrapolate the sample period);
-#'      \item \code{Sample Mean}: if one wishes a SINGLE weight matrix containing the average of weights over of the entire sample period;
-#'      \item Some year in particular (e.g. "1998", "2005" ...).
-#' }
-#' @param t_First_Wgvar Sample starting date (year)
-#' @param t_Last_Wgvar Sample last date (year)
+#' @param t0 character. Start date of the sample period in the format yyyy-mm-dd.
+#' @param tF character. End date of the sample period in the format yyyy-mm-dd.
+#' @param Economies character vector. Names of the economies included in the system.
+#' @param N positive integer. Number of country-specific spanned factors.
+#' @param FactorLabels list. Labels for all variables present in the model, as returned by \code{\link{LabFac}}.
+#' @param ModelType character. Model type to be estimated. Permissible choices: "JPS original", "JPS global", "GVAR single", "JPS multi", "GVAR multi", "JLL original", "JLL No DomUnit", "JLL joint Sigma".
+#' @param DataFrequency character. Data frequency. Permissible choices: "Daily All Days", "Daily Business Days", "Weekly", "Monthly", "Quarterly", "Annually".
+#' @param Macro_FullData list. Full set of macroeconomic data.
+#' @param Yields_FullData list. Full set of bond yield data.
+#' @param DataConnect list. Data for computing bilateral connectedness measures. Default is NULL. Required for GVAR-based models.
+#' @param W_type character. Weight matrix type. Permissible choices: "Full Sample" (all years), "Sample Mean" (average over sample), or a specific year (e.g. "1998", "2005"). Default is NULL.
+#' @param t_First_Wgvar character. First year for weight matrix computation. Default is NULL.
+#' @param t_Last_Wgvar character. Last year for weight matrix computation. Default is NULL.
 #'
-#' @return A list containing the
-#' \enumerate{
-#' \item time series of the complete set of bond yields (matrix, J x T or CJ x T);
-#' \item time series of the complete set risk factors (matrix, K x T);
-#' \item 'GVARFactors': list of all variables that are used in the estimation of the VARX \cr
-#'                (see e.g. \code{CM_Factors_GVAR} file). If the estimated model type is not GVAR-based, then returns NULL.
-#' }
+#' @return A list containing:
+#'   \enumerate{
+#'     \item Yields: matrix (J x Td or CJ x Td) of bond yields for all countries.
+#'     \item RiskFactors: matrix (K x Td) of risk factors for all countries.
+#'     \item GVARFactors: list of variables used in VARX estimation (see CM_Factors_GVAR). NULL if not GVAR-based.
+#'   }
 #'
-#' @seealso \code{\link{InputsForOpt}}
+#' @section General Notation:
+#'   \itemize{
+#'     \item Td: model time series dimension.
+#'     \item C: number of countries in the system.
+#'     \item N: number of country-specific spanned factors.
+#'     \item K: total number of risk factors.
+#'     \item J: number of bond yields per country used in estimation.
+#'   }
+#'
+#' @seealso \code{\link{Load_Excel_Data}}
 #'
 #' @examples
-#'
 #' DomVar <- c("Eco_Act", "Inflation")
 #' GlobalVar <- c("GBC", "CPI_OECD")
 #' t0 <- "2006-09-01"
@@ -40,11 +42,8 @@
 #' ModelType <- "JPS original"
 #' FactorLabels <- LabFac(N, DomVar, GlobalVar, Economies, ModelType)
 #' DataFrequency <- "Monthly"
-#'
-#' #  Retrieve data from excel files
 #' MacroData <- Load_Excel_Data(system.file("extdata", "MacroData.xlsx", package = "MultiATSM"))
 #' YieldData <- Load_Excel_Data(system.file("extdata", "YieldsData.xlsx", package = "MultiATSM"))
-#'
 #' DataModel <- DataForEstimation(
 #'   t0, tF, Economies, N, FactorLabels, ModelType, DataFrequency,
 #'   MacroData, YieldData
@@ -92,9 +91,14 @@ DataForEstimation <- function(t0, tF, Economies, N, FactorLabels, ModelType, Dat
 }
 
 ##########################################################################################################
-#' Read data from Excel files and transform them into a dataframe
+#' Read data from Excel files and return a named list of data frames
 #'
-#' @param ExcelFilePath Path of the excel file
+#' @param ExcelFilePath character. Path to the Excel file (.xlsx) to load. Must be a valid file path. The file can contain multiple sheets; each sheet will be loaded as a separate data frame in the output list.
+#'
+#' @return Named list of data frames, one for each sheet in the Excel file. The names of the list elements correspond to the sheet names.
+#'
+#' @details
+#' Uses the readxl package to read all sheets from the specified Excel file. Each sheet is returned as a data frame. The output is a named list, with names matching the sheet names in the Excel file.
 #'
 #' @examples
 #' if (!requireNamespace("readxl", quietly = TRUE)) {

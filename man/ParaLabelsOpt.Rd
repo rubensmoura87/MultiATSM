@@ -9,8 +9,8 @@ ParaLabelsOpt(ModelType, WishStationarityQ, MLEinputs, BS_outputs = FALSE)
 \arguments{
 \item{ModelType}{a string-vector containing the label of the model to be estimated}
 
-\item{WishStationarityQ}{User must set "1" is she wishes to impose the largest eigenvalue under the Q to be strictly
-smaller than 1. Otherwise set "0"}
+\item{WishStationarityQ}{User must set TRUE is she wishes to impose the largest eigenvalue under the Q to be strictly
+smaller than 1. Otherwise set FALSE}
 
 \item{MLEinputs}{Set of inputs that are necessary to the log-likelihood function}
 

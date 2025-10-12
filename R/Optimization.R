@@ -14,11 +14,11 @@
 #'                              the lines of the JLL models
 #'                          }
 #'   }
-#' @param FactorLabels A list of character vectors with labels for all variables in the model.
-#' @param Economies A character vector containing the names of the economies included in the system.
-#' @param ModelType A character vector indicating the model type to be estimated.
-#' @param JLLinputs List. Inputs for JLL model estimation (see \code{JLL}). Default is NULL.
-#' @param GVARinputs List. Inputs for GVAR model estimation (see \code{GVAR}). Default is NULL.
+#' @param FactorLabels list. Labels for all variables present in the model, as returned by \code{\link{LabFac}}.
+#' @param Economies character vector. Names of the economies included in the system.
+#' @param ModelType character. Model type to be estimated. Permissible choices: "JPS original", "JPS global", "GVAR single", "JPS multi", "GVAR multi", "JLL original", "JLL No DomUnit", "JLL joint Sigma".
+#' @param JLLinputs List. Inputs for JLL model estimation (see \code{\link{JLL}}). Default is NULL.
+#' @param GVARinputs List. Inputs for GVAR model estimation (see \code{\link{GVAR}}). Default is NULL.
 #' @param tol convergence tolerance (scalar). Default value is 1e-4.
 #' @param EstType Available options are"BFGS" and/or "Nelder-Mead".
 #' @param TimeCount computes the required time for estimation of the model. Default is TRUE.
@@ -70,8 +70,8 @@ Optimization_PE <- function(ML_fun, ListInputSet, FactorLabels, Economies, Model
 #' Perform the optimization of the log-likelihood function of the chosen ATSM
 #'
 #' @param MLEinputs  A list containing the necessary inputs for building the log-likelihood function (see \code{\link{InputsForOpt}} function).
-#' @param StatQ A binary variable (1 or 0) indicating whether to impose that the largest eigenvalue under Q is strictly
-#'                          smaller than 1. Set to 1 to impose the restriction, or 0 otherwise.
+#' @param StatQ A logical value indicating whether to impose that the largest eigenvalue under Q is strictly
+#'                          smaller than 1. Set TRUE to impose this restriction.
 #' @param DataFreq  A character vector specifying the data frequency. Available options: "Daily All Days", "Daily Business Days",
 #'                      "Weekly", "Monthly", "Quarterly", "Annually".
 #' @param FactorLabels A list of character vectors with labels for all variables in the model.
@@ -93,15 +93,15 @@ Optimization_PE <- function(ML_fun, ListInputSet, FactorLabels, Economies, Model
 #' GlobalVar <- "Gl_Eco_Act" # Global Variables
 #' DomVar <- "Eco_Act" # Domestic Variables
 #' DataFreq <- "Monthly"
-#' StatQ <- 0
+#' StatQ <- FALSE
 #'
 #' FacLab <- LabFac(N, DomVar, GlobalVar, Economy, ModelType)
 #' ATSMInputs <- InputsForOpt(t0, tF, ModelType, Yields, GlobalMacroVar, DomesticMacroVar,
 #'   FacLab, Economy, DataFreq,
-#'   CheckInputs = FALSE
+#'   CheckInputs = FALSE, verbose = FALSE
 #' )
 #'
-#' OptPara <- Optimization(ATSMInputs, StatQ, DataFreq, FacLab, Economy, ModelType)
+#' OptPara <- Optimization(ATSMInputs, StatQ, DataFreq, FacLab, Economy, ModelType, verbose = FALSE)
 #'
 #' @return
 #' An object of class 'ATSMModelOutputs' containing model outputs after the optimization of the chosen ATSM specification.
@@ -179,8 +179,8 @@ Optimization <- function(MLEinputs, StatQ, DataFreq, FactorLabels, Economies, Mo
 #' Create the variable labels used in the estimation
 #'
 #' @param ModelType a string-vector containing the label of the model to be estimated
-#' @param WishStationarityQ User must set "1" is she wishes to impose the largest eigenvalue under the Q to be strictly
-#'                       smaller than 1. Otherwise set "0"
+#' @param WishStationarityQ User must set TRUE is she wishes to impose the largest eigenvalue under the Q to be strictly
+#'                       smaller than 1. Otherwise set FALSE
 #' @param MLEinputs Set of inputs that are necessary to the log-likelihood function
 #' @param BS_outputs Generates simplified output list in the bootstrap setting. Default is set to FALSE.
 #'

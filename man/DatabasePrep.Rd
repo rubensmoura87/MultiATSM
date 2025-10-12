@@ -17,30 +17,38 @@ DatabasePrep(
 )
 }
 \arguments{
-\item{t_First}{Start date of the sample period in the format yyyy-mm-dd.}
+\item{t_First}{character. Start date of the sample period in the format yyyy-mm-dd.}
 
-\item{t_Last}{End date of the sample period in the format yyyy-mm-dd.}
+\item{t_Last}{character. End date of the sample period in the format yyyy-mm-dd.}
 
-\item{Economies}{A character vector containing the names of the economies included in the system.}
+\item{Economies}{character vector. Names of the economies included in the system.}
 
-\item{N}{Integer. Number of country-specific spanned factors.}
+\item{N}{positive integer. Number of country-specific spanned factors per country.}
 
-\item{FactorLabels}{A list of character vectors with labels for all variables in the model.}
+\item{FactorLabels}{list. Labels for all variables present in the model, as returned by \code{\link{LabFac}}.}
 
-\item{ModelType}{A character vector indicating the model type to be estimated.}
+\item{ModelType}{character. Model type to be estimated. Permissible choices: "JPS original", "JPS global", "GVAR single", "JPS multi", "GVAR multi", "JLL original", "JLL No DomUnit", "JLL joint Sigma".}
 
-\item{Macro_FullData}{List containing a full set of macroeconomic data.}
+\item{Macro_FullData}{list. Full set of macroeconomic data, as returned by \code{\link{Load_Excel_Data}}.}
 
-\item{Yields_FullData}{List containing a full set of bond yield data}
+\item{Yields_FullData}{list. Full set of bond yield data, as returned by \code{\link{Load_Excel_Data}}.}
 
-\item{Wgvar}{GVAR transition matrix of size C x C, applicable if a GVAR-type model is selected. Default is NULL.}
+\item{Wgvar}{GVAR transition matrix. For GVAR models, either a matrix (C x C) for fixed weights, or a named list of matrices for time-varying weights. Default is NULL. Required for GVAR models.}
 }
 \value{
-List containing the risk factor set. This list is particularly useful for the estimation of the GVAR-based models.
+List containing the risk factor set for all countries and global factors. Particularly useful for GVAR-based models.
 }
 \description{
 Gather data of several countries in a list. Particularly useful for GVAR-based setups (Compute "GVARFactors")
 }
+\section{General Notation}{
+
+  \itemize{
+    \item C: number of countries in the system.
+    \item N: number of country-specific spanned factors.
+  }
+}
+
 \examples{
 
 # Load data from excel

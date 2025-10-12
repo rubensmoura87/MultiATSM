@@ -21,8 +21,8 @@ Optimization(
 \arguments{
 \item{MLEinputs}{A list containing the necessary inputs for building the log-likelihood function (see \code{\link{InputsForOpt}} function).}
 
-\item{StatQ}{A binary variable (1 or 0) indicating whether to impose that the largest eigenvalue under Q is strictly
-smaller than 1. Set to 1 to impose the restriction, or 0 otherwise.}
+\item{StatQ}{A logical value indicating whether to impose that the largest eigenvalue under Q is strictly
+smaller than 1. Set TRUE to impose this restriction.}
 
 \item{DataFreq}{A character vector specifying the data frequency. Available options: "Daily All Days", "Daily Business Days",
 "Weekly", "Monthly", "Quarterly", "Annually".}
@@ -64,15 +64,15 @@ N <- 1
 GlobalVar <- "Gl_Eco_Act" # Global Variables
 DomVar <- "Eco_Act" # Domestic Variables
 DataFreq <- "Monthly"
-StatQ <- 0
+StatQ <- FALSE
 
 FacLab <- LabFac(N, DomVar, GlobalVar, Economy, ModelType)
 ATSMInputs <- InputsForOpt(t0, tF, ModelType, Yields, GlobalMacroVar, DomesticMacroVar,
   FacLab, Economy, DataFreq,
-  CheckInputs = FALSE
+  CheckInputs = FALSE, verbose = FALSE
 )
 
-OptPara <- Optimization(ATSMInputs, StatQ, DataFreq, FacLab, Economy, ModelType)
+OptPara <- Optimization(ATSMInputs, StatQ, DataFreq, FacLab, Economy, ModelType, verbose = FALSE)
 
 }
 \references{

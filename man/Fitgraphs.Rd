@@ -16,21 +16,21 @@ Fitgraphs(
 )
 }
 \arguments{
-\item{ModelType}{A character vector indicating the  estimated model type}
+\item{ModelType}{character. Estimated model type.}
 
-\item{WishFitgraphs}{binary variable: set 1, if the user wishes graphs to be generated; or set 0, otherwise}
+\item{WishFitgraphs}{logical. Set TRUE to generate fit graphs, FALSE otherwise.}
 
-\item{ModelPara}{List of model parameter estimates (See the \code{\link{Optimization}} function)}
+\item{ModelPara}{list. Model parameter estimates (see \code{\link{Optimization}}).}
 
-\item{NumOut}{A list of outputs containing the model fit, IRFs, FEVDs, GIRFs, GFEVDs and Term premia}
+\item{NumOut}{list. Outputs containing model fit, IRFs, FEVDs, GIRFs, GFEVDs and Term premia.}
 
-\item{Economies}{A character vector containing the names of the economies included in the system.}
+\item{Economies}{character vector. Names of the economies included in the system.}
 
-\item{PathsGraphs}{Path of the folder in which the graphs will be saved}
+\item{PathsGraphs}{character. Path of the folder in which the graphs will be saved.}
 
-\item{Folder2save}{Desired folder path to save outputs}
+\item{Folder2save}{character. Desired folder path to save outputs.}
 
-\item{verbose}{Logical flag controlling function messaging}
+\item{verbose}{logical. Flag controlling function messaging.}
 }
 \description{
 Model fit graphs for all models
@@ -45,9 +45,8 @@ data("ParaSetEx")
 data("NumOutEx")
 ModelType <- "JPS original"
 Economy <- "Brazil"
-
 Fitgraphs(ModelType,
-  WishFitgraphs = 1, ModelParaEx, NumOutEx, Economy, PathsGraphs = NULL,
+  WishFitgraphs = TRUE, ModelParaEx, NumOutEx, Economy, PathsGraphs = NULL,
   Folder2save = NULL, verbose = FALSE
 )
 

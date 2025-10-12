@@ -7,40 +7,44 @@
 JLL(NonOrthoFactors, N, JLLinputs, CheckInputs = FALSE)
 }
 \arguments{
-\item{NonOrthoFactors}{A numeric matrix (F x T) representing the time series of risk factors before the orthogonalization process.}
+\item{NonOrthoFactors}{numeric matrix (K x Td). Time series of risk factors before orthogonalization.}
 
-\item{N}{Integer. Number of country-specific spanned factors.}
+\item{N}{positive integer. Number of country-specific spanned factors.}
 
-\item{JLLinputs}{List of necessary inputs to estimate JLL models:
- \enumerate{
-     \item Economies:  set of economies that are part of the economic system (string-vector)
-     \item \code{DomUnit}: A string specifying the name of the economy assigned as the dominant unit. \cr
-                 If no dominant unit is assigned, set this variable to "None".
-     \item \code{WishSigmas}: Set to "1" if the user wishes to estimate the variance-covariance matrices and Cholesky factorizations \cr
-                 (this can take a long time). Set to "0" if not.
-     \item \code{SigmaNonOrtho}: A NULL value or an F x F matrix from the non-orthogonalized dynamics.
-     \item \code{JLLModelType}: A string specifying the type of JLL model. Available options are: "JLL original", "JLL joint Sigma", or "JLL No DomUnit".
+\item{JLLinputs}{list. Necessary inputs to estimate JLL models:
+\enumerate{
+  \item \code{Economies}: character vector. Set of economies in the system.
+  \item \code{DomUnit}: character. Name of the dominant economy, or "None" if not assigned (for "JLL No DomUnit" models).
+  \item \code{WishSigmas}: logical. TRUE to estimate variance-covariance matrices and Cholesky factorizations; FALSE otherwise.
+  \item \code{SigmaNonOrtho}: NULL or F x F matrix from non-orthogonalized dynamics.
+  \item \code{JLLModelType}: character. Permissible choices: "JLL original", "JLL joint Sigma", "JLL No DomUnit".
 }}
 
-\item{CheckInputs}{A logical flag to indicate whether to perform a prior consistency check on the inputs provided in \code{JLLinputs}. The default is set to FALSE}
+\item{CheckInputs}{logical. Whether to perform a prior consistency check on the inputs provided in \code{JLLinputs}. Default is FALSE.}
 }
 \value{
-List of model parameters from both the orthogonalized and non-orthogonalized versions of the JLL's based models
+List of model parameters from both the orthogonalized and non-orthogonalized versions of the JLL-based models
 }
 \description{
 Estimates the P-dynamics from JLL-based models
 }
+\section{General Notation}{
+
+\itemize{
+  \item \code{Td}: model time series dimension
+  \item \code{K}: total number of risk factors
+}
+}
+
 \examples{
 \donttest{
 data(CM_Factors)
 RF_TS <- RiskFactors
 N <- 3
-
 JLLinputs <- list(
   Economies = c("China", "Brazil", "Mexico", "Uruguay"), DomUnit = "China",
-  WishSigmas = 1, SigmaNonOrtho = NULL, JLLModelType = "JLL original"
+  WishSigmas = TRUE, SigmaNonOrtho = NULL, JLLModelType = "JLL original"
 )
-
 JLLPara <- JLL(RF_TS, N, JLLinputs)
 }
 }

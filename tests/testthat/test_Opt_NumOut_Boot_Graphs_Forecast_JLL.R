@@ -23,11 +23,11 @@ N <- 2
 GlobalVar <- "Gl_Eco_Act"
 DomVar <- "Eco_Act"
 DataFreq <- "Monthly"
-StatQ <- 0
-WishFP <- 1
+StatQ <- FALSE
+WishFP <- TRUE
 FPLim <- c(24, 36)
 
-WishBC <- 0
+WishBC <- FALSE
 JLLlist <- list(DomUnit = "China")
 GVARlist <- NULL
 
@@ -35,16 +35,16 @@ GVARlist <- NULL
 Horiz <- 10
 OutputLabel <- "Model_demo"
 DesiredGraphs <- c()
-WGYields <- 0
-WGFac <- 0
-WGJLL <- 0
+WGYields <- FALSE
+WGFac <- FALSE
+WGJLL <- FALSE
 
 # Bootstrap settings
-WishBoot <- 1
+WishBoot <- TRUE
 BootList <- list(methodBS = "bs", BlockLength = 4, ndraws = 5, pctg = 95)
 
 # Forecasting setting
-WishFor <- 1
+WishFor <- TRUE
 ForList <- list(ForHoriz = 6, t0Sample = 1, t0Forecast = 131, ForType = "Expanding")
 
 
@@ -140,7 +140,7 @@ test_that("Optimization + Outputs + Graphs return correct structure (JLL model)"
   # --- D) Bootstrap analysis ---
   res_Boot <- Bootstrap(ModelType, res_Opt, res_NumOut, Economies, InputsForOutputs, FacLab,
     JLLlist,
-    GVARlist = NULL, WishBC = 0, BRWlist = NULL, verbose = FALSE
+    GVARlist = NULL, WishBC = FALSE, BRWlist = NULL, verbose = FALSE
   )
   expect_type(res_Boot, "list")
   expect_s3_class(res_Boot, "ATSMModelBoot")

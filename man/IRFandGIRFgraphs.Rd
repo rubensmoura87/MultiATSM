@@ -18,25 +18,25 @@ IRFandGIRFgraphs(
 )
 }
 \arguments{
-\item{ModelType}{A character vector indicating the  estimated model type}
+\item{ModelType}{character. Estimated model type.}
 
-\item{NumOut}{list of computed outputs containing the model fit, IRFs, FEVDs, GIRFs, GFEVDs and perm premia}
+\item{NumOut}{list. Computed outputs containing model fit, IRFs, FEVDs, GIRFs, GFEVDs and term premia.}
 
-\item{WishPdynamicsgraphs}{binary variable: set 1, if the user wishes graphs to be generated; or set 0, otherwise}
+\item{WishPdynamicsgraphs}{logical. Set TRUE to generate risk factor graphs, FALSE otherwise.}
 
-\item{WishYieldsgraphs}{binary variable: set 1, if the user wishes graphs to be generated; or set 0, otherwise}
+\item{WishYieldsgraphs}{logical. Set TRUE to generate bond yield graphs, FALSE otherwise.}
 
-\item{IRFhoriz}{single numerical vector containing the desired horizon of analysis for the IRFs}
+\item{IRFhoriz}{integer. Desired horizon of analysis for the IRFs.}
 
-\item{PathsGraphs}{Path of the folder in which the graphs will be saved}
+\item{PathsGraphs}{character. Path of the folder in which the graphs will be saved.}
 
-\item{OutputType}{Available options are 'IRF' and 'GIRF'}
+\item{OutputType}{character. Available options: "IRF", "GIRF", "IRF Ortho", "GIRF Ortho".}
 
-\item{Economies}{A character vector containing the names of the economies included in the system.}
+\item{Economies}{character vector. Names of the economies included in the system.}
 
-\item{Folder2save}{Folder path where the outputs will be stored.}
+\item{Folder2save}{character. Folder path where the outputs will be stored.}
 
-\item{verbose}{Logical flag controlling function messaging.}
+\item{verbose}{logical. Flag controlling function messaging.}
 }
 \description{
 IRF and GIRF graphs for all models
@@ -44,10 +44,9 @@ IRF and GIRF graphs for all models
 \section{Available Methods}{
 
 - `autoplot(object, type = "IRF_Factor")`, `autoplot(object, type = "IRF_Yields")`,
-  `autoplot(object, type = "GIRF_Yields")`, `autoplot(object, type = "GIRF_Yields")`. \cr
-
- - For JLL-based models other option available are: `autoplot(object, type = "IRF_Factor-_Ortho")`,
- `autoplot(object, type = "IRF_Yields_Ortho")`, `autoplot(object, type = "GIRF_Yields_Ortho")`,
+  `autoplot(object, type = "GIRF_Yields")`, `autoplot(object, type = "GIRF_Yields")`.
+  For JLL-based models: `autoplot(object, type = "IRF_Factor-_Ortho")`,
+  `autoplot(object, type = "IRF_Yields_Ortho")`, `autoplot(object, type = "GIRF_Yields_Ortho")`,
   `autoplot(object, type = "GIRF_Yields_Ortho")`.
 }
 
@@ -57,7 +56,7 @@ ModelType <- "JPS original"
 Economy <- "Brazil"
 IRFhoriz <- 20
 IRFandGIRFgraphs(ModelType, NumOutEx,
-  WishPdynamicsgraphs = 0, WishYieldsgraphs = 1, IRFhoriz,
+  WishPdynamicsgraphs = FALSE, WishYieldsgraphs = TRUE, IRFhoriz,
   PathsGraphs = NULL, OutputType = "GIRF", Economy, Folder2save = NULL,
   verbose = FALSE
 )

@@ -1,21 +1,31 @@
 #' Estimates a standard VAR(1)
 #'
-#' @param RiskFactors A numeric matrix (F x T) representing the time series of risk factors.
-#' @param VARtype String vector with two possible values: 'unconstrained' or 'constrained'.
-#' @param Bcon_Mat Constraints matrix (F+1 x N), which includes an intercept. Entries containing NAs are treated as free parameters. \cr
-#'             Default is set to NULL.
+#' @param RiskFactors numeric matrix (K x Td). Time series of risk factors.
+#' @param VARtype character. Permissible choices: "unconstrained" or "constrained".
+#' @param Bcon_Mat matrix (K x K+1). Constraints matrix (includes intercept). Entries containing NAs are treated as free parameters. Default is NULL.
 #'
-#' @return intercept, feedback matrix and the variance-covariance matrix of a VAR(1)
+#' @return list. Contains:
+#'   - intercept (K x 1)
+#'   - feedback matrix (K x K)
+#'   - variance-covariance matrix (K x K) of a VAR(1)
+#'
+#' @section General Notation:
+#' \itemize{
+#'   \item \code{Td}: model time series dimension
+#'   \item \code{N}: number of country-specific spanned factors
+#'   \item \code{K}: total number of risk factors (K = C x (N + M) + G or K = N + M + G)
+#' }
+#'
 #' @examples
 #' data("CM_Factors")
 #' # Example 1: unconstrained case
-#' VAR(RiskFactors, VARtype = "unconstrained")
+#' VAR_para1 <- VAR(RiskFactors, VARtype = "unconstrained")
 #'
 #' # Example 2: constrained case
 #' K <- nrow(RiskFactors)
 #' Bcon_Mat <- matrix(0, nrow = K, ncol = K + 1)
 #' Bcon_Mat[, 1:3] <- NaN
-#' VAR(RiskFactors, VARtype = "constrained", Bcon_Mat)
+#' VAR_para2 <- VAR(RiskFactors, VARtype = "constrained", Bcon_Mat)
 #'
 #' @export
 

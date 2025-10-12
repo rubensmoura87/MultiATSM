@@ -8,7 +8,7 @@ N <- 3
 
 JLLinputs <- list(
   Economies = c("China", "Brazil"), DomUnit = "China",
-  WishSigmas = 1, SigmaNonOrtho = NULL, JLLModelType = "JLL original"
+  WishSigmas = TRUE, SigmaNonOrtho = NULL, JLLModelType = "JLL original"
 )
 
 
@@ -28,7 +28,7 @@ test_that("JLL returns correct output structure", {
 
 # 2) Verify the absence of a sigma list
 test_that("JLL issues an error for invalid output", {
-  JLLinputs$WishSigmas <- 0
+  JLLinputs$WishSigmas <- FALSE
   res <- JLL(RF_TS, N, JLLinputs)
   expect_false(is.list(res$Sigmas))
 })
@@ -36,7 +36,7 @@ test_that("JLL issues an error for invalid output", {
 
 # 3) Test error for No DomUnit model
 test_that("JLL issues an error for invalid output (No DomUnit model)", {
-  JLLinputs$WishSigmas <- 0
+  JLLinputs$WishSigmas <- FALSE
   JLLinputs$JLLModelType <- "JLL No DomUnit"
   expect_error(JLL(RF_TS, N, JLLinputs, CheckInputs = TRUE))
 })
@@ -44,7 +44,7 @@ test_that("JLL issues an error for invalid output (No DomUnit model)", {
 
 # 4) Test error for no DomUnit assigned
 test_that("JLL issues an error for invalid output (No DomUnit assigned)", {
-  JLLinputs$WishSigmas <- 0
+  JLLinputs$WishSigmas <- FALSE
   JLLinputs$DomUnit <- "None"
   expect_error(JLL(RF_TS, N, JLLinputs, CheckInputs = TRUE))
 })

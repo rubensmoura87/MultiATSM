@@ -1,15 +1,20 @@
 #' Gather data of several countries in a list. Particularly useful for GVAR-based setups (Compute "GVARFactors")
 #'
-#' @param t_First        Start date of the sample period in the format yyyy-mm-dd.
-#' @param t_Last         End date of the sample period in the format yyyy-mm-dd.
-#' @param Economies      A character vector containing the names of the economies included in the system.
-#' @param N              Integer. Number of country-specific spanned factors.
-#' @param FactorLabels   A list of character vectors with labels for all variables in the model.
-#' @param ModelType      A character vector indicating the model type to be estimated.
-#' @param Macro_FullData  List containing a full set of macroeconomic data.
-#' @param Yields_FullData  List containing a full set of bond yield data
-#' @param Wgvar          GVAR transition matrix of size C x C, applicable if a GVAR-type model is selected. Default is NULL.
+#' @param t_First character. Start date of the sample period in the format yyyy-mm-dd.
+#' @param t_Last character. End date of the sample period in the format yyyy-mm-dd.
+#' @param Economies character vector. Names of the economies included in the system.
+#' @param N positive integer. Number of country-specific spanned factors per country.
+#' @param FactorLabels list. Labels for all variables present in the model, as returned by \code{\link{LabFac}}.
+#' @param ModelType character. Model type to be estimated. Permissible choices: "JPS original", "JPS global", "GVAR single", "JPS multi", "GVAR multi", "JLL original", "JLL No DomUnit", "JLL joint Sigma".
+#' @param Macro_FullData list. Full set of macroeconomic data, as returned by \code{\link{Load_Excel_Data}}.
+#' @param Yields_FullData list. Full set of bond yield data, as returned by \code{\link{Load_Excel_Data}}.
+#' @param Wgvar GVAR transition matrix. For GVAR models, either a matrix (C x C) for fixed weights, or a named list of matrices for time-varying weights. Default is NULL. Required for GVAR models.
 #'
+#' @section General Notation:
+#'   \itemize{
+#'     \item C: number of countries in the system.
+#'     \item N: number of country-specific spanned factors.
+#'   }
 #'
 #' @examples
 #'
@@ -49,8 +54,7 @@
 #'   yields_data, Wgvar
 #' )
 #'
-#' @returns
-#' List containing the risk factor set. This list is particularly useful for the estimation of the GVAR-based models.
+#' @return List containing the risk factor set for all countries and global factors. Particularly useful for GVAR-based models.
 #'
 #' @export
 

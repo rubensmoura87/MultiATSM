@@ -13,7 +13,7 @@ tF_sample <- "01-12-2019"
 DataFreq <- "Monthly"
 
 # Inputs for a BRW model
-WishBC <- 0 # useful to get the risk factors, bias-corrected features will be tested below
+WishBC <- TRUE # useful to get the risk factors, bias-corrected features will be tested below
 BRWlist <- list(Cent_Measure = "Mean", gamma = 0.2, N_iter = 10, N_burn = 2, B = 2, check = FALSE)
 
 GVARlist <- list(

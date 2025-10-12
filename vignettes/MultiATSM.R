@@ -110,7 +110,7 @@ Final_Date <- "01-12-2019" # Format: "dd-mm-yyyy"
 DataFrequency <- "Monthly"
 
 # 5) Risk-neutral stationary constraint
-StationarityUnderQ <- 0 # 1 = set stationary condition under the Q; 0 = no stationary condition
+StationarityUnderQ <- FALSE
 
 # 6) Path to save outputs
 Folder2Save <- NULL
@@ -169,12 +169,12 @@ DesiredGraphs <- c("Fit", "GIRF", "GFEVD") # Available options are: "Fit", "IRF"
 # "GFEVD", "TermPremia".
 
 ## -----------------------------------------------------------------------------
-WishGraphRiskFac <- 0 #   YES: 1; No = 0.
-WishGraphYields <- 1 #    YES: 1; No = 0.
-WishOrthoJLLgraphs <- 0 # YES: 1; No = 0.
+WishGraphRiskFac <- FALSE 
+WishGraphYields <- TRUE 
+WishOrthoJLLgraphs <- FALSE 
 
 ## -----------------------------------------------------------------------------
-WishFPremia <- 1 # Wish to estimate the forward premia: YES: 1, NO:0
+WishFPremia <- TRUE
 FPmatLim <- c(60, 120)
 
 ## -----------------------------------------------------------------------------
@@ -250,7 +250,7 @@ GVARpara <- GVAR(GVARinputs, N, CheckInputs = TRUE)
 ## -----------------------------------------------------------------------------
 ModelType <- "JLL original"
 JLLinputs <- list(
-  Economies = Economies, DomUnit = "China", WishSigmas = 1, SigmaNonOrtho = NULL,
+  Economies = Economies, DomUnit = "China", WishSigmas = TRUE, SigmaNonOrtho = NULL,
   JLLModelType = ModelType
 )
 
@@ -283,7 +283,7 @@ JLLinputs <- list(
 # DataFreq <- "Monthly" # Frequency of the data
 # 
 # Folder2Save <- NULL # Folder to save the required graphical outputs. NULL -> temporary directory
-# StatQ <- 0 # Wish to impose stationary condition for the eigenvalues of each country: YES: 1,NO:0
+# StatQ <- FALSE # Wish to impose stationary condition for the eigenvalues of each country
 # 
 # # B.1) SPECIFIC model inputs
 # #################################### GVAR-based models ##################################################
@@ -300,7 +300,7 @@ JLLinputs <- list(
 # JLLlist <- list(DomUnit = "China")
 # # DomUnit: name of the economy of the economic system, or "None" for the model "JLL No DomUnit"
 # ###################################### BRW inputs  ######################################################
-# WishBC <- 0 # Wish to estimate the model with the bias correction method of BRW (2012): #YES: 1, NO:0
+# WishBC <- FALSE # Wish to estimate the model with the bias correction method of BRW (2012)
 # BRWlist <- within(list(
 #   Cent_Measure = "Mean", gamma = 0.05, N_iter = 250, B = 50, checkBRW = TRUE,
 #   B_check = 1000, Eigen_rest = 1
@@ -314,17 +314,17 @@ JLLinputs <- list(
 # # B_check: If checkBRW is chosen as TRUE, then choose number of bootstrap samples used in the check
 # 
 # # C) Decide on Settings for numerical outputs
-# WishFPremia <- 1 # Wish to estimate the forward premia: YES: 1, NO:0
+# WishFPremia <- TRUE # Wish to estimate the forward premia
 # FPmatLim <- c(60, 120) #  If the forward premia is desired, then choose the Min and max maturities of the
 # # forward premia. Otherwise set NA
 # Horiz <- 30
 # DesiredGraphs <- c("Fit", "IRF", "TermPremia") # "Fit", "IRF", "FEVD", "GIRF", "GFEVD", "TermPremia"
-# WishGraphRiskFac <- 0
-# WishGraphYields <- 1
-# WishOrthoJLLgraphs <- 0
+# WishGraphRiskFac <- FALSE
+# WishGraphYields <- TRUE
+# WishOrthoJLLgraphs <- FALSE
 # 
 # # D) Bootstrap settings
-# WishBootstrap <- 1 #  YES: 1; No = 0.
+# WishBootstrap <- TRUE
 # BootList <- list(methodBS = "bs", BlockLength = 4, ndraws = 4, pctg = 95)
 # # methodBS: bootstrap method. Available options: (i) 'bs' ; (ii) 'wild'; (iii) 'block'
 # # BlockLength: Block length, necessary input for the block bootstrap method
@@ -332,7 +332,7 @@ JLLinputs <- list(
 # # pctg: confidence level
 # 
 # # E) Out-of-sample forecast
-# WishForecast <- 1 #  YES: 1; No = 0.
+# WishForecast <- TRUE
 # ForecastList <- list(ForHoriz = 12, t0Sample = 1, t0Forecast = 131, ForType = "Rolling")
 # # ForHoriz: forecast horizon
 # # t0Sample:   initial sample date

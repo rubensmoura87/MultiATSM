@@ -1,10 +1,16 @@
 #' Computes the PCA weights for a single country
 #'
-#' @param Yields A matrix of bond yields (J x T) for a single country, where J is the number of maturities and T is the time series length.
-#' @param Economy A character string indicating the name of the economy.
+#' @param Yields matrix (J x Td). Bond yields for a single country.
+#' @param Economy character. Name of the economy.
 #'
+#' @return matrix (J x J). Eigenvectors of the variance-covariance matrix of yields.
 #'
-#' @return A matrix (J x J) that corresponds to the eigenvectors of the variance-covariance matrix of yields
+#' @section General Notation:
+#' \itemize{
+#'   \item \code{Td}: model time series dimension
+#'   \item \code{J}: number of bond yields per country used in estimation
+#' }
+#'
 #' @examples
 #' data(CM_Yields)
 #' Economy <- "Mexico"

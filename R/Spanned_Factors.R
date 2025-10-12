@@ -1,10 +1,19 @@
 #' Computes the country-specific spanned factors
-#
-#' @param Yields A matrix  (J x T), where J is the number of maturities and T is the length of the time series.
-#' @param Economies A character vector containing the names of the economies included in the system.
-#' @param N Scalar representing the desired number of country-specific spanned factors (maximum allowed is N = J).
 #'
-#' @return Matrix containing the N spanned factors for all the countries of the system  (CJ x T)
+#' @param Yields matrix (J x Td). Bond yields for all countries.
+#' @param Economies character vector. Names of the economies included in the system.
+#' @param N integer. Desired number of country-specific spanned factors (maximum allowed is N = J).
+#'
+#' @return matrix. Contains the N spanned factors for all countries in the system (CJ x Td).
+#'
+#' @section General Notation:
+#' \itemize{
+#'   \item \code{Td}: model time series dimension
+#'   \item \code{C}: number of countries in the system
+#'   \item \code{N}: number of country-specific spanned factors
+#'   \item \code{J}: number of bond yields per country used in estimation
+#' }
+#'
 #' @examples
 #' data(CM_Yields)
 #' Economies <- c("China", "Brazil", "Mexico", "Uruguay")

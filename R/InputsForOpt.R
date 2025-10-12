@@ -2,24 +2,59 @@
 #'
 #' @param InitialSampleDate Start date of the sample period in the format "dd-mm-yyyy"
 #' @param FinalSampleDate End date of the sample period in the format "dd-mm-yyyy"
-#' @param ModelType A character vector indicating the model type to be estimated. Available options: "JPS original", "JPS global", "GVAR single", "JPS multi", "GVAR multi", "JLL original", "JLL No DomUnit", "JLL joint Sigma".
-#' @param Yields A numerical matrix with time series of yields (J x T or CJ x T)
-#' @param GlobalMacro A numerical matrix with time series of the global risk factors (G x T)
-#' @param DomMacro A numerical matrix with time series of the country-specific risk factors for all C countries (CM x T)
-#' @param FactorLabels A list of character vectors with labels for all variables in the model.
-#' @param Economies A character vector containing the names of the economies included in the system.
-#' @param DataFrequency A character vector specifying the frequency of the data. Available options are: "Daily All Days", "Daily Business Days", "Weekly", "Monthly", "Quarterly", or "Annually".
-#' @param GVARlist A list containing the necessary inputs for the estimation of GVAR-based models
-#' @param JLLlist A list of necessary inputs for the estimation of JLL-based models. If the chosen model is "JLL original" or "JLL joint Sigma", then a dominant unit economy must be chosen. Otherwise, this list must be set as 'None'.
-#' @param WishBRW Logical. Whether to estimate the physical parameter model with bias correction, based on the method by Bauer, Rudebusch and Wu (2012). Default is FALSE.
-#' @param BRWlist List of necessary inputs for performing the bias-corrected estimation.
-#' @param UnitYields A character string indicating the maturity unit of yields. Options are: "Month" for yields expressed in months, or "Year" for yields expressed in years. Default is "Month".
-#' @param CheckInputs Logical. Whether to perform a prior check on the consistency of the provided input list. Default is TRUE.
-#' @param BS_Adj Logical. Whether to adjust the global series for the sepQ models in the Bootstrap setting. Default is FALSE.
-#' @param verbose Logical flag controlling function messaging. Default is TRUE.
+#' @param ModelType character. Model type to be estimated. Permissible choices: "JPS original", "JPS global", "GVAR single", "JPS multi", "GVAR multi", "JLL original", "JLL No DomUnit", "JLL joint Sigma".
+#' @param Yields numerical matrix with time series of yields (J x Td or CJ x Td)
+#' @param GlobalMacro numerical matrix with time series of the global risk factors (G x Td)
+#' @param DomMacro numerical matrix with time series of the country-specific risk factors for all C countries (C X Td or CM x Td)
+#' @param FactorLabels list. Labels for all variables present in the model.
+#' @param Economies character vector. Names of the economies included in the system.
+#' @param DataFrequency character. Data frequency. Permissible choices: "Daily All Days", "Daily Business Days", "Weekly", "Monthly", "Quarterly", "Annually".
+#' @param GVARlist list. Inputs for GVAR model estimation. See details below.
+#' @param JLLlist list. Inputs for JLL model estimation. See details below.
+#' @param WishBRW logical. Whether to estimate the physical parameter model with bias correction (see \code{\link{Bias_Correc_VAR}}). Default is FALSE.
+#' @param BRWlist list. Inputs for bias-corrected estimation.
+#' @param UnitYields character. Maturity unit of yields. Permissible choices: "Month" or "Year". Default is "Month".
+#' @param CheckInputs logical. Whether to perform a prior check on the consistency of the provided input list. Default is TRUE.
+#' @param BS_Adj logical. Whether to adjust the global series for the sepQ models in the Bootstrap setting. Default is FALSE.
+#' @param verbose logical. Print progress messages. Default is TRUE.
+#'
+#' @section Permissible options for GVARlist:
+#' \itemize{
+#'   \item \strong{VARXtype}: "unconstrained" or "constrained"
+#'   \item \strong{W_type}: "Time-varying" or "Sample Mean"
+#'   \item \strong{t_First_Wgvar}, \strong{t_Last_Wgvar}: year as character
+#' }
+#'
+#' @section Permissible options for JLLlist:
+#' \itemize{
+#'   \item \strong{DomUnit}: name of the dominant economy or "None"
+#'   \item \strong{WishSigmas}: 1 (estimate variance-covariance matrices) or 0
+#'   \item \strong{SigmaNonOrtho}: NULL or F x F matrix
+#' }
+#'
+#' @section Permissible options for BRWlist:
+#' \itemize{
+#'   \item \strong{BiasCorrection}: 1 (bias-corrected) or 0
+#'   \item \strong{flag_mean}: TRUE (mean) or FALSE (median)
+#'   \item \strong{gamma}: numeric adjustment parameter
+#'   \item \strong{N_iter}: number of iterations
+#'   \item \strong{N_burn}: number of burn-in iterations
+#'   \item \strong{B}: number of bootstrap samples
+#'   \item \strong{checkBRW}: TRUE or FALSE
+#'   \item \strong{B_check}: number of bootstrap samples for closeness check
+#' }
+#'
+#'
+#' @section General Notation:
+#' \itemize{
+#'   \item \code{Td} model time series dimension.
+#'   \item \code{C} number of countries in the system.
+#'   \item \code{G} number of global unspanned factors.
+#'   \item \code{M} number of country-specific unspanned factors.
+#'   \item \code{J} number of bond yields per country used in estimation.
+#' }
 #'
 #' @importFrom pracma null
-#'
 #' @return An object of class 'ATSMModelInputs' containing the necessary inputs for performing the model optimization.
 #'
 #' @section Available Methods:

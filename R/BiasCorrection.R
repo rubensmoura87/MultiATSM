@@ -1,23 +1,23 @@
 #' Estimates an unbiased VAR(1) using stochastic approximation (Bauer, Rudebusch and Wu, 2012)
 #'
-#' @param ModelType A character vector indicating the model type to be estimated.
-#' @param BRWinputs A list containing the necessary inputs for the BRW model estimation:
+#' @param ModelType character. Model type to be estimated. Permissible choices: "JPS original", "JPS global", "GVAR single", "JPS multi", "GVAR multi", "JLL original", "JLL No DomUnit", "JLL joint Sigma".
+#' @param BRWinputs list. Contains the necessary inputs for the BRW model estimation:
 #' \enumerate{
-#' \item \code{Cent_Measure}: Determines whether "Mean" or "Median"-unbiased estimation is desired.
-#' \item \code{gamma}: Numeric. Adjustment parameter between 0 and 1. Default is 0.5.
-#' \item \code{N_iter}: Integer. Number of iterations for the stochastic approximation algorithm after burn-in. Default is 5,000.
-#' \item \code{N_burn}: Integer. Number of burn-in iterations. Default is 15% of \code{N_iter}.
-#' \item \code{B}: Integer. Number of bootstrap samples per iteration for calculating the noisy measure of the biased estimator's mean or median. Default is 50.
-#' \item \code{check}: Logical. Indicates whether to perform a closeness check. Default is TRUE.
-#' \item \code{B_check}: Integer. Number of bootstrap samples for the closeness check. Default is 100,000.
-#' \item \code{Eigen_rest}: Numeric. Restriction on the largest eigenvalue under the P-measure. Default is 1.
+#'   \item \code{Cent_Measure}: "Mean" or "Median" (unbiased estimation type)
+#'   \item \code{gamma}: Numeric. Adjustment parameter between 0 and 1. Default is 0.5.
+#'   \item \code{N_iter}: Integer. Number of iterations for the stochastic approximation algorithm after burn-in. Default is 5000.
+#'   \item \code{N_burn}: Integer. Number of burn-in iterations. Default is 15% of \code{N_iter}.
+#'   \item \code{B}: Integer. Number of bootstrap samples per iteration for calculating the noisy measure of the biased estimator's mean or median. Default is 50.
+#'   \item \code{check}: Logical. Indicates whether to perform a closeness check. Default is TRUE.
+#'   \item \code{B_check}: Integer. Number of bootstrap samples for the closeness check. Default is 100000.
+#'   \item \code{Eigen_rest}: Numeric. Restriction on the largest eigenvalue under the P-measure. Default is 1.
 #' }
-#' @param RiskFactors A numeric matrix (T x F) representing the time series of risk factors.
-#' @param Economies A character vector containing the names of the economies included in the system.
-#' @param FactorLabels A list of character vectors with labels for all variables in the model.
-#' @param GVARinputs List. Inputs for GVAR model estimation (see \code{\link{GVAR}} function). Default is NULL.
-#' @param JLLinputs List. Inputs for JLL model estimation (see \code{\link{JLL}} function). Default is NULL.
-#' @param verbose verbose Logical flag controlling function messaging. Default is TRUE.
+#' @param RiskFactors numeric matrix (Td x K). Time series of risk factors.
+#' @param Economies character vector. Names of the economies included in the system.
+#' @param FactorLabels list. Labels for all variables in the model.
+#' @param GVARinputs list. Inputs for GVAR model estimation (see \code{\link{GVAR}}). Default is NULL.
+#' @param JLLinputs list. Inputs for JLL model estimation (see \code{\link{JLL}}). Default is NULL.
+#' @param verbose logical. Flag controlling function messaging. Default TRUE.
 #'
 #' @examples
 #' \donttest{
@@ -34,15 +34,21 @@
 #' ModelType <- "JPS original"
 #' FactorLabels <- NULL
 #'
-#' BRWpara <- Bias_Correc_VAR(ModelType, BRWinputs, Factors, Economies, FactorLabels)
+#' BRWpara <- Bias_Correc_VAR(ModelType, BRWinputs, Factors, Economies, FactorLabels, verbose = FALSE)
 #' }
 #'
 #' @return Bias-corrected VAR parameters based on the framework of Bauer, Rudebusch and Wu (2012). The list contains:
 #' \enumerate{
-#' \item \code{KOZ_BC}: estimated intercept (F x 1);
-#' \item \code{K1Z_BC}: estimated feedback matrix (F x F);
-#' \item \code{SSZ_BC}: estimated variance-covariance matrix (F x F);
-#' \item \code{dist}: root mean square distance (scalar);
+#'   \item \code{KOZ_BC}: estimated intercept (K x 1);
+#'   \item \code{K1Z_BC}: estimated feedback matrix (K x K);
+#'   \item \code{SSZ_BC}: estimated variance-covariance matrix (K x K);
+#'   \item \code{dist}: root mean square distance (scalar);
+#' }
+#'
+#' @section General Notation:
+#' \itemize{
+#'   \item \code{Td} denotes the model time series dimension.
+#'   \item \code{K} denotes the total number of risk factors.
 #' }
 #'
 #' @references

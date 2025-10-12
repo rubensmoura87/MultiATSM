@@ -2,7 +2,7 @@
 % Please edit documentation in R/InputsForOutputs.R
 \name{InputsForOutputs}
 \alias{InputsForOutputs}
-\title{Collects the inputs that are used to construct the numerical and the graphical outputs}
+\title{Collects the inputs that are used to construct the numerical and graphical outputs}
 \usage{
 InputsForOutputs(
   ModelType,
@@ -11,72 +11,56 @@ InputsForOutputs(
   OutputLabel,
   WishStationarityQ,
   DataFrequency,
-  WishGraphYields = 0,
-  WishGraphRiskFactors = 0,
-  WishOrthoJLLgraphs = 0,
-  WishForwardPremia = 0,
+  WishGraphYields = FALSE,
+  WishGraphRiskFactors = FALSE,
+  WishOrthoJLLgraphs = FALSE,
+  WishForwardPremia = FALSE,
   LimFP = NULL,
-  WishBootstrap = 0,
+  WishBootstrap = FALSE,
   ListBoot = NULL,
-  WishForecast = 0,
+  WishForecast = FALSE,
   ListForecast = NULL,
   UnitYields = "Month"
 )
 }
 \arguments{
-\item{ModelType}{A character vector indicating the model type to be estimated.}
+\item{ModelType}{character. Model type to be estimated. Permissible choices: "JPS original", "JPS global", "GVAR single", "JPS multi", "GVAR multi", "JLL original", "JLL No DomUnit", "JLL joint Sigma".}
 
-\item{Horiz}{A numeric scalar specifying the desired analysis horizon for the outputs.}
+\item{Horiz}{numeric scalar. Desired analysis horizon for the outputs.}
 
-\item{ListOutputWished}{A list of desired graphical outputs. Available options are: "Fit", "IRF", "FEVD", "GIRF", "GFEVD", "TermPremia".}
+\item{ListOutputWished}{character vector. Desired graphical outputs. Available options: "RiskFactors", "Fit", "IRF", "FEVD", "GIRF", "GFEVD", "TermPremia", "ForwardPremia".}
 
-\item{OutputLabel}{A string for the name of the output label to be stored.}
+\item{OutputLabel}{character. Name of the output label to be stored.}
 
-\item{WishStationarityQ}{A binary variable (1 or 0) indicating whether to impose that the largest eigenvalue under Q is strictly
-smaller than 1. Set to 1 to impose the restriction, or 0 otherwise.}
+\item{WishStationarityQ}{logical. Whether to impose that the largest eigenvalue under Q is strictly smaller than 1. TRUE to impose.}
 
-\item{DataFrequency}{A character vector specifying the data frequency. Available options: "Daily All Days", "Daily Business Days",
-"Weekly", "Monthly", "Quarterly", "Annually".}
+\item{DataFrequency}{character. Data frequency. Permissible choices: "Daily All Days", "Daily Business Days", "Weekly", "Monthly", "Quarterly", "Annually".}
 
-\item{WishGraphYields}{A binary variable (1 or 0) indicating whether the user wishes to generate graphs for yields. Default is 0.}
+\item{WishGraphYields}{logical. Whether to generate graphs for yields. Default is FALSE.}
 
-\item{WishGraphRiskFactors}{A binary variable (1 or 0) indicating whether the user wishes to generate graphs for risk factors. Default is 0.}
+\item{WishGraphRiskFactors}{logical. Whether to generate graphs for risk factors. Default is FALSE.}
 
-\item{WishOrthoJLLgraphs}{A binary variable (1 or 0) indicating whether the user wishes to generate orthogonalized JLL-based graphs.
-Default is 0.}
+\item{WishOrthoJLLgraphs}{logical. Whether to generate orthogonalized JLL-based graphs. Default is FALSE.}
 
-\item{WishForwardPremia}{A binary variable (1 or 0) indicating whether the user wishes to generate forward premia graphs. Default is 0.}
+\item{WishForwardPremia}{logical. Whether to generate forward premia graphs. Default is FALSE.}
 
-\item{LimFP}{A numeric vector containing the maturities associated with the start and end dates of the loan.}
+\item{LimFP}{numeric vector. Maturities associated with the start and end dates of the loan.}
 
-\item{WishBootstrap}{A binary variable (1 or 0) indicating whether the user wishes to perform bootstrap-based estimation. Default is 0.}
+\item{WishBootstrap}{logical. Whether to perform bootstrap-based estimation. Default is FALSE.}
 
-\item{ListBoot}{A List containing the following four elements:
-\enumerate{
- \item \code{methodBS}: Desired bootstrap method: (a) 'bs' for standard residual bootstrap, (b) 'wild' for wild bootstrap,
-                   or (c) 'block' for block bootstrap.
- \item \code{BlockLength}: If block bootstrap is chosen, specify the block length (numeric scalar).
- \item \code{ndraws}: Number of bootstrap draws.
- \item \code{pctg}: Confidence level expressed in basis points (numeric vector).
-}}
+\item{ListBoot}{list. Contains bootstrap settings: methodBS ("bs", "wild", "block"), BlockLength (numeric), ndraws (numeric), pctg (numeric).}
 
-\item{WishForecast}{A binary variable (1 or 0) indicating whether the user wishes to generate forecasts. Default is 0.}
+\item{WishForecast}{logical. Whether to generate forecasts. Default is FALSE.}
 
-\item{ListForecast}{A list containing the following three elements:
-\enumerate{
- \item \code{ForHoriz}: forecast horizon;
- \item \code{t0Sample}: Index of the first variable in the information set.
- \item \code{t0Forecast}: Index of the first forecast cut-off date.
- \item \code{ForType}: A string specifying the desired forecast type. Available options are: "Rolling" or "Expanding".
-}}
+\item{ListForecast}{list. Contains forecast settings: ForHoriz (numeric), t0Sample (numeric), t0Forecast (numeric), ForType ("Rolling", "Expanding").}
 
-\item{UnitYields}{A character string indicating the maturity unit of yields. Options are: (i) "Month" for yields expressed in months, or (ii) "Year" for yields expressed in years. Default is "Month".}
+\item{UnitYields}{character. Maturity unit of yields. Options: "Month" or "Year". Default is "Month".}
 }
 \value{
-List of necessary inputs to generate the graphs of the outputs of the desired model
+List of necessary inputs to generate the graphs and outputs of the desired model.
 }
 \description{
-Collects the inputs that are used to construct the numerical and the graphical outputs
+Collects the inputs that are used to construct the numerical and graphical outputs
 }
 \examples{
 
@@ -84,12 +68,13 @@ ModelType <- "JPS original"
 Horiz <- 100
 DesiredOutputGraphs <- c("Fit", "GIRF", "GFEVD")
 OutputLabel <- "Test"
-WishStationarityQ <- 1
-WishGraphRiskFac <- 0
-WishGraphYields <- 1
+WishStationarityQ <- TRUE
+WishGraphRiskFac <- FALSE
+WishGraphYields <- TRUE
 
 InputsList <- InputsForOutputs(
   ModelType, Horiz, DesiredOutputGraphs, OutputLabel,
   WishStationarityQ, WishGraphYields, WishGraphRiskFac
 )
+
 }

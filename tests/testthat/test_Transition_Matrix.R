@@ -1,17 +1,9 @@
 library(testthat)
 library(MultiATSM)
 
-# Simulate trade data for testing
+# Set inputs
 LoadData("CM_2024")
 Economies <- c("China", "Brazil", "Mexico", "Uruguay")
-# Years <- c("2000", "2001", "2002")
-# TradeFlows <- list(
-#  China = data.frame(Brazil = c(10, 20, 30), China = c(90, 80, 70), row.names = Years),
-#  Brazil = data.frame(Brazil = c(60, 50, 40), China = c(40, 50, 60), row.names = Years)
-# )
-# for (e in Economies) {
-#  TradeFlows[[e]] <- t(TradeFlows[[e]])
-# }
 
 # 1) Test Sample Mean output
 test_that("Transition_Matrix returns correct output for Sample Mean", {

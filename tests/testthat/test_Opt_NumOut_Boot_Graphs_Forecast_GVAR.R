@@ -23,25 +23,25 @@ N <- 2
 GlobalVar <- "Gl_Eco_Act"
 DomVar <- "Eco_Act"
 DataFreq <- "Monthly"
-StatQ <- 0
-WishFP <- 0
+StatQ <- FALSE
+WishFP <- FALSE
 FPLim <- c()
-WishBC <- 0
+WishBC <- FALSE
 
 # Inputs required for the computation of the numerical outputs
 Horiz <- 10
 OutputLabel <- "Model_demo"
 DesiredGraphs <- c()
-WGYields <- 0
-WGFac <- 0
-WGJLL <- 0
+WGYields <- FALSE
+WGFac <- FALSE
+WGJLL <- FALSE
 
 # Bootstrap settings
-WishBoot <- 1
+WishBoot <- TRUE
 BootList <- list(methodBS = "bs", BlockLength = 4, ndraws = 5, pctg = 95)
 
 # Forecasting setting
-WishFor <- 1
+WishFor <- TRUE
 ForList <- list(ForHoriz = 6, t0Sample = 1, t0Forecast = 131, ForType = "Expanding")
 
 test_that("Optimization + Outputs + Graphs return correct structure (GVAR model)", {

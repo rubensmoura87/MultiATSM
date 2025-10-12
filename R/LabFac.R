@@ -1,10 +1,12 @@
-#' Generates the labels factors
+#' Generates the labels for risk factors used in the model
 #'
-#' @param N Integer. Number of country-specific spanned factors.
-#' @param DomVar A character vector containing the names of the domestic variables.
-#' @param GlobalVar A character vector containing the names of the global variables.
-#' @param Economies A character vector containing the names of the economies included in the system.
-#' @param ModelType A character vector indicating the model type to be estimated.
+#' @param N positive integer. Number of country-specific spanned factors. Must be between 1 and 8.
+#' @param DomVar character vector. Names of the domestic variables.
+#' @param GlobalVar character vector. Names of the global variables.
+#' @param Economies character vector. Names of the economies included in the system.
+#' @param ModelType character. Model type to be estimated. Permissible choices: "JPS original", "JPS global", "GVAR single", "JPS multi", "GVAR multi", "JLL original", "JLL No DomUnit", "JLL joint Sigma".
+#'
+#' @return List containing the risk factor labels for spanned, domestic, star, and global variables, as well as tables for each country and all countries.
 #'
 #' @examples
 #' N <- 2
@@ -12,12 +14,7 @@
 #' GlobalVar <- "Commodity Prices"
 #' Economies <- c("U.S.", "Canada", "Germany", "Japan")
 #' ModelType <- "JPS original"
-#'
 #' VarLabels <- LabFac(N, DomVar, GlobalVar, Economies, ModelType)
-#'
-#' @returns
-#' List containing the risk factor labels
-#'
 #' @export
 
 LabFac <- function(N, DomVar, GlobalVar, Economies, ModelType) {

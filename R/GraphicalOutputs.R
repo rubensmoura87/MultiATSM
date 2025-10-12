@@ -87,13 +87,13 @@ GraphicalOutputs <- function(ModelType, ModelPara, NumOut, InputsForOutputs, Eco
 #########################################################################################################
 #' Spanned and unspanned factors plot
 #'
-#' @param ModelType A character vector indicating the  estimated model type
-#' @param WishRFgraphs binary variable: set 1, if the user wishes graphs to be generated; or set 0, otherwise
-#' @param ModelOutputs list of model parameter estimates (see the \code{\link{Optimization}} function)
-#' @param Economies A character vector containing the names of the economies included in the system.
-#' @param FactorLabels A character vector indicating the model type to be estimated.
-#' @param Folder2save Folder path where the outputs will be stored.
-#' @param verbose Logical flag controlling function messaging.
+#' @param ModelType character. Estimated model type.
+#' @param WishRFgraphs logical. Set TRUE to generate graphs, FALSE otherwise.
+#' @param ModelOutputs list. Model parameter estimates (see \code{\link{Optimization}}).
+#' @param Economies character vector. Names of the economies included in the system.
+#' @param FactorLabels list. Labels for all variables in the model.
+#' @param Folder2save character. Folder path where the outputs will be stored.
+#' @param verbose logical. Flag controlling function messaging.
 #'
 #' @examples
 #' data("ParaSetEx")
@@ -103,7 +103,7 @@ GraphicalOutputs <- function(ModelType, ModelPara, NumOut, InputsForOutputs, Eco
 #' FacLab <- LabFac(N = 1, DomVar = "Eco_Act", GlobalVar = "Gl_Eco_Act", Economy, ModelType)
 #'
 #' RiskFactorsGraphs(ModelType,
-#'   WishRFgraphs = 1, ModelParaEx, Economy, FacLab,
+#'   WishRFgraphs = FALSE, ModelParaEx, Economy, FacLab,
 #'   Folder2save = NULL, verbose = FALSE
 #' )
 #'
@@ -113,7 +113,7 @@ GraphicalOutputs <- function(ModelType, ModelPara, NumOut, InputsForOutputs, Eco
 #' @export
 
 RiskFactorsGraphs <- function(ModelType, WishRFgraphs, ModelOutputs, Economies, FactorLabels, Folder2save, verbose) {
-  if (WishRFgraphs == 0) {
+  if (!WishRFgraphs) {
     if (verbose) message("No graphs for risk factor dynamics were generated")
     return(invisible(NULL))
   }
@@ -264,14 +264,14 @@ RiskFactorsGraphs <- function(ModelType, WishRFgraphs, ModelOutputs, Economies, 
 #####################################################################################################
 #' Model fit graphs for all models
 #'
-#' @param ModelType A character vector indicating the  estimated model type
-#' @param WishFitgraphs binary variable: set 1, if the user wishes graphs to be generated; or set 0, otherwise
-#' @param ModelPara List of model parameter estimates (See the \code{\link{Optimization}} function)
-#' @param NumOut A list of outputs containing the model fit, IRFs, FEVDs, GIRFs, GFEVDs and Term premia
-#' @param Economies A character vector containing the names of the economies included in the system.
-#' @param PathsGraphs Path of the folder in which the graphs will be saved
-#' @param Folder2save Desired folder path to save outputs
-#' @param verbose Logical flag controlling function messaging
+#' @param ModelType character. Estimated model type.
+#' @param WishFitgraphs logical. Set TRUE to generate fit graphs, FALSE otherwise.
+#' @param ModelPara list. Model parameter estimates (see \code{\link{Optimization}}).
+#' @param NumOut list. Outputs containing model fit, IRFs, FEVDs, GIRFs, GFEVDs and Term premia.
+#' @param Economies character vector. Names of the economies included in the system.
+#' @param PathsGraphs character. Path of the folder in which the graphs will be saved.
+#' @param Folder2save character. Desired folder path to save outputs.
+#' @param verbose logical. Flag controlling function messaging.
 #'
 #' @importFrom ggplot2 ggplot theme_classic scale_x_date element_rect
 #'
@@ -280,9 +280,8 @@ RiskFactorsGraphs <- function(ModelType, WishRFgraphs, ModelOutputs, Economies, 
 #' data("NumOutEx")
 #' ModelType <- "JPS original"
 #' Economy <- "Brazil"
-#'
 #' Fitgraphs(ModelType,
-#'   WishFitgraphs = 1, ModelParaEx, NumOutEx, Economy, PathsGraphs = NULL,
+#'   WishFitgraphs = TRUE, ModelParaEx, NumOutEx, Economy, PathsGraphs = NULL,
 #'   Folder2save = NULL, verbose = FALSE
 #' )
 #'
@@ -292,7 +291,7 @@ RiskFactorsGraphs <- function(ModelType, WishRFgraphs, ModelOutputs, Economies, 
 #' @export
 
 Fitgraphs <- function(ModelType, WishFitgraphs, ModelPara, NumOut, Economies, PathsGraphs, Folder2save, verbose) {
-  if (WishFitgraphs == 0) {
+  if (!WishFitgraphs) {
     if (verbose) message("No graphs for bond yields fit were generated")
     return(invisible(NULL))
   } else {
@@ -353,16 +352,16 @@ Fitgraphs <- function(ModelType, WishFitgraphs, ModelPara, NumOut, Economies, Pa
 #####################################################################################################
 #' IRF and GIRF graphs for all models
 #'
-#' @param ModelType A character vector indicating the  estimated model type
-#' @param NumOut list of computed outputs containing the model fit, IRFs, FEVDs, GIRFs, GFEVDs and perm premia
-#' @param WishPdynamicsgraphs binary variable: set 1, if the user wishes graphs to be generated; or set 0, otherwise
-#' @param WishYieldsgraphs binary variable: set 1, if the user wishes graphs to be generated; or set 0, otherwise
-#' @param IRFhoriz single numerical vector containing the desired horizon of analysis for the IRFs
-#' @param PathsGraphs Path of the folder in which the graphs will be saved
-#' @param OutputType Available options are 'IRF' and 'GIRF'
-#' @param Economies A character vector containing the names of the economies included in the system.
-#' @param Folder2save Folder path where the outputs will be stored.
-#' @param verbose Logical flag controlling function messaging.
+#' @param ModelType character. Estimated model type.
+#' @param NumOut list. Computed outputs containing model fit, IRFs, FEVDs, GIRFs, GFEVDs and term premia.
+#' @param WishPdynamicsgraphs logical. Set TRUE to generate risk factor graphs, FALSE otherwise.
+#' @param WishYieldsgraphs logical. Set TRUE to generate bond yield graphs, FALSE otherwise.
+#' @param IRFhoriz integer. Desired horizon of analysis for the IRFs.
+#' @param PathsGraphs character. Path of the folder in which the graphs will be saved.
+#' @param OutputType character. Available options: "IRF", "GIRF", "IRF Ortho", "GIRF Ortho".
+#' @param Economies character vector. Names of the economies included in the system.
+#' @param Folder2save character. Folder path where the outputs will be stored.
+#' @param verbose logical. Flag controlling function messaging.
 #'
 #' @importFrom ggplot2 ggplot geom_line labs geom_hline theme ggtitle theme_classic
 #'
@@ -372,24 +371,23 @@ Fitgraphs <- function(ModelType, WishFitgraphs, ModelPara, NumOut, Economies, Pa
 #' Economy <- "Brazil"
 #' IRFhoriz <- 20
 #' IRFandGIRFgraphs(ModelType, NumOutEx,
-#'   WishPdynamicsgraphs = 0, WishYieldsgraphs = 1, IRFhoriz,
+#'   WishPdynamicsgraphs = FALSE, WishYieldsgraphs = TRUE, IRFhoriz,
 #'   PathsGraphs = NULL, OutputType = "GIRF", Economy, Folder2save = NULL,
 #'   verbose = FALSE
 #' )
 #'
 #' @section Available Methods:
 #' - `autoplot(object, type = "IRF_Factor")`, `autoplot(object, type = "IRF_Yields")`,
-#'   `autoplot(object, type = "GIRF_Yields")`, `autoplot(object, type = "GIRF_Yields")`. \cr
-#'
-#'  - For JLL-based models other option available are: `autoplot(object, type = "IRF_Factor-_Ortho")`,
-#'  `autoplot(object, type = "IRF_Yields_Ortho")`, `autoplot(object, type = "GIRF_Yields_Ortho")`,
+#'   `autoplot(object, type = "GIRF_Yields")`, `autoplot(object, type = "GIRF_Yields")`.
+#'   For JLL-based models: `autoplot(object, type = "IRF_Factor-_Ortho")`,
+#'   `autoplot(object, type = "IRF_Yields_Ortho")`, `autoplot(object, type = "GIRF_Yields_Ortho")`,
 #'   `autoplot(object, type = "GIRF_Yields_Ortho")`.
 #'
 #' @export
 
 IRFandGIRFgraphs <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsgraphs, IRFhoriz,
                              PathsGraphs, OutputType, Economies, Folder2save, verbose) {
-  if (WishPdynamicsgraphs == 0 & WishYieldsgraphs == 0) {
+  if (!WishPdynamicsgraphs & !WishYieldsgraphs) {
     if (verbose) message(paste("No graphs for", OutputType, "were generated"))
 
     if (any(ModelType == c("JLL original", "JLL No DomUnit", "JLL joint Sigma")) &&
@@ -599,16 +597,16 @@ IRFandGIRFgraphs <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsg
 #####################################################################################################
 #' FEVD and GFEVD graphs for all models
 #'
-#' @param ModelType A character vector indicating the  estimated model type
-#' @param NumOut list of computed outputs containing the model fit, IRFs, FEVDs, GIRFs, GFEVDs and Term premia
-#' @param WishPdynamicsgraphs binary variable: set 1, if the user wishes graphs to be generated; or set 0, otherwise
-#' @param WishYieldsgraphs binary variable: set 1, if the user wishes graphs to be generated; or set 0, otherwise
-#' @param FEVDhoriz single numerical vector containing the desired horizon of analysis for the FEVDs
-#' @param PathsGraphs Path of the folder in which the graphs will be saved
-#' @param OutputType Available options are 'FEVD' and 'GFEVD'
-#' @param Economies A character vector containing the names of the economies included in the system.
-#' @param Folder2save Folder path where the outputs will be stored.
-#' @param verbose Logical flag controlling function messaging.
+#' @param ModelType character. Estimated model type.
+#' @param NumOut list. Computed outputs containing model fit, IRFs, FEVDs, GIRFs, GFEVDs and Term premia.
+#' @param WishPdynamicsgraphs logical. Set TRUE to generate risk factor graphs, FALSE otherwise.
+#' @param WishYieldsgraphs logical. Set TRUE to generate bond yield graphs, FALSE otherwise.
+#' @param FEVDhoriz integer. Desired horizon of analysis for the FEVDs.
+#' @param PathsGraphs character. Path of the folder in which the graphs will be saved.
+#' @param OutputType character. Available options: "FEVD", "GFEVD", "FEVD Ortho", "GFEVD Ortho".
+#' @param Economies character vector. Names of the economies included in the system.
+#' @param Folder2save character. Folder path where the outputs will be stored.
+#' @param verbose logical. Flag controlling function messaging.
 #'
 #' @importFrom ggplot2 ggplot theme_classic aes element_text theme labs ggtitle element_blank aes_string geom_col geom_hline
 #'
@@ -617,26 +615,24 @@ IRFandGIRFgraphs <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsg
 #' ModelType <- "JPS original"
 #' Economy <- "Brazil"
 #' FEVDhoriz <- 20
-#'
 #' FEVDandGFEVDgraphs(ModelType, NumOutEx,
-#'   WishPdynamicsgraphs = 0, WishYieldsgraphs = 1, FEVDhoriz,
+#'   WishPdynamicsgraphs = FALSE, WishYieldsgraphs = TRUE, FEVDhoriz,
 #'   PathsGraphs = NULL, OutputType = "FEVD", Economy,
 #'   Folder2save = NULL, verbose = FALSE
 #' )
 #'
 #' @section Available Methods:
 #' - `autoplot(object, type = "FEVD_Factor")`, `autoplot(object, type = "FEVD_Yields")`,
-#'   `autoplot(object, type = "GFEVD_Yields")`, `autoplot(object, type = "GFEVD_Yields")`. \cr
-#'
-#'  - For JLL-based models other option available are: `autoplot(object, type = "FEVD_Factor-_Ortho")`,
-#'  `autoplot(object, type = "FEVD_Yields_Ortho")`, `autoplot(object, type = "GFEVD_Yields_Ortho")`,
+#'   `autoplot(object, type = "GFEVD_Yields")`, `autoplot(object, type = "GFEVD_Yields")`.
+#'   For JLL-based models: `autoplot(object, type = "FEVD_Factor-_Ortho")`,
+#'   `autoplot(object, type = "FEVD_Yields_Ortho")`, `autoplot(object, type = "GFEVD_Yields_Ortho")`,
 #'   `autoplot(object, type = "GFEVD_Yields_Ortho")`.
 #'
 #' @export
 
 FEVDandGFEVDgraphs <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsgraphs, FEVDhoriz,
                                PathsGraphs, OutputType, Economies, Folder2save, verbose) {
-  if (WishPdynamicsgraphs == 0 & WishYieldsgraphs == 0) {
+  if (!WishPdynamicsgraphs & !WishYieldsgraphs) {
     if (verbose) message(paste("No graphs for", OutputType, "were generated"))
 
     if (any(ModelType == c("JLL original", "JLL No DomUnit", "JLL joint Sigma")) &&
@@ -784,7 +780,6 @@ FEVDandGFEVDgraphs <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYield
               OutputType, FEDset$FEVDFactors[[h]], nmFactors[h], Lab_Fac,
               PathAdj
             )
-
             Autoplot_List[[nmFactors[h]]] <- pp
           }
         }
@@ -797,7 +792,6 @@ FEVDandGFEVDgraphs <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYield
               OutputType, FEDset$FEVDYields[[h]], nmYields[h], Lab_Yield,
               PathAdj
             )
-
             Autoplot_List[[nmYields[h]]] <- pp
           }
         }
@@ -813,16 +807,15 @@ FEVDandGFEVDgraphs <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYield
 #####################################################################################################################
 #' Term Premia decomposition graphs for all models
 #'
-#' @param ModelType A character vector indicating the  estimated model type
-#' @param NumOut list of computed outputs containing the model fit, IRFs, FEVDs, GIRFs, GFEVDs and Risk premia
-#' @param ModelPara list of model parameter estimates (See the \code{\link{Optimization}} function)
-#' @param WishRPgraphs binary variable: set 1, if the user wishes graphs to be generated; or set 0, otherwise
-#' @param UnitYields (i) "Month": if maturity of yields are expressed in months or
-#'                  (ii) "Year": if maturity of yields are expressed in years
-#' @param Economies A character vector containing the names of the economies included in the system.
-#' @param PathsGraphs Path of the folder in which the graphs will be saved
-#' @param Folder2Save Folder path where the outputs will be stored.
-#' @param verbose description  Logical flag controlling function messaging.
+#' @param ModelType character. Estimated model type.
+#' @param NumOut list. Computed outputs containing model fit, IRFs, FEVDs, GIRFs, GFEVDs and risk premia.
+#' @param ModelPara list. Model parameter estimates (see \code{\link{Optimization}}).
+#' @param WishRPgraphs logical. Set TRUE to generate term premia graphs, FALSE otherwise.
+#' @param UnitYields character. "Month" if yields are in months, "Year" if in years.
+#' @param Economies character vector. Names of the economies included in the system.
+#' @param PathsGraphs character. Path of the folder in which the graphs will be saved.
+#' @param Folder2Save character. Folder path where the outputs will be stored.
+#' @param verbose logical. Flag controlling function messaging.
 #'
 #' @examples
 #' data("ParaSetEx")
@@ -830,9 +823,8 @@ FEVDandGFEVDgraphs <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYield
 #' ModelType <- "JPS original"
 #' Economy <- "Brazil"
 #' UnitYields <- "Month"
-#'
 #' TPDecompGraph(ModelType, NumOutEx, ModelParaEx,
-#'   WishRPgraphs = 1, UnitYields, Economy,
+#'   WishRPgraphs = FALSE, UnitYields, Economy,
 #'   PathsGraphs = NULL, Folder2Save = NULL, verbose = FALSE
 #' )
 #'
@@ -843,7 +835,7 @@ FEVDandGFEVDgraphs <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYield
 
 TPDecompGraph <- function(ModelType, NumOut, ModelPara, WishRPgraphs, UnitYields, Economies, PathsGraphs,
                           Folder2Save, verbose) {
-  if (WishRPgraphs == 0) {
+  if (!WishRPgraphs) {
     if (verbose) message("No graphs for term-premia were generated")
     return(invisible(NULL))
   }
@@ -1461,7 +1453,7 @@ FolderPrep_FEVDs <- function(OutputType, WishPdynamicsgraphs, WishYieldsgraphs, 
         dir.create(paste(Folder2Save, "/Outputs/", ModelType, "/Point Estimate/Model ", Economies,
           "/FEVD/Factors",
           sep = ""
-        ))
+                ))
       } else {
         dir.create(paste(Folder2Save, "/Outputs/", ModelType, "/Point Estimate/Model ", Economies,
           "/GFEVD/Factors",
@@ -1472,7 +1464,7 @@ FolderPrep_FEVDs <- function(OutputType, WishPdynamicsgraphs, WishYieldsgraphs, 
 
     # a.2) Folders for graph of yields
     if (WishYieldsgraphs == 1) {
-      if (OutputType == "FEVD") {
+           if (OutputType == "FEVD") {
         dir.create(paste(Folder2Save, "/Outputs/", ModelType, "/Point Estimate/Model ", Economies,
           "/FEVD/Yields",
           sep = ""
@@ -1807,7 +1799,8 @@ BuildFEVDlist <- function(NumOut, Economies, ModelType, FEVDhoriz, FacDim, Yield
 
   return(list(FEVDFactors = FEVDFactors, FEVDYields = FEVDYields))
 }
-###################################################################################################
+
+##########################################################################################################
 #' Generate paths to save IRFs/GIRFs graphs
 #'
 #' @param OutputType available options are "IRF" and "GIRF"

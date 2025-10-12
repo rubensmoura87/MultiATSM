@@ -2,26 +2,26 @@
 % Please edit documentation in R/LabFac.R
 \name{LabFac}
 \alias{LabFac}
-\title{Generates the labels factors}
+\title{Generates the labels for risk factors used in the model}
 \usage{
 LabFac(N, DomVar, GlobalVar, Economies, ModelType)
 }
 \arguments{
-\item{N}{Integer. Number of country-specific spanned factors.}
+\item{N}{positive integer. Number of country-specific spanned factors. Must be between 1 and 8.}
 
-\item{DomVar}{A character vector containing the names of the domestic variables.}
+\item{DomVar}{character vector. Names of the domestic variables.}
 
-\item{GlobalVar}{A character vector containing the names of the global variables.}
+\item{GlobalVar}{character vector. Names of the global variables.}
 
-\item{Economies}{A character vector containing the names of the economies included in the system.}
+\item{Economies}{character vector. Names of the economies included in the system.}
 
-\item{ModelType}{A character vector indicating the model type to be estimated.}
+\item{ModelType}{character. Model type to be estimated. Permissible choices: "JPS original", "JPS global", "GVAR single", "JPS multi", "GVAR multi", "JLL original", "JLL No DomUnit", "JLL joint Sigma".}
 }
 \value{
-List containing the risk factor labels
+List containing the risk factor labels for spanned, domestic, star, and global variables, as well as tables for each country and all countries.
 }
 \description{
-Generates the labels factors
+Generates the labels for risk factors used in the model
 }
 \examples{
 N <- 2
@@ -29,7 +29,5 @@ DomVar <- c("inflation", "Output gap")
 GlobalVar <- "Commodity Prices"
 Economies <- c("U.S.", "Canada", "Germany", "Japan")
 ModelType <- "JPS original"
-
 VarLabels <- LabFac(N, DomVar, GlobalVar, Economies, ModelType)
-
 }

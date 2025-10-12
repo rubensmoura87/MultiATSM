@@ -1,17 +1,25 @@
 #' Generates the bootstrap-related outputs
 #'
-#' @param ModelType A character vector indicating the model type to be estimated.
-#' @param ModelParaPE A list containing the point estimates of the model parameters. For details, refer to the outputs from the \code{\link{Optimization}} function.
-#' @param NumOutPE The point estimate derived from numerical outputs. See the outputs from the \code{\link{NumOutputs}} function for further information.
-#' @param Economies A character vector containing the names of the economies included in the system.
-#' @param InputsForOutputs A list containing the necessary inputs for generating IRFs, GIRFs, FEVDs, GFEVDs and Term Premia.
-#' @param FactorLabels A list of character vectors with labels for all variables in the model.
-#' @param JLLlist List. Inputs for JLL model estimation (see \code{\link{JLL}} function). Default is NULL.
-#' @param GVARlist List. Inputs for GVAR model estimation (see \code{\link{GVAR}} function). Default is NULL.
-#' @param WishBC Whether to estimate the physical parameter model with bias correction, based on the method by Bauer, Rudebusch and Wu (2012) (see \code{\link{Bias_Correc_VAR}} function). Default is set to 0.
-#' @param BRWlist List of necessary inputs for performing the bias-corrected estimation (see \code{\link{Bias_Correc_VAR}} function).
-#' @param Folder2save Folder path where the outputs will be stored. Default option saves the outputs in a temporary directory.
-#' @param verbose Logical flag controlling function messaging. Default is TRUE.
+#' @param ModelType character. Model type to be estimated. Permissible choices: "JPS original", "JPS global", "GVAR single", "JPS multi", "GVAR multi", "JLL original", "JLL No DomUnit", "JLL joint Sigma".
+#' @param ModelParaPE list. Point estimates of the model parameters. See outputs from \code{\link{Optimization}}.
+#' @param NumOutPE list. Point estimates from numerical outputs. See outputs from \code{\link{NumOutputs}}.
+#' @param Economies character vector. Names of the economies included in the system.
+#' @param InputsForOutputs list. Inputs for generating IRFs, GIRFs, FEVDs, GFEVDs, and Term Premia.
+#' @param FactorLabels list. Labels for all variables present in the model, as returned by \code{\link{LabFac}}.
+#' @param JLLlist list. Inputs for JLL model estimation (see \code{\link{JLL}}). Default is NULL.
+#' @param GVARlist list. Inputs for GVAR model estimation (see \code{\link{GVAR}}). Default is NULL.
+#' @param WishBC logical. Whether to estimate the physical parameter model with bias correction (see \code{\link{Bias_Correc_VAR}}). Default is FALSE.
+#' @param BRWlist list. Inputs for bias-corrected estimation (see \code{\link{Bias_Correc_VAR}}).
+#' @param Folder2save character. Folder path where outputs will be stored. Default saves outputs in a temporary directory.
+#' @param verbose logical. Print progress messages. Default is TRUE.
+#'
+#' @section Permissible options - Bootstrap list (\code{InputsForOutputs} input):
+#' \itemize{
+#'    \item \strong{methodBS} : \code{"bs"} (standard bootstrap), \code{"wild"} (wild bootstrap), \code{"block"} (block bootstrap)
+#'    \item \strong{BlockLength} : required input for the block bootstrap method. Block length must be larger than 0 and smallar than the model time series dimension (Td).
+#'    \item \strong{ndraws}: number of draws. must be a positive integer.
+#'    \item \strong{pctg} : confidence level. must be a positive integer. Common choices are: 68, 90 and  95.
+#' }
 #'
 #' @examples
 #' \donttest{
@@ -30,29 +38,30 @@
 #'
 #' Boot <- Bootstrap(ModelType, ModelParaEx, NumOutEx, Economy, InpForOutEx, FacLab,
 #'   JLLlist = NULL,
-#'   GVARlist = NULL, WishBC = 0, BRWlist = NULL, Folder2save = NULL, verbose = TRUE
+#'   GVARlist = NULL, WishBC = FALSE, BRWlist = NULL, Folder2save = NULL, verbose = TRUE
 #' )
 #' }
 #'
+#'
 #' @section Available methods:
-#' - `autoplot(object, NumOutPE, type)`
+#' - \code{autoplot(object, NumOutPE, type)}
 #'
 #' @returns
-#' An object of class 'ATSMModelBoot' containing the following keys elements:
+#' An object of class 'ATSMModelBoot' containing:
 #' \itemize{
-#' \item List of model parameters for each draw
-#' \item List of numerical outputs (IRFs, GIRFs, FEVDs and GFEVDs) for each draw
-#' \item Confidence bounds for the chosen level of significance
+#'   \item List of model parameters for each draw
+#'   \item List of numerical outputs (IRFs, GIRFs, FEVDs, GFEVDs) for each draw
+#'   \item Confidence bounds for the chosen level of significance
 #' }
 #'
 #' @export
 
 Bootstrap <- function(ModelType, ModelParaPE, NumOutPE, Economies, InputsForOutputs, FactorLabels, JLLlist,
-                      GVARlist, WishBC, BRWlist, Folder2save = NULL, verbose = TRUE) {
+                      GVARlist, WishBC = FALSE, BRWlist = NULL, Folder2save = NULL, verbose = TRUE) {
   if (verbose) message("3) BOOTSTRAP ANALYSIS")
   WishBoot <- InputsForOutputs[[ModelType]]$Bootstrap$WishBoot
 
-  if (WishBoot == 0) {
+  if (!WishBoot) {
     if (verbose) message("No Bootstrap analysis was generated \n")
     return(NULL)
   }

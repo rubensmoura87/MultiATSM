@@ -15,19 +15,19 @@ RiskFactorsGraphs(
 )
 }
 \arguments{
-\item{ModelType}{A character vector indicating the  estimated model type}
+\item{ModelType}{character. Estimated model type.}
 
-\item{WishRFgraphs}{binary variable: set 1, if the user wishes graphs to be generated; or set 0, otherwise}
+\item{WishRFgraphs}{logical. Set TRUE to generate graphs, FALSE otherwise.}
 
-\item{ModelOutputs}{list of model parameter estimates (see the \code{\link{Optimization}} function)}
+\item{ModelOutputs}{list. Model parameter estimates (see \code{\link{Optimization}}).}
 
-\item{Economies}{A character vector containing the names of the economies included in the system.}
+\item{Economies}{character vector. Names of the economies included in the system.}
 
-\item{FactorLabels}{A character vector indicating the model type to be estimated.}
+\item{FactorLabels}{list. Labels for all variables in the model.}
 
-\item{Folder2save}{Folder path where the outputs will be stored.}
+\item{Folder2save}{character. Folder path where the outputs will be stored.}
 
-\item{verbose}{Logical flag controlling function messaging.}
+\item{verbose}{logical. Flag controlling function messaging.}
 }
 \description{
 Spanned and unspanned factors plot
@@ -45,7 +45,7 @@ Economy <- "Brazil"
 FacLab <- LabFac(N = 1, DomVar = "Eco_Act", GlobalVar = "Gl_Eco_Act", Economy, ModelType)
 
 RiskFactorsGraphs(ModelType,
-  WishRFgraphs = 1, ModelParaEx, Economy, FacLab,
+  WishRFgraphs = FALSE, ModelParaEx, Economy, FacLab,
   Folder2save = NULL, verbose = FALSE
 )
 

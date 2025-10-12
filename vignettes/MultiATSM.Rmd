@@ -288,9 +288,9 @@ several general inputs, namely:
 
 **5. Stationary constraint under the** $Q$-**dynamics**:
 
--   A binary variable that equals $1$ if the user wishes to impose the
+-   A logical variable. Choose *TRUE* to impose the
     constraint that the largest eigenvalue under the $Q$-measure is
-    strictly less than $1$ otherwise, it should be set to $0$. While
+    strictly less than $1$ otherwise, it should be set to *FALSE*. While
     enforcing this stationary constraint may prolong model estimation,
     it can improve the convergence of the model.
 
@@ -324,7 +324,7 @@ Final_Date <- "01-12-2019" # Format: "dd-mm-yyyy"
 DataFrequency <- "Monthly"
 
 # 5) Risk-neutral stationary constraint
-StationarityUnderQ <- 0 # 1 = set stationary condition under the Q; 0 = no stationary condition
+StationarityUnderQ <- FALSE
 
 # 6) Path to save outputs
 Folder2Save <- NULL
@@ -500,9 +500,9 @@ Moreover, the user must select the types of variables of interest
 the orthogonalized version should be additionally included
 
 ```{r}
-WishGraphRiskFac <- 0 #   YES: 1; No = 0.
-WishGraphYields <- 1 #    YES: 1; No = 0.
-WishOrthoJLLgraphs <- 0 # YES: 1; No = 0.
+WishGraphRiskFac <- FALSE 
+WishGraphYields <- TRUE 
+WishOrthoJLLgraphs <- FALSE 
 ```
 
 The function `InputsForOutputs()` can provide some guidance for
@@ -526,14 +526,14 @@ could perfom such a decomposition at the forward rate level
 ($f_t^{(n)}$), specifically
 $f_t^{(n)} = \sum_{h=m}^{n} E_t[y_{t+h}^{(1)}] + FP_t^{(n)}$ where
 $FP_t^{(n)}$ corresponds to the forward premia. In this case, the user
-must specify a binary variable set to $1$ if the computation of forward
-premia is desired, or $0$ otherwise. If set to $1$, the user must also
+must specify a logical variable set to *TRUE* if the computation of forward
+premia is desired, or *FALSE* otherwise. If set to *TRUE*, the user must also
 provide a two-element numerical vector containing the maturities
 corresponding to the starting and ending dates of the bond maturity.
 Example:
 
 ```{r}
-WishFPremia <- 1 # Wish to estimate the forward premia: YES: 1, NO:0
+WishFPremia <- TRUE
 FPmatLim <- c(60, 120)
 ```
 
@@ -789,10 +789,10 @@ country-specific spanned factors and *(iii)* the specification of the
     the *JLL original* and *JLL joint Sigma* models) or *None*
     (applicable for the *JLL No DomUnit*);
 
-3.  *Wish the estimation of the sigmas matrices*: this is a binary
-    variable which assumes value equal to $1$ if the user wishes the
+3.  *Wish the estimation of the sigmas matrices*: this is a logical
+    variable which assumes value equal to *TRUE* if the user wishes the
     estimation of all JLL sigma matrices (i.e. variance-covariance and
-    the Cholesky factorization matrices) and, $0$ otherwise. Since this
+    the Cholesky factorization matrices) and, *FALSE* otherwise. Since this
     estimation is done numerically, its estimation can take several
     minutes;
 
@@ -809,7 +809,7 @@ One possible list of *JLLinputs* is as follows:
 ```{r}
 ModelType <- "JLL original"
 JLLinputs <- list(
-  Economies = Economies, DomUnit = "China", WishSigmas = 1, SigmaNonOrtho = NULL,
+  Economies = Economies, DomUnit = "China", WishSigmas = TRUE, SigmaNonOrtho = NULL,
   JLLModelType = ModelType
 )
 ```
@@ -893,7 +893,7 @@ OutputLabel <- "Test" # label of the model for saving the file
 DataFreq <- "Monthly" # Frequency of the data
 
 Folder2Save <- NULL # Folder to save the required graphical outputs. NULL -> temporary directory
-StatQ <- 0 # Wish to impose stationary condition for the eigenvalues of each country: YES: 1,NO:0
+StatQ <- FALSE # Wish to impose stationary condition for the eigenvalues of each country
 
 # B.1) SPECIFIC model inputs
 #################################### GVAR-based models ##################################################
@@ -910,7 +910,7 @@ GVARlist <- list(
 JLLlist <- list(DomUnit = "China")
 # DomUnit: name of the economy of the economic system, or "None" for the model "JLL No DomUnit"
 ###################################### BRW inputs  ######################################################
-WishBC <- 0 # Wish to estimate the model with the bias correction method of BRW (2012): #YES: 1, NO:0
+WishBC <- FALSE # Wish to estimate the model with the bias correction method of BRW (2012)
 BRWlist <- within(list(
   Cent_Measure = "Mean", gamma = 0.05, N_iter = 250, B = 50, checkBRW = TRUE,
   B_check = 1000, Eigen_rest = 1
@@ -924,17 +924,17 @@ BRWlist <- within(list(
 # B_check: If checkBRW is chosen as TRUE, then choose number of bootstrap samples used in the check
 
 # C) Decide on Settings for numerical outputs
-WishFPremia <- 1 # Wish to estimate the forward premia: YES: 1, NO:0
+WishFPremia <- TRUE # Wish to estimate the forward premia
 FPmatLim <- c(60, 120) #  If the forward premia is desired, then choose the Min and max maturities of the
 # forward premia. Otherwise set NA
 Horiz <- 30
 DesiredGraphs <- c("Fit", "IRF", "TermPremia") # "Fit", "IRF", "FEVD", "GIRF", "GFEVD", "TermPremia"
-WishGraphRiskFac <- 0
-WishGraphYields <- 1
-WishOrthoJLLgraphs <- 0
+WishGraphRiskFac <- FALSE
+WishGraphYields <- TRUE
+WishOrthoJLLgraphs <- FALSE
 
 # D) Bootstrap settings
-WishBootstrap <- 1 #  YES: 1; No = 0.
+WishBootstrap <- TRUE 
 BootList <- list(methodBS = "bs", BlockLength = 4, ndraws = 4, pctg = 95)
 # methodBS: bootstrap method. Available options: (i) 'bs' ; (ii) 'wild'; (iii) 'block'
 # BlockLength: Block length, necessary input for the block bootstrap method
@@ -942,7 +942,7 @@ BootList <- list(methodBS = "bs", BlockLength = 4, ndraws = 4, pctg = 95)
 # pctg: confidence level
 
 # E) Out-of-sample forecast
-WishForecast <- 1 #  YES: 1; No = 0.
+WishForecast <- TRUE 
 ForecastList <- list(ForHoriz = 12, t0Sample = 1, t0Forecast = 131, ForType = "Rolling")
 # ForHoriz: forecast horizon
 # t0Sample:   initial sample date

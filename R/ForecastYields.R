@@ -1,16 +1,24 @@
 #' Generates forecasts of bond yields for all model types
 #'
-#' @param ModelType A character vector indicating the model type to be estimated.
-#' @param ModelPara A list containing the point estimates of the model parameters. For details, refer to the outputs from the \code{\link{Optimization}} function.
-#' @param InputsForOutputs A list containing the necessary inputs for generating IRFs, GIRFs, FEVDs, GFEVDs and Term Premia.
-#' @param FactorLabels A list of character vectors with labels for all variables in the model.
-#' @param Economies A character vector containing the names of the economies included in the system.
-#' @param JLLlist A list of necessary inputs for the estimation of JLL-based models (see the \code{\link{JLL}} function).
-#' @param GVARlist A list containing the necessary inputs for the estimation of GVAR-based models (see the \code{\link{GVAR}} function).
-#' @param WishBRW Whether to estimate the physical parameter model with bias correction, based on the method by Bauer, Rudebusch and Wu (2012) (see \code{\link{Bias_Correc_VAR}} function). Default is set to 0.
-#' @param BRWlist List of necessary inputs for performing the bias-corrected estimation (see \code{\link{Bias_Correc_VAR}} function).
-#' @param Folder2save Folder path where the outputs will be stored. Default option saves the outputs in a temporary directory.
-#' @param verbose Logical flag controlling function messaging. Default is TRUE.
+#' @param ModelType character. Model type to be estimated. Permissible choices: "JPS original", "JPS global", "GVAR single", "JPS multi", "GVAR multi", "JLL original", "JLL No DomUnit", "JLL joint Sigma".
+#' @param ModelPara list. Point estimates of the model parameters. See outputs from \code{\link{Optimization}}.
+#' @param InputsForOutputs list. Inputs for generating IRFs, GIRFs, FEVDs, GFEVDs, and Term Premia.
+#' @param FactorLabels list. Labels for all variables present in the model, as returned by \code{\link{LabFac}}.
+#' @param Economies character vector. Names of the economies included in the system.
+#' @param JLLlist list. Inputs for JLL model estimation (see \code{\link{JLL}}). Default is NULL.
+#' @param GVARlist list. Inputs for GVAR model estimation (see \code{\link{GVAR}}). Default is NULL.
+#' @param WishBRW logical. Whether to estimate the physical parameter model with bias correction (see \code{\link{Bias_Correc_VAR}}). Default is FALSE.
+#' @param BRWlist list. Inputs for bias-corrected estimation (see \code{\link{Bias_Correc_VAR}}).
+#' @param Folder2save character. Folder path where outputs will be stored. Default saves outputs in a temporary directory.
+#' @param verbose logical. Print progress messages. Default is TRUE.
+#'
+#' @section Permissible options - forecast list (\code{InputsForOutputs} input):
+#' \itemize{
+#'    \item \strong{ForHoriz}: forecast horizon. Must be a positive integer.
+#'    \item \strong{t0Sample}:   initial sample date. Must be a positive integer smaller than the time series dimension of the model (Td)
+#'    \item \strong{t0Forecast}:  last sample date for the first forecast. Note that Td > t0Forecast + ForHoriz.
+#'    \item \strong{ForType}: \code{"Rolling"} (rolling window forecast) or \code{"Expanding"} (for expanding window forecast)
+#' }
 #'
 #' @examples
 #' \donttest{
@@ -27,25 +35,24 @@
 #' )
 #'
 #' Forecast <- ForecastYields(ModelType, ModelParaEx, InpForOutEx, FacLab, Economy,
-#'   WishBRW = 0, verbose = TRUE
+#'   WishBRW = FALSE, verbose = TRUE
 #' )
 #' }
 #' @return
 #' An object of class 'ATSMModelForecast' containing the following elements:
 #' \enumerate{
-#' \item Out-of-sample forecasts of bond yields per forecast horizon
-#' \item Out-of-sample forecast errors of bond yields per forecast horizon
-#' \item Root mean square errors per forecast horizon
+#'   \item Out-of-sample forecasts of bond yields per forecast horizon
+#'   \item Out-of-sample forecast errors of bond yields per forecast horizon
+#'   \item Root mean square errors per forecast horizon
 #' }
 #'
 #' @section Available Methods:
 #' - `plot(object)`
 #'
-#'
 #' @export
 
 ForecastYields <- function(ModelType, ModelPara, InputsForOutputs, FactorLabels, Economies, JLLlist = NULL,
-                           GVARlist = NULL, WishBRW, BRWlist = NULL, Folder2save = NULL, verbose = TRUE) {
+                           GVARlist = NULL, WishBRW = FALSE, BRWlist = NULL, Folder2save = NULL, verbose = TRUE) {
   if (verbose) message("4) OUT-OF-SAMPLE FORECASTING ANALYSIS")
   forecast_info <- InputsForOutputs[[ModelType]]$Forecasting
 

@@ -2,7 +2,7 @@
 % Please edit documentation in R/DataForEstimation.R
 \name{DataForEstimation}
 \alias{DataForEstimation}
-\title{Retrieves data from Excel and build the database used in the model estimation}
+\title{Retrieves data from Excel and builds the database used in the model estimation}
 \usage{
 DataForEstimation(
   t0,
@@ -21,51 +21,55 @@ DataForEstimation(
 )
 }
 \arguments{
-\item{t0}{Start date of the sample period in the format yyyy-mm-dd. Day form must be "01"}
+\item{t0}{character. Start date of the sample period in the format yyyy-mm-dd.}
 
-\item{tF}{End date of the sample period in the format yyyy-mm-dd. Day form must be "01".}
+\item{tF}{character. End date of the sample period in the format yyyy-mm-dd.}
 
-\item{Economies}{A character vector containing the names of the economies included in the system.}
+\item{Economies}{character vector. Names of the economies included in the system.}
 
-\item{N}{Integer. Number of country-specific spanned factors.}
+\item{N}{positive integer. Number of country-specific spanned factors.}
 
-\item{FactorLabels}{String-list based which contains the labels of all the variables present in the model}
+\item{FactorLabels}{list. Labels for all variables present in the model, as returned by \code{\link{LabFac}}.}
 
-\item{ModelType}{String-vector containing the label of the model to be estimated}
+\item{ModelType}{character. Model type to be estimated. Permissible choices: "JPS original", "JPS global", "GVAR single", "JPS multi", "GVAR multi", "JLL original", "JLL No DomUnit", "JLL joint Sigma".}
 
-\item{DataFrequency}{Character-based-vector. Available options are: "Daily All Days", "Daily Business Days", "Weekly", "Monthly", "Quarterly", "Annually"}
+\item{DataFrequency}{character. Data frequency. Permissible choices: "Daily All Days", "Daily Business Days", "Weekly", "Monthly", "Quarterly", "Annually".}
 
-\item{Macro_FullData}{List containing a full set of macroeconomic data.}
+\item{Macro_FullData}{list. Full set of macroeconomic data.}
 
-\item{Yields_FullData}{List containing a full set of bond yield data}
+\item{Yields_FullData}{list. Full set of bond yield data.}
 
-\item{DataConnect}{List containing data for computing bilateral contentedness measures. Default is NULL.}
+\item{DataConnect}{list. Data for computing bilateral connectedness measures. Default is NULL. Required for GVAR-based models.}
 
-\item{W_type}{Three possibilities:
-\itemize{
-     \item \code{Full Sample}: if one wishes ALL weight matrices of each year from which data is available (it may extrapolate the sample period);
-     \item \code{Sample Mean}: if one wishes a SINGLE weight matrix containing the average of weights over of the entire sample period;
-     \item Some year in particular (e.g. "1998", "2005" ...).
-}}
+\item{W_type}{character. Weight matrix type. Permissible choices: "Full Sample" (all years), "Sample Mean" (average over sample), or a specific year (e.g. "1998", "2005"). Default is NULL.}
 
-\item{t_First_Wgvar}{Sample starting date (year)}
+\item{t_First_Wgvar}{character. First year for weight matrix computation. Default is NULL.}
 
-\item{t_Last_Wgvar}{Sample last date (year)}
+\item{t_Last_Wgvar}{character. Last year for weight matrix computation. Default is NULL.}
 }
 \value{
-A list containing the
-\enumerate{
-\item time series of the complete set of bond yields (matrix, J x T or CJ x T);
-\item time series of the complete set risk factors (matrix, K x T);
-\item 'GVARFactors': list of all variables that are used in the estimation of the VARX \cr
-               (see e.g. \code{CM_Factors_GVAR} file). If the estimated model type is not GVAR-based, then returns NULL.
-}
+A list containing:
+  \enumerate{
+    \item Yields: matrix (J x Td or CJ x Td) of bond yields for all countries.
+    \item RiskFactors: matrix (K x Td) of risk factors for all countries.
+    \item GVARFactors: list of variables used in VARX estimation (see CM_Factors_GVAR). NULL if not GVAR-based.
+  }
 }
 \description{
-Retrieves data from Excel and build the database used in the model estimation
+Retrieves data from Excel and builds the database used in the model estimation
 }
-\examples{
+\section{General Notation}{
 
+  \itemize{
+    \item Td: model time series dimension.
+    \item C: number of countries in the system.
+    \item N: number of country-specific spanned factors.
+    \item K: total number of risk factors.
+    \item J: number of bond yields per country used in estimation.
+  }
+}
+
+\examples{
 DomVar <- c("Eco_Act", "Inflation")
 GlobalVar <- c("GBC", "CPI_OECD")
 t0 <- "2006-09-01"
@@ -75,11 +79,8 @@ N <- 2
 ModelType <- "JPS original"
 FactorLabels <- LabFac(N, DomVar, GlobalVar, Economies, ModelType)
 DataFrequency <- "Monthly"
-
-#  Retrieve data from excel files
 MacroData <- Load_Excel_Data(system.file("extdata", "MacroData.xlsx", package = "MultiATSM"))
 YieldData <- Load_Excel_Data(system.file("extdata", "YieldsData.xlsx", package = "MultiATSM"))
-
 DataModel <- DataForEstimation(
   t0, tF, Economies, N, FactorLabels, ModelType, DataFrequency,
   MacroData, YieldData
@@ -87,5 +88,5 @@ DataModel <- DataForEstimation(
 
 }
 \seealso{
-\code{\link{InputsForOpt}}
+\code{\link{Load_Excel_Data}}
 }

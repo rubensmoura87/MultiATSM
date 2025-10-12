@@ -2,56 +2,67 @@
 % Please edit documentation in R/GVAR.R
 \name{GVAR}
 \alias{GVAR}
-\title{Estimates a GVAR(1) and a VARX(1,1,1) models}
+\title{Estimates a GVAR(1) and VARX(1,1,1) models}
 \usage{
 GVAR(GVARinputs, N, CheckInputs = FALSE)
 }
 \arguments{
-\item{GVARinputs}{List of inputs for GVAR model estimation:
+\item{GVARinputs}{list. Inputs for GVAR model estimation:
 \enumerate{
-       \item  \code{Economies}:  A character vector containing the names of the economies included in the system.
-       \item  \code{GVARFactors}: A list of all variables used in the estimation of the VARX model \cr
+       \item  \code{Economies}:  character vector. Contains the names of the economies included in the system.
+       \item  \code{GVARFactors}: list. All variables used in the estimation of the VARX model \cr
                (see e.g. \code{CM_Factors_GVAR} file for details);
-       \item \code{VARXtype}: A character vector with three possible options:
+       \item \code{VARXtype}: Permissible:
  \itemize{
        \item \code{'unconstrained'}: model is estimated without constraints (each equation is estimated individually by ordinary least square);
        \item \code{'constrained: Spanned Factors'}: The model is estimated with the restriction that foreign pricing factors do NOT
                                affect (i) domestic economic variables and (ii) domestic pricing factors. \cr
-                              (Equations are estimated using restricted least squares)
+                              (estimation via restricted least squares)
        \item \code{'constrained : [factor_name]'}: The model is estimated with the restriction that the specified risk factor
              is influenced only by its own lagged values and the lagged values of its corresponding star variables.
-       (Equations are estimated using restricted least squares.)
+       (estimation via restricted least squares.)
          }
          \item \code{Wgvar}: The GVAR transition matrix (C x C) used in the model solution. \cr
                                (See the output from the \code{\link{Transition_Matrix}} function.).
 }}
 
-\item{N}{Integer. Number of country-specific spanned factors.}
+\item{N}{posite integer. Number of country-specific spanned factors.}
 
-\item{CheckInputs}{A logical flag to indicate whether to perform a prior consistency check on the inputs provided in \code{GVARinputs}. The default is set to FALSE}
+\item{CheckInputs}{logical. Whether to perform a prior consistency check on the inputs provided in \code{GVARinputs}. Default is FALSE.}
 }
 \value{
-A list containing
+list. Contains:
 \enumerate{
-\item parameters of the country-specific VARX(1,1,1)
-\itemize{
-\item intercept (M+Nx1);
-\item phi_1   (M+N x M+N);
-\item phi_1^star (M+N x M+N);
-\item phi_g (M+N x M+N);
-\item Sigma (M+N x G)
-}
-\item parameters of the GVAR.
-\itemize{
-\item F0 (F X 1);
-\item F1 (F x F);
-\item Sigma_y (F x F)
-}
+  \item parameters of the country-specific VARX(1,1,1):
+    \itemize{
+      \item intercept (M + N x 1)
+      \item phi_1   (M + N x M + N)
+      \item phi_1* (M + N x M + N)
+      \item phi_g (M + N x M + N)
+      \item Sigma (M + N x G)
+    }
+  \item parameters of the GVAR:
+    \itemize{
+      \item F0 (K x K)
+      \item F1 (K x K)
+      \item Sigma_y (K x K)
+    }
 }
 }
 \description{
-Estimates a GVAR(1) and a VARX(1,1,1) models
+Estimates a GVAR(1) and VARX(1,1,1) models
 }
+\section{General Notation}{
+
+\itemize{
+  \item \code{C}: number of countries in the system
+  \item \code{G}: number of global unspanned factors
+  \item \code{M}: number of country-specific unspanned factors
+  \item \code{N}: number of country-specific spanned factors
+  \item \code{K}: total number of risk factors (K = C x (N + M) + G)
+}
+}
+
 \examples{
 data(CM_Factors_GVAR)
 
@@ -72,5 +83,5 @@ GVARPara <- GVAR(GVARinputs, N)
 
 }
 \references{
-Chudik and Pesaran, (2016). "Theory and Practice of GVAR modelling" (Journal of Economic Surveys)
+Chudik, A. and Pesaran, M. H. (2016). "Theory and Practice of GVAR modelling" (Journal of Economic Surveys)
 }
