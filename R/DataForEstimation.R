@@ -2,7 +2,7 @@
 #'
 #' @param t0 character. Start date of the sample period in the format yyyy-mm-dd.
 #' @param tF character. End date of the sample period in the format yyyy-mm-dd.
-#' @param Economies character vector. Names of the economies included in the system.
+#' @param Economies character vector. Names of the \code{C} economies included in the system.
 #' @param N positive integer. Number of country-specific spanned factors.
 #' @param FactorLabels list. Labels for all variables present in the model, as returned by \code{\link{LabFac}}.
 #' @param ModelType character. Model type to be estimated. Permissible choices: "JPS original", "JPS global", "GVAR single", "JPS multi", "GVAR multi", "JLL original", "JLL No DomUnit", "JLL joint Sigma".

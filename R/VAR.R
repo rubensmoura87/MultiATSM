@@ -1,19 +1,21 @@
 #' Estimates a standard VAR(1)
 #'
-#' @param RiskFactors numeric matrix (K x Td). Time series of risk factors.
+#' @param RiskFactors numeric matrix (\code{K x Td}). Time series of risk factors.
 #' @param VARtype character. Permissible choices: "unconstrained" or "constrained".
-#' @param Bcon_Mat matrix (K x K+1). Constraints matrix (includes intercept). Entries containing NAs are treated as free parameters. Default is NULL.
+#' @param Bcon_Mat matrix (\code{K x K + 1}). Constraints matrix (includes intercept). Entries containing NAs are treated as free parameters. Default is NULL.
 #'
 #' @return list. Contains:
-#'   - intercept (K x 1)
-#'   - feedback matrix (K x K)
-#'   - variance-covariance matrix (K x K) of a VAR(1)
+#'   \itemize{
+#'   \item intercept (K x 1)
+#'   \item feedback matrix (K x K)
+#'   \item variance-covariance matrix (K x K) of a VAR(1)
+#'}
 #'
 #' @section General Notation:
 #' \itemize{
 #'   \item \code{Td}: model time series dimension
 #'   \item \code{N}: number of country-specific spanned factors
-#'   \item \code{K}: total number of risk factors (K = C x (N + M) + G or K = N + M + G)
+#'   \item \code{K}: total number of risk factors
 #' }
 #'
 #' @examples

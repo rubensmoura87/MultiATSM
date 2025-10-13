@@ -2,13 +2,13 @@
 #'
 #' @param t_First character. Start date of the sample period in the format yyyy-mm-dd.
 #' @param t_Last character. End date of the sample period in the format yyyy-mm-dd.
-#' @param Economies character vector. Names of the economies included in the system.
+#' @param Economies character vector. Names of the \code{C} economies included in the system.
 #' @param N positive integer. Number of country-specific spanned factors per country.
 #' @param FactorLabels list. Labels for all variables present in the model, as returned by \code{\link{LabFac}}.
 #' @param ModelType character. Model type to be estimated. Permissible choices: "JPS original", "JPS global", "GVAR single", "JPS multi", "GVAR multi", "JLL original", "JLL No DomUnit", "JLL joint Sigma".
 #' @param Macro_FullData list. Full set of macroeconomic data, as returned by \code{\link{Load_Excel_Data}}.
 #' @param Yields_FullData list. Full set of bond yield data, as returned by \code{\link{Load_Excel_Data}}.
-#' @param Wgvar GVAR transition matrix. For GVAR models, either a matrix (C x C) for fixed weights, or a named list of matrices for time-varying weights. Default is NULL. Required for GVAR models.
+#' @param Wgvar GVAR transition matrix. For GVAR models, either a matrix (\code{C x C}) for fixed weights, or a named list of matrices for time-varying weights. Default is NULL. Required for GVAR models.
 #'
 #' @section General Notation:
 #'   \itemize{

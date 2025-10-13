@@ -2,7 +2,7 @@
 #'
 #' @param t_First character. Sample starting date (format: yyyy).
 #' @param t_Last character. Sample ending date (format: yyyy).
-#' @param Economies character vector. Names of the economies included in the system.
+#' @param Economies character vector. Names of the \item \code{C} economies included in the system.
 #' @param type character. Method for computing interdependence. Possible options:
 #' \itemize{
 #'   \item \code{"Time-varying"}: Computes time-varying interdependence and returns weight matrices for each year.

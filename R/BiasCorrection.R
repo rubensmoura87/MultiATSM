@@ -12,8 +12,8 @@
 #'   \item \code{B_check}: Integer. Number of bootstrap samples for the closeness check. Default is 100000.
 #'   \item \code{Eigen_rest}: Numeric. Restriction on the largest eigenvalue under the P-measure. Default is 1.
 #' }
-#' @param RiskFactors numeric matrix (Td x K). Time series of risk factors.
-#' @param Economies character vector. Names of the economies included in the system.
+#' @param RiskFactors numeric matrix (\code{Td x K}). Time series of risk factors.
+#' @param Economies character vector. Names of the \code{C} economies included in the system.
 #' @param FactorLabels list. Labels for all variables in the model.
 #' @param GVARinputs list. Inputs for GVAR model estimation (see \code{\link{GVAR}}). Default is NULL.
 #' @param JLLinputs list. Inputs for JLL model estimation (see \code{\link{JLL}}). Default is NULL.
@@ -48,6 +48,7 @@
 #' @section General Notation:
 #' \itemize{
 #'   \item \code{Td} denotes the model time series dimension.
+#'   \item \code{C} number of countries in the system.
 #'   \item \code{K} denotes the total number of risk factors.
 #' }
 #'
