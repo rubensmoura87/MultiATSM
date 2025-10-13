@@ -7,14 +7,14 @@
 Spanned_Factors(Yields, Economies, N)
 }
 \arguments{
-\item{Yields}{matrix (J x Td). Bond yields for all countries.}
+\item{Yields}{matrix (\code{J x Td}). Bond yields for all countries.}
 
-\item{Economies}{character vector. Names of the economies included in the system.}
+\item{Economies}{character vector. Names of the \code{C} economies included in the system.}
 
-\item{N}{integer. Desired number of country-specific spanned factors (maximum allowed is N = J).}
+\item{N}{integer. Desired number of country-specific spanned factors (maximum allowed is \code{N = J}).}
 }
 \value{
-matrix. Contains the N spanned factors for all countries in the system (CJ x Td).
+matrix. Contains the \code{N} spanned factors for all countries in the system (\code{CJ x Td}).
 }
 \description{
 Computes the country-specific spanned factors

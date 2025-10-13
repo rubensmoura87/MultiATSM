@@ -12,8 +12,8 @@
 #'
 #' @section General Notation:
 #'   \itemize{
-#'     \item C: number of countries in the system.
-#'     \item N: number of country-specific spanned factors.
+#'     \item \code{C}: number of countries in the system.
+#'     \item \code{N}: number of country-specific spanned factors.
 #'   }
 #'
 #' @examples

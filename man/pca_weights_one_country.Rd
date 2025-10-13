@@ -7,12 +7,12 @@
 pca_weights_one_country(Yields, Economy)
 }
 \arguments{
-\item{Yields}{matrix (J x Td). Bond yields for a single country.}
+\item{Yields}{matrix (\code{J x Td}). Bond yields for a single country.}
 
 \item{Economy}{character. Name of the economy.}
 }
 \value{
-matrix (J x J). Eigenvectors of the variance-covariance matrix of yields.
+matrix (\code{J x J}). Eigenvectors of the variance-covariance matrix of yields.
 }
 \description{
 Computes the PCA weights for a single country

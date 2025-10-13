@@ -17,7 +17,7 @@ TPDecompGraph(
 )
 }
 \arguments{
-\item{ModelType}{character. Estimated model type.}
+\item{ModelType}{character. Estimated model type. Permissible choices: "JPS original", "JPS global", "GVAR single", "JPS multi", "GVAR multi", "JLL original", "JLL No DomUnit", "JLL joint Sigma".}
 
 \item{NumOut}{list. Computed outputs containing model fit, IRFs, FEVDs, GIRFs, GFEVDs and risk premia.}
 
@@ -27,7 +27,7 @@ TPDecompGraph(
 
 \item{UnitYields}{character. "Month" if yields are in months, "Year" if in years.}
 
-\item{Economies}{character vector. Names of the economies included in the system.}
+\item{Economies}{character vector. Names of the \code{C} economies included in the system.}
 
 \item{PathsGraphs}{character. Path of the folder in which the graphs will be saved.}
 

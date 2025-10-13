@@ -19,21 +19,21 @@ Optimization(
 )
 }
 \arguments{
-\item{MLEinputs}{A list containing the necessary inputs for building the log-likelihood function (see \code{\link{InputsForOpt}} function).}
+\item{MLEinputs}{list. Contains the inputs for building the log-likelihood function (see \code{\link{InputsForOpt}}).}
 
 \item{StatQ}{A logical value indicating whether to impose that the largest eigenvalue under Q is strictly
 smaller than 1. Set TRUE to impose this restriction.}
 
-\item{DataFreq}{A character vector specifying the data frequency. Available options: "Daily All Days", "Daily Business Days",
+\item{DataFreq}{character vector specifying the data frequency. Available options: "Daily All Days", "Daily Business Days",
 "Weekly", "Monthly", "Quarterly", "Annually".}
 
-\item{FactorLabels}{A list of character vectors with labels for all variables in the model.}
+\item{FactorLabels}{list. Labels for all variables present in the model, as returned by \code{\link{LabFac}}..}
 
-\item{Economies}{A character vector containing the names of the economies included in the system.}
+\item{Economies}{character vector. Names of the \code{C} economies included in the system.}
 
-\item{ModelType}{A character vector indicating the model type to be estimated.}
+\item{ModelType}{character. Model type to be estimated. Permissible choices: "JPS original", "JPS global", "GVAR single", "JPS multi", "GVAR multi", "JLL original", "JLL No DomUnit", "JLL joint Sigma".}
 
-\item{tol}{Convergence tolerance (scalar). The default is 1e-4.}
+\item{tol}{numeric. Convergence tolerance. The default is 1e-4.}
 
 \item{EstType}{Available options are"BFGS" and/or "Nelder-Mead".}
 

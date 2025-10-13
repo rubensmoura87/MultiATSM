@@ -15,13 +15,13 @@ RiskFactorsGraphs(
 )
 }
 \arguments{
-\item{ModelType}{character. Estimated model type.}
+\item{ModelType}{character. Estimated model type. Permissible choices: "JPS original", "JPS global", "GVAR single", "JPS multi", "GVAR multi", "JLL original", "JLL No DomUnit", "JLL joint Sigma".}
 
 \item{WishRFgraphs}{logical. Set TRUE to generate graphs, FALSE otherwise.}
 
 \item{ModelOutputs}{list. Model parameter estimates (see \code{\link{Optimization}}).}
 
-\item{Economies}{character vector. Names of the economies included in the system.}
+\item{Economies}{character vector. Names of the \code{C} economies included in the system.}
 
 \item{FactorLabels}{list. Labels for all variables in the model.}
 

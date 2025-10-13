@@ -87,10 +87,10 @@ GraphicalOutputs <- function(ModelType, ModelPara, NumOut, InputsForOutputs, Eco
 #########################################################################################################
 #' Spanned and unspanned factors plot
 #'
-#' @param ModelType character. Estimated model type.
+#' @param ModelType character. Estimated model type. Permissible choices: "JPS original", "JPS global", "GVAR single", "JPS multi", "GVAR multi", "JLL original", "JLL No DomUnit", "JLL joint Sigma".
 #' @param WishRFgraphs logical. Set TRUE to generate graphs, FALSE otherwise.
 #' @param ModelOutputs list. Model parameter estimates (see \code{\link{Optimization}}).
-#' @param Economies character vector. Names of the economies included in the system.
+#' @param Economies character vector. Names of the \code{C} economies included in the system.
 #' @param FactorLabels list. Labels for all variables in the model.
 #' @param Folder2save character. Folder path where the outputs will be stored.
 #' @param verbose logical. Flag controlling function messaging.
@@ -352,14 +352,14 @@ Fitgraphs <- function(ModelType, WishFitgraphs, ModelPara, NumOut, Economies, Pa
 #####################################################################################################
 #' IRF and GIRF graphs for all models
 #'
-#' @param ModelType character. Estimated model type.
+#' @param ModelType character. Estimated model type.Permissible choices: "JPS original", "JPS global", "GVAR single", "JPS multi", "GVAR multi", "JLL original", "JLL No DomUnit", "JLL joint Sigma".
 #' @param NumOut list. Computed outputs containing model fit, IRFs, FEVDs, GIRFs, GFEVDs and term premia.
 #' @param WishPdynamicsgraphs logical. Set TRUE to generate risk factor graphs, FALSE otherwise.
 #' @param WishYieldsgraphs logical. Set TRUE to generate bond yield graphs, FALSE otherwise.
 #' @param IRFhoriz integer. Desired horizon of analysis for the IRFs.
 #' @param PathsGraphs character. Path of the folder in which the graphs will be saved.
 #' @param OutputType character. Available options: "IRF", "GIRF", "IRF Ortho", "GIRF Ortho".
-#' @param Economies character vector. Names of the economies included in the system.
+#' @param Economies character vector. Names of the \code{C} economies included in the system.
 #' @param Folder2save character. Folder path where the outputs will be stored.
 #' @param verbose logical. Flag controlling function messaging.
 #'
@@ -370,7 +370,7 @@ Fitgraphs <- function(ModelType, WishFitgraphs, ModelPara, NumOut, Economies, Pa
 #' ModelType <- "JPS original"
 #' Economy <- "Brazil"
 #' IRFhoriz <- 20
-#' IRFandGIRFgraphs(ModelType, NumOutEx,
+#' irf_Out <- IRFandGIRFgraphs(ModelType, NumOutEx,
 #'   WishPdynamicsgraphs = FALSE, WishYieldsgraphs = TRUE, IRFhoriz,
 #'   PathsGraphs = NULL, OutputType = "GIRF", Economy, Folder2save = NULL,
 #'   verbose = FALSE
@@ -379,7 +379,7 @@ Fitgraphs <- function(ModelType, WishFitgraphs, ModelPara, NumOut, Economies, Pa
 #' @section Available Methods:
 #' - `autoplot(object, type = "IRF_Factor")`, `autoplot(object, type = "IRF_Yields")`,
 #'   `autoplot(object, type = "GIRF_Yields")`, `autoplot(object, type = "GIRF_Yields")`.
-#'   For JLL-based models: `autoplot(object, type = "IRF_Factor-_Ortho")`,
+#'   For JLL-based models: `autoplot(object, type = "IRF_Factor-_Ortho")`,\cr
 #'   `autoplot(object, type = "IRF_Yields_Ortho")`, `autoplot(object, type = "GIRF_Yields_Ortho")`,
 #'   `autoplot(object, type = "GIRF_Yields_Ortho")`.
 #'
@@ -597,14 +597,14 @@ IRFandGIRFgraphs <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsg
 #####################################################################################################
 #' FEVD and GFEVD graphs for all models
 #'
-#' @param ModelType character. Estimated model type.
+#' @param ModelType character. Estimated model type. Permissible choices: "JPS original", "JPS global", "GVAR single", "JPS multi", "GVAR multi", "JLL original", "JLL No DomUnit", "JLL joint Sigma".
 #' @param NumOut list. Computed outputs containing model fit, IRFs, FEVDs, GIRFs, GFEVDs and Term premia.
 #' @param WishPdynamicsgraphs logical. Set TRUE to generate risk factor graphs, FALSE otherwise.
 #' @param WishYieldsgraphs logical. Set TRUE to generate bond yield graphs, FALSE otherwise.
 #' @param FEVDhoriz integer. Desired horizon of analysis for the FEVDs.
 #' @param PathsGraphs character. Path of the folder in which the graphs will be saved.
 #' @param OutputType character. Available options: "FEVD", "GFEVD", "FEVD Ortho", "GFEVD Ortho".
-#' @param Economies character vector. Names of the economies included in the system.
+#' @param Economies character vector. Names of the \code{C} economies included in the system.
 #' @param Folder2save character. Folder path where the outputs will be stored.
 #' @param verbose logical. Flag controlling function messaging.
 #'
@@ -624,7 +624,7 @@ IRFandGIRFgraphs <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsg
 #' @section Available Methods:
 #' - `autoplot(object, type = "FEVD_Factor")`, `autoplot(object, type = "FEVD_Yields")`,
 #'   `autoplot(object, type = "GFEVD_Yields")`, `autoplot(object, type = "GFEVD_Yields")`.
-#'   For JLL-based models: `autoplot(object, type = "FEVD_Factor-_Ortho")`,
+#'   For JLL-based models: `autoplot(object, type = "FEVD_Factor-_Ortho")`, \cr
 #'   `autoplot(object, type = "FEVD_Yields_Ortho")`, `autoplot(object, type = "GFEVD_Yields_Ortho")`,
 #'   `autoplot(object, type = "GFEVD_Yields_Ortho")`.
 #'
@@ -807,12 +807,12 @@ FEVDandGFEVDgraphs <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYield
 #####################################################################################################################
 #' Term Premia decomposition graphs for all models
 #'
-#' @param ModelType character. Estimated model type.
+#' @param ModelType character. Estimated model type. Permissible choices: "JPS original", "JPS global", "GVAR single", "JPS multi", "GVAR multi", "JLL original", "JLL No DomUnit", "JLL joint Sigma".
 #' @param NumOut list. Computed outputs containing model fit, IRFs, FEVDs, GIRFs, GFEVDs and risk premia.
 #' @param ModelPara list. Model parameter estimates (see \code{\link{Optimization}}).
 #' @param WishRPgraphs logical. Set TRUE to generate term premia graphs, FALSE otherwise.
 #' @param UnitYields character. "Month" if yields are in months, "Year" if in years.
-#' @param Economies character vector. Names of the economies included in the system.
+#' @param Economies character vector. Names of the \code{C} economies included in the system.
 #' @param PathsGraphs character. Path of the folder in which the graphs will be saved.
 #' @param Folder2Save character. Folder path where the outputs will be stored.
 #' @param verbose logical. Flag controlling function messaging.

@@ -4,7 +4,7 @@
 #' @param ModelPara list. Point estimates of the model parameters. See outputs from \code{\link{Optimization}}.
 #' @param InputsForOutputs list. Inputs for generating IRFs, GIRFs, FEVDs, GFEVDs, and Term Premia.
 #' @param FactorLabels list. Labels for all variables present in the model, as returned by \code{\link{LabFac}}.
-#' @param Economies character vector. Names of the economies included in the system.
+#' @param Economies character vector. Names of the \code{C} economies included in the system.
 #' @param JLLlist list. Inputs for JLL model estimation (see \code{\link{JLL}}). Default is NULL.
 #' @param GVARlist list. Inputs for GVAR model estimation (see \code{\link{GVAR}}). Default is NULL.
 #' @param WishBRW logical. Whether to estimate the physical parameter model with bias correction (see \code{\link{Bias_Correc_VAR}}). Default is FALSE.
@@ -14,10 +14,10 @@
 #'
 #' @section Permissible options - forecast list (\code{InputsForOutputs} input):
 #' \itemize{
-#'    \item \strong{ForHoriz}: forecast horizon. Must be a positive integer.
-#'    \item \strong{t0Sample}:   initial sample date. Must be a positive integer smaller than the time series dimension of the model (Td)
-#'    \item \strong{t0Forecast}:  last sample date for the first forecast. Note that Td > t0Forecast + ForHoriz.
-#'    \item \strong{ForType}: \code{"Rolling"} (rolling window forecast) or \code{"Expanding"} (for expanding window forecast)
+#'    \item \code{ForHoriz}: forecast horizon. Must be a positive integer.
+#'    \item \code{t0Sample}:   initial sample date. Must be a positive integer smaller than the time series dimension of the model (\code{Td})
+#'    \item \code{t0Forecast}:  last sample date for the first forecast. Note that \code{Td > t0Forecast + ForHoriz}.
+#'    \item \code{ForType}: \code{"Rolling"} (rolling window forecast) or \code{"Expanding"} (for expanding window forecast)
 #' }
 #'
 #' @examples
@@ -52,7 +52,7 @@
 #' @export
 
 ForecastYields <- function(ModelType, ModelPara, InputsForOutputs, FactorLabels, Economies, JLLlist = NULL,
-                           GVARlist = NULL, WishBRW = FALSE, BRWlist = NULL, Folder2save = NULL, verbose = TRUE) {
+                           GVARlist = NULL, WishBRW = FALSE, BRWlist = NULL, Folder2save = NULL, verbose = FALSE) {
   if (verbose) message("4) OUT-OF-SAMPLE FORECASTING ANALYSIS")
   forecast_info <- InputsForOutputs[[ModelType]]$Forecasting
 

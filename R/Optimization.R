@@ -15,7 +15,7 @@
 #'                          }
 #'   }
 #' @param FactorLabels list. Labels for all variables present in the model, as returned by \code{\link{LabFac}}.
-#' @param Economies character vector. Names of the economies included in the system.
+#' @param Economies character vector. Names of the \code{C} economies included in the system.
 #' @param ModelType character. Model type to be estimated. Permissible choices: "JPS original", "JPS global", "GVAR single", "JPS multi", "GVAR multi", "JLL original", "JLL No DomUnit", "JLL joint Sigma".
 #' @param JLLinputs List. Inputs for JLL model estimation (see \code{\link{JLL}}). Default is NULL.
 #' @param GVARinputs List. Inputs for GVAR model estimation (see \code{\link{GVAR}}). Default is NULL.
@@ -69,15 +69,15 @@ Optimization_PE <- function(ML_fun, ListInputSet, FactorLabels, Economies, Model
 #############################################################################################################
 #' Perform the optimization of the log-likelihood function of the chosen ATSM
 #'
-#' @param MLEinputs  A list containing the necessary inputs for building the log-likelihood function (see \code{\link{InputsForOpt}} function).
+#' @param MLEinputs list. Contains the inputs for building the log-likelihood function (see \code{\link{InputsForOpt}}).
 #' @param StatQ A logical value indicating whether to impose that the largest eigenvalue under Q is strictly
 #'                          smaller than 1. Set TRUE to impose this restriction.
-#' @param DataFreq  A character vector specifying the data frequency. Available options: "Daily All Days", "Daily Business Days",
+#' @param DataFreq  character vector specifying the data frequency. Available options: "Daily All Days", "Daily Business Days",
 #'                      "Weekly", "Monthly", "Quarterly", "Annually".
-#' @param FactorLabels A list of character vectors with labels for all variables in the model.
-#' @param Economies A character vector containing the names of the economies included in the system.
-#' @param ModelType A character vector indicating the model type to be estimated.
-#' @param tol Convergence tolerance (scalar). The default is 1e-4.
+#' @param FactorLabels list. Labels for all variables present in the model, as returned by \code{\link{LabFac}}..
+#' @param Economies character vector. Names of the \code{C} economies included in the system.
+#' @param ModelType character. Model type to be estimated. Permissible choices: "JPS original", "JPS global", "GVAR single", "JPS multi", "GVAR multi", "JLL original", "JLL No DomUnit", "JLL joint Sigma".
+#' @param tol numeric. Convergence tolerance. The default is 1e-4.
 #' @param EstType Available options are"BFGS" and/or "Nelder-Mead".
 #' @param TimeCount Logical. If TRUE, computes the time required for model estimation. Default is TRUE.
 #' @param BS_outputs Logical. If TRUE, generates a simplified output list in the bootstrap setting. Default is FALSE.

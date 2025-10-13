@@ -18,7 +18,7 @@ FEVDandGFEVDgraphs(
 )
 }
 \arguments{
-\item{ModelType}{character. Estimated model type.}
+\item{ModelType}{character. Estimated model type. Permissible choices: "JPS original", "JPS global", "GVAR single", "JPS multi", "GVAR multi", "JLL original", "JLL No DomUnit", "JLL joint Sigma".}
 
 \item{NumOut}{list. Computed outputs containing model fit, IRFs, FEVDs, GIRFs, GFEVDs and Term premia.}
 
@@ -32,7 +32,7 @@ FEVDandGFEVDgraphs(
 
 \item{OutputType}{character. Available options: "FEVD", "GFEVD", "FEVD Ortho", "GFEVD Ortho".}
 
-\item{Economies}{character vector. Names of the economies included in the system.}
+\item{Economies}{character vector. Names of the \code{C} economies included in the system.}
 
 \item{Folder2save}{character. Folder path where the outputs will be stored.}
 
@@ -45,7 +45,7 @@ FEVD and GFEVD graphs for all models
 
 - `autoplot(object, type = "FEVD_Factor")`, `autoplot(object, type = "FEVD_Yields")`,
   `autoplot(object, type = "GFEVD_Yields")`, `autoplot(object, type = "GFEVD_Yields")`.
-  For JLL-based models: `autoplot(object, type = "FEVD_Factor-_Ortho")`,
+  For JLL-based models: `autoplot(object, type = "FEVD_Factor-_Ortho")`, \cr
   `autoplot(object, type = "FEVD_Yields_Ortho")`, `autoplot(object, type = "GFEVD_Yields_Ortho")`,
   `autoplot(object, type = "GFEVD_Yields_Ortho")`.
 }

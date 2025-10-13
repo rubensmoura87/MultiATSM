@@ -25,7 +25,7 @@ DataForEstimation(
 
 \item{tF}{character. End date of the sample period in the format yyyy-mm-dd.}
 
-\item{Economies}{character vector. Names of the economies included in the system.}
+\item{Economies}{character vector. Names of the \code{C} economies included in the system.}
 
 \item{N}{positive integer. Number of country-specific spanned factors.}
 
@@ -50,8 +50,8 @@ DataForEstimation(
 \value{
 A list containing:
   \enumerate{
-    \item Yields: matrix (J x Td or CJ x Td) of bond yields for all countries.
-    \item RiskFactors: matrix (K x Td) of risk factors for all countries.
+    \item Yields: matrix (\code{J x Td} or \code{CJ x Td}) of bond yields for all countries.
+    \item RiskFactors: matrix (\code{K x Td}) of risk factors for all countries.
     \item GVARFactors: list of variables used in VARX estimation (see CM_Factors_GVAR). NULL if not GVAR-based.
   }
 }
@@ -61,11 +61,11 @@ Retrieves data from Excel and builds the database used in the model estimation
 \section{General Notation}{
 
   \itemize{
-    \item Td: model time series dimension.
-    \item C: number of countries in the system.
-    \item N: number of country-specific spanned factors.
-    \item K: total number of risk factors.
-    \item J: number of bond yields per country used in estimation.
+    \item \code{Td}: model time series dimension.
+    \item \code{C}: number of countries in the system.
+    \item \code{N}: number of country-specific spanned factors.
+    \item \code{K}: total number of risk factors.
+    \item \code{J}: number of bond yields per country used in estimation.
   }
 }
 

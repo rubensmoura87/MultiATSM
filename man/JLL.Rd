@@ -7,14 +7,14 @@
 JLL(NonOrthoFactors, N, JLLinputs, CheckInputs = FALSE)
 }
 \arguments{
-\item{NonOrthoFactors}{numeric matrix (K x Td). Time series of risk factors before orthogonalization.}
+\item{NonOrthoFactors}{numeric matrix (\code{K x Td}). Time series of risk factors before orthogonalization.}
 
 \item{N}{positive integer. Number of country-specific spanned factors.}
 
 \item{JLLinputs}{list. Necessary inputs to estimate JLL models:
 \enumerate{
-  \item \code{Economies}: character vector. Set of economies in the system.
-  \item \code{DomUnit}: character. Name of the dominant economy, or "None" if not assigned (for "JLL No DomUnit" models).
+  \item \code{Economies}: character vector. Set of \code{C} economies in the system.
+  \item \code{DomUnit}: character. Name of the dominant economy, or "None" if not assigned (for "JLL No DomUnit" model).
   \item \code{WishSigmas}: logical. TRUE to estimate variance-covariance matrices and Cholesky factorizations; FALSE otherwise.
   \item \code{SigmaNonOrtho}: NULL or F x F matrix from non-orthogonalized dynamics.
   \item \code{JLLModelType}: character. Permissible choices: "JLL original", "JLL joint Sigma", "JLL No DomUnit".
@@ -32,6 +32,7 @@ Estimates the P-dynamics from JLL-based models
 
 \itemize{
   \item \code{Td}: model time series dimension
+  \item \code{C} number of countries in the system.
   \item \code{K}: total number of risk factors
 }
 }
@@ -49,5 +50,5 @@ JLLPara <- JLL(RF_TS, N, JLLinputs)
 }
 }
 \references{
-Jotiskhatira, Le and Lundblad (2015). "Why do interest rates in different currencies co-move?" (Journal of Financial Economics)
+Jotiskhatira, P. ; Le, A. and Lundblad, C. (2015). "Why do interest rates in different currencies co-move?" (Journal of Financial Economics)
 }

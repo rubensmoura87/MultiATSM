@@ -9,20 +9,19 @@ GVAR(GVARinputs, N, CheckInputs = FALSE)
 \arguments{
 \item{GVARinputs}{list. Inputs for GVAR model estimation:
 \enumerate{
-       \item  \code{Economies}:  character vector. Contains the names of the economies included in the system.
+       \item  \code{Economies}:  character vector. Contains the \code{C} names of the economies included in the system.
        \item  \code{GVARFactors}: list. All variables used in the estimation of the VARX model \cr
                (see e.g. \code{CM_Factors_GVAR} file for details);
        \item \code{VARXtype}: Permissible:
  \itemize{
        \item \code{'unconstrained'}: model is estimated without constraints (each equation is estimated individually by ordinary least square);
        \item \code{'constrained: Spanned Factors'}: The model is estimated with the restriction that foreign pricing factors do NOT
-                               affect (i) domestic economic variables and (ii) domestic pricing factors. \cr
-                              (estimation via restricted least squares)
+                               affect (i) domestic economic variables and (ii) domestic pricing factors (estimation via restricted least squares).
        \item \code{'constrained : [factor_name]'}: The model is estimated with the restriction that the specified risk factor
              is influenced only by its own lagged values and the lagged values of its corresponding star variables.
        (estimation via restricted least squares.)
          }
-         \item \code{Wgvar}: The GVAR transition matrix (C x C) used in the model solution. \cr
+         \item \code{Wgvar}: The GVAR transition matrix (\code{C x C}) used in the model solution. \cr
                                (See the output from the \code{\link{Transition_Matrix}} function.).
 }}
 

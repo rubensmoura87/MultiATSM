@@ -37,7 +37,7 @@ Optimization_PE(
 
 \item{FactorLabels}{list. Labels for all variables present in the model, as returned by \code{\link{LabFac}}.}
 
-\item{Economies}{character vector. Names of the economies included in the system.}
+\item{Economies}{character vector. Names of the \code{C} economies included in the system.}
 
 \item{ModelType}{character. Model type to be estimated. Permissible choices: "JPS original", "JPS global", "GVAR single", "JPS multi", "GVAR multi", "JLL original", "JLL No DomUnit", "JLL joint Sigma".}
 

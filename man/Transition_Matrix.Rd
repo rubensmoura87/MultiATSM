@@ -11,7 +11,7 @@ Transition_Matrix(t_First, t_Last, Economies, type, DataConnectedness)
 
 \item{t_Last}{character. Sample ending date (format: yyyy).}
 
-\item{Economies}{character vector. Names of the economies included in the system.}
+\item{Economies}{character vector. Names of the \code{C} economies included in the system.}
 
 \item{type}{character. Method for computing interdependence. Possible options:
 \itemize{

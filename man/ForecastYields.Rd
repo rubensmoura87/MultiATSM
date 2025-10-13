@@ -15,7 +15,7 @@ ForecastYields(
   WishBRW = FALSE,
   BRWlist = NULL,
   Folder2save = NULL,
-  verbose = TRUE
+  verbose = FALSE
 )
 }
 \arguments{
@@ -27,7 +27,7 @@ ForecastYields(
 
 \item{FactorLabels}{list. Labels for all variables present in the model, as returned by \code{\link{LabFac}}.}
 
-\item{Economies}{character vector. Names of the economies included in the system.}
+\item{Economies}{character vector. Names of the \code{C} economies included in the system.}
 
 \item{JLLlist}{list. Inputs for JLL model estimation (see \code{\link{JLL}}). Default is NULL.}
 
@@ -55,10 +55,10 @@ Generates forecasts of bond yields for all model types
 \section{Permissible options - forecast list (\code{InputsForOutputs} input)}{
 
 \itemize{
-   \item \strong{ForHoriz}: forecast horizon. Must be a positive integer.
-   \item \strong{t0Sample}:   initial sample date. Must be a positive integer smaller than the time series dimension of the model (Td)
-   \item \strong{t0Forecast}:  last sample date for the first forecast. Note that Td > t0Forecast + ForHoriz.
-   \item \strong{ForType}: \code{"Rolling"} (rolling window forecast) or \code{"Expanding"} (for expanding window forecast)
+   \item \code{ForHoriz}: forecast horizon. Must be a positive integer.
+   \item \code{t0Sample}:   initial sample date. Must be a positive integer smaller than the time series dimension of the model (\code{Td})
+   \item \code{t0Forecast}:  last sample date for the first forecast. Note that \code{Td > t0Forecast + ForHoriz}.
+   \item \code{ForType}: \code{"Rolling"} (rolling window forecast) or \code{"Expanding"} (for expanding window forecast)
 }
 }
 

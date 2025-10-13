@@ -3,11 +3,11 @@
 #' @param InitialSampleDate Start date of the sample period in the format "dd-mm-yyyy"
 #' @param FinalSampleDate End date of the sample period in the format "dd-mm-yyyy"
 #' @param ModelType character. Model type to be estimated. Permissible choices: "JPS original", "JPS global", "GVAR single", "JPS multi", "GVAR multi", "JLL original", "JLL No DomUnit", "JLL joint Sigma".
-#' @param Yields numerical matrix with time series of yields (J x Td or CJ x Td)
-#' @param GlobalMacro numerical matrix with time series of the global risk factors (G x Td)
-#' @param DomMacro numerical matrix with time series of the country-specific risk factors for all C countries (C X Td or CM x Td)
-#' @param FactorLabels list. Labels for all variables present in the model.
-#' @param Economies character vector. Names of the economies included in the system.
+#' @param Yields numerical matrix with time series of yields (\code{J x Td} or \code{CJ x Td})
+#' @param GlobalMacro numerical matrix with time series of the global risk factors (\code{G x Td})
+#' @param DomMacro numerical matrix with time series of the country-specific risk factors for all \code{C} countries ( \code{C X Td} or  \code{CM x Td})
+#' @param FactorLabels list. Labels for all variables present in the model, as returned by \code{\link{LabFac}}.
+#' @param Economies character vector. Names of the \code{C} economies included in the system.
 #' @param DataFrequency character. Data frequency. Permissible choices: "Daily All Days", "Daily Business Days", "Weekly", "Monthly", "Quarterly", "Annually".
 #' @param GVARlist list. Inputs for GVAR model estimation. See details below.
 #' @param JLLlist list. Inputs for JLL model estimation. See details below.
@@ -20,28 +20,28 @@
 #'
 #' @section Permissible options for GVARlist:
 #' \itemize{
-#'   \item \strong{VARXtype}: "unconstrained" or "constrained"
-#'   \item \strong{W_type}: "Time-varying" or "Sample Mean"
-#'   \item \strong{t_First_Wgvar}, \strong{t_Last_Wgvar}: year as character
+#'   \item \code{VARXtype}: "unconstrained" or "constrained"
+#'   \item \code{W_type}: "Time-varying" or "Sample Mean"
+#'   \item \code{t_First_Wgvar}, \code{t_Last_Wgvar}: year as character
 #' }
 #'
 #' @section Permissible options for JLLlist:
 #' \itemize{
-#'   \item \strong{DomUnit}: name of the dominant economy or "None"
-#'   \item \strong{WishSigmas}: 1 (estimate variance-covariance matrices) or 0
-#'   \item \strong{SigmaNonOrtho}: NULL or F x F matrix
+#'   \item \code{DomUnit}: name of the dominant economy or \code{None}
+#'   \item \code{WishSigmas}: TRUE (estimate variance-covariance matrices) or FALSE
+#'   \item \code{SigmaNonOrtho}: NULL or \code{K x K} matrix
 #' }
 #'
 #' @section Permissible options for BRWlist:
 #' \itemize{
-#'   \item \strong{BiasCorrection}: 1 (bias-corrected) or 0
-#'   \item \strong{flag_mean}: TRUE (mean) or FALSE (median)
-#'   \item \strong{gamma}: numeric adjustment parameter
-#'   \item \strong{N_iter}: number of iterations
-#'   \item \strong{N_burn}: number of burn-in iterations
-#'   \item \strong{B}: number of bootstrap samples
-#'   \item \strong{checkBRW}: TRUE or FALSE
-#'   \item \strong{B_check}: number of bootstrap samples for closeness check
+#'   \item \code{BiasCorrection}: TRUE (bias-corrected) or FALSE
+#'   \item \code{flag_mean}: TRUE (mean) or FALSE (median)
+#'   \item \code{gamma}: numeric adjustment parameter
+#'   \item \code{N_iter}: number of iterations
+#'   \item \code{N_burn}: number of burn-in iterations
+#'   \item \code{B}: number of bootstrap samples
+#'   \item \code{checkBRW}: TRUE or FALSE
+#'   \item \code{B_check}: number of bootstrap samples for closeness check
 #' }
 #'
 #'
@@ -51,6 +51,7 @@
 #'   \item \code{C} number of countries in the system.
 #'   \item \code{G} number of global unspanned factors.
 #'   \item \code{M} number of country-specific unspanned factors.
+#'   \item \code{K} total number of risk factors.
 #'   \item \code{J} number of bond yields per country used in estimation.
 #' }
 #'
@@ -81,7 +82,7 @@
 #'
 #' ATSMInputs <- InputsForOpt(t0, tF, ModelType, Yields, GlobalMacroVar, DomesticMacroVar,
 #'   FactorLabels, Economies, DataFreq,
-#'   CheckInputs = FALSE
+#'   CheckInputs = FALSE, verbose = FALSE
 #' )
 #'
 #' # Example 2:
@@ -105,7 +106,7 @@
 #'
 #' ATSMInputs <- InputsForOpt(t0, tF, ModelType, Yields, GlobalMacroVar, DomesticMacroVar,
 #'   FactorLabels, Economies, DataFreq, GVARlist,
-#'   CheckInputs = FALSE
+#'   CheckInputs = FALSE, verbose = FALSE
 #' )
 #'
 #' # Example 3:
@@ -128,7 +129,7 @@
 #' ATSMInputs <- InputsForOpt(t0, tF, ModelType, Yields, GlobalMacroVar, DomesticMacroVar,
 #'   FactorLabels, Economies, DataFreq,
 #'   JLLlist = JLLinputs,
-#'   CheckInputs = FALSE
+#'   CheckInputs = FALSE, verbose = FALSE
 #' )
 #' }
 #' @export

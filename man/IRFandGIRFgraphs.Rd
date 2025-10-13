@@ -18,7 +18,7 @@ IRFandGIRFgraphs(
 )
 }
 \arguments{
-\item{ModelType}{character. Estimated model type.}
+\item{ModelType}{character. Estimated model type.Permissible choices: "JPS original", "JPS global", "GVAR single", "JPS multi", "GVAR multi", "JLL original", "JLL No DomUnit", "JLL joint Sigma".}
 
 \item{NumOut}{list. Computed outputs containing model fit, IRFs, FEVDs, GIRFs, GFEVDs and term premia.}
 
@@ -32,7 +32,7 @@ IRFandGIRFgraphs(
 
 \item{OutputType}{character. Available options: "IRF", "GIRF", "IRF Ortho", "GIRF Ortho".}
 
-\item{Economies}{character vector. Names of the economies included in the system.}
+\item{Economies}{character vector. Names of the \code{C} economies included in the system.}
 
 \item{Folder2save}{character. Folder path where the outputs will be stored.}
 
@@ -45,7 +45,7 @@ IRF and GIRF graphs for all models
 
 - `autoplot(object, type = "IRF_Factor")`, `autoplot(object, type = "IRF_Yields")`,
   `autoplot(object, type = "GIRF_Yields")`, `autoplot(object, type = "GIRF_Yields")`.
-  For JLL-based models: `autoplot(object, type = "IRF_Factor-_Ortho")`,
+  For JLL-based models: `autoplot(object, type = "IRF_Factor-_Ortho")`,\cr
   `autoplot(object, type = "IRF_Yields_Ortho")`, `autoplot(object, type = "GIRF_Yields_Ortho")`,
   `autoplot(object, type = "GIRF_Yields_Ortho")`.
 }
@@ -55,7 +55,7 @@ data("NumOutEx")
 ModelType <- "JPS original"
 Economy <- "Brazil"
 IRFhoriz <- 20
-IRFandGIRFgraphs(ModelType, NumOutEx,
+irf_Out <- IRFandGIRFgraphs(ModelType, NumOutEx,
   WishPdynamicsgraphs = FALSE, WishYieldsgraphs = TRUE, IRFhoriz,
   PathsGraphs = NULL, OutputType = "GIRF", Economy, Folder2save = NULL,
   verbose = FALSE

@@ -21,7 +21,7 @@ DatabasePrep(
 
 \item{t_Last}{character. End date of the sample period in the format yyyy-mm-dd.}
 
-\item{Economies}{character vector. Names of the economies included in the system.}
+\item{Economies}{character vector. Names of the \code{C} economies included in the system.}
 
 \item{N}{positive integer. Number of country-specific spanned factors per country.}
 
@@ -33,7 +33,7 @@ DatabasePrep(
 
 \item{Yields_FullData}{list. Full set of bond yield data, as returned by \code{\link{Load_Excel_Data}}.}
 
-\item{Wgvar}{GVAR transition matrix. For GVAR models, either a matrix (C x C) for fixed weights, or a named list of matrices for time-varying weights. Default is NULL. Required for GVAR models.}
+\item{Wgvar}{GVAR transition matrix. For GVAR models, either a matrix (\code{C x C}) for fixed weights, or a named list of matrices for time-varying weights. Default is NULL. Required for GVAR models.}
 }
 \value{
 List containing the risk factor set for all countries and global factors. Particularly useful for GVAR-based models.
@@ -44,8 +44,8 @@ Gather data of several countries in a list. Particularly useful for GVAR-based s
 \section{General Notation}{
 
   \itemize{
-    \item C: number of countries in the system.
-    \item N: number of country-specific spanned factors.
+    \item \code{C}: number of countries in the system.
+    \item \code{N}: number of country-specific spanned factors.
   }
 }
 

@@ -4,7 +4,7 @@
 #' @param ModelPara list. Point estimates of the model parameters. See outputs from \code{\link{Optimization}}
 #' @param InputsForOutputs list. Inputs for generating IRFs, GIRFs, FEVDs, GFEVDs, and Term Premia.
 #' @param FactorLabels list. Labels for all variables present in the model, as returned by \code{\link{LabFac}}.
-#' @param Economies character vector. Names of the economies included in the system.
+#' @param Economies character vector. Names of the \code{C} economies included in the system.
 #' @param Folder2save Folder path where the outputs will be stored. Default option saves the outputs in a temporary directory.
 #' @param verbose Logical flag controlling function messaging. Default is TRUE.
 #'

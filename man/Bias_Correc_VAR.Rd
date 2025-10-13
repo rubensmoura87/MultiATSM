@@ -30,9 +30,9 @@ Bias_Correc_VAR(
   \item \code{Eigen_rest}: Numeric. Restriction on the largest eigenvalue under the P-measure. Default is 1.
 }}
 
-\item{RiskFactors}{numeric matrix (Td x K). Time series of risk factors.}
+\item{RiskFactors}{numeric matrix (\code{Td x K}). Time series of risk factors.}
 
-\item{Economies}{character vector. Names of the economies included in the system.}
+\item{Economies}{character vector. Names of the \code{C} economies included in the system.}
 
 \item{FactorLabels}{list. Labels for all variables in the model.}
 
@@ -58,6 +58,7 @@ Estimates an unbiased VAR(1) using stochastic approximation (Bauer, Rudebusch an
 
 \itemize{
   \item \code{Td} denotes the model time series dimension.
+  \item \code{C} number of countries in the system.
   \item \code{K} denotes the total number of risk factors.
 }
 }

@@ -1,10 +1,10 @@
 #' Computes the country-specific spanned factors
 #'
-#' @param Yields matrix (J x Td). Bond yields for all countries.
-#' @param Economies character vector. Names of the economies included in the system.
-#' @param N integer. Desired number of country-specific spanned factors (maximum allowed is N = J).
+#' @param Yields matrix (\code{J x Td}). Bond yields for all countries.
+#' @param Economies character vector. Names of the \code{C} economies included in the system.
+#' @param N integer. Desired number of country-specific spanned factors (maximum allowed is \code{N = J}).
 #'
-#' @return matrix. Contains the N spanned factors for all countries in the system (CJ x Td).
+#' @return matrix. Contains the \code{N} spanned factors for all countries in the system (\code{CJ x Td}).
 #'
 #' @section General Notation:
 #' \itemize{

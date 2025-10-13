@@ -26,7 +26,7 @@ Bootstrap(
 
 \item{NumOutPE}{list. Point estimates from numerical outputs. See outputs from \code{\link{NumOutputs}}.}
 
-\item{Economies}{character vector. Names of the economies included in the system.}
+\item{Economies}{character vector. Names of the \code{C} economies included in the system.}
 
 \item{InputsForOutputs}{list. Inputs for generating IRFs, GIRFs, FEVDs, GFEVDs, and Term Premia.}
 
@@ -55,13 +55,13 @@ An object of class 'ATSMModelBoot' containing:
 \description{
 Generates the bootstrap-related outputs
 }
-\section{Permissible options - Bootstrap list (\code{InputsForOutputs} input)}{
+\section{Permissible options - Bootstrap list in \code{InputsForOutputs}}{
 
 \itemize{
-   \item \strong{methodBS} : \code{"bs"} (standard bootstrap), \code{"wild"} (wild bootstrap), \code{"block"} (block bootstrap)
-   \item \strong{BlockLength} : required input for the block bootstrap method. Block length must be larger than 0 and smallar than the model time series dimension (Td).
-   \item \strong{ndraws}: number of draws. must be a positive integer.
-   \item \strong{pctg} : confidence level. must be a positive integer. Common choices are: 68, 90 and  95.
+   \item \code{methodBS} : \code{"bs"} (standard bootstrap), \code{"wild"} (wild bootstrap), \code{"block"} (block bootstrap)
+   \item \code{BlockLength} : required input for the block bootstrap method. Block length must be larger than 0 and smallar than the model time series dimension (\code{Td}).
+   \item \code{ndraws}: number of draws. Must be a positive integer.
+   \item \code{pctg} : confidence level. Must be a positive integer. Common choices are: 68, 90 and  95.
 }
 }
 
@@ -87,7 +87,7 @@ InpForOutEx[[ModelType]]$Bootstrap <- list(
 
 Boot <- Bootstrap(ModelType, ModelParaEx, NumOutEx, Economy, InpForOutEx, FacLab,
   JLLlist = NULL,
-  GVARlist = NULL, WishBC = FALSE, BRWlist = NULL, Folder2save = NULL, verbose = TRUE
+  GVARlist = NULL, WishBC = FALSE, BRWlist = NULL, Folder2save = NULL, verbose = FALSE
 )
 }
 

@@ -1,9 +1,9 @@
 #' Computes the PCA weights for a single country
 #'
-#' @param Yields matrix (J x Td). Bond yields for a single country.
+#' @param Yields matrix (\code{J x Td}). Bond yields for a single country.
 #' @param Economy character. Name of the economy.
 #'
-#' @return matrix (J x J). Eigenvectors of the variance-covariance matrix of yields.
+#' @return matrix (\code{J x J}). Eigenvectors of the variance-covariance matrix of yields.
 #'
 #' @section General Notation:
 #' \itemize{

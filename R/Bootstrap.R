@@ -3,7 +3,7 @@
 #' @param ModelType character. Model type to be estimated. Permissible choices: "JPS original", "JPS global", "GVAR single", "JPS multi", "GVAR multi", "JLL original", "JLL No DomUnit", "JLL joint Sigma".
 #' @param ModelParaPE list. Point estimates of the model parameters. See outputs from \code{\link{Optimization}}.
 #' @param NumOutPE list. Point estimates from numerical outputs. See outputs from \code{\link{NumOutputs}}.
-#' @param Economies character vector. Names of the economies included in the system.
+#' @param Economies character vector. Names of the \code{C} economies included in the system.
 #' @param InputsForOutputs list. Inputs for generating IRFs, GIRFs, FEVDs, GFEVDs, and Term Premia.
 #' @param FactorLabels list. Labels for all variables present in the model, as returned by \code{\link{LabFac}}.
 #' @param JLLlist list. Inputs for JLL model estimation (see \code{\link{JLL}}). Default is NULL.
@@ -13,12 +13,12 @@
 #' @param Folder2save character. Folder path where outputs will be stored. Default saves outputs in a temporary directory.
 #' @param verbose logical. Print progress messages. Default is TRUE.
 #'
-#' @section Permissible options - Bootstrap list (\code{InputsForOutputs} input):
+#' @section Permissible options - Bootstrap list in \code{InputsForOutputs}:
 #' \itemize{
-#'    \item \strong{methodBS} : \code{"bs"} (standard bootstrap), \code{"wild"} (wild bootstrap), \code{"block"} (block bootstrap)
-#'    \item \strong{BlockLength} : required input for the block bootstrap method. Block length must be larger than 0 and smallar than the model time series dimension (Td).
-#'    \item \strong{ndraws}: number of draws. must be a positive integer.
-#'    \item \strong{pctg} : confidence level. must be a positive integer. Common choices are: 68, 90 and  95.
+#'    \item \code{methodBS} : \code{"bs"} (standard bootstrap), \code{"wild"} (wild bootstrap), \code{"block"} (block bootstrap)
+#'    \item \code{BlockLength} : required input for the block bootstrap method. Block length must be larger than 0 and smallar than the model time series dimension (\code{Td}).
+#'    \item \code{ndraws}: number of draws. Must be a positive integer.
+#'    \item \code{pctg} : confidence level. Must be a positive integer. Common choices are: 68, 90 and  95.
 #' }
 #'
 #' @examples
@@ -38,7 +38,7 @@
 #'
 #' Boot <- Bootstrap(ModelType, ModelParaEx, NumOutEx, Economy, InpForOutEx, FacLab,
 #'   JLLlist = NULL,
-#'   GVARlist = NULL, WishBC = FALSE, BRWlist = NULL, Folder2save = NULL, verbose = TRUE
+#'   GVARlist = NULL, WishBC = FALSE, BRWlist = NULL, Folder2save = NULL, verbose = FALSE
 #' )
 #' }
 #'
