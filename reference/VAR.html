@@ -51,7 +51,7 @@
 
 
 <dl><dt id="arg-riskfactors">RiskFactors<a class="anchor" aria-label="anchor" href="#arg-riskfactors"></a></dt>
-<dd><p>numeric matrix (K x Td). Time series of risk factors.</p></dd>
+<dd><p>numeric matrix (<code>K x Td</code>). Time series of risk factors.</p></dd>
 
 
 <dt id="arg-vartype">VARtype<a class="anchor" aria-label="anchor" href="#arg-vartype"></a></dt>
@@ -59,23 +59,22 @@
 
 
 <dt id="arg-bcon-mat">Bcon_Mat<a class="anchor" aria-label="anchor" href="#arg-bcon-mat"></a></dt>
-<dd><p>matrix (K x K+1). Constraints matrix (includes intercept). Entries containing NAs are treated as free parameters. Default is NULL.</p></dd>
+<dd><p>matrix (<code>K x K + 1</code>). Constraints matrix (includes intercept). Entries containing NAs are treated as free parameters. Default is NULL.</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>list. Contains:
-  - intercept (K x 1)
-  - feedback matrix (K x K)
-  - variance-covariance matrix (K x K) of a VAR(1)</p>
-    </div>
+    <p>list. Contains:</p><ul><li><p>intercept (K x 1)</p></li>
+<li><p>feedback matrix (K x K)</p></li>
+<li><p>variance-covariance matrix (K x K) of a VAR(1)</p></li>
+</ul></div>
     <div class="section level2">
     <h2 id="general-notation">General Notation<a class="anchor" aria-label="anchor" href="#general-notation"></a></h2>
 
 
 <ul><li><p><code>Td</code>: model time series dimension</p></li>
 <li><p><code>N</code>: number of country-specific spanned factors</p></li>
-<li><p><code>K</code>: total number of risk factors (K = C x (N + M) + G or K = N + M + G)</p></li>
+<li><p><code>K</code>: total number of risk factors</p></li>
 </ul></div>
 
     <div class="section level2">

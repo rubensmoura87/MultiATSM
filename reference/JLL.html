@@ -51,7 +51,7 @@
 
 
 <dl><dt id="arg-nonorthofactors">NonOrthoFactors<a class="anchor" aria-label="anchor" href="#arg-nonorthofactors"></a></dt>
-<dd><p>numeric matrix (K x Td). Time series of risk factors before orthogonalization.</p></dd>
+<dd><p>numeric matrix (<code>K x Td</code>). Time series of risk factors before orthogonalization.</p></dd>
 
 
 <dt id="arg-n">N<a class="anchor" aria-label="anchor" href="#arg-n"></a></dt>
@@ -59,8 +59,8 @@
 
 
 <dt id="arg-jllinputs">JLLinputs<a class="anchor" aria-label="anchor" href="#arg-jllinputs"></a></dt>
-<dd><p>list. Necessary inputs to estimate JLL models:</p><ol><li><p><code>Economies</code>: character vector. Set of economies in the system.</p></li>
-<li><p><code>DomUnit</code>: character. Name of the dominant economy, or "None" if not assigned (for "JLL No DomUnit" models).</p></li>
+<dd><p>list. Necessary inputs to estimate JLL models:</p><ol><li><p><code>Economies</code>: character vector. Set of <code>C</code> economies in the system.</p></li>
+<li><p><code>DomUnit</code>: character. Name of the dominant economy, or "None" if not assigned (for "JLL No DomUnit" model).</p></li>
 <li><p><code>WishSigmas</code>: logical. TRUE to estimate variance-covariance matrices and Cholesky factorizations; FALSE otherwise.</p></li>
 <li><p><code>SigmaNonOrtho</code>: NULL or F x F matrix from non-orthogonalized dynamics.</p></li>
 <li><p><code>JLLModelType</code>: character. Permissible choices: "JLL original", "JLL joint Sigma", "JLL No DomUnit".</p></li>
@@ -80,11 +80,12 @@
 
 
 <ul><li><p><code>Td</code>: model time series dimension</p></li>
+<li><p><code>C</code> number of countries in the system.</p></li>
 <li><p><code>K</code>: total number of risk factors</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
-    <p>Jotiskhatira, Le and Lundblad (2015). "Why do interest rates in different currencies co-move?" (Journal of Financial Economics)</p>
+    <p>Jotiskhatira, P. ; Le, A. and Lundblad, C. (2015). "Why do interest rates in different currencies co-move?" (Journal of Financial Economics)</p>
     </div>
 
     <div class="section level2">

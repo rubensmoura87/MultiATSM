@@ -62,7 +62,7 @@
 
 
 <dl><dt id="arg-modeltype">ModelType<a class="anchor" aria-label="anchor" href="#arg-modeltype"></a></dt>
-<dd><p>character. Estimated model type.</p></dd>
+<dd><p>character. Estimated model type.Permissible choices: "JPS original", "JPS global", "GVAR single", "JPS multi", "GVAR multi", "JLL original", "JLL No DomUnit", "JLL joint Sigma".</p></dd>
 
 
 <dt id="arg-numout">NumOut<a class="anchor" aria-label="anchor" href="#arg-numout"></a></dt>
@@ -90,7 +90,7 @@
 
 
 <dt id="arg-economies">Economies<a class="anchor" aria-label="anchor" href="#arg-economies"></a></dt>
-<dd><p>character vector. Names of the economies included in the system.</p></dd>
+<dd><p>character vector. Names of the <code>C</code> economies included in the system.</p></dd>
 
 
 <dt id="arg-folder-save">Folder2save<a class="anchor" aria-label="anchor" href="#arg-folder-save"></a></dt>
@@ -107,7 +107,7 @@
 
 <p>- `autoplot(object, type = "IRF_Factor")`, `autoplot(object, type = "IRF_Yields")`,
   `autoplot(object, type = "GIRF_Yields")`, `autoplot(object, type = "GIRF_Yields")`.
-  For JLL-based models: `autoplot(object, type = "IRF_Factor-_Ortho")`,
+  For JLL-based models: `autoplot(object, type = "IRF_Factor-_Ortho")`,<br>
   `autoplot(object, type = "IRF_Yields_Ortho")`, `autoplot(object, type = "GIRF_Yields_Ortho")`,
   `autoplot(object, type = "GIRF_Yields_Ortho")`.</p>
     </div>
@@ -118,7 +118,7 @@
 <span class="r-in"><span><span class="va">ModelType</span> <span class="op">&lt;-</span> <span class="st">"JPS original"</span></span></span>
 <span class="r-in"><span><span class="va">Economy</span> <span class="op">&lt;-</span> <span class="st">"Brazil"</span></span></span>
 <span class="r-in"><span><span class="va">IRFhoriz</span> <span class="op">&lt;-</span> <span class="fl">20</span></span></span>
-<span class="r-in"><span><span class="fu">IRFandGIRFgraphs</span><span class="op">(</span><span class="va">ModelType</span>, <span class="va">NumOutEx</span>,</span></span>
+<span class="r-in"><span><span class="va">irf_Out</span> <span class="op">&lt;-</span> <span class="fu">IRFandGIRFgraphs</span><span class="op">(</span><span class="va">ModelType</span>, <span class="va">NumOutEx</span>,</span></span>
 <span class="r-in"><span>  WishPdynamicsgraphs <span class="op">=</span> <span class="cn">FALSE</span>, WishYieldsgraphs <span class="op">=</span> <span class="cn">TRUE</span>, <span class="va">IRFhoriz</span>,</span></span>
 <span class="r-in"><span>  PathsGraphs <span class="op">=</span> <span class="cn">NULL</span>, OutputType <span class="op">=</span> <span class="st">"GIRF"</span>, <span class="va">Economy</span>, Folder2save <span class="op">=</span> <span class="cn">NULL</span>,</span></span>
 <span class="r-in"><span>  verbose <span class="op">=</span> <span class="cn">FALSE</span></span></span>
@@ -129,17 +129,6 @@
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> The deprecated feature was likely used in the <span style="color: #0000BB;">MultiATSM</span> package.</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span>   Please report the issue at</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span>   <span style="color: #0000BB; font-style: italic;">&lt;https://github.com/rubensmoura87/MultiATSM/issues&gt;</span>.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $Brazil</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $Brazil$Gl_Eco_Act</span>
-<span class="r-plt img"><img src="IRFandGIRFgraphs-1.png" alt="" width="700" height="433"></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $Brazil$Eco_Act.Brazil</span>
-<span class="r-plt img"><img src="IRFandGIRFgraphs-2.png" alt="" width="700" height="433"></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $Brazil$Level.Brazil</span>
-<span class="r-plt img"><img src="IRFandGIRFgraphs-3.png" alt="" width="700" height="433"></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

@@ -51,18 +51,17 @@
 
 
 <dl><dt id="arg-gvarinputs">GVARinputs<a class="anchor" aria-label="anchor" href="#arg-gvarinputs"></a></dt>
-<dd><p>list. Inputs for GVAR model estimation:</p><ol><li><p><code>Economies</code>:  character vector. Contains the names of the economies included in the system.</p></li>
+<dd><p>list. Inputs for GVAR model estimation:</p><ol><li><p><code>Economies</code>:  character vector. Contains the <code>C</code> names of the economies included in the system.</p></li>
 <li><p><code>GVARFactors</code>: list. All variables used in the estimation of the VARX model <br>
                (see e.g. <code>CM_Factors_GVAR</code> file for details);</p></li>
 <li><p><code>VARXtype</code>: Permissible:</p><ul><li><p><code>'unconstrained'</code>: model is estimated without constraints (each equation is estimated individually by ordinary least square);</p></li>
 <li><p><code>'constrained: Spanned Factors'</code>: The model is estimated with the restriction that foreign pricing factors do NOT
-                               affect (i) domestic economic variables and (ii) domestic pricing factors. <br>
-                              (estimation via restricted least squares)</p></li>
+                               affect (i) domestic economic variables and (ii) domestic pricing factors (estimation via restricted least squares).</p></li>
 <li><p><code>'constrained : [factor_name]'</code>: The model is estimated with the restriction that the specified risk factor
              is influenced only by its own lagged values and the lagged values of its corresponding star variables.
        (estimation via restricted least squares.)</p></li>
 </ul></li>
-<li><p><code>Wgvar</code>: The GVAR transition matrix (C x C) used in the model solution. <br>
+<li><p><code>Wgvar</code>: The GVAR transition matrix (<code>C x C</code>) used in the model solution. <br>
                                (See the output from the <code><a href="Transition_Matrix.html">Transition_Matrix</a></code> function.).</p></li>
 </ol></dd>
 

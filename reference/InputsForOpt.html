@@ -81,23 +81,23 @@
 
 
 <dt id="arg-yields">Yields<a class="anchor" aria-label="anchor" href="#arg-yields"></a></dt>
-<dd><p>numerical matrix with time series of yields (J x Td or CJ x Td)</p></dd>
+<dd><p>numerical matrix with time series of yields (<code>J x Td</code> or <code>CJ x Td</code>)</p></dd>
 
 
 <dt id="arg-globalmacro">GlobalMacro<a class="anchor" aria-label="anchor" href="#arg-globalmacro"></a></dt>
-<dd><p>numerical matrix with time series of the global risk factors (G x Td)</p></dd>
+<dd><p>numerical matrix with time series of the global risk factors (<code>G x Td</code>)</p></dd>
 
 
 <dt id="arg-dommacro">DomMacro<a class="anchor" aria-label="anchor" href="#arg-dommacro"></a></dt>
-<dd><p>numerical matrix with time series of the country-specific risk factors for all C countries (C X Td or CM x Td)</p></dd>
+<dd><p>numerical matrix with time series of the country-specific risk factors for all <code>C</code> countries ( <code>C X Td</code> or  <code>CM x Td</code>)</p></dd>
 
 
 <dt id="arg-factorlabels">FactorLabels<a class="anchor" aria-label="anchor" href="#arg-factorlabels"></a></dt>
-<dd><p>list. Labels for all variables present in the model.</p></dd>
+<dd><p>list. Labels for all variables present in the model, as returned by <code><a href="LabFac.html">LabFac</a></code>.</p></dd>
 
 
 <dt id="arg-economies">Economies<a class="anchor" aria-label="anchor" href="#arg-economies"></a></dt>
-<dd><p>character vector. Names of the economies included in the system.</p></dd>
+<dd><p>character vector. Names of the <code>C</code> economies included in the system.</p></dd>
 
 
 <dt id="arg-datafrequency">DataFrequency<a class="anchor" aria-label="anchor" href="#arg-datafrequency"></a></dt>
@@ -144,30 +144,30 @@
     <h2 id="permissible-options-for-gvarlist">Permissible options for GVARlist<a class="anchor" aria-label="anchor" href="#permissible-options-for-gvarlist"></a></h2>
 
 
-<ul><li><p><strong>VARXtype</strong>: "unconstrained" or "constrained"</p></li>
-<li><p><strong>W_type</strong>: "Time-varying" or "Sample Mean"</p></li>
-<li><p><strong>t_First_Wgvar</strong>, <strong>t_Last_Wgvar</strong>: year as character</p></li>
+<ul><li><p><code>VARXtype</code>: "unconstrained" or "constrained"</p></li>
+<li><p><code>W_type</code>: "Time-varying" or "Sample Mean"</p></li>
+<li><p><code>t_First_Wgvar</code>, <code>t_Last_Wgvar</code>: year as character</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="permissible-options-for-jlllist">Permissible options for JLLlist<a class="anchor" aria-label="anchor" href="#permissible-options-for-jlllist"></a></h2>
 
 
-<ul><li><p><strong>DomUnit</strong>: name of the dominant economy or "None"</p></li>
-<li><p><strong>WishSigmas</strong>: 1 (estimate variance-covariance matrices) or 0</p></li>
-<li><p><strong>SigmaNonOrtho</strong>: NULL or F x F matrix</p></li>
+<ul><li><p><code>DomUnit</code>: name of the dominant economy or <code>None</code></p></li>
+<li><p><code>WishSigmas</code>: TRUE (estimate variance-covariance matrices) or FALSE</p></li>
+<li><p><code>SigmaNonOrtho</code>: NULL or <code>K x K</code> matrix</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="permissible-options-for-brwlist">Permissible options for BRWlist<a class="anchor" aria-label="anchor" href="#permissible-options-for-brwlist"></a></h2>
 
 
-<ul><li><p><strong>BiasCorrection</strong>: 1 (bias-corrected) or 0</p></li>
-<li><p><strong>flag_mean</strong>: TRUE (mean) or FALSE (median)</p></li>
-<li><p><strong>gamma</strong>: numeric adjustment parameter</p></li>
-<li><p><strong>N_iter</strong>: number of iterations</p></li>
-<li><p><strong>N_burn</strong>: number of burn-in iterations</p></li>
-<li><p><strong>B</strong>: number of bootstrap samples</p></li>
-<li><p><strong>checkBRW</strong>: TRUE or FALSE</p></li>
-<li><p><strong>B_check</strong>: number of bootstrap samples for closeness check</p></li>
+<ul><li><p><code>BiasCorrection</code>: TRUE (bias-corrected) or FALSE</p></li>
+<li><p><code>flag_mean</code>: TRUE (mean) or FALSE (median)</p></li>
+<li><p><code>gamma</code>: numeric adjustment parameter</p></li>
+<li><p><code>N_iter</code>: number of iterations</p></li>
+<li><p><code>N_burn</code>: number of burn-in iterations</p></li>
+<li><p><code>B</code>: number of bootstrap samples</p></li>
+<li><p><code>checkBRW</code>: TRUE or FALSE</p></li>
+<li><p><code>B_check</code>: number of bootstrap samples for closeness check</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="general-notation">General Notation<a class="anchor" aria-label="anchor" href="#general-notation"></a></h2>
@@ -177,6 +177,7 @@
 <li><p><code>C</code> number of countries in the system.</p></li>
 <li><p><code>G</code> number of global unspanned factors.</p></li>
 <li><p><code>M</code> number of country-specific unspanned factors.</p></li>
+<li><p><code>K</code> total number of risk factors.</p></li>
 <li><p><code>J</code> number of bond yields per country used in estimation.</p></li>
 </ul></div>
     <div class="section level2">
@@ -208,12 +209,8 @@
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">ATSMInputs</span> <span class="op">&lt;-</span> <span class="fu">InputsForOpt</span><span class="op">(</span><span class="va">t0</span>, <span class="va">tF</span>, <span class="va">ModelType</span>, <span class="va">Yields</span>, <span class="va">GlobalMacroVar</span>, <span class="va">DomesticMacroVar</span>,</span></span>
 <span class="r-in"><span>  <span class="va">FactorLabels</span>, <span class="va">Economies</span>, <span class="va">DataFreq</span>,</span></span>
-<span class="r-in"><span>  CheckInputs <span class="op">=</span> <span class="cn">FALSE</span></span></span>
+<span class="r-in"><span>  CheckInputs <span class="op">=</span> <span class="cn">FALSE</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 1) PREPARING INPUTS FOR THE ESTIMATION OF THE MODEL: JPS original . SAMPLE PERIOD: 01-05-2007 - 01-12-2018</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 1.1) Constructing the time-series of the risk factors</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 1.2) Estimating model P-dynamics parameters:</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> - Without the bias-correction procedure </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 2:</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="LoadData.html">LoadData</a></span><span class="op">(</span><span class="st">"CM_2024"</span><span class="op">)</span></span></span>
@@ -236,12 +233,8 @@
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">ATSMInputs</span> <span class="op">&lt;-</span> <span class="fu">InputsForOpt</span><span class="op">(</span><span class="va">t0</span>, <span class="va">tF</span>, <span class="va">ModelType</span>, <span class="va">Yields</span>, <span class="va">GlobalMacroVar</span>, <span class="va">DomesticMacroVar</span>,</span></span>
 <span class="r-in"><span>  <span class="va">FactorLabels</span>, <span class="va">Economies</span>, <span class="va">DataFreq</span>, <span class="va">GVARlist</span>,</span></span>
-<span class="r-in"><span>  CheckInputs <span class="op">=</span> <span class="cn">FALSE</span></span></span>
+<span class="r-in"><span>  CheckInputs <span class="op">=</span> <span class="cn">FALSE</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 1) PREPARING INPUTS FOR THE ESTIMATION OF THE MODEL: GVAR multi . SAMPLE PERIOD: 01-05-2007 - 01-12-2019</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 1.1) Constructing the time-series of the risk factors</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 1.2) Estimating model P-dynamics parameters:</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> - Without the bias-correction procedure </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 3:</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="LoadData.html">LoadData</a></span><span class="op">(</span><span class="st">"CM_2024"</span><span class="op">)</span></span></span>
@@ -263,14 +256,8 @@
 <span class="r-in"><span><span class="va">ATSMInputs</span> <span class="op">&lt;-</span> <span class="fu">InputsForOpt</span><span class="op">(</span><span class="va">t0</span>, <span class="va">tF</span>, <span class="va">ModelType</span>, <span class="va">Yields</span>, <span class="va">GlobalMacroVar</span>, <span class="va">DomesticMacroVar</span>,</span></span>
 <span class="r-in"><span>  <span class="va">FactorLabels</span>, <span class="va">Economies</span>, <span class="va">DataFreq</span>,</span></span>
 <span class="r-in"><span>  JLLlist <span class="op">=</span> <span class="va">JLLinputs</span>,</span></span>
-<span class="r-in"><span>  CheckInputs <span class="op">=</span> <span class="cn">FALSE</span></span></span>
+<span class="r-in"><span>  CheckInputs <span class="op">=</span> <span class="cn">FALSE</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 1) PREPARING INPUTS FOR THE ESTIMATION OF THE MODEL: JLL original . SAMPLE PERIOD: 01-05-2007 - 01-12-2019</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 1.1) Constructing the time-series of the risk factors</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 1.2) Estimating model P-dynamics parameters:</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> - Without the bias-correction procedure </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> JLL-based setup in progress: Estimating the variance-covariance matrix numerically.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>                              This may take some time. </span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
     </div>

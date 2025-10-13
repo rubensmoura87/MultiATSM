@@ -73,7 +73,7 @@
 
 
 <dt id="arg-economies">Economies<a class="anchor" aria-label="anchor" href="#arg-economies"></a></dt>
-<dd><p>character vector. Names of the economies included in the system.</p></dd>
+<dd><p>character vector. Names of the <code>C</code> economies included in the system.</p></dd>
 
 
 <dt id="arg-n">N<a class="anchor" aria-label="anchor" href="#arg-n"></a></dt>
@@ -118,19 +118,19 @@
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A list containing:</p><ol><li><p>Yields: matrix (J x Td or CJ x Td) of bond yields for all countries.</p></li>
-<li><p>RiskFactors: matrix (K x Td) of risk factors for all countries.</p></li>
+    <p>A list containing:</p><ol><li><p>Yields: matrix (<code>J x Td</code> or <code>CJ x Td</code>) of bond yields for all countries.</p></li>
+<li><p>RiskFactors: matrix (<code>K x Td</code>) of risk factors for all countries.</p></li>
 <li><p>GVARFactors: list of variables used in VARX estimation (see CM_Factors_GVAR). NULL if not GVAR-based.</p></li>
 </ol></div>
     <div class="section level2">
     <h2 id="general-notation">General Notation<a class="anchor" aria-label="anchor" href="#general-notation"></a></h2>
 
 
-<p></p><ul><li><p>Td: model time series dimension.</p></li>
-<li><p>C: number of countries in the system.</p></li>
-<li><p>N: number of country-specific spanned factors.</p></li>
-<li><p>K: total number of risk factors.</p></li>
-<li><p>J: number of bond yields per country used in estimation.</p></li>
+<p></p><ul><li><p><code>Td</code>: model time series dimension.</p></li>
+<li><p><code>C</code>: number of countries in the system.</p></li>
+<li><p><code>N</code>: number of country-specific spanned factors.</p></li>
+<li><p><code>K</code>: total number of risk factors.</p></li>
+<li><p><code>J</code>: number of bond yields per country used in estimation.</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>

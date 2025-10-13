@@ -76,7 +76,7 @@
 
 
 <dt id="arg-economies">Economies<a class="anchor" aria-label="anchor" href="#arg-economies"></a></dt>
-<dd><p>character vector. Names of the economies included in the system.</p></dd>
+<dd><p>character vector. Names of the <code>C</code> economies included in the system.</p></dd>
 
 
 <dt id="arg-inputsforoutputs">InputsForOutputs<a class="anchor" aria-label="anchor" href="#arg-inputsforoutputs"></a></dt>
@@ -118,13 +118,13 @@
 <li><p>Confidence bounds for the chosen level of significance</p></li>
 </ul></div>
     <div class="section level2">
-    <h2 id="permissible-options-bootstrap-list-inputsforoutputs-input-">Permissible options - Bootstrap list (<code>InputsForOutputs</code> input)<a class="anchor" aria-label="anchor" href="#permissible-options-bootstrap-list-inputsforoutputs-input-"></a></h2>
+    <h2 id="permissible-options-bootstrap-list-in-inputsforoutputs">Permissible options - Bootstrap list in <code>InputsForOutputs</code><a class="anchor" aria-label="anchor" href="#permissible-options-bootstrap-list-in-inputsforoutputs"></a></h2>
 
 
-<ul><li><p><strong>methodBS</strong> : <code>"bs"</code> (standard bootstrap), <code>"wild"</code> (wild bootstrap), <code>"block"</code> (block bootstrap)</p></li>
-<li><p><strong>BlockLength</strong> : required input for the block bootstrap method. Block length must be larger than 0 and smallar than the model time series dimension (Td).</p></li>
-<li><p><strong>ndraws</strong>: number of draws. must be a positive integer.</p></li>
-<li><p><strong>pctg</strong> : confidence level. must be a positive integer. Common choices are: 68, 90 and  95.</p></li>
+<ul><li><p><code>methodBS</code> : <code>"bs"</code> (standard bootstrap), <code>"wild"</code> (wild bootstrap), <code>"block"</code> (block bootstrap)</p></li>
+<li><p><code>BlockLength</code> : required input for the block bootstrap method. Block length must be larger than 0 and smallar than the model time series dimension (<code>Td</code>).</p></li>
+<li><p><code>ndraws</code>: number of draws. Must be a positive integer.</p></li>
+<li><p><code>pctg</code> : confidence level. Must be a positive integer. Common choices are: 68, 90 and  95.</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="available-methods">Available methods<a class="anchor" aria-label="anchor" href="#available-methods"></a></h2>
@@ -151,17 +151,10 @@
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">Boot</span> <span class="op">&lt;-</span> <span class="fu">Bootstrap</span><span class="op">(</span><span class="va">ModelType</span>, <span class="va">ModelParaEx</span>, <span class="va">NumOutEx</span>, <span class="va">Economy</span>, <span class="va">InpForOutEx</span>, <span class="va">FacLab</span>,</span></span>
 <span class="r-in"><span>  JLLlist <span class="op">=</span> <span class="cn">NULL</span>,</span></span>
-<span class="r-in"><span>  GVARlist <span class="op">=</span> <span class="cn">NULL</span>, WishBC <span class="op">=</span> <span class="cn">FALSE</span>, BRWlist <span class="op">=</span> <span class="cn">NULL</span>, Folder2save <span class="op">=</span> <span class="cn">NULL</span>, verbose <span class="op">=</span> <span class="cn">TRUE</span></span></span>
+<span class="r-in"><span>  GVARlist <span class="op">=</span> <span class="cn">NULL</span>, WishBC <span class="op">=</span> <span class="cn">FALSE</span>, BRWlist <span class="op">=</span> <span class="cn">NULL</span>, Folder2save <span class="op">=</span> <span class="cn">NULL</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 3) BOOTSTRAP ANALYSIS</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 3.1) Estimating bootstrap setup. This may take several hours.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> -- Done!</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Elapsed time: 3.80 seconds</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 3.2) Computing numerical outputs.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 3.3) Computing confidence bounds and producing graphical outputs.</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>cannot create dir '/tmp/Rtmpe16Ym2/Outputs/JPS original/Bootstrap', reason 'No such file or directory'</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>cannot create dir '/tmp/Rtmpe16Ym2/Outputs/JPS original/Bootstrap/Model Brazil', reason 'No such file or directory'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Desired graphs are saved in your chosen directory. Please, check: /tmp/Rtmpe16Ym2 </span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>cannot create dir '/tmp/RtmpEwReZL/Outputs/JPS original/Bootstrap', reason 'No such file or directory'</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>cannot create dir '/tmp/RtmpEwReZL/Outputs/JPS original/Bootstrap/Model Brazil', reason 'No such file or directory'</span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>

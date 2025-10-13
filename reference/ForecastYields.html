@@ -54,7 +54,7 @@
 <span>  WishBRW <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  BRWlist <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  Folder2save <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  verbose <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  verbose <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -79,7 +79,7 @@
 
 
 <dt id="arg-economies">Economies<a class="anchor" aria-label="anchor" href="#arg-economies"></a></dt>
-<dd><p>character vector. Names of the economies included in the system.</p></dd>
+<dd><p>character vector. Names of the <code>C</code> economies included in the system.</p></dd>
 
 
 <dt id="arg-jlllist">JLLlist<a class="anchor" aria-label="anchor" href="#arg-jlllist"></a></dt>
@@ -116,10 +116,10 @@
     <h2 id="permissible-options-forecast-list-inputsforoutputs-input-">Permissible options - forecast list (<code>InputsForOutputs</code> input)<a class="anchor" aria-label="anchor" href="#permissible-options-forecast-list-inputsforoutputs-input-"></a></h2>
 
 
-<ul><li><p><strong>ForHoriz</strong>: forecast horizon. Must be a positive integer.</p></li>
-<li><p><strong>t0Sample</strong>:   initial sample date. Must be a positive integer smaller than the time series dimension of the model (Td)</p></li>
-<li><p><strong>t0Forecast</strong>:  last sample date for the first forecast. Note that Td &gt; t0Forecast + ForHoriz.</p></li>
-<li><p><strong>ForType</strong>: <code>"Rolling"</code> (rolling window forecast) or <code>"Expanding"</code> (for expanding window forecast)</p></li>
+<ul><li><p><code>ForHoriz</code>: forecast horizon. Must be a positive integer.</p></li>
+<li><p><code>t0Sample</code>:   initial sample date. Must be a positive integer smaller than the time series dimension of the model (<code>Td</code>)</p></li>
+<li><p><code>t0Forecast</code>:  last sample date for the first forecast. Note that <code>Td &gt; t0Forecast + ForHoriz</code>.</p></li>
+<li><p><code>ForType</code>: <code>"Rolling"</code> (rolling window forecast) or <code>"Expanding"</code> (for expanding window forecast)</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="available-methods">Available Methods<a class="anchor" aria-label="anchor" href="#available-methods"></a></h2>
@@ -149,7 +149,7 @@
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Out-of-sample forecast for the information set: 01-07-2006 || 01-05-2018 </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Out-of-sample forecast for the information set: 01-07-2006 || 01-06-2018 </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Out-of-sample forecast for the information set: 01-07-2006 || 01-07-2018 </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Elapsed time: 3.44 seconds</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Elapsed time: 3.36 seconds</span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
     </div>
