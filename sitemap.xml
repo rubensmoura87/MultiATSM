@@ -57,7 +57,7 @@
 <url><loc>https://rubensmoura87.github.io/MultiATSM/reference/DataSet_BS.html</loc></url>
 <url><loc>https://rubensmoura87.github.io/MultiATSM/reference/DatabasePrep.html</loc></url>
 <url><loc>https://rubensmoura87.github.io/MultiATSM/reference/DomMacro.html</loc></url>
-<url><loc>https://rubensmoura87.github.io/MultiATSM/reference/DomesticMacroVar.html</loc></url>
+<url><loc>https://rubensmoura87.github.io/MultiATSM/reference/DomMacro_covid.html</loc></url>
 <url><loc>https://rubensmoura87.github.io/MultiATSM/reference/Est_K1h.html</loc></url>
 <url><loc>https://rubensmoura87.github.io/MultiATSM/reference/Est_RestOLS.html</loc></url>
 <url><loc>https://rubensmoura87.github.io/MultiATSM/reference/EstimationSigma_GVARrest.html</loc></url>
@@ -71,7 +71,6 @@
 <url><loc>https://rubensmoura87.github.io/MultiATSM/reference/FacQuantile_bs.html</loc></url>
 <url><loc>https://rubensmoura87.github.io/MultiATSM/reference/FactorBounds_FEVDandGFEVD.html</loc></url>
 <url><loc>https://rubensmoura87.github.io/MultiATSM/reference/FactorBounds_IRFandGIRF.html</loc></url>
-<url><loc>https://rubensmoura87.github.io/MultiATSM/reference/FactorsGVAR.html</loc></url>
 <url><loc>https://rubensmoura87.github.io/MultiATSM/reference/Factors_NonOrtho.html</loc></url>
 <url><loc>https://rubensmoura87.github.io/MultiATSM/reference/FeedMat_M.html</loc></url>
 <url><loc>https://rubensmoura87.github.io/MultiATSM/reference/FeedMat_Q.html</loc></url>
@@ -88,6 +87,7 @@
 <url><loc>https://rubensmoura87.github.io/MultiATSM/reference/ForwardPremia.html</loc></url>
 <url><loc>https://rubensmoura87.github.io/MultiATSM/reference/FunctionML_vec.html</loc></url>
 <url><loc>https://rubensmoura87.github.io/MultiATSM/reference/GVAR.html</loc></url>
+<url><loc>https://rubensmoura87.github.io/MultiATSM/reference/GVARFactors.html</loc></url>
 <url><loc>https://rubensmoura87.github.io/MultiATSM/reference/GVAR_PrepFactors.html</loc></url>
 <url><loc>https://rubensmoura87.github.io/MultiATSM/reference/Gather_Forecasts.html</loc></url>
 <url><loc>https://rubensmoura87.github.io/MultiATSM/reference/GaussianDensity.html</loc></url>
@@ -119,7 +119,7 @@
 <url><loc>https://rubensmoura87.github.io/MultiATSM/reference/Get_r0.html</loc></url>
 <url><loc>https://rubensmoura87.github.io/MultiATSM/reference/Getdt.html</loc></url>
 <url><loc>https://rubensmoura87.github.io/MultiATSM/reference/GlobalMacro.html</loc></url>
-<url><loc>https://rubensmoura87.github.io/MultiATSM/reference/GlobalMacroVar.html</loc></url>
+<url><loc>https://rubensmoura87.github.io/MultiATSM/reference/GlobalMacro_covid.html</loc></url>
 <url><loc>https://rubensmoura87.github.io/MultiATSM/reference/GraphicalOutputs.html</loc></url>
 <url><loc>https://rubensmoura87.github.io/MultiATSM/reference/IDXZeroRestrictionsJLLVarCovOrtho.html</loc></url>
 <url><loc>https://rubensmoura87.github.io/MultiATSM/reference/IRFandGIRF.html</loc></url>
@@ -156,8 +156,8 @@
 <url><loc>https://rubensmoura87.github.io/MultiATSM/reference/MatAdjusted.html</loc></url>
 <url><loc>https://rubensmoura87.github.io/MultiATSM/reference/Maturities.html</loc></url>
 <url><loc>https://rubensmoura87.github.io/MultiATSM/reference/MergeFEVD_graphs.html</loc></url>
-<url><loc>https://rubensmoura87.github.io/MultiATSM/reference/ModelParaEx.html</loc></url>
 <url><loc>https://rubensmoura87.github.io/MultiATSM/reference/MultiATSM.html</loc></url>
+<url><loc>https://rubensmoura87.github.io/MultiATSM/reference/MultiATSM_datasets.html</loc></url>
 <url><loc>https://rubensmoura87.github.io/MultiATSM/reference/NoOrthoVAR_JLL.html</loc></url>
 <url><loc>https://rubensmoura87.github.io/MultiATSM/reference/NumOutEx.html</loc></url>
 <url><loc>https://rubensmoura87.github.io/MultiATSM/reference/NumOutputs.html</loc></url>
@@ -170,16 +170,17 @@
 <url><loc>https://rubensmoura87.github.io/MultiATSM/reference/Optimization_Time.html</loc></url>
 <url><loc>https://rubensmoura87.github.io/MultiATSM/reference/OrthoReg_JLL.html</loc></url>
 <url><loc>https://rubensmoura87.github.io/MultiATSM/reference/OrthoVAR_JLL.html</loc></url>
-<url><loc>https://rubensmoura87.github.io/MultiATSM/reference/Out.html</loc></url>
+<url><loc>https://rubensmoura87.github.io/MultiATSM/reference/Out_Example.html</loc></url>
 <url><loc>https://rubensmoura87.github.io/MultiATSM/reference/OutputConstruction.html</loc></url>
 <url><loc>https://rubensmoura87.github.io/MultiATSM/reference/Outputs2exportMLE.html</loc></url>
 <url><loc>https://rubensmoura87.github.io/MultiATSM/reference/ParaLabelsOpt.html</loc></url>
+<url><loc>https://rubensmoura87.github.io/MultiATSM/reference/ParaSetEx.html</loc></url>
 <url><loc>https://rubensmoura87.github.io/MultiATSM/reference/PdynResid_BS.html</loc></url>
 <url><loc>https://rubensmoura87.github.io/MultiATSM/reference/RMSE.html</loc></url>
 <url><loc>https://rubensmoura87.github.io/MultiATSM/reference/Reg_demean.html</loc></url>
 <url><loc>https://rubensmoura87.github.io/MultiATSM/reference/RemoveNA.html</loc></url>
 <url><loc>https://rubensmoura87.github.io/MultiATSM/reference/ResampleResiduals_BS.html</loc></url>
-<url><loc>https://rubensmoura87.github.io/MultiATSM/reference/RiskFactors.html</loc></url>
+<url><loc>https://rubensmoura87.github.io/MultiATSM/reference/RiskFacFull.html</loc></url>
 <url><loc>https://rubensmoura87.github.io/MultiATSM/reference/RiskFactorsGraphs.html</loc></url>
 <url><loc>https://rubensmoura87.github.io/MultiATSM/reference/RiskFactorsPrep.html</loc></url>
 <url><loc>https://rubensmoura87.github.io/MultiATSM/reference/RootEigen.html</loc></url>
@@ -192,7 +193,7 @@
 <url><loc>https://rubensmoura87.github.io/MultiATSM/reference/TermPremiaDecomp.html</loc></url>
 <url><loc>https://rubensmoura87.github.io/MultiATSM/reference/TimeVarWeights_GVAR.html</loc></url>
 <url><loc>https://rubensmoura87.github.io/MultiATSM/reference/TradeFlows.html</loc></url>
-<url><loc>https://rubensmoura87.github.io/MultiATSM/reference/Trade_Flows.html</loc></url>
+<url><loc>https://rubensmoura87.github.io/MultiATSM/reference/TradeFlows_covid.html</loc></url>
 <url><loc>https://rubensmoura87.github.io/MultiATSM/reference/Transition_Matrix.html</loc></url>
 <url><loc>https://rubensmoura87.github.io/MultiATSM/reference/True_BlockDiag.html</loc></url>
 <url><loc>https://rubensmoura87.github.io/MultiATSM/reference/True_JLLstruct.html</loc></url>
@@ -217,6 +218,7 @@
 <url><loc>https://rubensmoura87.github.io/MultiATSM/reference/Yields.html</loc></url>
 <url><loc>https://rubensmoura87.github.io/MultiATSM/reference/YieldsFit.html</loc></url>
 <url><loc>https://rubensmoura87.github.io/MultiATSM/reference/YieldsFitAll.html</loc></url>
+<url><loc>https://rubensmoura87.github.io/MultiATSM/reference/Yields_covid.html</loc></url>
 <url><loc>https://rubensmoura87.github.io/MultiATSM/reference/adjust_delta.html</loc></url>
 <url><loc>https://rubensmoura87.github.io/MultiATSM/reference/autoplot.ATSMModelBoot.html</loc></url>
 <url><loc>https://rubensmoura87.github.io/MultiATSM/reference/autoplot.ATSMNumOutputs.html</loc></url>

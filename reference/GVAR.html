@@ -53,7 +53,7 @@
 <dl><dt id="arg-gvarinputs">GVARinputs<a class="anchor" aria-label="anchor" href="#arg-gvarinputs"></a></dt>
 <dd><p>list. Inputs for GVAR model estimation:</p><ol><li><p><code>Economies</code>:  character vector. Contains the <code>C</code> names of the economies included in the system.</p></li>
 <li><p><code>GVARFactors</code>: list. All variables used in the estimation of the VARX model <br>
-               (see e.g. <code>CM_Factors_GVAR</code> file for details);</p></li>
+               (see e.g. <code>GVARFactors</code> file for details);</p></li>
 <li><p><code>VARXtype</code>: Permissible:</p><ul><li><p><code>'unconstrained'</code>: model is estimated without constraints (each equation is estimated individually by ordinary least square);</p></li>
 <li><p><code>'constrained: Spanned Factors'</code>: The model is estimated with the restriction that foreign pricing factors do NOT
                                affect (i) domestic economic variables and (ii) domestic pricing factors (estimation via restricted least squares).</p></li>
@@ -67,7 +67,7 @@
 
 
 <dt id="arg-n">N<a class="anchor" aria-label="anchor" href="#arg-n"></a></dt>
-<dd><p>posite integer. Number of country-specific spanned factors.</p></dd>
+<dd><p>positive integer. Number of country-specific spanned factors.</p></dd>
 
 
 <dt id="arg-checkinputs">CheckInputs<a class="anchor" aria-label="anchor" href="#arg-checkinputs"></a></dt>
@@ -104,11 +104,11 @@
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">CM_Factors_GVAR</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">GVARFactors</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">GVARinputs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>  Economies <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"China"</span>, <span class="st">"Brazil"</span>, <span class="st">"Mexico"</span>, <span class="st">"Uruguay"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>  GVARFactors <span class="op">=</span> <span class="va">FactorsGVAR</span>, VARXtype <span class="op">=</span> <span class="st">"unconstrained"</span></span></span>
+<span class="r-in"><span>  GVARFactors <span class="op">=</span> <span class="va">GVARFactors</span>, VARXtype <span class="op">=</span> <span class="st">"unconstrained"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">GVARinputs</span><span class="op">$</span><span class="va">Wgvar</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span></span>

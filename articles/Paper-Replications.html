@@ -60,7 +60,7 @@
                         <h4 data-toc-skip class="author">Rubens
 Moura</h4>
             
-            <h4 data-toc-skip class="date">2025-10-13</h4>
+            <h4 data-toc-skip class="date">2025-10-15</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/rubensmoura87/MultiATSM/blob/main/vignettes/Paper-Replications.Rmd" class="external-link"><code>vignettes/Paper-Replications.Rmd</code></a></small>
       <div class="d-none name"><code>Paper-Replications.Rmd</code></div>
@@ -659,7 +659,7 @@ Uruguay.</p>
 <span></span>
 <span><span class="co"># 3) Prepare the inputs of the likelihood function</span></span>
 <span><span class="va">ATSMInputs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/InputsForOpt.html">InputsForOpt</a></span><span class="op">(</span></span>
-<span>  <span class="va">t0_sample</span>, <span class="va">tF_sample</span>, <span class="va">ModelType</span>, <span class="va">Yields</span>, <span class="va">GlobalMacroVar</span>, <span class="va">DomesticMacroVar</span>,</span>
+<span>  <span class="va">t0_sample</span>, <span class="va">tF_sample</span>, <span class="va">ModelType</span>, <span class="va">Yields</span>, <span class="va">GlobalMacro</span>, <span class="va">DomMacro</span>,</span>
 <span>  <span class="va">FactorLabels</span>, <span class="va">Economies</span>, <span class="va">DataFreq</span>, <span class="va">GVARlist</span>, <span class="va">JLLlist</span>, <span class="va">WishBC</span>, <span class="va">BRWlist</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -732,7 +732,7 @@ pandemic.</p>
 <span><span class="co">#################################### GVAR-based models ##################################################</span></span>
 <span><span class="va">GVARlist</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  VARXtype <span class="op">=</span> <span class="st">"constrained: COVID"</span>, W_type <span class="op">=</span> <span class="st">"Sample Mean"</span>, t_First_Wgvar <span class="op">=</span> <span class="st">"2015"</span>,</span>
-<span>  t_Last_Wgvar <span class="op">=</span> <span class="st">"2020"</span>, DataConnectedness <span class="op">=</span> <span class="va">Trade_Flows</span></span>
+<span>  t_Last_Wgvar <span class="op">=</span> <span class="st">"2020"</span>, DataConnectedness <span class="op">=</span> <span class="va">TradeFlows_covid</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">###################################### BRW inputs  ######################################################</span></span>
 <span><span class="va">WishBC</span> <span class="op">&lt;-</span> <span class="cn">FALSE</span></span>
@@ -760,7 +760,7 @@ pandemic.</p>
 <span></span>
 <span><span class="co"># 3) Prepare the inputs of the likelihood function</span></span>
 <span><span class="va">ATSMInputs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/InputsForOpt.html">InputsForOpt</a></span><span class="op">(</span></span>
-<span>  <span class="va">t0_sample</span>, <span class="va">tF_sample</span>, <span class="va">ModelType</span>, <span class="va">Yields</span>, <span class="va">GlobalMacro</span>, <span class="va">DomMacro</span>, <span class="va">FactorLabels</span>,</span>
+<span>  <span class="va">t0_sample</span>, <span class="va">tF_sample</span>, <span class="va">ModelType</span>, <span class="va">Yields_covid</span>, <span class="va">GlobalMacro_covid</span>, <span class="va">DomMacro_covid</span>, <span class="va">FactorLabels</span>,</span>
 <span>  <span class="va">Economies</span>, <span class="va">DataFreq</span>, <span class="va">GVARlist</span></span>
 <span><span class="op">)</span></span>
 <span></span>

@@ -60,7 +60,7 @@
                         <h4 data-toc-skip class="author">Rubens
 Moura</h4>
             
-            <h4 data-toc-skip class="date">2025-10-13</h4>
+            <h4 data-toc-skip class="date">2025-10-15</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/rubensmoura87/MultiATSM/blob/main/vignettes/MultiATSM.Rmd" class="external-link"><code>vignettes/MultiATSM.Rmd</code></a></small>
       <div class="d-none name"><code>MultiATSM.Rmd</code></div>
@@ -663,7 +663,7 @@ package does not include routines for bootstrapping zero-coupon yields
 from coupon bonds, so users must handle this data manipulation
 themselves if needed. The data can also be retrieved using:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"CM_Yields"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"Yields"</span><span class="op">)</span></span></code></pre></div>
 <p>Bond yield data are also used to construct the country-specific
 <strong>spanned</strong> factors, according to the terminology of JPS
 (2014). These factors typically correspond to the standard yield curve
@@ -677,8 +677,8 @@ countries in the sample and <em>(ii)</em> the global economy. Similar to
 the bond yield data, these economic indicators must be constructed by
 the user.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"CM_GlobalMacroFactors"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"CM_DomMacroFactors"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"GlobalMacro"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"DomMacro"</span><span class="op">)</span></span></code></pre></div>
 <p>The final dataset captures cross-country interconnectedness measures,
 proxied by bilateral trade flows, and is essential for estimating
 GVAR-based models. Specifically, the trade data—sourced from the
@@ -688,7 +688,7 @@ the sample, available from 1948 onward. All the values are free on board
 and are expressed in U.S. dollars. These data are specifically used to
 construct the transition matrix of the GVAR models.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"CM_Trade"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"TradeFlows"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="S:SectionImport">Import data from Excel files<a class="anchor" aria-label="anchor" href="#S:SectionImport"></a>
@@ -946,7 +946,7 @@ is:</p>
 <span></span>
 <span><span class="va">DataFreq</span> <span class="op">&lt;-</span> <span class="st">"Monthly"</span></span>
 <span></span>
-<span><span class="va">ATSMInputs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/InputsForOpt.html">InputsForOpt</a></span><span class="op">(</span><span class="va">t0</span>, <span class="va">tF</span>, <span class="va">ModelType</span>, <span class="va">Yields</span>, <span class="va">GlobalMacroVar</span>, <span class="va">DomesticMacroVar</span>,</span>
+<span><span class="va">ATSMInputs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/InputsForOpt.html">InputsForOpt</a></span><span class="op">(</span><span class="va">t0</span>, <span class="va">tF</span>, <span class="va">ModelType</span>, <span class="va">Yields</span>, <span class="va">GlobalMacro</span>, <span class="va">DomMacro</span>,</span>
 <span>  <span class="va">FactorLabels</span>, <span class="va">Economies</span>, <span class="va">DataFreq</span>,</span>
 <span>  CheckInputs <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -1132,7 +1132,7 @@ Yield loadings on the spanned factors
 factors, the user can use the <code><a href="../reference/Spanned_Factors.html">Spanned_Factors()</a></code> function as
 follows:</p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"CM_Yields"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"Yields"</span><span class="op">)</span></span>
 <span><span class="va">Economies</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"China"</span>, <span class="st">"Brazil"</span>, <span class="st">"Mexico"</span>, <span class="st">"Uruguay"</span><span class="op">)</span></span>
 <span><span class="va">N</span> <span class="op">&lt;-</span> <span class="fl">3</span></span>
 <span><span class="va">SpaFact</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/Spanned_Factors.html">Spanned_Factors</a></span><span class="op">(</span><span class="va">Yields</span>, <span class="va">Economies</span>, <span class="va">N</span><span class="op">)</span></span></code></pre></div>
@@ -1159,12 +1159,12 @@ estimation of the
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>P</mi><annotation encoding="application/x-tex">P</annotation></semantics></math>-dynamics
 parameters is obtained as</p>
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"CM_Factors"</span><span class="op">)</span></span>
-<span><span class="va">PdynPara</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/VAR.html">VAR</a></span><span class="op">(</span><span class="va">RiskFactors</span>, VARtype <span class="op">=</span> <span class="st">"unconstrained"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">RiskFacFull</span><span class="op">)</span></span>
+<span><span class="va">PdynPara</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/VAR.html">VAR</a></span><span class="op">(</span><span class="va">RiskFacFull</span>, VARtype <span class="op">=</span> <span class="st">"unconstrained"</span><span class="op">)</span></span></code></pre></div>
 <p>whereas the estimation of a <em>JPS original</em> model for China
 is</p>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">FactorsChina</span> <span class="op">&lt;-</span> <span class="va">RiskFactors</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">7</span>, <span class="op">]</span></span>
+<code class="sourceCode R"><span><span class="va">FactorsChina</span> <span class="op">&lt;-</span> <span class="va">RiskFacFull</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">7</span>, <span class="op">]</span></span>
 <span><span class="va">PdynPara</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/VAR.html">VAR</a></span><span class="op">(</span><span class="va">FactorsChina</span>, VARtype <span class="op">=</span> <span class="st">"unconstrained"</span><span class="op">)</span></span></code></pre></div>
 <p>In both cases, the outputs generated are the vector of intercepts and
 both the feedback and variance-covariance matrices of an unconstrained
@@ -1200,8 +1200,8 @@ last two cases, the VARX(1,1,1) is estimated by restricted least
 squares.</p></li>
 </ol>
 <div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"CM_Factors_GVAR"</span><span class="op">)</span></span>
-<span><span class="va">GVARinputs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>Economies <span class="op">=</span> <span class="va">Economies</span>, GVARFactors <span class="op">=</span> <span class="va">FactorsGVAR</span>, VARXtype <span class="op">=</span> <span class="st">"constrained: Inflation"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">GVARFactors</span><span class="op">)</span></span>
+<span><span class="va">GVARinputs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>Economies <span class="op">=</span> <span class="va">Economies</span>, GVARFactors <span class="op">=</span> <span class="va">GVARFactors</span>, VARXtype <span class="op">=</span> <span class="st">"constrained: Inflation"</span><span class="op">)</span></span></code></pre></div>
 <ol start="4" style="list-style-type: decimal">
 <li>
 <em>Transition matrix</em>: The estimation of a GVAR model requires
@@ -1228,7 +1228,7 @@ countries is assumed to be fixed over the entire sample span. Note that
 each row sums up to
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>1</mn><annotation encoding="application/x-tex">1</annotation></semantics></math>.</p>
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"CM_Trade"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"TradeFlows"</span><span class="op">)</span></span>
 <span><span class="va">t_First</span> <span class="op">&lt;-</span> <span class="st">"2006"</span></span>
 <span><span class="va">t_Last</span> <span class="op">&lt;-</span> <span class="st">"2019"</span></span>
 <span><span class="va">Economies</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"China"</span>, <span class="st">"Brazil"</span>, <span class="st">"Mexico"</span>, <span class="st">"Uruguay"</span><span class="op">)</span></span>
@@ -1246,9 +1246,9 @@ the <em>GVARinputs</em> list to estimate a GVAR(1) model. Note that the
 prior consistency check on the inputs provided in
 <em>GVARinputs</em>.</p>
 <div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"CM_Factors_GVAR"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">GVARFactors</span><span class="op">)</span></span>
 <span><span class="va">GVARinputs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>  Economies <span class="op">=</span> <span class="va">Economies</span>, GVARFactors <span class="op">=</span> <span class="va">FactorsGVAR</span>, VARXtype <span class="op">=</span> <span class="st">"unconstrained"</span>,</span>
+<span>  Economies <span class="op">=</span> <span class="va">Economies</span>, GVARFactors <span class="op">=</span> <span class="va">GVARFactors</span>, VARXtype <span class="op">=</span> <span class="st">"unconstrained"</span>,</span>
 <span>  Wgvar <span class="op">=</span> <span class="va">W_gvar</span></span>
 <span><span class="op">)</span></span>
 <span><span class="va">N</span> <span class="op">&lt;-</span> <span class="fl">3</span></span>
@@ -1296,9 +1296,9 @@ JLL model to be estimated according to the features described in <a href="#tab-M
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>P</mi><mo>−</mo></mrow><annotation encoding="application/x-tex">P-</annotation></semantics></math>dynamics
 dimension of a JLL-based setup can be computed as:</p>
 <div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"CM_Factors"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"RiskFacFull"</span><span class="op">)</span></span>
 <span><span class="va">N</span> <span class="op">&lt;-</span> <span class="fl">3</span></span>
-<span><span class="va">JLLpara</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/JLL.html">JLL</a></span><span class="op">(</span><span class="va">RiskFactors</span>, <span class="va">N</span>, <span class="va">JLLinputs</span>, CheckInputs <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">JLLpara</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/JLL.html">JLL</a></span><span class="op">(</span><span class="va">RiskFacFull</span>, <span class="va">N</span>, <span class="va">JLLinputs</span>, CheckInputs <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level3">
@@ -1444,7 +1444,7 @@ package for a detailed reproduction.</p>
 <span></span>
 <span><span class="co"># 3) Prepare the inputs of the likelihood function</span></span>
 <span><span class="va">ATSMInputs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/InputsForOpt.html">InputsForOpt</a></span><span class="op">(</span></span>
-<span>  <span class="va">t0_sample</span>, <span class="va">tF_sample</span>, <span class="va">ModelType</span>, <span class="va">Yields</span>, <span class="va">GlobalMacroVar</span>, <span class="va">DomesticMacroVar</span>,</span>
+<span>  <span class="va">t0_sample</span>, <span class="va">tF_sample</span>, <span class="va">ModelType</span>, <span class="va">Yields</span>, <span class="va">GlobalMacro</span>, <span class="va">DomMacro</span>,</span>
 <span>  <span class="va">FactorLabels</span>, <span class="va">Economies</span>, <span class="va">DataFreq</span>, <span class="va">GVARlist</span>, <span class="va">JLLlist</span>, <span class="va">WishBC</span>, <span class="va">BRWlist</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -1502,7 +1502,7 @@ inputs and the economic system’s general features, while the
 factors and bond yields.</p>
 <div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"Out_Example"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">Out</span><span class="op">$</span><span class="va">ATSMInputs</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">Out_Example</span><span class="op">$</span><span class="va">ATSMInputs</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## General Model Inputs: </span></span>
 <span><span class="co">## ------------------------------------------</span></span>
 <span><span class="co">## Model Type: JPS original </span></span>
@@ -1520,7 +1520,7 @@ factors and bond yields.</p>
 <span><span class="co">## Total amount of risk factors in the system: 7 </span></span>
 <span><span class="co">## ------------------------------------------</span></span></code></pre>
 <div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">Out</span><span class="op">$</span><span class="va">ATSMInputs</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">Out_Example</span><span class="op">$</span><span class="va">ATSMInputs</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Summary Statistics from the Time Series Components:</span></span>
 <span><span class="co">## ------------------------------------------------------</span></span>
 <span><span class="co">## 1) Risk Factors:</span></span>
@@ -1573,7 +1573,7 @@ cross-sectional dimension, and the count of physical-measure eigenvalues
 greater than one—an indicator of potential explosive behavior in the
 model’s time series dimension.</p>
 <div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">Out</span><span class="op">$</span><span class="va">ModelPara</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">Out_Example</span><span class="op">$</span><span class="va">ModelPara</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Model China </span></span>
 <span><span class="co">## General Model Outputs: </span></span>
 <span><span class="co">## ------------------------------------------------------</span></span>
@@ -1652,7 +1652,7 @@ additional <code>_Ortho</code> suffix generates orthogonalized outputs.
 The examples below illustrate the responses of the Brazilian and Chinese
 yield curves to a global economic activity shock:</p>
 <div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">GIRF_all</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/autoplot.html">autoplot</a></span><span class="op">(</span><span class="va">Out</span><span class="op">$</span><span class="va">NumOut</span>, type <span class="op">=</span> <span class="st">"GIRF_Yields"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">GIRF_all</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/autoplot.html">autoplot</a></span><span class="op">(</span><span class="va">Out_Example</span><span class="op">$</span><span class="va">NumOut</span>, type <span class="op">=</span> <span class="st">"GIRF_Yields"</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Warning: `aes_string()` was deprecated in ggplot2 3.0.0.</span></span>
 <span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Please use tidy evaluation idioms with `aes()`.</span></span>
 <span><span class="co">## <span style="color: #00BBBB;">ℹ</span> See also `vignette("ggplot2-in-packages")` for more information.</span></span>
@@ -1675,7 +1675,7 @@ method for <em>ATSMModelBoot</em> objects—generated by the
 significance of the results. The example below shows the responses of
 12-month bond yields to several shocks.</p>
 <div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">GIRF_all_Boot</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/autoplot.html">autoplot</a></span><span class="op">(</span><span class="va">Out</span><span class="op">$</span><span class="va">Bootstrap</span>, <span class="va">Out</span><span class="op">$</span><span class="va">NumOut</span>, type <span class="op">=</span> <span class="st">"GIRF_Yields_Boot"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">GIRF_all_Boot</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/autoplot.html">autoplot</a></span><span class="op">(</span><span class="va">Out_Example</span><span class="op">$</span><span class="va">Bootstrap</span>, <span class="va">Out_Example</span><span class="op">$</span><span class="va">NumOut</span>, type <span class="op">=</span> <span class="st">"GIRF_Yields_Boot"</span><span class="op">)</span></span>
 <span><span class="va">GIRF_all_Boot</span><span class="op">$</span><span class="va">China</span><span class="op">$</span><span class="va">Y12M_China</span></span></code></pre></div>
 <p><img src="MultiATSM_files/figure-html/unnamed-chunk-37-1.png" alt="GIRFs - Responses of 12-month maturity bonds in China and Brazil to several shocks" width="700"></p>
 <div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
@@ -1701,7 +1701,7 @@ was carried out with only a few draws (4).</p>
 method. This method generates a graphical representation of the RMSEs
 across different countries and forecast horizons.</p>
 <div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">Out</span><span class="op">$</span><span class="va">Forecasts</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">Out_Example</span><span class="op">$</span><span class="va">Forecasts</span><span class="op">)</span></span></code></pre></div>
 <p><img src="MultiATSM_files/figure-html/unnamed-chunk-38-1.png" alt="Root mean square error (RMSE)" width="700"><img src="MultiATSM_files/figure-html/unnamed-chunk-38-2.png" alt="Root mean square error (RMSE)" width="700"></p>
 </div>
 </div>

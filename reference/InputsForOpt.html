@@ -192,9 +192,9 @@
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="co"># Example 1:</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">CM_GlobalMacroFactors</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">CM_DomMacroFactors</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">CM_Yields</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">GlobalMacro</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">DomMacro</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">Yields</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">ModelType</span> <span class="op">&lt;-</span> <span class="st">"JPS original"</span></span></span>
 <span class="r-in"><span><span class="va">Economies</span> <span class="op">&lt;-</span> <span class="st">"Mexico"</span></span></span>
@@ -207,7 +207,7 @@
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">DataFreq</span> <span class="op">&lt;-</span> <span class="st">"Monthly"</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">ATSMInputs</span> <span class="op">&lt;-</span> <span class="fu">InputsForOpt</span><span class="op">(</span><span class="va">t0</span>, <span class="va">tF</span>, <span class="va">ModelType</span>, <span class="va">Yields</span>, <span class="va">GlobalMacroVar</span>, <span class="va">DomesticMacroVar</span>,</span></span>
+<span class="r-in"><span><span class="va">ATSMInputs</span> <span class="op">&lt;-</span> <span class="fu">InputsForOpt</span><span class="op">(</span><span class="va">t0</span>, <span class="va">tF</span>, <span class="va">ModelType</span>, <span class="va">Yields</span>, <span class="va">GlobalMacro</span>, <span class="va">DomMacro</span>,</span></span>
 <span class="r-in"><span>  <span class="va">FactorLabels</span>, <span class="va">Economies</span>, <span class="va">DataFreq</span>,</span></span>
 <span class="r-in"><span>  CheckInputs <span class="op">=</span> <span class="cn">FALSE</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
@@ -231,7 +231,7 @@
 <span class="r-in"><span>  t_First_Wgvar <span class="op">=</span> <span class="st">"2007"</span>, t_Last_Wgvar <span class="op">=</span> <span class="st">"2019"</span>, DataConnectedness <span class="op">=</span> <span class="va">TradeFlows</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">ATSMInputs</span> <span class="op">&lt;-</span> <span class="fu">InputsForOpt</span><span class="op">(</span><span class="va">t0</span>, <span class="va">tF</span>, <span class="va">ModelType</span>, <span class="va">Yields</span>, <span class="va">GlobalMacroVar</span>, <span class="va">DomesticMacroVar</span>,</span></span>
+<span class="r-in"><span><span class="va">ATSMInputs</span> <span class="op">&lt;-</span> <span class="fu">InputsForOpt</span><span class="op">(</span><span class="va">t0</span>, <span class="va">tF</span>, <span class="va">ModelType</span>, <span class="va">Yields</span>, <span class="va">GlobalMacro</span>, <span class="va">DomMacro</span>,</span></span>
 <span class="r-in"><span>  <span class="va">FactorLabels</span>, <span class="va">Economies</span>, <span class="va">DataFreq</span>, <span class="va">GVARlist</span>,</span></span>
 <span class="r-in"><span>  CheckInputs <span class="op">=</span> <span class="cn">FALSE</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
@@ -253,7 +253,7 @@
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">DataFrequency</span> <span class="op">&lt;-</span> <span class="st">"Monthly"</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">ATSMInputs</span> <span class="op">&lt;-</span> <span class="fu">InputsForOpt</span><span class="op">(</span><span class="va">t0</span>, <span class="va">tF</span>, <span class="va">ModelType</span>, <span class="va">Yields</span>, <span class="va">GlobalMacroVar</span>, <span class="va">DomesticMacroVar</span>,</span></span>
+<span class="r-in"><span><span class="va">ATSMInputs</span> <span class="op">&lt;-</span> <span class="fu">InputsForOpt</span><span class="op">(</span><span class="va">t0</span>, <span class="va">tF</span>, <span class="va">ModelType</span>, <span class="va">Yields</span>, <span class="va">GlobalMacro</span>, <span class="va">DomMacro</span>,</span></span>
 <span class="r-in"><span>  <span class="va">FactorLabels</span>, <span class="va">Economies</span>, <span class="va">DataFreq</span>,</span></span>
 <span class="r-in"><span>  JLLlist <span class="op">=</span> <span class="va">JLLinputs</span>,</span></span>
 <span class="r-in"><span>  CheckInputs <span class="op">=</span> <span class="cn">FALSE</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span></span></span>
