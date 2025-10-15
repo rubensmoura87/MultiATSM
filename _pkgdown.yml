@@ -10,16 +10,17 @@ reference:
   desc: >
     Datasets included in the package
   contents:
-  - CM_GlobalMacroFactors
-  - CM_GlobalMacro_2023
-  - CM_DomMacroFactors
-  - CM_DomMacro_2023
-  - CM_Trade
-  - CM_Trade_2023
-  - CM_Yields
-  - CM_Yields_2023
-  - CM_Factors
-  - CM_Factors_GVAR
+  - MultiATSM_datasets
+  - GlobalMacro
+  - GlobalMacro_covid
+  - DomMacro
+  - DomMacro_covid
+  - TradeFlows
+  - TradeFlows_covid
+  - Yields
+  - Yields_covid
+  - RiskFacFull
+  - GVARFactors
 - title: Data handling
   desc: >
    Functions for handling and transforming data
@@ -78,7 +79,7 @@ reference:
   desc: >
     Pre computed outputs
   contents:
-  - BR_jps_gro_R3
+  - BR_jps_out
   - InpForOutEx
   - ParaSetEx
   - NumOutEx

@@ -52,7 +52,7 @@ A list containing:
   \enumerate{
     \item Yields: matrix (\code{J x Td} or \code{CJ x Td}) of bond yields for all countries.
     \item RiskFactors: matrix (\code{K x Td}) of risk factors for all countries.
-    \item GVARFactors: list of variables used in VARX estimation (see CM_Factors_GVAR). NULL if not GVAR-based.
+    \item GVARFactors: list of variables used in VARX estimation (see \code{GVARFactors} data file). NULL if not GVAR-based.
   }
 }
 \description{

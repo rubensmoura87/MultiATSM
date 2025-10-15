@@ -34,7 +34,7 @@
 #'   t0Forecast = 143, ForType = "Expanding"
 #' )
 #'
-#' Forecast <- ForecastYields(ModelType, ModelParaEx, InpForOutEx, FacLab, Economy,
+#' Forecast <- ForecastYields(ModelType, ParaSetEx, InpForOutEx, FacLab, Economy,
 #'   WishBRW = FALSE, verbose = TRUE
 #' )
 #' }

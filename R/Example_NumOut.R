@@ -15,5 +15,5 @@
 #'    \item{GFEVD}{Generalized Forecast error variance decomposition}
 #'    \item{TermPremiaDecomp}{Term Premia decomposition}
 #'   }
-#' @keywords Numerical outputs for JPS model - Brazil
+#' @keywords Numerical outputs for an illustrative JPS model for Brazil
 NULL

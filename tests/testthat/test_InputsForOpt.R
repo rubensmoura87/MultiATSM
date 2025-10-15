@@ -17,7 +17,7 @@ test_that("InputsForOpt returns correct output structure (JPS model)", {
   ModelType <- "JPS original"
   Economies <- "Mexico"
   FactorLabels <- LabFac(N, DomVar, GlobalVar, Economies, ModelType)
-  res <- InputsForOpt(InitialSampleDate, FinalSampleDate, ModelType, Yields, GlobalMacroVar, DomesticMacroVar,
+  res <- InputsForOpt(InitialSampleDate, FinalSampleDate, ModelType, Yields, GlobalMacro, DomMacro,
     FactorLabels, Economies, DataFrequency,
     CheckInputs = FALSE, verbose = FALSE
   )
@@ -49,7 +49,7 @@ test_that("InputsForOpt returns correct output structure (JPS model with bias co
   ), N_burn <- round(N_iter * 0.15))
 
   FactorLabels <- LabFac(N, DomVar, GlobalVar, Economies, ModelType)
-  res <- InputsForOpt(InitialSampleDate, FinalSampleDate, ModelType, Yields, GlobalMacroVar, DomesticMacroVar,
+  res <- InputsForOpt(InitialSampleDate, FinalSampleDate, ModelType, Yields, GlobalMacro, DomMacro,
     FactorLabels, Economies, DataFrequency,
     WishBRW = TRUE, BRWlist = BRWlist,
     CheckInputs = FALSE, verbose = FALSE
@@ -68,7 +68,7 @@ test_that("InputsForOpt returns correct output structure (JPS model with bias co
 test_that("InputsForOpt throws error for inconsistent input (ModelType mispelled)", {
   ModelType <- "JPS Original" # Typo, capital o in "original"
   Economies <- "Mexico"
-  expect_error(InputsForOpt(InitialSampleDate, FinalSampleDate, ModelType, Yields, GlobalMacroVar, DomesticMacroVar,
+  expect_error(InputsForOpt(InitialSampleDate, FinalSampleDate, ModelType, Yields, GlobalMacro, DomMacro,
     FactorLabels, Economies, DataFrequency,
     CheckInputs = TRUE, verbose = FALSE
   ))
@@ -80,7 +80,7 @@ test_that("InputsForOpt throws error for inconsistent input (date mispecified)",
   InitialSampleDate <- "15-01-2007" # wrong format
   Economies <- "Mexico"
   FactorLabels <- LabFac(N, DomVar, GlobalVar, Economies, ModelType)
-  expect_error(InputsForOpt(InitialSampleDate, FinalSampleDate, ModelType, Yields, GlobalMacroVar, DomesticMacroVar,
+  expect_error(InputsForOpt(InitialSampleDate, FinalSampleDate, ModelType, Yields, GlobalMacro, DomMacro,
     FactorLabels, Economies, DataFrequency,
     CheckInputs = TRUE, verbose = FALSE
   ))
@@ -93,7 +93,7 @@ test_that("InputsForOpt throws error for inconsistent input (frequency mispecifi
   Economies <- "Mexico"
   DataFrequency <- "Bi-annual" # unavailable option
   FactorLabels <- LabFac(N, DomVar, GlobalVar, Economies, ModelType)
-  expect_error(InputsForOpt(InitialSampleDate, FinalSampleDate, ModelType, Yields, GlobalMacroVar, DomesticMacroVar,
+  expect_error(InputsForOpt(InitialSampleDate, FinalSampleDate, ModelType, Yields, GlobalMacro, DomMacro,
     FactorLabels, Economies, DataFrequency,
     CheckInputs = TRUE, verbose = FALSE
   ))
@@ -111,7 +111,7 @@ test_that("InputsForOpt returns correct output structure (GVAR single model)", {
   )
   FactorLabels <- LabFac(N, DomVar, GlobalVar, Economies, ModelType)
 
-  res <- InputsForOpt(InitialSampleDate, FinalSampleDate, ModelType, Yields, GlobalMacroVar, DomesticMacroVar,
+  res <- InputsForOpt(InitialSampleDate, FinalSampleDate, ModelType, Yields, GlobalMacro, DomMacro,
     FactorLabels, Economies, DataFrequency, GVARlist,
     CheckInputs = FALSE, verbose = FALSE
   )
@@ -134,7 +134,7 @@ test_that("InputsForOpt returns correct output structure (GVAR multi model)", {
   )
   FactorLabels <- LabFac(N, DomVar, GlobalVar, Economies, ModelType)
 
-  res <- InputsForOpt(InitialSampleDate, FinalSampleDate, ModelType, Yields, GlobalMacroVar, DomesticMacroVar,
+  res <- InputsForOpt(InitialSampleDate, FinalSampleDate, ModelType, Yields, GlobalMacro, DomMacro,
     FactorLabels, Economies, DataFrequency, GVARlist,
     CheckInputs = FALSE, verbose = FALSE
   )
@@ -162,7 +162,7 @@ test_that("InputsForOpt returns correct output structure (GVAR multi model with 
   ), N_burn <- round(N_iter * 0.15))
 
   FactorLabels <- LabFac(N, DomVar, GlobalVar, Economies, ModelType)
-  res <- InputsForOpt(InitialSampleDate, FinalSampleDate, ModelType, Yields, GlobalMacroVar, DomesticMacroVar,
+  res <- InputsForOpt(InitialSampleDate, FinalSampleDate, ModelType, Yields, GlobalMacro, DomMacro,
     FactorLabels, Economies, DataFrequency, GVARlist,
     WishBRW = TRUE, BRWlist = BRWlist,
     CheckInputs = FALSE, verbose = FALSE
@@ -186,7 +186,7 @@ test_that("InputsForOpt returns correct output structure (JLL model)", {
 
   FactorLabels <- LabFac(N, DomVar, GlobalVar, Economies, ModelType)
 
-  res <- InputsForOpt(InitialSampleDate, FinalSampleDate, ModelType, Yields, GlobalMacroVar, DomesticMacroVar,
+  res <- InputsForOpt(InitialSampleDate, FinalSampleDate, ModelType, Yields, GlobalMacro, DomMacro,
     FactorLabels, Economies, DataFrequency, GVARlist, JLLlist,
     CheckInputs = FALSE, verbose = FALSE
   )

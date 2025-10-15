@@ -170,7 +170,7 @@ handle this data manipulation themselves if needed. The data can also be retriev
 using:
 
 ```{r}
-data("CM_Yields")
+data("Yields")
 ```
 
 Bond yield data are also used to construct the country-specific **spanned** factors,
@@ -185,8 +185,8 @@ four countries in the sample and *(ii)* the global economy. Similar to the bond
 yield data, these economic indicators must be constructed by the user.
 
 ```{r}
-data("CM_GlobalMacroFactors")
-data("CM_DomMacroFactors")
+data("GlobalMacro")
+data("DomMacro")
 ```
 
 The final dataset captures cross-country interconnectedness measures, proxied by 
@@ -198,7 +198,7 @@ and are expressed in U.S. dollars. These data are specifically used to
 construct the transition matrix of the GVAR models.
 
 ```{r}
-data("CM_Trade")
+data("TradeFlows")
 ```
 
 ## Import data from Excel files {#S:SectionImport}
@@ -455,7 +455,7 @@ FactorLabels <- LabFac(N, DomVar, GlobalVar, Economies, ModelType)
 
 DataFreq <- "Monthly"
 
-ATSMInputs <- InputsForOpt(t0, tF, ModelType, Yields, GlobalMacroVar, DomesticMacroVar,
+ATSMInputs <- InputsForOpt(t0, tF, ModelType, Yields, GlobalMacro, DomMacro,
   FactorLabels, Economies, DataFreq,
   CheckInputs = FALSE
 )
@@ -649,7 +649,7 @@ factors, the user can use the `Spanned_Factors()` function as
 follows:
 
 ```{r}
-data("CM_Yields")
+data("Yields")
 Economies <- c("China", "Brazil", "Mexico", "Uruguay")
 N <- 3
 SpaFact <- Spanned_Factors(Yields, Economies, N)
@@ -673,14 +673,14 @@ the models *JPS global* and *JPS multi*, the estimation of the
 $P$-dynamics parameters is obtained as
 
 ```{r}
-data("CM_Factors")
-PdynPara <- VAR(RiskFactors, VARtype = "unconstrained")
+data(RiskFacFull)
+PdynPara <- VAR(RiskFacFull, VARtype = "unconstrained")
 ```
 
 whereas the estimation of a *JPS original* model for China is
 
 ```{r}
-FactorsChina <- RiskFactors[1:7, ]
+FactorsChina <- RiskFacFull[1:7, ]
 PdynPara <- VAR(FactorsChina, VARtype = "unconstrained")
 ```
 
@@ -719,8 +719,8 @@ elements:
     restricted least squares.
 
 ```{r}
-data("CM_Factors_GVAR")
-GVARinputs <- list(Economies = Economies, GVARFactors = FactorsGVAR, VARXtype = "constrained: Inflation")
+data(GVARFactors)
+GVARinputs <- list(Economies = Economies, GVARFactors = GVARFactors, VARXtype = "constrained: Inflation")
 ```
 
 4.  *Transition matrix*: The estimation of a GVAR model requires
@@ -747,7 +747,7 @@ countries is assumed to be fixed over the entire sample span. Note that
 each row sums up to $1$.
 
 ```{r}
-data("CM_Trade")
+data("TradeFlows")
 t_First <- "2006"
 t_Last <- "2019"
 Economies <- c("China", "Brazil", "Mexico", "Uruguay")
@@ -762,9 +762,9 @@ Having defined the form of the transition matrix, one can complete the
 check on the inputs provided in *GVARinputs*.
 
 ```{r}
-data("CM_Factors_GVAR")
+data(GVARFactors)
 GVARinputs <- list(
-  Economies = Economies, GVARFactors = FactorsGVAR, VARXtype = "unconstrained",
+  Economies = Economies, GVARFactors = GVARFactors, VARXtype = "unconstrained",
   Wgvar = W_gvar
 )
 N <- 3
@@ -818,9 +818,9 @@ As such, the $P-$dynamics dimension of a JLL-based setup can be computed
 as:
 
 ```{r, eval=FALSE}
-data("CM_Factors")
+data("RiskFacFull")
 N <- 3
-JLLpara <- JLL(RiskFactors, N, JLLinputs, CheckInputs = TRUE)
+JLLpara <- JLL(RiskFacFull, N, JLLinputs, CheckInputs = TRUE)
 ```
 
 ## ATSM estimation
@@ -960,7 +960,7 @@ FactorLabels <- LabFac(N, DomVar, GlobalVar, Economies, ModelType)
 
 # 3) Prepare the inputs of the likelihood function
 ATSMInputs <- InputsForOpt(
-  t0_sample, tF_sample, ModelType, Yields, GlobalMacroVar, DomesticMacroVar,
+  t0_sample, tF_sample, ModelType, Yields, GlobalMacro, DomMacro,
   FactorLabels, Economies, DataFreq, GVARlist, JLLlist, WishBC, BRWlist
 )
 
@@ -1004,11 +1004,11 @@ The *ATSMInputs* variable is an object of class *ATSMModelInputs* that includes 
 
 ```{r}
 data("Out_Example")
-print(Out$ATSMInputs)
+print(Out_Example$ATSMInputs)
 ```
 
 ```{r}
-summary(Out$ATSMInputs)
+summary(Out_Example$ATSMInputs)
 ```
 
 
@@ -1017,14 +1017,14 @@ The `Optimization()` function returns an object of class *'ATSMModelOutputs'*, w
 optimization process, including the maximum log-likelihood value, the intercept and slope coefficients from the model’s cross-sectional dimension, and the count of physical-measure eigenvalues greater than one—an indicator of potential explosive behavior in the model’s time series dimension. 
 
 ```{r}
-summary(Out$ModelPara)
+summary(Out_Example$ModelPara)
 ```
 
 ### Graphical outputs
 The `NumOutputs()` function returns an object of class *ATSMNumOutputs*, which includes an `autoplot()` $S3$ method. This method allows users to inspect the empirical properties of the chosen specification by displaying graphical outputs in the console, regardless of whether they were saved to *Folder2Save*. The user must specify a plot type: `RiskFactors`, `Fit`, `TermPremia`, or one of `IRF`, `FEVD`, `GIRF`, `GFEVD` (each suffixed with `_Factors` or `_Yields`). For JLL-based models, an additional `_Ortho` suffix generates orthogonalized outputs. The examples below illustrate the responses of the Brazilian and Chinese yield curves to a global economic activity shock:
 
 ```{r, fig.alt="GIRFs - Responses of yields curves in China and Brazil to a global economic shocks"}
-GIRF_all <- autoplot(Out$NumOut, type = "GIRF_Yields")
+GIRF_all <- autoplot(Out_Example$NumOut, type = "GIRF_Yields")
 GIRF_all$Brazil$Gl_Eco_Act
 GIRF_all$China$Gl_Eco_Act
 ```
@@ -1032,7 +1032,7 @@ GIRF_all$China$Gl_Eco_Act
 Additionally, the `autoplot()` $S3$ method for *ATSMModelBoot* objects—generated by the `Bootstrap()` function—allows users to assess the statistical significance of the results. The example below shows the responses of 12-month bond yields to several shocks.
 
 ```{r, fig.alt="GIRFs - Responses of 12-month maturity bonds in China and Brazil to several shocks"}
-GIRF_all_Boot <- autoplot(Out$Bootstrap, Out$NumOut, type = "GIRF_Yields_Boot")
+GIRF_all_Boot <- autoplot(Out_Example$Bootstrap, Out_Example$NumOut, type = "GIRF_Yields_Boot")
 GIRF_all_Boot$China$Y12M_China
 GIRF_all_Boot$Brazil$Y12M_Brazil
 ```
@@ -1044,7 +1044,7 @@ In this context, the `autoplot()` method requires two additional inputs beyond t
 The `ForecastYields()` function returns an object of class *'ATSMModelForecast'*, which can be visualized using the `plot()` $S3$ method. This method generates a graphical representation of the RMSEs across different countries and forecast horizons.
 
 ```{r  fig.alt="Root mean square error (RMSE)"}
-plot(Out$Forecasts)
+plot(Out_Example$Forecasts)
 ```
 
 # References

@@ -52,7 +52,7 @@ test_that("Optimization + Outputs + Graphs return correct structure (JLL model)"
   # Run optimization
   FacLab <- LabFac(N, DomVar, GlobalVar, Economies, ModelType)
   ATSMInputs <- InputsForOpt(
-    t0, tF, ModelType, Yields, GlobalMacroVar, DomesticMacroVar, FacLab, Economies,
+    t0, tF, ModelType, Yields, GlobalMacro, DomMacro, FacLab, Economies,
     DataFreq, GVARlist, JLLlist,
     CheckInputs = FALSE, verbose = FALSE
   )

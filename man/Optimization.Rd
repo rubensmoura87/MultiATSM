@@ -67,7 +67,7 @@ DataFreq <- "Monthly"
 StatQ <- FALSE
 
 FacLab <- LabFac(N, DomVar, GlobalVar, Economy, ModelType)
-ATSMInputs <- InputsForOpt(t0, tF, ModelType, Yields, GlobalMacroVar, DomesticMacroVar,
+ATSMInputs <- InputsForOpt(t0, tF, ModelType, Yields, GlobalMacro, DomMacro,
   FacLab, Economy, DataFreq,
   CheckInputs = FALSE, verbose = FALSE
 )

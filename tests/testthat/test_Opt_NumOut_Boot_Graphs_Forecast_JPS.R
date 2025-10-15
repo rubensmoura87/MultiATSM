@@ -50,7 +50,7 @@ test_that("Optimization + Outputs + Graphs return correct structure (JPS model)"
   # Run optimization
   FacLab <- LabFac(N, DomVar, GlobalVar, Economy, ModelType)
   ATSMInputs <- InputsForOpt(
-    t0, tF, ModelType, Yields, GlobalMacroVar, DomesticMacroVar,
+    t0, tF, ModelType, Yields, GlobalMacro, DomMacro,
     FacLab, Economy, DataFreq,
     CheckInputs = FALSE, verbose = FALSE
   )

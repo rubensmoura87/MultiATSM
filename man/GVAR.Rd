@@ -11,7 +11,7 @@ GVAR(GVARinputs, N, CheckInputs = FALSE)
 \enumerate{
        \item  \code{Economies}:  character vector. Contains the \code{C} names of the economies included in the system.
        \item  \code{GVARFactors}: list. All variables used in the estimation of the VARX model \cr
-               (see e.g. \code{CM_Factors_GVAR} file for details);
+               (see e.g. \code{GVARFactors} file for details);
        \item \code{VARXtype}: Permissible:
  \itemize{
        \item \code{'unconstrained'}: model is estimated without constraints (each equation is estimated individually by ordinary least square);
@@ -25,7 +25,7 @@ GVAR(GVARinputs, N, CheckInputs = FALSE)
                                (See the output from the \code{\link{Transition_Matrix}} function.).
 }}
 
-\item{N}{posite integer. Number of country-specific spanned factors.}
+\item{N}{positive integer. Number of country-specific spanned factors.}
 
 \item{CheckInputs}{logical. Whether to perform a prior consistency check on the inputs provided in \code{GVARinputs}. Default is FALSE.}
 }
@@ -63,11 +63,11 @@ Estimates a GVAR(1) and VARX(1,1,1) models
 }
 
 \examples{
-data(CM_Factors_GVAR)
+data(GVARFactors)
 
 GVARinputs <- list(
   Economies = c("China", "Brazil", "Mexico", "Uruguay"),
-  GVARFactors = FactorsGVAR, VARXtype = "unconstrained"
+  GVARFactors = GVARFactors, VARXtype = "unconstrained"
 )
 
 GVARinputs$Wgvar <- matrix(c(

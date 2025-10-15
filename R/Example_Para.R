@@ -1,7 +1,7 @@
 #' @title Example of parameter set after optimization
 #'
 #' @description JPS-based model for Brazilian data
-#' @name ModelParaEx
+#' @name ParaSetEx
 #' @aliases ParaSetEx
 #' @docType data
 #' @usage data("ParaSetEx")
@@ -10,5 +10,5 @@
 #'    \item{Inupts}{general model inputs}
 #'    \item{ModEst}{model parameters estimates (JPS form)}
 #'   }
-#' @keywords  JPS model - Brazil
+#' @keywords Illustrative JPS model for Brazilian data
 NULL

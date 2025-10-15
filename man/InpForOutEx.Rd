@@ -13,7 +13,12 @@ data("InpForOutEx")
 \description{
 List of inputs of a JPS-based model for Brazilian data
 }
-\keyword{-}
 \keyword{Brazil}
 \keyword{JPS}
+\keyword{an}
+\keyword{for}
+\keyword{illustrative}
+\keyword{inputs}
+\keyword{list}
 \keyword{model}
+\keyword{of}

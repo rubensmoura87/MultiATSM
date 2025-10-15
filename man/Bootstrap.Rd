@@ -85,7 +85,7 @@ InpForOutEx[[ModelType]]$Bootstrap <- list(
   ndraws = 5, pctg = 95
 )
 
-Boot <- Bootstrap(ModelType, ModelParaEx, NumOutEx, Economy, InpForOutEx, FacLab,
+Boot <- Bootstrap(ModelType, ParaSetEx, NumOutEx, Economy, InpForOutEx, FacLab,
   JLLlist = NULL,
   GVARlist = NULL, WishBC = FALSE, BRWlist = NULL, Folder2save = NULL, verbose = FALSE
 )

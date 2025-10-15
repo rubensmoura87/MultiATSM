@@ -118,9 +118,9 @@ Generates inputs necessary to build the likelihood function for the ATSM model
 \examples{
 \donttest{
 # Example 1:
-data(CM_GlobalMacroFactors)
-data(CM_DomMacroFactors)
-data(CM_Yields)
+data(GlobalMacro)
+data(DomMacro)
+data(Yields)
 
 ModelType <- "JPS original"
 Economies <- "Mexico"
@@ -133,7 +133,7 @@ FactorLabels <- LabFac(N, DomVar, GlobalVar, Economies, ModelType)
 
 DataFreq <- "Monthly"
 
-ATSMInputs <- InputsForOpt(t0, tF, ModelType, Yields, GlobalMacroVar, DomesticMacroVar,
+ATSMInputs <- InputsForOpt(t0, tF, ModelType, Yields, GlobalMacro, DomMacro,
   FactorLabels, Economies, DataFreq,
   CheckInputs = FALSE, verbose = FALSE
 )
@@ -157,7 +157,7 @@ GVARlist <- list(
   t_First_Wgvar = "2007", t_Last_Wgvar = "2019", DataConnectedness = TradeFlows
 )
 
-ATSMInputs <- InputsForOpt(t0, tF, ModelType, Yields, GlobalMacroVar, DomesticMacroVar,
+ATSMInputs <- InputsForOpt(t0, tF, ModelType, Yields, GlobalMacro, DomMacro,
   FactorLabels, Economies, DataFreq, GVARlist,
   CheckInputs = FALSE, verbose = FALSE
 )
@@ -179,7 +179,7 @@ JLLinputs <- list(DomUnit = "China")
 
 DataFrequency <- "Monthly"
 
-ATSMInputs <- InputsForOpt(t0, tF, ModelType, Yields, GlobalMacroVar, DomesticMacroVar,
+ATSMInputs <- InputsForOpt(t0, tF, ModelType, Yields, GlobalMacro, DomMacro,
   FactorLabels, Economies, DataFreq,
   JLLlist = JLLinputs,
   CheckInputs = FALSE, verbose = FALSE

@@ -65,9 +65,9 @@
 #' @examples
 #' \donttest{
 #' # Example 1:
-#' data(CM_GlobalMacroFactors)
-#' data(CM_DomMacroFactors)
-#' data(CM_Yields)
+#' data(GlobalMacro)
+#' data(DomMacro)
+#' data(Yields)
 #'
 #' ModelType <- "JPS original"
 #' Economies <- "Mexico"
@@ -80,7 +80,7 @@
 #'
 #' DataFreq <- "Monthly"
 #'
-#' ATSMInputs <- InputsForOpt(t0, tF, ModelType, Yields, GlobalMacroVar, DomesticMacroVar,
+#' ATSMInputs <- InputsForOpt(t0, tF, ModelType, Yields, GlobalMacro, DomMacro,
 #'   FactorLabels, Economies, DataFreq,
 #'   CheckInputs = FALSE, verbose = FALSE
 #' )
@@ -104,7 +104,7 @@
 #'   t_First_Wgvar = "2007", t_Last_Wgvar = "2019", DataConnectedness = TradeFlows
 #' )
 #'
-#' ATSMInputs <- InputsForOpt(t0, tF, ModelType, Yields, GlobalMacroVar, DomesticMacroVar,
+#' ATSMInputs <- InputsForOpt(t0, tF, ModelType, Yields, GlobalMacro, DomMacro,
 #'   FactorLabels, Economies, DataFreq, GVARlist,
 #'   CheckInputs = FALSE, verbose = FALSE
 #' )
@@ -126,7 +126,7 @@
 #'
 #' DataFrequency <- "Monthly"
 #'
-#' ATSMInputs <- InputsForOpt(t0, tF, ModelType, Yields, GlobalMacroVar, DomesticMacroVar,
+#' ATSMInputs <- InputsForOpt(t0, tF, ModelType, Yields, GlobalMacro, DomMacro,
 #'   FactorLabels, Economies, DataFreq,
 #'   JLLlist = JLLinputs,
 #'   CheckInputs = FALSE, verbose = FALSE
@@ -404,18 +404,18 @@ AdjustYieldsDates <- function(Yields, PdynamicsFactors, Economies) {
 
 LoadData <- function(DataPaper) {
   switch(DataPaper,
-    "BR_2017" = utils::data("BR_jps_gro_R3"),
+    "BR_2017" = utils::data("BR_jps_out"),
     "CM_2024" = {
-      utils::data("CM_GlobalMacroFactors")
-      utils::data("CM_DomMacroFactors")
-      utils::data("CM_Trade")
-      utils::data("CM_Yields")
+      utils::data("GlobalMacro")
+      utils::data("DomMacro")
+      utils::data("TradeFlows")
+      utils::data("Yields")
     },
     "CM_2023" = {
-      utils::data("CM_GlobalMacro_2023")
-      utils::data("CM_DomMacro_2023")
-      utils::data("CM_Trade_2023")
-      utils::data("CM_Yields_2023")
+      utils::data("GlobalMacro_covid")
+      utils::data("DomMacro_covid")
+      utils::data("TradeFlows_covid")
+      utils::data("Yields_covid")
     },
     stop("Database unavailable.")
   )

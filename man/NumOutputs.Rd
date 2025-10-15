@@ -60,7 +60,7 @@ ModelType <- "JPS original"
 Economy <- "Brazil"
 FacLab <- LabFac(N = 1, DomVar = "Eco_Act", GlobalVar = "Gl_Eco_Act", Economy, ModelType)
 
-NumOut <- NumOutputs(ModelType, ModelParaEx, InpForOutEx, FacLab, Economy,
+NumOut <- NumOutputs(ModelType, ParaSetEx, InpForOutEx, FacLab, Economy,
   Folder2save = NULL, verbose = FALSE
 )
 

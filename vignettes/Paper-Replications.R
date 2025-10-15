@@ -43,7 +43,6 @@ ModelPara <- Optimization(ATSMInputs, StatQ, DataFreq, FactorLabels, Economies, 
 
 ## ----echo= FALSE--------------------------------------------------------------
 options(scipen = 100) # eliminate the scientific notation
-data("BR_jps_gro_R3")
 
 RowsQ <- c("$r0$", "$\\lambda_1$", "$\\lambda_2$", "$\\lambda_3$")
 TableQ <- data.frame(matrix(NA, ncol = 0, nrow = length(RowsQ)))
@@ -109,7 +108,6 @@ kableExtra::kbl(TableP, align = "c", caption = "$P$-dynamics parameters") %>%
   kableExtra::footnote(general = " $K0Z$ is the intercept and $K1Z$ is feedback matrix from the $P$-dynamics.")
 
 ## ----echo= FALSE--------------------------------------------------------------
-#data("BR_jps_gro_R3")
 
 se <- data.frame(BR_jps_out$est.llk$sigma.e, ModelPara$`JPS original`$US$ModEst$Q$se)
 rownames(se) <- "se"
@@ -184,7 +182,7 @@ kableExtra::kbl(se, align = "c", caption = "Portfolio of yields with errors") %>
 # 
 # # 3) Prepare the inputs of the likelihood function
 # ATSMInputs <- InputsForOpt(
-#   t0_sample, tF_sample, ModelType, Yields, GlobalMacroVar, DomesticMacroVar,
+#   t0_sample, tF_sample, ModelType, Yields, GlobalMacro, DomMacro,
 #   FactorLabels, Economies, DataFreq, GVARlist, JLLlist, WishBC, BRWlist
 # )
 # 
@@ -242,7 +240,7 @@ kableExtra::kbl(se, align = "c", caption = "Portfolio of yields with errors") %>
 # #################################### GVAR-based models ##################################################
 # GVARlist <- list(
 #   VARXtype = "constrained: COVID", W_type = "Sample Mean", t_First_Wgvar = "2015",
-#   t_Last_Wgvar = "2020", DataConnectedness = Trade_Flows
+#   t_Last_Wgvar = "2020", DataConnectedness = TradeFlows_covid
 # )
 # ###################################### BRW inputs  ######################################################
 # WishBC <- FALSE
@@ -270,7 +268,7 @@ kableExtra::kbl(se, align = "c", caption = "Portfolio of yields with errors") %>
 # 
 # # 3) Prepare the inputs of the likelihood function
 # ATSMInputs <- InputsForOpt(
-#   t0_sample, tF_sample, ModelType, Yields, GlobalMacro, DomMacro, FactorLabels,
+#   t0_sample, tF_sample, ModelType, Yields_covid, GlobalMacro_covid, DomMacro_covid, FactorLabels,
 #   Economies, DataFreq, GVARlist
 # )
 # 

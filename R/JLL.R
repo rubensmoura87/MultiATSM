@@ -21,8 +21,8 @@
 #'
 #' @examples
 #' \donttest{
-#' data(CM_Factors)
-#' RF_TS <- RiskFactors
+#' data(RiskFacFull)
+#' RF_TS <- RiskFacFull
 #' N <- 3
 #' JLLinputs <- list(
 #'   Economies = c("China", "Brazil", "Mexico", "Uruguay"), DomUnit = "China",

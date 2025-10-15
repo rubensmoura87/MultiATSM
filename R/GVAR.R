@@ -4,7 +4,7 @@
 #' \enumerate{
 #'        \item  \code{Economies}:  character vector. Contains the \code{C} names of the economies included in the system.
 #'        \item  \code{GVARFactors}: list. All variables used in the estimation of the VARX model \cr
-#'                (see e.g. \code{CM_Factors_GVAR} file for details);
+#'                (see e.g. \code{GVARFactors} file for details);
 #'        \item \code{VARXtype}: Permissible:
 #'  \itemize{
 #'        \item \code{'unconstrained'}: model is estimated without constraints (each equation is estimated individually by ordinary least square);
@@ -17,7 +17,7 @@
 #'          \item \code{Wgvar}: The GVAR transition matrix (\code{C x C}) used in the model solution. \cr
 #'                                (See the output from the \code{\link{Transition_Matrix}} function.).
 #' }
-#' @param N posite integer. Number of country-specific spanned factors.
+#' @param N positive integer. Number of country-specific spanned factors.
 #' @param CheckInputs logical. Whether to perform a prior consistency check on the inputs provided in \code{GVARinputs}. Default is FALSE.
 #'
 #' @return list. Contains:
@@ -49,11 +49,11 @@
 #'
 #'
 #' @examples
-#' data(CM_Factors_GVAR)
+#' data(GVARFactors)
 #'
 #' GVARinputs <- list(
 #'   Economies = c("China", "Brazil", "Mexico", "Uruguay"),
-#'   GVARFactors = FactorsGVAR, VARXtype = "unconstrained"
+#'   GVARFactors = GVARFactors, VARXtype = "unconstrained"
 #' )
 #'
 #' GVARinputs$Wgvar <- matrix(c(

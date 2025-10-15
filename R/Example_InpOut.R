@@ -6,6 +6,5 @@
 #' @docType data
 #' @usage data("InpForOutEx")
 #' @format list of inputs
-#'
-#' @keywords  JPS model - Brazil
+#' @keywords  list of inputs for an illustrative JPS model for Brazil
 NULL

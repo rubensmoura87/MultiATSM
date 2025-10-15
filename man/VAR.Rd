@@ -34,14 +34,14 @@ Estimates a standard VAR(1)
 }
 
 \examples{
-data("CM_Factors")
+data(RiskFacFull)
 # Example 1: unconstrained case
-VAR_para1 <- VAR(RiskFactors, VARtype = "unconstrained")
+VAR_para1 <- VAR(RiskFacFull, VARtype = "unconstrained")
 
 # Example 2: constrained case
-K <- nrow(RiskFactors)
+K <- nrow(RiskFacFull)
 Bcon_Mat <- matrix(0, nrow = K, ncol = K + 1)
 Bcon_Mat[, 1:3] <- NaN
-VAR_para2 <- VAR(RiskFactors, VARtype = "constrained", Bcon_Mat)
+VAR_para2 <- VAR(RiskFacFull, VARtype = "constrained", Bcon_Mat)
 
 }

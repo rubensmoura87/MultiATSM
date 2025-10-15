@@ -53,7 +53,7 @@ test_that("Optimization + Outputs + Graphs return correct structure (GVAR model)
 
   FacLab <- LabFac(N, DomVar, GlobalVar, Economies, ModelType)
   ATSMInputs <- InputsForOpt(
-    t0, tF, ModelType, Yields, GlobalMacroVar, DomesticMacroVar,
+    t0, tF, ModelType, Yields, GlobalMacro, DomMacro,
     FacLab, Economies, DataFreq, GVARlist,
     CheckInputs = FALSE, verbose = FALSE
   )
@@ -168,7 +168,7 @@ test_that("Optimization returns correct output structure (GVAR model, unconstrai
   )
 
   FacLab <- LabFac(N, DomVar, GlobalVar, Economies, ModelType)
-  ATSMInputs <- InputsForOpt(t0, tF, ModelType, Yields, GlobalMacroVar, DomesticMacroVar,
+  ATSMInputs <- InputsForOpt(t0, tF, ModelType, Yields, GlobalMacro, DomMacro,
     FacLab, Economies, DataFreq, GVARlist,
     CheckInputs = FALSE, verbose = FALSE
   )

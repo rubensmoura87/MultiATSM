@@ -49,7 +49,7 @@ data("NumOutEx")
 ModelType <- "JPS original"
 Economy <- "Brazil"
 UnitYields <- "Month"
-TPDecompGraph(ModelType, NumOutEx, ModelParaEx,
+TPDecompGraph(ModelType, NumOutEx, ParaSetEx,
   WishRPgraphs = FALSE, UnitYields, Economy,
   PathsGraphs = NULL, Folder2Save = NULL, verbose = FALSE
 )

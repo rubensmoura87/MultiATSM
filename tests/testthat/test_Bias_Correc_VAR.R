@@ -28,7 +28,7 @@ test_that("Bias_Correc_VAR returns correct output structure (JPS model)", {
   ModelType <- "JPS original"
 
   FactorLabels <- LabFac(N, DomVar, GlobalVar, Economies, ModelType)
-  ATSMInputs <- InputsForOpt(t0_sample, tF_sample, ModelType, Yields, GlobalMacroVar, DomesticMacroVar,
+  ATSMInputs <- InputsForOpt(t0_sample, tF_sample, ModelType, Yields, GlobalMacro, DomMacro,
     FactorLabels, Economies, DataFreq, GVARlist, JLLlist, WishBC, BRWlist,
     verbose = FALSE
   )
@@ -52,7 +52,7 @@ test_that("Bias_Correc_VAR returns correct output structure (GVAR model)", {
   ModelType <- "GVAR multi"
 
   FactorLabels <- LabFac(N, DomVar, GlobalVar, Economies, ModelType)
-  ATSMInputs <- InputsForOpt(t0_sample, tF_sample, ModelType, Yields, GlobalMacroVar, DomesticMacroVar,
+  ATSMInputs <- InputsForOpt(t0_sample, tF_sample, ModelType, Yields, GlobalMacro, DomMacro,
     FactorLabels, Economies, DataFreq, GVARlist, JLLlist, WishBC, BRWlist,
     verbose = FALSE
   )
@@ -80,7 +80,7 @@ test_that("Bias_Correc_VAR returns correct output structure (JLL model)", {
   ModelType <- "JLL original"
 
   FactorLabels <- LabFac(N, DomVar, GlobalVar, Economies, ModelType)
-  ATSMInputs <- InputsForOpt(t0_sample, tF_sample, ModelType, Yields, GlobalMacroVar, DomesticMacroVar,
+  ATSMInputs <- InputsForOpt(t0_sample, tF_sample, ModelType, Yields, GlobalMacro, DomMacro,
     FactorLabels, Economies, DataFreq, GVARlist, JLLlist, WishBC, BRWlist,
     verbose = FALSE
   )

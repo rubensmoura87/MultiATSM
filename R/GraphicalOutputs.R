@@ -103,7 +103,7 @@ GraphicalOutputs <- function(ModelType, ModelPara, NumOut, InputsForOutputs, Eco
 #' FacLab <- LabFac(N = 1, DomVar = "Eco_Act", GlobalVar = "Gl_Eco_Act", Economy, ModelType)
 #'
 #' RiskFactorsGraphs(ModelType,
-#'   WishRFgraphs = FALSE, ModelParaEx, Economy, FacLab,
+#'   WishRFgraphs = FALSE, ParaSetEx, Economy, FacLab,
 #'   Folder2save = NULL, verbose = FALSE
 #' )
 #'
@@ -281,7 +281,7 @@ RiskFactorsGraphs <- function(ModelType, WishRFgraphs, ModelOutputs, Economies, 
 #' ModelType <- "JPS original"
 #' Economy <- "Brazil"
 #' Fitgraphs(ModelType,
-#'   WishFitgraphs = TRUE, ModelParaEx, NumOutEx, Economy, PathsGraphs = NULL,
+#'   WishFitgraphs = TRUE, ParaSetEx, NumOutEx, Economy, PathsGraphs = NULL,
 #'   Folder2save = NULL, verbose = FALSE
 #' )
 #'
@@ -823,7 +823,7 @@ FEVDandGFEVDgraphs <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYield
 #' ModelType <- "JPS original"
 #' Economy <- "Brazil"
 #' UnitYields <- "Month"
-#' TPDecompGraph(ModelType, NumOutEx, ModelParaEx,
+#' TPDecompGraph(ModelType, NumOutEx, ParaSetEx,
 #'   WishRPgraphs = FALSE, UnitYields, Economy,
 #'   PathsGraphs = NULL, Folder2Save = NULL, verbose = FALSE
 #' )

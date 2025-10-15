@@ -15,7 +15,7 @@
 #' }
 #'
 #' @examples
-#' data(CM_Yields)
+#' data(Yields)
 #' Economies <- c("China", "Brazil", "Mexico", "Uruguay")
 #' N <- 3
 #' SpaFact_TS <- Spanned_Factors(Yields, Economies, N)

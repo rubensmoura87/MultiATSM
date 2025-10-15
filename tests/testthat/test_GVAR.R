@@ -2,11 +2,11 @@ library(testthat)
 library(MultiATSM)
 
 # Load inputs
-data(CM_Factors_GVAR)
+data(GVARFactors)
 
 GVARinputs <- list(
   Economies = c("China", "Brazil", "Mexico", "Uruguay"),
-  GVARFactors = FactorsGVAR, VARXtype = "unconstrained"
+  GVARFactors = GVARFactors, VARXtype = "unconstrained"
 )
 
 GVARinputs$Wgvar <- matrix(c(
@@ -36,7 +36,7 @@ test_that("GVAR issues an error for inconsistent N", {
 
 # 3) Test for restricted VARXtype elements
 test_that("GVAR checks for a constrained model version (Spanned Factors)", {
-  G <- length(FactorsGVAR$Global)
+  G <- length(GVARFactors$Global)
   GVARinputs$VARXtype <- "constrained: Spanned Factors"
   res <- GVAR(GVARinputs, N, CheckInputs = TRUE)
   expect_true(any(res$F1[-(1:G), ] == 0))

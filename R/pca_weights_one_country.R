@@ -12,7 +12,7 @@
 #' }
 #'
 #' @examples
-#' data(CM_Yields)
+#' data(Yields)
 #' Economy <- "Mexico"
 #' pca_weights <- pca_weights_one_country(Yields, Economy)
 #'

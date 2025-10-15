@@ -3,7 +3,7 @@ library(MultiATSM)
 
 # Load data
 LoadData("CM_2024")
-RiskFactors <- rbind(GlobalMacroVar, DomesticMacroVar[1:4, ])
+RiskFactors <- rbind(GlobalMacro, DomMacro[1:4, ])
 
 # 1) Test unconstrained VAR
 test_that("VAR returns correct output for unconstrained case", {

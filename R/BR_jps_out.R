@@ -2,9 +2,9 @@
 #'
 #' @description Unspanned macro risk model outputs by Bauer and Rudebusch (2017)
 #' @name BR_jps_out
-#' @aliases BR_jps_gro_R3
+#' @aliases BR_jps_out
 #' @docType data
-#' @usage data("BR_jps_gro_R3")
+#' @usage data("BR_jps_out")
 #' @format Unspanned macro risk model outputs by Bauer and Rudebusch (2017)
 #' \describe{
 #' \item{est.llk}{summary list of log-likelihood estimations}
@@ -16,5 +16,5 @@
 #'    \item{R}{total number of  spanned factor of the model}
 #'   }
 #' @references Bauer, M. and Rudebusch, G. "Resolving the Spanning Puzzle in Macro-Finance Term Structure Models"
-#' @keywords JPS (2014) outputs
+#' @keywords Set of outputs, replication of JPS (2014)
 NULL

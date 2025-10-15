@@ -14,7 +14,7 @@ RiskFactorsPrep(
 )
 }
 \arguments{
-\item{FactorSet}{Factor set list (see e.g. "CM_Factors_GVAR" data file)}
+\item{FactorSet}{Factor set list (see e.g. "GVARFactors" data file)}
 
 \item{Economies}{A character vector containing the names of the economies included in the system.}
 

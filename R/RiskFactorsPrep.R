@@ -1,6 +1,6 @@
 #' Builds the complete set of time series of the risk factors (spanned and unspanned)
 #'
-#' @param FactorSet Factor set list (see e.g. "CM_Factors_GVAR" data file)
+#' @param FactorSet Factor set list (see e.g. "GVARFactors" data file)
 #' @param Economies A character vector containing the names of the economies included in the system.
 #' @param FactorLabels A list of character vectors with labels for all variables in the model.
 #' @param Initial_Date Start date of the sample period in the format yyyy-mm-dd

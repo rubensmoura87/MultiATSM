@@ -2,8 +2,8 @@ library(testthat)
 library(MultiATSM)
 
 # Load inputs
-data(CM_Factors)
-RF_TS <- RiskFactors[1:12, ]
+data(RiskFacFull)
+RF_TS <- RiskFacFull[1:12, ]
 N <- 3
 
 JLLinputs <- list(

@@ -22,10 +22,11 @@ data("NumOutEx")
 \description{
 Numerical outputs for JPS-based model using Brazilian data
 }
-\keyword{-}
 \keyword{Brazil}
 \keyword{JPS}
 \keyword{Numerical}
+\keyword{an}
 \keyword{for}
+\keyword{illustrative}
 \keyword{model}
 \keyword{outputs}

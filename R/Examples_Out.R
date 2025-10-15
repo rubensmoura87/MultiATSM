@@ -1,7 +1,7 @@
 #' @title Complete list of several outputs from an ATSM
 #'
 #' @description Example for illustration used in the package vignette
-#' @name Out
+#' @name Out_Example
 #' @aliases Out_Example
 #' @docType data
 #' @usage data("Out_Example")
@@ -13,5 +13,5 @@
 #'    \item{NumOut}{List of numerical outputs}
 #'    \item{Bootstrap}{List of set of outputs after bootstrap}
 #'   }
-#' @keywords examples
+#' @keywords Numerical outputs for an illustrative JPS model for Brazil
 NULL

@@ -45,7 +45,7 @@ Economy <- "Brazil"
 FacLab <- LabFac(N = 1, DomVar = "Eco_Act", GlobalVar = "Gl_Eco_Act", Economy, ModelType)
 
 RiskFactorsGraphs(ModelType,
-  WishRFgraphs = FALSE, ModelParaEx, Economy, FacLab,
+  WishRFgraphs = FALSE, ParaSetEx, Economy, FacLab,
   Folder2save = NULL, verbose = FALSE
 )
 

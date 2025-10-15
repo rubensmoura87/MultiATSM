@@ -62,14 +62,14 @@ kableExtra::kbl(
 LoadData("CM_2024")
 
 ## -----------------------------------------------------------------------------
-data("CM_Yields")
+data("Yields")
 
 ## -----------------------------------------------------------------------------
-data("CM_GlobalMacroFactors")
-data("CM_DomMacroFactors")
+data("GlobalMacro")
+data("DomMacro")
 
 ## -----------------------------------------------------------------------------
-data("CM_Trade")
+data("TradeFlows")
 
 ## -----------------------------------------------------------------------------
 MacroData <- Load_Excel_Data(system.file("extdata", "MacroData.xlsx", package = "MultiATSM"))
@@ -156,7 +156,7 @@ BRWlist <- within(list(
 # 
 # DataFreq <- "Monthly"
 # 
-# ATSMInputs <- InputsForOpt(t0, tF, ModelType, Yields, GlobalMacroVar, DomesticMacroVar,
+# ATSMInputs <- InputsForOpt(t0, tF, ModelType, Yields, GlobalMacro, DomMacro,
 #   FactorLabels, Economies, DataFreq,
 #   CheckInputs = FALSE
 # )
@@ -211,25 +211,25 @@ g <- ggplot2::ggplot(data = w_pca, ggplot2::aes(x = mat)) +
 print(g)
 
 ## -----------------------------------------------------------------------------
-data("CM_Yields")
+data("Yields")
 Economies <- c("China", "Brazil", "Mexico", "Uruguay")
 N <- 3
 SpaFact <- Spanned_Factors(Yields, Economies, N)
 
 ## -----------------------------------------------------------------------------
-data("CM_Factors")
-PdynPara <- VAR(RiskFactors, VARtype = "unconstrained")
+data(RiskFacFull)
+PdynPara <- VAR(RiskFacFull, VARtype = "unconstrained")
 
 ## -----------------------------------------------------------------------------
-FactorsChina <- RiskFactors[1:7, ]
+FactorsChina <- RiskFacFull[1:7, ]
 PdynPara <- VAR(FactorsChina, VARtype = "unconstrained")
 
 ## -----------------------------------------------------------------------------
-data("CM_Factors_GVAR")
-GVARinputs <- list(Economies = Economies, GVARFactors = FactorsGVAR, VARXtype = "constrained: Inflation")
+data(GVARFactors)
+GVARinputs <- list(Economies = Economies, GVARFactors = GVARFactors, VARXtype = "constrained: Inflation")
 
 ## -----------------------------------------------------------------------------
-data("CM_Trade")
+data("TradeFlows")
 t_First <- "2006"
 t_Last <- "2019"
 Economies <- c("China", "Brazil", "Mexico", "Uruguay")
@@ -238,9 +238,9 @@ W_gvar <- Transition_Matrix(t_First, t_Last, Economies, type, TradeFlows)
 print(W_gvar)
 
 ## -----------------------------------------------------------------------------
-data("CM_Factors_GVAR")
+data(GVARFactors)
 GVARinputs <- list(
-  Economies = Economies, GVARFactors = FactorsGVAR, VARXtype = "unconstrained",
+  Economies = Economies, GVARFactors = GVARFactors, VARXtype = "unconstrained",
   Wgvar = W_gvar
 )
 N <- 3
@@ -255,9 +255,9 @@ JLLinputs <- list(
 )
 
 ## ----eval=FALSE---------------------------------------------------------------
-# data("CM_Factors")
+# data("RiskFacFull")
 # N <- 3
-# JLLpara <- JLL(RiskFactors, N, JLLinputs, CheckInputs = TRUE)
+# JLLpara <- JLL(RiskFacFull, N, JLLinputs, CheckInputs = TRUE)
 
 ## ----eval=FALSE---------------------------------------------------------------
 # ########################################################################################################
@@ -350,7 +350,7 @@ JLLinputs <- list(
 # 
 # # 3) Prepare the inputs of the likelihood function
 # ATSMInputs <- InputsForOpt(
-#   t0_sample, tF_sample, ModelType, Yields, GlobalMacroVar, DomesticMacroVar,
+#   t0_sample, tF_sample, ModelType, Yields, GlobalMacro, DomMacro,
 #   FactorLabels, Economies, DataFreq, GVARlist, JLLlist, WishBC, BRWlist
 # )
 # 
@@ -385,24 +385,24 @@ JLLinputs <- list(
 
 ## -----------------------------------------------------------------------------
 data("Out_Example")
-print(Out$ATSMInputs)
+print(Out_Example$ATSMInputs)
 
 ## -----------------------------------------------------------------------------
-summary(Out$ATSMInputs)
+summary(Out_Example$ATSMInputs)
 
 ## -----------------------------------------------------------------------------
-summary(Out$ModelPara)
+summary(Out_Example$ModelPara)
 
 ## ----fig.alt="GIRFs - Responses of yields curves in China and Brazil to a global economic shocks"----
-GIRF_all <- autoplot(Out$NumOut, type = "GIRF_Yields")
+GIRF_all <- autoplot(Out_Example$NumOut, type = "GIRF_Yields")
 GIRF_all$Brazil$Gl_Eco_Act
 GIRF_all$China$Gl_Eco_Act
 
 ## ----fig.alt="GIRFs - Responses of 12-month maturity bonds in China and Brazil to several shocks"----
-GIRF_all_Boot <- autoplot(Out$Bootstrap, Out$NumOut, type = "GIRF_Yields_Boot")
+GIRF_all_Boot <- autoplot(Out_Example$Bootstrap, Out_Example$NumOut, type = "GIRF_Yields_Boot")
 GIRF_all_Boot$China$Y12M_China
 GIRF_all_Boot$Brazil$Y12M_Brazil
 
 ## ----fig.alt="Root mean square error (RMSE)"----------------------------------
-plot(Out$Forecasts)
+plot(Out_Example$Forecasts)
 

@@ -19,5 +19,5 @@ This is a re-submission. In this version I have:
 * reformatted the whole package using the *styler* package; 
 * replaced the binary combination 0/1 for FALSE/TRUE in the package documentation, as well as variable permissible choices;
 * included variable dimensions in the documentation of user-facing functions containing matrices;
-
+* improved the data documentation in several dimensions;
 

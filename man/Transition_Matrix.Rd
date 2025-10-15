@@ -63,7 +63,7 @@ if (GetExcelData) {
     DataConnectedness <- list_all_Trade
   }
 } else {
-  data(CM_Trade)
+  data(TradeFlows)
   DataConnectedness <- TradeFlows
 }
 
