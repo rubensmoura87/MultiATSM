@@ -10,3 +10,5 @@
 ^README\.Rmd$
 ^README\.html$
 ^data-raw$
+^doc$
+^Meta$

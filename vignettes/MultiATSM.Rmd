@@ -864,8 +864,7 @@ package to fully implement ATSMs. The console displays messages to help
 the user track the progress of the code execution at each step. Further
 on, the functions of this package are used to replicate some of the
 results presented in the original papers of JPS (2014), CM (2023) and CM
-(2024). See the [Paper Replication Vignette](Paper-Replications.html) of
-this package for a detailed reproduction.
+(2024). See the **paper replication vignette** (included with this package) for a detailed reproduction. 
 
 ## General template {#S:SectionTemplate}
 
