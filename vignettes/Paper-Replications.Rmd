@@ -145,7 +145,6 @@ kableExtra::kbl(TableP, align = "c", caption = "$P$-dynamics parameters") %>%
 ```
 
 ```{r, echo= FALSE}
-
 se <- data.frame(BR_jps_out$est.llk$sigma.e, ModelPara$`JPS original`$US$ModEst$Q$se)
 rownames(se) <- "se"
 colnames(se) <- c("MultiATSM", "BR (2017)")

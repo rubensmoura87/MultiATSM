@@ -49,6 +49,7 @@ test_that("Bias_Correc_VAR returns correct output structure (JPS model)", {
 
 # 2) Test output structure - "GVAR multi"
 test_that("Bias_Correc_VAR returns correct output structure (GVAR model)", {
+  set.seed(1)
   ModelType <- "GVAR multi"
 
   FactorLabels <- LabFac(N, DomVar, GlobalVar, Economies, ModelType)

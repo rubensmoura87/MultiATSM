@@ -25,9 +25,5 @@ Unspanned macro risk model outputs by Bauer and Rudebusch (2017)
 \references{
 Bauer, M. and Rudebusch, G. "Resolving the Spanning Puzzle in Macro-Finance Term Structure Models"
 }
-\keyword{(2014)}
-\keyword{JPS}
-\keyword{Set}
-\keyword{of}
-\keyword{outputs,}
+\keyword{outputs}
 \keyword{replication}

@@ -393,7 +393,7 @@ Get_llk <- function(P, Y, Z, N, mat, We, Wpca, K0Z, K1Z, SSZ, LoadBs, LoadAs, Mo
 #' computes the density function of a gaussian process
 #'
 #' @param res matrix of residuals (N x T)
-#' @param SS covariance matrices or array of covariance matrices (N x N)
+#' @param SSZ covariance matrices or array of covariance matrices (N x N)
 #'
 #' @keywords internal
 #'

@@ -22,3 +22,25 @@ This is a re-submission. In this version I have:
 * improved the data documentation in several dimensions;
 * added several files to the data-raw folder in order to replicate the various datasets available in the package;
 
+
+## Local Checks
+
+I have checked the package locally with:
+
+`devtools::check(args = c("--as-cran"))`
+
+and it passes with **no errors, warnings, or notes**.
+
+I have also verified Rd and documentation integrity using:
+`roxygen2::roxygenize()`
+`tools::checkRd()`
+Both checks completed without issues.
+
+## Additional Information
+
+The only message appearing on CRAN’s automated checks seems to be a **platform-specific HTML rendering warning** under `r-devel-linux-x86_64-debian-gcc`:
+
+*AdjustOptm_BS.html:62:1 (AdjustOptm_BS.Rd:18): Warning: missing </ul> before </div>*
+*...*
+
+This message does not appear under other platforms or local CRAN checks.

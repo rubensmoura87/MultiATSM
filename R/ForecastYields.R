@@ -28,7 +28,7 @@
 #' ModelType <- "JPS original"
 #' Economy <- "Brazil"
 #' FacLab <- LabFac(N = 1, DomVar = "Eco_Act", GlobalVar = "Gl_Eco_Act", Economy, ModelType)
-# Adjust Forecasting setting
+#'  # Adjust Forecasting setting
 #' InpForOutEx[[ModelType]]$Forecasting <- list(
 #'   WishForecast = 1, ForHoriz = 12, t0Sample = 1,
 #'   t0Forecast = 143, ForType = "Expanding"

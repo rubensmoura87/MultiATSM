@@ -7,9 +7,13 @@
 ImposeStat_True(params, K1Q, ub = 0.9999, lb = 1e-04)
 }
 \arguments{
+\item{params}{parameter of interest (scalar or matrix)}
+
 \item{K1Q}{risk-neutral feedback matrix}
 
-\item{x}{parameter of interest (scalar or matrix)}
+\item{ub}{upper bound. Default is 0.9999.}
+
+\item{lb}{lower bound. Default is 1e-4.}
 }
 \description{
 Makes sure that the stationary constraint under the risk-neutral measure is preserved

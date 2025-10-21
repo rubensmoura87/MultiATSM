@@ -27,7 +27,7 @@ smaller than 1. Set TRUE to impose this restriction.}
 \item{DataFreq}{character vector specifying the data frequency. Available options: "Daily All Days", "Daily Business Days",
 "Weekly", "Monthly", "Quarterly", "Annually".}
 
-\item{FactorLabels}{list. Labels for all variables present in the model, as returned by \code{\link{LabFac}}..}
+\item{FactorLabels}{list. Labels for all variables present in the model, as returned by \code{\link{LabFac}}.}
 
 \item{Economies}{character vector. Names of the \code{C} economies included in the system.}
 

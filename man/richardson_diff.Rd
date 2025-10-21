@@ -17,7 +17,7 @@ richardson_diff(f, x, i, h, fx0, nlevels = 5L)
 
 \item{fx0}{f(x), precomputed}
 
-\item{levels}{depth of extrapolation. Default is 5}
+\item{nlevels}{depth of extrapolation. Default is 5}
 }
 \description{
 Richardson extrapolation

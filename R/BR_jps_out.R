@@ -16,5 +16,5 @@
 #'    \item{R}{total number of  spanned factor of the model}
 #'   }
 #' @references Bauer, M. and Rudebusch, G. "Resolving the Spanning Puzzle in Macro-Finance Term Structure Models"
-#' @keywords Set of outputs, replication of JPS (2014)
+#' @keywords replication outputs
 NULL

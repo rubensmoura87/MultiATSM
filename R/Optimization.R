@@ -74,7 +74,7 @@ Optimization_PE <- function(ML_fun, ListInputSet, FactorLabels, Economies, Model
 #'                          smaller than 1. Set TRUE to impose this restriction.
 #' @param DataFreq  character vector specifying the data frequency. Available options: "Daily All Days", "Daily Business Days",
 #'                      "Weekly", "Monthly", "Quarterly", "Annually".
-#' @param FactorLabels list. Labels for all variables present in the model, as returned by \code{\link{LabFac}}..
+#' @param FactorLabels list. Labels for all variables present in the model, as returned by \code{\link{LabFac}}.
 #' @param Economies character vector. Names of the \code{C} economies included in the system.
 #' @param ModelType character. Model type to be estimated. Permissible choices: "JPS original", "JPS global", "GVAR single", "JPS multi", "GVAR multi", "JLL original", "JLL No DomUnit", "JLL joint Sigma".
 #' @param tol numeric. Convergence tolerance. The default is 1e-4.
@@ -257,7 +257,7 @@ K1XQStationary <- function(StationaryEigenvalues) {
 #' Optimization routine for the entire selected ATSM
 #'
 #' @param x0 List containing features for estimation of the risk-neutral parameters.
-#' @param FFvec Log-likelihood function
+#' @param MLvec Log-likelihood function
 #' @param EstType Estimation type. Available options: "BFGS" and "Nelder-Mead".
 #' @param tol convergence tolerance (scalar). Default value is set as 1e-4.
 #' @param verbose Logical flag controlling function messaging.
@@ -426,7 +426,7 @@ Optimization_Time <- function(start_time, verbose) {
 #' @param i coordinate index
 #' @param h base step size
 #' @param fx0 f(x), precomputed
-#' @param levels depth of extrapolation. Default is 5
+#' @param nlevels depth of extrapolation. Default is 5
 #'
 #' @keywords internal
 

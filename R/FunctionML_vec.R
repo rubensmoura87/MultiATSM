@@ -225,8 +225,10 @@ True_jordan_OneCountry <- function(ParaValue, stationary = FALSE) {
 ###########################################################################################################
 #' Makes sure that the stationary constraint under the risk-neutral measure is preserved
 #'
-#' @param x parameter of interest (scalar or matrix)
+#' @param params parameter of interest (scalar or matrix)
 #' @param K1Q risk-neutral feedback matrix
+#' @param ub upper bound. Default is 0.9999.
+#' @param lb lower bound. Default is 1e-4.
 #'
 #' @keywords internal
 

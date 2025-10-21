@@ -9,13 +9,13 @@ OptimizationSetup_ATSM(x0, MLvec, EstType, tol = 1e-04, verbose = FALSE)
 \arguments{
 \item{x0}{List containing features for estimation of the risk-neutral parameters.}
 
+\item{MLvec}{Log-likelihood function}
+
 \item{EstType}{Estimation type. Available options: "BFGS" and "Nelder-Mead".}
 
 \item{tol}{convergence tolerance (scalar). Default value is set as 1e-4.}
 
 \item{verbose}{Logical flag controlling function messaging.}
-
-\item{FFvec}{Log-likelihood function}
 }
 \description{
 Optimization routine for the entire selected ATSM
