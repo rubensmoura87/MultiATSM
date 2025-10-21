@@ -9,7 +9,7 @@
 #'   \item intercept (K x 1)
 #'   \item feedback matrix (K x K)
 #'   \item variance-covariance matrix (K x K) of a VAR(1)
-#'}
+#' }
 #'
 #' @section General Notation:
 #' \itemize{
@@ -84,7 +84,7 @@ Est_RestOLS <- function(LHS, RHS, Rmat) {
   Y_lg <- as.vector(YX)
 
   # Solve only for free parameters
-  Betas[idx_FreePara] <- solve(X_lg[idx_FreePara, idx_FreePara, drop = FALSE], Y_lg[idx_FreePara])
+  Betas[idx_FreePara] <- solve(X_lg[idx_FreePara, idx_FreePara, drop = FALSE], Y_lg[idx_FreePara], tol = 1e-25)
 
   return(Betas)
 }

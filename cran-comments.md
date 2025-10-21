@@ -20,4 +20,5 @@ This is a re-submission. In this version I have:
 * replaced the binary combination 0/1 for FALSE/TRUE in the package documentation, as well as variable permissible choices;
 * included variable dimensions in the documentation of user-facing functions containing matrices;
 * improved the data documentation in several dimensions;
+* added several files to the data-raw folder in order to replicate the various datasets available in the package;
 

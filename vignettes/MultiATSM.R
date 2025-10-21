@@ -169,9 +169,9 @@ DesiredGraphs <- c("Fit", "GIRF", "GFEVD") # Available options are: "Fit", "IRF"
 # "GFEVD", "TermPremia".
 
 ## -----------------------------------------------------------------------------
-WishGraphRiskFac <- FALSE 
-WishGraphYields <- TRUE 
-WishOrthoJLLgraphs <- FALSE 
+WishGraphRiskFac <- FALSE
+WishGraphYields <- TRUE
+WishOrthoJLLgraphs <- FALSE
 
 ## -----------------------------------------------------------------------------
 WishFPremia <- TRUE
@@ -238,7 +238,7 @@ W_gvar <- Transition_Matrix(t_First, t_Last, Economies, type, TradeFlows)
 print(W_gvar)
 
 ## -----------------------------------------------------------------------------
-data(GVARFactors)
+data("GVARFactors")
 GVARinputs <- list(
   Economies = Economies, GVARFactors = GVARFactors, VARXtype = "unconstrained",
   Wgvar = W_gvar

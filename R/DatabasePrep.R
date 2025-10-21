@@ -126,9 +126,10 @@ DatabasePrep <- function(t_First, t_Last, Economies, N, FactorLabels, ModelType,
 
   # 4) Fill in list with the corresponding factors
   # A) Country-specific variables (economy-related variables)
-  for (i in 1:C) {
+   for (i in 1:C) {
     for (j in 1:M) {
-      ListFactors[[Economies[i]]]$Factors[[j]] <- AllFactorsClean$DomMacro[[Economies[i]]][[FactorLabels$Domestic[j]]]
+      temp <- AllFactorsClean$DomMacro[[Economies[i]]][[FactorLabels$Domestic[j]]]
+      ListFactors[[Economies[i]]]$Factors[[j]] <- as.matrix(temp, ncol = 1 )
     }
   }
 

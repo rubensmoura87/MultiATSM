@@ -15,7 +15,7 @@ ForecastYields(
   WishBRW = FALSE,
   BRWlist = NULL,
   Folder2save = NULL,
-  verbose = FALSE
+  verbose = TRUE
 )
 }
 \arguments{

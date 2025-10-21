@@ -13,7 +13,7 @@
 #' \item{Domestic unspanned factors}{See \code{data("DomMacro")} for a detailed data description.}
 #' \item{Domestic spanned factors}{First three principal components of each country set of bond yields. See \code{data("Yields")} for a detailed data description.}
 #' \item{Domestic star factors}{Weighted average of foreign factors. See \code{\link{Transition_Matrix}} for the computation of weights.}
-#'}
+#' }
 #' @references Candelon, B. and Moura, R. (2024) "A Multicountry Model of the Term Structures of Interest Rates with a GVAR". (Journal of Financial Econometrics)
 #' @keywords Risk Factors GVAR
 NULL

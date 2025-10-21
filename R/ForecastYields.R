@@ -52,7 +52,7 @@
 #' @export
 
 ForecastYields <- function(ModelType, ModelPara, InputsForOutputs, FactorLabels, Economies, JLLlist = NULL,
-                           GVARlist = NULL, WishBRW = FALSE, BRWlist = NULL, Folder2save = NULL, verbose = FALSE) {
+                           GVARlist = NULL, WishBRW = FALSE, BRWlist = NULL, Folder2save = NULL, verbose = TRUE) {
   if (verbose) message("4) OUT-OF-SAMPLE FORECASTING ANALYSIS")
   forecast_info <- InputsForOutputs[[ModelType]]$Forecasting
 

@@ -91,5 +91,4 @@ Boot <- Bootstrap(ModelType, ParaSetEx, NumOutEx, Economy, InpForOutEx, FacLab,
 )
 }
 
-
 }

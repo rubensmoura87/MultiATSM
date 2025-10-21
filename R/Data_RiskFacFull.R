@@ -7,7 +7,7 @@
 #' @usage data("RiskFacFull")
 #' @format matrix containing the full risk factors: (i) global unspanned factors (global economic activity and global inflation); (ii) domestic unspanned factors (economic activity and inflation); and (iii) domestic spanned factors (level, slope, and curvature).
 #' Economic system is formed by Brazil, China, Mexico and Uruguay. The data have monthly frequency and span the period from June/2004 to January/2020.
-#'@source
+#' @source
 #' \describe{
 #' \item{Global unspanned factor}{ See \code{data("GlobalMacro")} for a detailed data description.}
 #' \item{Domestic unspanned factor}{See \code{data("DomMacro")} for a detailed data description.}

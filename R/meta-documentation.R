@@ -25,7 +25,6 @@
 #' The remaining datasets correspond to Candelon and Moura (2024) and include Brazil, China, Mexico, and Uruguay.
 #' @references
 #' \enumerate{
-#' \item
 #' \item Candelon, B. and Moura, R. (2023) "Sovereign yield curves and the COVID-19 in emerging markets". (Economic Modelling)
 #' \item Candelon, B. and Moura, R. (2024) "A Multicountry Model of the Term Structures of Interest Rates with a GVAR". (Journal of Financial Econometrics)
 #' }

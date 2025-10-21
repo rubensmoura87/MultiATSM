@@ -108,7 +108,6 @@ kableExtra::kbl(TableP, align = "c", caption = "$P$-dynamics parameters") %>%
   kableExtra::footnote(general = " $K0Z$ is the intercept and $K1Z$ is feedback matrix from the $P$-dynamics.")
 
 ## ----echo= FALSE--------------------------------------------------------------
-
 se <- data.frame(BR_jps_out$est.llk$sigma.e, ModelPara$`JPS original`$US$ModEst$Q$se)
 rownames(se) <- "se"
 colnames(se) <- c("MultiATSM", "BR (2017)")

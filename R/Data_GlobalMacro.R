@@ -15,4 +15,3 @@
 #' @references Candelon, B. and Moura, R. (2024) "A Multicountry Model of the Term Structures of Interest Rates with a GVAR". (Journal of Financial Econometrics)
 #' @keywords Global risk factors
 NULL
-

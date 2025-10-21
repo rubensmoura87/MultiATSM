@@ -1,8 +1,8 @@
 Package: MultiATSM
 Type: Package
 Title: Multicountry Term Structure of Interest Rates Models
-Version: 1.5.0
-Date: 2025-09-02
+Version: 1.4.0
+Date: 2025-10-21
 Authors@R: 
     person("Rubens", "Moura", , "rubens.gtmoura@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0001-8105-4729"))
@@ -30,3 +30,4 @@ Maintainer: Rubens Moura <rubens.gtmoura@gmail.com>
 Repository: CRAN
 Date/Publication: 2025-01-27 17:10:01 UTC
 Config/testthat/edition: 3
+LazyData: true

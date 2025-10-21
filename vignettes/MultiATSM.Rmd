@@ -500,9 +500,9 @@ Moreover, the user must select the types of variables of interest
 the orthogonalized version should be additionally included
 
 ```{r}
-WishGraphRiskFac <- FALSE 
-WishGraphYields <- TRUE 
-WishOrthoJLLgraphs <- FALSE 
+WishGraphRiskFac <- FALSE
+WishGraphYields <- TRUE
+WishOrthoJLLgraphs <- FALSE
 ```
 
 The function `InputsForOutputs()` can provide some guidance for
@@ -762,7 +762,7 @@ Having defined the form of the transition matrix, one can complete the
 check on the inputs provided in *GVARinputs*.
 
 ```{r}
-data(GVARFactors)
+data("GVARFactors")
 GVARinputs <- list(
   Economies = Economies, GVARFactors = GVARFactors, VARXtype = "unconstrained",
   Wgvar = W_gvar
@@ -934,7 +934,7 @@ WishGraphYields <- TRUE
 WishOrthoJLLgraphs <- FALSE
 
 # D) Bootstrap settings
-WishBootstrap <- TRUE 
+WishBootstrap <- TRUE
 BootList <- list(methodBS = "bs", BlockLength = 4, ndraws = 4, pctg = 95)
 # methodBS: bootstrap method. Available options: (i) 'bs' ; (ii) 'wild'; (iii) 'block'
 # BlockLength: Block length, necessary input for the block bootstrap method
@@ -942,7 +942,7 @@ BootList <- list(methodBS = "bs", BlockLength = 4, ndraws = 4, pctg = 95)
 # pctg: confidence level
 
 # E) Out-of-sample forecast
-WishForecast <- TRUE 
+WishForecast <- TRUE
 ForecastList <- list(ForHoriz = 12, t0Sample = 1, t0Forecast = 131, ForType = "Rolling")
 # ForHoriz: forecast horizon
 # t0Sample:   initial sample date

@@ -76,7 +76,7 @@ test_that("Bias_Correc_VAR returns correct output structure (GVAR model)", {
 
 # 3) Test output structure - "JLL original"
 test_that("Bias_Correc_VAR returns correct output structure (JLL model)", {
-  set.seed(1)
+  set.seed(20)
   ModelType <- "JLL original"
 
   FactorLabels <- LabFac(N, DomVar, GlobalVar, Economies, ModelType)

@@ -337,7 +337,7 @@ CheckJLLinputs <- function(RiskFactorsNonOrtho, JLLinputs) {
 
   # CHECK 3: Check for the consistency of dominant unit
   if ((grepl("JLL original", JLLinputs$JLLModelType) ||
-       grepl("JLL jointSigma", JLLinputs$JLLModelType)) & JLLinputs$DomUnit == "None") {
+    grepl("JLL jointSigma", JLLinputs$JLLModelType)) & JLLinputs$DomUnit == "None") {
     stop("In 'JLL original' and 'jointSigma', the  DomUnit input cannot be 'None'. One dominant country is required.")
   }
 

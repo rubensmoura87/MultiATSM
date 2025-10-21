@@ -42,7 +42,6 @@
 #' )
 #' }
 #'
-#'
 #' @section Available methods:
 #' - \code{autoplot(object, NumOutPE, type)}
 #'

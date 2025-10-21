@@ -882,7 +882,7 @@ TPDecompGraph <- function(ModelType, NumOut, ModelPara, WishRPgraphs, UnitYields
     T_dim <- ncol(Para_Set[[Economies[1]]]$Inputs$Y)
   } else {
     dt <- Para_Set$Inputs$dt
-    mat <- Para_Set$Inputss$mat
+    mat <- Para_Set$Inputs$mat
     Yields <- Para_Set$Inputs$Y
     T_dim <- ncol(Yields)
   }
@@ -1453,7 +1453,7 @@ FolderPrep_FEVDs <- function(OutputType, WishPdynamicsgraphs, WishYieldsgraphs, 
         dir.create(paste(Folder2Save, "/Outputs/", ModelType, "/Point Estimate/Model ", Economies,
           "/FEVD/Factors",
           sep = ""
-                ))
+        ))
       } else {
         dir.create(paste(Folder2Save, "/Outputs/", ModelType, "/Point Estimate/Model ", Economies,
           "/GFEVD/Factors",
@@ -1464,7 +1464,7 @@ FolderPrep_FEVDs <- function(OutputType, WishPdynamicsgraphs, WishYieldsgraphs, 
 
     # a.2) Folders for graph of yields
     if (WishYieldsgraphs == 1) {
-           if (OutputType == "FEVD") {
+      if (OutputType == "FEVD") {
         dir.create(paste(Folder2Save, "/Outputs/", ModelType, "/Point Estimate/Model ", Economies,
           "/FEVD/Yields",
           sep = ""
