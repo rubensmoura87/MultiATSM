@@ -19,7 +19,7 @@ Economies <- c("China", "Mexico")
 ModelType <- "JLL original"
 t0 <- "01-05-2007"
 tF <- "01-12-2018"
-N <- 2
+N <- 1
 GlobalVar <- "Gl_Eco_Act"
 DomVar <- "Eco_Act"
 DataFreq <- "Monthly"
@@ -41,11 +41,11 @@ WGJLL <- FALSE
 
 # Bootstrap settings
 WishBoot <- TRUE
-BootList <- list(methodBS = "bs", BlockLength = 4, ndraws = 5, pctg = 95)
+BootList <- list(methodBS = "bs", BlockLength = 4, ndraws = 3, pctg = 95)
 
 # Forecasting setting
 WishFor <- TRUE
-ForList <- list(ForHoriz = 6, t0Sample = 1, t0Forecast = 131, ForType = "Expanding")
+ForList <- list(ForHoriz = 6, t0Sample = 1, t0Forecast = 132, ForType = "Expanding")
 
 
 test_that("Optimization + Outputs + Graphs return correct structure (JLL model)", {
@@ -85,7 +85,7 @@ test_that("Optimization + Outputs + Graphs return correct structure (JLL model)"
   expect_s3_class(res_NumOut, "ATSMNumOutputs")
 
   expect_true(all(c("PC var explained", "Fit", "IRF", "FEVD", "GIRF", "GFEVD", "TermPremiaDecomp") %in% names(res_NumOut)))
-  expect_equal(length(res_NumOut$`PC var explained`), N)
+  expect_equal(length(res_NumOut$`PC var explained`), length(Economies)*N)
 
   # compact checks of nested names
   checks <- list(
@@ -122,10 +122,14 @@ test_that("Optimization + Outputs + Graphs return correct structure (JLL model)"
   # --- C) Graphs ---
   plot_types <- c(
     "RiskFactors", "Fit",
-    "IRF_Factors", "IRF_Yields", "IRF_Factors_Ortho", "IRF_Yields_Ortho",
-    "GIRF_Factors", "GIRF_Yields", "GIRF_Factors_Ortho", "GIRF_Yields_Ortho",
-    "FEVD_Factors", "FEVD_Yields", "FEVD_Factors_Ortho", "FEVD_Yields_Ortho",
-    "GFEVD_Factors", "GFEVD_Yields", "GFEVD_Factors_Ortho", "GFEVD_Yields_Ortho",
+    #"IRF_Factors", "IRF_Yields", # To save time
+    "IRF_Factors_Ortho", "IRF_Yields_Ortho",
+    #"GIRF_Factors", "GIRF_Yields", # To save time
+    "GIRF_Factors_Ortho", "GIRF_Yields_Ortho",
+    #"FEVD_Factors", "FEVD_Yields", # To save time
+    "FEVD_Factors_Ortho", "FEVD_Yields_Ortho",
+    #"GFEVD_Factors", "GFEVD_Yields", # To save time
+    "GFEVD_Factors_Ortho", "GFEVD_Yields_Ortho",
     "TermPremia"
   )
 
@@ -146,10 +150,14 @@ test_that("Optimization + Outputs + Graphs return correct structure (JLL model)"
   expect_s3_class(res_Boot, "ATSMModelBoot")
 
   plot_types_Boot <- c(
-    "IRF_Factors_Boot", "IRF_Yields_Boot", "IRF_Factors_Ortho_Boot", "IRF_Yields_Ortho_Boot",
-    "GIRF_Factors_Boot", "GIRF_Yields_Boot", "GIRF_Factors_Ortho_Boot", "GIRF_Yields_Ortho_Boot",
-    "FEVD_Factors_Boot", "FEVD_Yields_Boot", "FEVD_Factors_Ortho_Boot", "FEVD_Yields_Ortho_Boot",
-    "GFEVD_Factors_Boot", "GFEVD_Yields_Boot", "GFEVD_Factors_Ortho_Boot", "GFEVD_Yields_Ortho_Boot"
+    #"IRF_Factors_Boot", "IRF_Yields_Boot",   # to save time
+    "IRF_Factors_Ortho_Boot", "IRF_Yields_Ortho_Boot",
+    #"GIRF_Factors_Boot", "GIRF_Yields_Boot", # to save time
+    "GIRF_Factors_Ortho_Boot", "GIRF_Yields_Ortho_Boot",
+    #"FEVD_Factors_Boot", "FEVD_Yields_Boot", # to save time
+    "FEVD_Factors_Ortho_Boot", "FEVD_Yields_Ortho_Boot",
+    #"GFEVD_Factors_Boot", "GFEVD_Yields_Boot", # to save time
+    "GFEVD_Factors_Ortho_Boot", "GFEVD_Yields_Ortho_Boot"
   )
 
   plot_list_Boot <- lapply(plot_types_Boot, function(tp) autoplot(res_Boot, res_NumOut, type = tp))

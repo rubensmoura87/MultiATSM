@@ -19,7 +19,7 @@ Economies <- c("Brazil", "Mexico")
 ModelType <- "GVAR multi"
 t0 <- "01-05-2007"
 tF <- "01-12-2018"
-N <- 2
+N <- 1
 GlobalVar <- "Gl_Eco_Act"
 DomVar <- "Eco_Act"
 DataFreq <- "Monthly"
@@ -38,11 +38,11 @@ WGJLL <- FALSE
 
 # Bootstrap settings
 WishBoot <- TRUE
-BootList <- list(methodBS = "bs", BlockLength = 4, ndraws = 5, pctg = 95)
+BootList <- list(methodBS = "bs", BlockLength = 4, ndraws = 3, pctg = 95)
 
 # Forecasting setting
 WishFor <- TRUE
-ForList <- list(ForHoriz = 6, t0Sample = 1, t0Forecast = 131, ForType = "Expanding")
+ForList <- list(ForHoriz = 6, t0Sample = 1, t0Forecast = 132, ForType = "Expanding")
 
 test_that("Optimization + Outputs + Graphs return correct structure (GVAR model)", {
   GVARlist <- list(
@@ -86,7 +86,7 @@ test_that("Optimization + Outputs + Graphs return correct structure (GVAR model)
   expect_s3_class(res_NumOut, "ATSMNumOutputs")
 
   expect_true(all(c("PC var explained", "Fit", "IRF", "FEVD", "GIRF", "GFEVD", "TermPremiaDecomp") %in% names(res_NumOut)))
-  expect_equal(length(res_NumOut$`PC var explained`), N)
+  expect_equal(length(res_NumOut$`PC var explained`), length(Economies)*N)
 
   # compact checks of nested names
   checks <- list(

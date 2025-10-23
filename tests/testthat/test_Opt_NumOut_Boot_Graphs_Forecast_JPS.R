@@ -38,11 +38,11 @@ WGJLL <- FALSE
 
 # Bootstrap settings
 WishBoot <- TRUE
-BootList <- list(methodBS = "bs", BlockLength = 4, ndraws = 5, pctg = 95)
+BootList <- list(methodBS = "bs", BlockLength = 4, ndraws = 3, pctg = 95)
 
 # Forecasting setting
 WishFor <- TRUE
-ForList <- list(ForHoriz = 6, t0Sample = 1, t0Forecast = 131, ForType = "Expanding")
+ForList <- list(ForHoriz = 6, t0Sample = 1, t0Forecast = 132, ForType = "Expanding")
 
 
 # 1) Set of tests

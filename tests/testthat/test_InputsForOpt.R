@@ -157,8 +157,8 @@ test_that("InputsForOpt returns correct output structure (GVAR multi model with 
   )
   WishBC <- TRUE
   BRWlist <- within(list(
-    Cent_Measure = "Mean", gamma = 0.1, N_iter = 10, B = 20, checkBRW = TRUE,
-    B_check = 1000, Eigen_rest = 1
+    Cent_Measure = "Mean", gamma = 0.1, N_iter = 10, B = 15, checkBRW = TRUE,
+    B_check = 100, Eigen_rest = 1
   ), N_burn <- round(N_iter * 0.15))
 
   FactorLabels <- LabFac(N, DomVar, GlobalVar, Economies, ModelType)

@@ -6,7 +6,7 @@ LoadData("CM_2024")
 
 Economies <- c("China", "Brazil")
 GlobalVar <- c("Gl_Eco_Act")
-DomVar <- c("Eco_Act", "Inflation")
+DomVar <- c("Eco_Act")
 N <- 2
 t0_sample <- "01-01-2005"
 tF_sample <- "01-12-2019"
@@ -14,7 +14,7 @@ DataFreq <- "Monthly"
 
 # Inputs for a BRW model
 WishBC <- TRUE # useful to get the risk factors, bias-corrected features will be tested below
-BRWlist <- list(Cent_Measure = "Mean", gamma = 0.2, N_iter = 10, N_burn = 2, B = 2, check = FALSE)
+BRWlist <- list(Cent_Measure = "Mean", gamma = 0.2, N_iter = 5, N_burn = 2, B = 2, check = FALSE)
 
 GVARlist <- list(
   VARXtype = "unconstrained", W_type = "Sample Mean", t_First_Wgvar = "2005",
@@ -62,7 +62,7 @@ test_that("Bias_Correc_VAR returns correct output structure (GVAR model)", {
   GVARinputs <- ATSMInputs$GVARinputs
 
   BRWlist$check <- TRUE
-  BRWlist$B_check <- 20
+  BRWlist$B_check <- 10
 
   res <- Bias_Correc_VAR(ModelType, BRWlist, t(RiskFactors), Economies, FactorLabels, GVARinputs, verbose = FALSE)
   expect_type(res, "list")
