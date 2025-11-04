@@ -9,7 +9,7 @@
 #' @param Folder2save Folder path where the outputs will be stored.
 #' @param verbose Logical flag controlling function messaging.
 #'
-#' @importFrom ggplot2 ggplot theme_classic scale_x_date element_rect theme_minimal scale_x_continuous scale_y_continuous ggplot_build ggplot_gtable
+#' @importFrom ggplot2 ggplot theme_classic scale_x_date element_rect scale_fill_brewer theme_minimal scale_x_continuous scale_y_continuous ggplot_build ggplot_gtable expansion
 #' @importFrom cowplot plot_grid ggdraw draw_label
 #'
 #' @keywords internal
@@ -219,7 +219,7 @@ RiskFactorsGraphs <- function(ModelType, WishRFgraphs, ModelOutputs, Economies, 
   legend_data <- plot_list[[G + 1]]$data
   # Format legend
   legend_plot <- ggplot(legend_data, aes(x = TimeSpan, y = Value, color = Legend)) +
-    geom_line(size = 1) + # Make lines slightly thicker for legend clarity
+    geom_line(linewidth = 1) + # Make lines slightly thicker for legend clarity
     labs(color = "Legend") +
     theme_minimal() +
     theme(
@@ -608,7 +608,7 @@ IRFandGIRFgraphs <- function(ModelType, NumOut, WishPdynamicsgraphs, WishYieldsg
 #' @param Folder2save character. Folder path where the outputs will be stored.
 #' @param verbose logical. Flag controlling function messaging.
 #'
-#' @importFrom ggplot2 ggplot theme_classic aes element_text theme labs ggtitle element_blank aes_string geom_col geom_hline
+#' @importFrom ggplot2 ggplot theme_classic aes element_text theme labs ggtitle element_blank geom_col geom_hline
 #'
 #' @examples
 #' data("NumOutEx")
@@ -1345,10 +1345,13 @@ IRFandGIRFs_Format_Fac <- function(IRFFac) {
   K <- length(nmFactors) - 1
   plot_list <- list()
 
+
   for (x in 1:K) {
     p <- c()
-    p <- ggplot(IRFFac, aes_string(x = nmFactors[1], y = nmFactors[x + 1])) +
-      geom_line() +
+    mapping <- stats::setNames(list(IRFFac[[nmFactors[1]]], IRFFac[[nmFactors[x + 1]]]),
+                              c("x", "y"))
+    p <- ggplot(IRFFac, do.call(aes, mapping)) +
+     geom_line() +
       ggtitle(nmFactors[x + 1])
     p <- p + theme_classic() + theme(
       plot.title = element_text(size = 6, face = "bold", hjust = 0.5),
@@ -1375,7 +1378,11 @@ IRFandGIRFs_Format_Yields <- function(IRFYields) {
 
   for (x in 1:J) { # Generate graph-by-graph
     p <- c()
-    p <- ggplot(IRFYields, aes_string(x = nmYields[1], y = nmYields[x + 1])) +
+
+    mapping <- stats::setNames(list(IRFYields[[nmYields[1]]], IRFYields[[nmYields[x + 1]]]),
+                               c("x", "y"))
+
+    p <- ggplot(IRFYields, do.call(aes, mapping)) +
       geom_line() +
       labs(title = nmYields[x + 1])
     p <- p + theme_classic() + theme(
@@ -1878,6 +1885,9 @@ AdjustPathFEVDs <- function(OutputType, ElementType, PathsGraphs, Economies, Mod
 FEVDandGFEVDs_Graphs <- function(OutputType, FEVDlist, nmVarInt, Lab_Fac, PathsGraphs) {
   # Merge factors with a small contributions
   FEVDlist <- MergeFEVD_graphs(FEVDlist, Threshold = 0.05)
+  # Make variable labels more readable
+  FEVDlist$variable <- factor(FEVDlist$variable,
+                              labels = clean_labels(levels(factor(FEVDlist$variable))))
 
   index <- FEVDlist$index
   value <- FEVDlist$value
@@ -1885,6 +1895,8 @@ FEVDandGFEVDs_Graphs <- function(OutputType, FEVDlist, nmVarInt, Lab_Fac, PathsG
 
   p <- ggplot(FEVDlist, aes(x = index, y = value, fill = variable)) +
     geom_col(position = "dodge") +
+    scale_fill_brewer(palette = "Set2") + # color-friendly pallet
+    scale_y_continuous(limits = c(0, NA), expand = expansion()) +
     labs(title = paste0(OutputType, " - ", nmVarInt)) +
     theme_classic() +
     theme(
@@ -1955,4 +1967,22 @@ MergeFEVD_graphs <- function(FEVDlist, Threshold = 0.05) {
   FEVD_cleaned <- stats::aggregate(value ~ index + variable, data = FEVD_cleaned, sum)
 
   return(FEVD_cleaned)
+}
+###########################################################################################################
+#' Modify variable labels to make legends more readable
+#'
+#' @param x variable labels prior to the modification
+#' @keywords internal
+
+clean_labels <- function(x) {
+  # Replace underscores and dots with spaces or dashes
+  x <- gsub("_", " ", x)
+  x <- gsub("\\.", " - ", x)
+
+  # Capitalize first letter of each word
+  x <- sapply(strsplit(x, " "), function(words) {
+    paste(toupper(substring(words, 1, 1)), substring(words, 2), sep = "", collapse = " ")
+  })
+
+  return(x)
 }

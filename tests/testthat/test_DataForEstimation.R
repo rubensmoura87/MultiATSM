@@ -36,7 +36,7 @@ test_that("DataForEstimation returns correct structure for GVAR model", {
   ModelType <- "GVAR multi"
   FactorLabels <- LabFac(N, DomVar, GlobalVar, Economies, ModelType)
   DataFrequency <- "Monthly"
-  data("CM_Trade")
+  #data("CM_Trade")
   res <- DataForEstimation(t0, tF, Economies, N, FactorLabels, ModelType, DataFrequency, MacroAllData,
     YieldsAllData, TradeFlows,
     W_type = "Sample Mean",

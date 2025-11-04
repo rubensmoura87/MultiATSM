@@ -316,7 +316,6 @@ autoplot.ATSMNumOutputs <- function(x, type, ...) {
   verb <- FALSE
   UMY <- info$Inputs$UnitMatYields
 
-  # ModelType, WishRFgraphs, ModelOutputs, Economies, FactorLabels, Folder2save, verbose
   # 3) Dispatch to appropriate plotting function
   switch(type,
     # 1) Risk Factors

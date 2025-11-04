@@ -82,11 +82,11 @@ IRFandGIRFbs <- function(ModelType, ModelBootstrap, NumOutPE, InputsForOutputs, 
   # 4) PLOTS
   WG <- WishGraphs_IRFandGIRF_Boot(InputsForOutputs, ModelType)
 
-  if (any(c(WG$Fac, WG$Yields) == 1)) {
+  if (any(c(WG$Fac, WG$Yields))) {
     if (verbose) message(" ** IRFs/GIRFs (Bootstrap)")
 
     # a) Factors
-    if (any(WG$Fac == 1)) {
+    if (any(WG$Fac)) {
       Boot_Fac_Graphs(
         NumOutBounds, NumOutPE, ModelType, K, Horiz, Economies, PathsGraphs, "IRF", Folder2save,
         WG$Fac, WG$Fac_Ortho
@@ -94,7 +94,7 @@ IRFandGIRFbs <- function(ModelType, ModelBootstrap, NumOutPE, InputsForOutputs, 
     }
 
     # b) Yields
-    if (any(WG$Yields == 1)) {
+    if (any(WG$Yields)) {
       Boot_Yields_Graphs(
         NumOutBounds, NumOutPE, ModelType, K, J, Horiz, Economies, PathsGraphs, "IRF", Folder2save,
         WG$Yields, WG$Yields_Ortho
@@ -150,7 +150,7 @@ FEVDandGFEVDbs <- function(ModelType, ModelBootstrap, NumOutPE, InputsForOutputs
     if (verbose) message(" ** FEVDs/GFEVDs (Bootstrap)")
 
     # a) Factors
-    if (any(WG$Fac == 1)) {
+    if (any(WG$Fac)) {
       Boot_Fac_Graphs(
         NumOutBounds, NumOutPE, ModelType, K, Horiz, Economies, PathsGraphs, "FEVD",
         Folder2save, WG$Fac, WG$Fac_Ortho
@@ -158,7 +158,7 @@ FEVDandGFEVDbs <- function(ModelType, ModelBootstrap, NumOutPE, InputsForOutputs
     }
 
     # b) Yields
-    if (any(WG$Yields == 1)) {
+    if (any(WG$Yields)) {
       Boot_Yields_Graphs(
         NumOutBounds, NumOutPE, ModelType, K, J, Horiz, Economies, PathsGraphs, "FEVD",
         Folder2save, WG$Yields, WG$Yields_Ortho
@@ -823,10 +823,10 @@ Boot_graph_template <- function(ALLdata, nmResponse) {
   TimeSpan <- ALLdata$TimeSpan
 
   p <- ggplot(data = ALLdata, aes(x = TimeSpan)) +
-    geom_line(aes(y = LL), color = "#0072B2") +
-    geom_line(aes(y = MM), color = "#009E73") +
-    geom_line(aes(y = UU), color = "#D55E00") +
-    geom_line(aes(y = PP)) +
+    geom_line(aes(y = LL), color = "gray50", linetype = "dashed") +
+    geom_line(aes(y = MM), color = "#009E73", linewidth = 1) +
+    geom_line(aes(y = UU), color = "gray50", linetype = "dashed") +
+    geom_line(aes(y = PP), linewidth = 1) +
     theme_classic() +
     theme(
       plot.title = element_text(size = 6, face = "bold", hjust = 0.5),
