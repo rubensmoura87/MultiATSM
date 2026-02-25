@@ -54,9 +54,8 @@ install.packages("MultiATSM")
 
 ## More information about `{MultiATSM}`
 
-You can learn more about the underlying models in the working paper
-published in the [LIDAM-LFIN
-Series.](https://dial.uclouvain.be/pr/boreal/object/boreal%3A259119/datastream/PDF_01/view#:~:text=Abstract,sample%20forecasting%20of%20bond%20yields.).
+You can learn more about the underlying models in the paper published in
+the [R Journal](https://journal.r-project.org/articles/RJ-2025-044/).
 
 ## References
 
@@ -82,5 +81,9 @@ Series.](https://dial.uclouvain.be/pr/boreal/object/boreal%3A259119/datastream/P
 - Jotikasthira, C., Le, A., & Lundblad, C. (2015). Why do term
   structures in different currencies co-move?. *Journal of Financial
   Economics*, 115(1), 58-83.
+
+- Moura, R (2025). MultiATSM: An R Package for Arbitrage-Free
+  Macrofinance Multicountry Affine Term Structure Models. *The R
+  Journal*, 17(4), 275-304.
 
 - See also the references in the package documentation.

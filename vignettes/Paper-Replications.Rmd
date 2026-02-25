@@ -25,7 +25,7 @@ A thorough explanation on the usage of the additional functionalities of the *Mu
 library(MultiATSM)
 ```
 
-# Joslin, Priebisch and Singleton (2014)
+# Joslin, Priebsch and Singleton (2014)
 
 The database used in this replication was constructed by @BauerRudebusch2017 (BR, 2017) and is available at [Bauer's website](https://www.michaeldbauer.com/publication/spanning-puzzle/). In that paper, BR (2017) investigate whether macro-finance term structure models better suit the unspanned macro risk framework by JPS (2014) or the earlier traditional spanned settings as the one by @AngPiazzesi2003JME. Accordingly, BR (2017) intend to replicate some of the empirical results reported in JPS (2014). The R-code used by BR (2017) is also available at [Bauer's website](https://www.michaeldbauer.com/publication/spanning-puzzle/).
 

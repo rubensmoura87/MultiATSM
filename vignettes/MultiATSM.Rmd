@@ -36,7 +36,7 @@ these models assume the absence of arbitrage opportunities, consider a
 linear state space representation of the yield curve dynamics and offer 
 a tractable approach to simultaneously combine the traditional yield curve 
 factors (spanned factors) along with macroeconomic variables
-(unspanned factors).
+(unspanned factors). A formal exposition of the model’s underlying features can be found in @Moura2025.
 
 The *MultiATSM* package currently supports the generation of outputs for
 eight distinct classes of ATSMs. Specifically, the package accommodates
