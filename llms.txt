@@ -1,0 +1,235 @@
+## Overview
+
+MultiATSM is an R package for estimating, analyzing, and forecasting
+multi-country macro-finance affine term structure models (ATSMs). The
+package implements a variety of models, including JPS, GVAR, and JLL
+frameworks (see complete references below), and provides tools for bias
+correction, bootstrap analysis, and graphical/numerical outputs.
+
+## Features
+
+- Estimation of multi-country ATSMs (JPS, 2014, JLL, 2015, GVAR,
+  2023-2024, and variants)
+- Flexible input structure for macroeconomic and yield data
+- Graphical and numerical outputs for model diagnostics and
+  interpretation
+- Bias correction for a VAR dynamics (BRW, 2012)
+- Bootstrap analysis for confidence intervals
+- Out-of-sample forecasting
+
+## Installation
+
+You can install the development version of MultiATSM from
+[GitHub](https://github.com/) with:
+
+``` r
+# install.packages("devtools")
+devtools::install_github("rubensmoura87/MultiATSM")
+```
+
+You can also get the official release version from CRAN
+
+``` r
+install.packages("MultiATSM")
+```
+
+## Usage and documentation
+
+- See the package
+  [manual](https://rubensmoura87.github.io/MultiATSM/reference/index.html)
+  and
+  [vignettes](https://rubensmoura87.github.io/MultiATSM/articles/MultiATSM.html)
+  for detailed function documentation and examples.
+- Main functions: `InputsForOpt`, `Bias_Correc_VAR`, `Optimization`,
+  `NumOutputs`, `Bootstrap`, `ForecastYields`, etc.
+
+## More information about `{MultiATSM}`
+
+You can learn more about the underlying models in the paper published in
+the [R Journal](https://journal.r-project.org/articles/RJ-2025-044/).
+
+## References
+
+- Bauer, M. D., Rudebusch, G. D., & Wu, J. C. (2012). Correcting
+  estimation bias in dynamic term structure models. *Journal of Business
+  & Economic Statistics*, 30(3), 454-467.
+
+- Candelon, B., & Moura, R. (2023). Sovereign yield curves and the
+  COVID-19 in emerging markets. *Economic Modelling*, 127, 106453.
+
+- Candelon, B., & Moura, R. (2024). A Multicountry Model of the Term
+  Structures of Interest Rates with a GVAR. *Journal of Financial
+  Econometrics*, 22(5), 1558-1587.
+
+- Joslin, S., Priebsch, M., & Singleton, K. J. (2014). Risk premiums in
+  dynamic term structure models with unspanned macro risks. *The Journal
+  of Finance*, 69(3), 1197-1233.
+
+- Joslin, S., Singleton, K. J., & Zhu, H. (2011). A new perspective on
+  Gaussian dynamic term structure models. *The Review of Financial
+  Studies*, 24(3), 926-970.
+
+- Jotikasthira, C., Le, A., & Lundblad, C. (2015). Why do term
+  structures in different currencies co-move?. *Journal of Financial
+  Economics*, 115(1), 58-83.
+
+- Moura, R (2025). MultiATSM: An R Package for Arbitrage-Free
+  Macrofinance Multicountry Affine Term Structure Models. *The R
+  Journal*, 17(4), 275-304.
+
+- See also the references in the package documentation.
+
+# Package index
+
+## Dataset
+
+Datasets included in the package
+
+- [`MultiATSM_datasets`](https://rubensmoura87.github.io/MultiATSM/reference/MultiATSM_datasets.md)
+  : Overview of Datasets Included in the MultiATSM Package
+- [`GlobalMacro`](https://rubensmoura87.github.io/MultiATSM/reference/GlobalMacro.md)
+  : Data: Risk Factors - Candelon and Moura (2024, JFEC)
+- [`GlobalMacro_covid`](https://rubensmoura87.github.io/MultiATSM/reference/GlobalMacro_covid.md)
+  : Data: Risk Factors - Candelon and Moura (2023, EM)
+- [`DomMacro`](https://rubensmoura87.github.io/MultiATSM/reference/DomMacro.md)
+  : Data: domestic risk factors - Candelon and Moura (2024, JFEC)
+- [`DomMacro_covid`](https://rubensmoura87.github.io/MultiATSM/reference/DomMacro_covid.md)
+  : Data: Risk Factors for the GVAR - Candelon and Moura (2023)
+- [`TradeFlows`](https://rubensmoura87.github.io/MultiATSM/reference/TradeFlows.md)
+  : Data: Trade Flows - Candelon and Moura (2024, JFEC)
+- [`TradeFlows_covid`](https://rubensmoura87.github.io/MultiATSM/reference/TradeFlows_covid.md)
+  : Data: Trade Flows - Candelon and Moura (2023, EM)
+- [`Yields`](https://rubensmoura87.github.io/MultiATSM/reference/Yields.md)
+  : Data: bond yield data - Candelon and Moura (2024, JFEC)
+- [`Yields_covid`](https://rubensmoura87.github.io/MultiATSM/reference/Yields_covid.md)
+  : Data: Yields - Candelon and Moura (2023)
+- [`RiskFacFull`](https://rubensmoura87.github.io/MultiATSM/reference/RiskFacFull.md)
+  : Data: Full set of risk factors - Candelon and Moura (2024, JFEC)
+- [`GVARFactors`](https://rubensmoura87.github.io/MultiATSM/reference/GVARFactors.md)
+  : Data: Risk Factors for the GVAR - Candelon and Moura (2024, JFEC)
+
+## Data handling
+
+Functions for handling and transforming data
+
+- [`DataForEstimation()`](https://rubensmoura87.github.io/MultiATSM/reference/DataForEstimation.md)
+  : Retrieves data from Excel and builds the database used in the model
+  estimation
+- [`DatabasePrep()`](https://rubensmoura87.github.io/MultiATSM/reference/DatabasePrep.md)
+  : Gather data of several countries in a list. Particularly useful for
+  GVAR-based setups (Compute "GVARFactors")
+- [`LoadData()`](https://rubensmoura87.github.io/MultiATSM/reference/LoadData.md)
+  : Loads data sets from several papers
+- [`Load_Excel_Data()`](https://rubensmoura87.github.io/MultiATSM/reference/Load_Excel_Data.md)
+  : Read data from Excel files and return a named list of data frames
+- [`InputsForOutputs()`](https://rubensmoura87.github.io/MultiATSM/reference/InputsForOutputs.md)
+  : Collects the inputs that are used to construct the numerical and
+  graphical outputs
+- [`LabFac()`](https://rubensmoura87.github.io/MultiATSM/reference/LabFac.md)
+  : Generates the labels for risk factors used in the model
+
+## Estimation of model P-dynamics
+
+Functions for estimating the parameters from the P-dynamics
+
+- [`Bias_Correc_VAR()`](https://rubensmoura87.github.io/MultiATSM/reference/Bias_Correc_VAR.md)
+  : Estimates an unbiased VAR(1) using stochastic approximation (Bauer,
+  Rudebusch and Wu, 2012)
+- [`GVAR()`](https://rubensmoura87.github.io/MultiATSM/reference/GVAR.md)
+  : Estimates a GVAR(1) and VARX(1,1,1) models
+- [`JLL()`](https://rubensmoura87.github.io/MultiATSM/reference/JLL.md)
+  : Estimates the P-dynamics from JLL-based models
+- [`Transition_Matrix()`](https://rubensmoura87.github.io/MultiATSM/reference/Transition_Matrix.md)
+  : Computes the transition matrix required in the estimation of the
+  GVAR model
+- [`VAR()`](https://rubensmoura87.github.io/MultiATSM/reference/VAR.md)
+  : Estimates a standard VAR(1)
+
+## Methods
+
+Available methods for several object classes
+
+- [`autoplot()`](https://rubensmoura87.github.io/MultiATSM/reference/autoplot.md)
+  : Autoplot generic function
+- [`autoplot(`*`<ATSMModelBoot>`*`)`](https://rubensmoura87.github.io/MultiATSM/reference/autoplot.ATSMModelBoot.md)
+  : Autoplot method for ATSMModelBoot objects
+- [`autoplot(`*`<ATSMNumOutputs>`*`)`](https://rubensmoura87.github.io/MultiATSM/reference/autoplot.ATSMNumOutputs.md)
+  : Autoplot method for ATSMNumOutputs objects
+- [`plot(`*`<ATSMModelForecast>`*`)`](https://rubensmoura87.github.io/MultiATSM/reference/plot.ATSMModelForecast.md)
+  : Plot method for ATSMModelForecast objects
+- [`print(`*`<ATSMModelInputs>`*`)`](https://rubensmoura87.github.io/MultiATSM/reference/print.ATSMModelInputs.md)
+  : Print method for ATSMModelInputs objects
+- [`summary(`*`<ATSMModelInputs>`*`)`](https://rubensmoura87.github.io/MultiATSM/reference/summary.ATSMModelInputs.md)
+  : Summary method for ATSMModelInputs objects
+- [`summary(`*`<ATSMModelOutputs>`*`)`](https://rubensmoura87.github.io/MultiATSM/reference/summary.ATSMModelOutputs.md)
+  : Summary method for ATSMModelOutputs objects
+
+## Graphs
+
+Functions to generate graphical outputs
+
+- [`FEVDandGFEVDgraphs()`](https://rubensmoura87.github.io/MultiATSM/reference/FEVDandGFEVDgraphs.md)
+  : FEVD and GFEVD graphs for all models
+- [`Fitgraphs()`](https://rubensmoura87.github.io/MultiATSM/reference/Fitgraphs.md)
+  : Model fit graphs for all models
+- [`IRFandGIRFgraphs()`](https://rubensmoura87.github.io/MultiATSM/reference/IRFandGIRFgraphs.md)
+  : IRF and GIRF graphs for all models
+- [`RiskFactorsGraphs()`](https://rubensmoura87.github.io/MultiATSM/reference/RiskFactorsGraphs.md)
+  : Spanned and unspanned factors plot
+- [`TPDecompGraph()`](https://rubensmoura87.github.io/MultiATSM/reference/TPDecompGraph.md)
+  : Term Premia decomposition graphs for all models
+
+## Spanned factors-related
+
+Functions related to the computation of spanned factors
+
+- [`Spanned_Factors()`](https://rubensmoura87.github.io/MultiATSM/reference/Spanned_Factors.md)
+  : Computes the country-specific spanned factors
+- [`pca_weights_one_country()`](https://rubensmoura87.github.io/MultiATSM/reference/pca_weights_one_country.md)
+  : Computes the PCA weights for a single country
+
+## Optimization-related
+
+Model optimization, numerical outputs, bootstrap and forecasting
+
+- [`Bootstrap()`](https://rubensmoura87.github.io/MultiATSM/reference/Bootstrap.md)
+  : Generates the bootstrap-related outputs
+- [`ForecastYields()`](https://rubensmoura87.github.io/MultiATSM/reference/ForecastYields.md)
+  : Generates forecasts of bond yields for all model types
+- [`InputsForOpt()`](https://rubensmoura87.github.io/MultiATSM/reference/InputsForOpt.md)
+  : Generates inputs necessary to build the likelihood function for the
+  ATSM model
+- [`Optimization()`](https://rubensmoura87.github.io/MultiATSM/reference/Optimization.md)
+  : Perform the optimization of the log-likelihood function of the
+  chosen ATSM
+- [`NumOutputs()`](https://rubensmoura87.github.io/MultiATSM/reference/NumOutputs.md)
+  : Constructs the model numerical outputs (model fit, IRFs, GIRFs,
+  FEVDs, GFEVDs, and term premia)
+
+## Pre-loaded outputs
+
+Pre computed outputs
+
+- [`BR_jps_out`](https://rubensmoura87.github.io/MultiATSM/reference/BR_jps_out.md)
+  : Replications of the JPS (2014) outputs by Bauer and Rudebusch (2017)
+- [`InpForOutEx`](https://rubensmoura87.github.io/MultiATSM/reference/InpForOutEx.md)
+  : Example of list inputs used in the construction of several model
+  outputs
+- [`ParaSetEx`](https://rubensmoura87.github.io/MultiATSM/reference/ParaSetEx.md)
+  : Example of parameter set after optimization
+- [`NumOutEx`](https://rubensmoura87.github.io/MultiATSM/reference/NumOutEx.md)
+  : Example of computed numerical outputs
+- [`Out_Example`](https://rubensmoura87.github.io/MultiATSM/reference/Out_Example.md)
+  : Complete list of several outputs from an ATSM
+- [`MultiATSM`](https://rubensmoura87.github.io/MultiATSM/reference/MultiATSM.md)
+  [`MultiATSM-package`](https://rubensmoura87.github.io/MultiATSM/reference/MultiATSM.md)
+  : ATSM Package
+
+# Articles
+
+### All vignettes
+
+- [MultiATSM package - General
+  Guidelines](https://rubensmoura87.github.io/MultiATSM/articles/MultiATSM.md):
+- [Paper
+  Replications](https://rubensmoura87.github.io/MultiATSM/articles/Paper-Replications.md):

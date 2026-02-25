@@ -1,0 +1,68 @@
+# Build P-dynamic graphs after the bootstrap implementation
+
+Build P-dynamic graphs after the bootstrap implementation
+
+## Usage
+
+``` r
+Boot_Fac_Graphs(
+  NumOutBounds,
+  NumOutPE,
+  ModelType,
+  FacDim,
+  Horiz,
+  Economies,
+  PathsGraphs,
+  OutInt,
+  Folder2save,
+  WishFacGraphs,
+  WishFacGraphsOrtho = NULL
+)
+```
+
+## Arguments
+
+- NumOutBounds:
+
+  numerical output set from the bootstrap analysis
+
+- NumOutPE:
+
+  numerical output set from the point estimate analysis
+
+- ModelType:
+
+  desired model type
+
+- FacDim:
+
+  dimension of the risk factor set
+
+- Horiz:
+
+  horizon of numerical outputs
+
+- Economies:
+
+  Economies that are part of the economic system
+
+- PathsGraphs:
+
+  Path to save the desired graphs
+
+- OutInt:
+
+  available options are "IRF", "FEVD", "GIRF" or "GFEVD"
+
+- Folder2save:
+
+  Folder path where the outputs will be stored.
+
+- WishFacGraphs:
+
+  Binary variable reflecting the graphs of interest
+
+- WishFacGraphsOrtho:
+
+  Binary variable reflecting the graphs of interest (orthogonalized
+  version). Default is NULL

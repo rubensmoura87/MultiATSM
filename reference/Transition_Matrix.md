@@ -1,0 +1,93 @@
+# Computes the transition matrix required in the estimation of the GVAR model
+
+Computes the transition matrix required in the estimation of the GVAR
+model
+
+## Usage
+
+``` r
+Transition_Matrix(t_First, t_Last, Economies, type, DataConnectedness)
+```
+
+## Arguments
+
+- t_First:
+
+  character. Sample starting date (format: yyyy).
+
+- t_Last:
+
+  character. Sample ending date (format: yyyy).
+
+- Economies:
+
+  character vector. Names of the `C` economies included in the system.
+
+- type:
+
+  character. Method for computing interdependence. Possible options:
+
+  - `"Time-varying"`: Computes time-varying interdependence and returns
+    weight matrices for each year.
+
+  - `"Sample Mean"`: Returns a single weight matrix with average weights
+    over the sample period.
+
+  - Specific year (e.g., "1998", "2005"): Computes time-invariant
+    interdependence for the specified year.
+
+- DataConnectedness:
+
+  list or data frame. Data used to compute the transition matrix (e.g.,
+  trade flows).
+
+## Value
+
+matrix or list of matrices. Time-varying or time-invariant transition
+matrix depending on 'type'.
+
+## Details
+
+If there is missing data for any country in a particular year, the
+transition matrix will include only NAs.
+
+## Examples
+
+``` r
+t_First <- "2006"
+t_Last <- "2019"
+Economies <- c("China", "Brazil", "Mexico", "Uruguay")
+type <- "Sample Mean"
+# Load data if Connectedness data from excel, otherwise use pre-saved data
+GetExcelData <- FALSE
+
+if (GetExcelData) {
+  if (!requireNamespace("readxl", quietly = TRUE)) {
+    stop(
+      "Please install package \"readxl\" to use this feature.",
+      call. = FALSE
+    )
+    DataPath <- system.file("extdata", "TradeData.xlsx", package = "MultiATSM")
+    tab_names_Trade <- readxl::excel_sheets(DataPath)
+    list_all_Trade <- suppressMessages(lapply(tab_names_Trade, function(x) {
+      readxl::read_excel(path = DataPath, sheet = x)
+    }))
+    names(list_all_Trade) <- tab_names_Trade
+
+    L <- length(list_all_Trade)
+
+    for (i in 1:L) {
+      Countries <- list_all_Trade[[i]][[1]]
+      list_all_Trade[[i]] <- as.data.frame(list_all_Trade[[i]][, -1])
+      rownames(list_all_Trade[[i]]) <- Countries
+    }
+
+    DataConnectedness <- list_all_Trade
+  }
+} else {
+  data(TradeFlows)
+  DataConnectedness <- TradeFlows
+}
+
+W_mat <- Transition_Matrix(t_First, t_Last, Economies, type, DataConnectedness)
+```
