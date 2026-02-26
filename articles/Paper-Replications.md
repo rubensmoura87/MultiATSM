@@ -342,7 +342,7 @@ Puzzle in Macro-Finance Term Structure Models.” *Review of Finance* 21
 
 Candelon, Bertrand, and Rubens Moura. 2023. “Sovereign Yield Curves and
 the COVID-19 in Emerging Markets.” *Economic Modelling*, 106453.
-https://doi.org/<https://doi.org/10.1016/j.econmod.2023.106453>.
+<https://doi.org/10.1016/j.econmod.2023.106453>.
 
 ———. 2024. “A Multicountry Model of the Term Structures of Interest
 Rates with a GVAR.” *Journal of Financial Econometrics* 22 (5): 1558–87.

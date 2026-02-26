@@ -131,6 +131,6 @@ Forecast <- ForecastYields(ModelType, ParaSetEx, InpForOutEx, FacLab, Economy,
 #> Out-of-sample forecast for the information set: 01-07-2006 || 01-05-2018 
 #> Out-of-sample forecast for the information set: 01-07-2006 || 01-06-2018 
 #> Out-of-sample forecast for the information set: 01-07-2006 || 01-07-2018 
-#> Elapsed time: 3.34 seconds
+#> Elapsed time: 3.50 seconds
 # }
 ```

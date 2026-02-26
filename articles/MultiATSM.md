@@ -1189,7 +1189,7 @@ of Business & Economic Statistics* 30 (3): 454–67.
 
 Candelon, Bertrand, and Rubens Moura. 2023. “Sovereign Yield Curves and
 the COVID-19 in Emerging Markets.” *Economic Modelling*, 106453.
-https://doi.org/<https://doi.org/10.1016/j.econmod.2023.106453>.
+<https://doi.org/10.1016/j.econmod.2023.106453>.
 
 ———. 2024. “A Multicountry Model of the Term Structures of Interest
 Rates with a GVAR.” *Journal of Financial Econometrics* 22 (5): 1558–87.
@@ -1211,4 +1211,4 @@ Economics* 115: 58–83.
 
 Moura, Rubens. 2025. “MultiATSM: An R Package for Arbitrage-Free
 Macrofinance Multicountry Affine Term Structure Models.” *The R Journal*
-17: 275–304. <https://doi.org/10.32614/RJ-2025-044>.
+17: 275–304.
