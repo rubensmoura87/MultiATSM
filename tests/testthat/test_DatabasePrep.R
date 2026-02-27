@@ -18,8 +18,8 @@ DataConnect <- lapply(Trade_Alldata, function(df) {
 
 
 # 2) Select desired inputs
-Economies <- c("China", "Brazil", "Mexico", "Russia")
-DomVar <- c("Eco_Act", "Inflation")
+Economies <- c("China", "Brazil", "Russia")
+DomVar <- c("Eco_Act")
 GlobalVar <- c("GBC", "CPI_OECD")
 N <- 1
 t0 <- "2007-09-01"

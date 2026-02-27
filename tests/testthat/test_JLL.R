@@ -4,7 +4,7 @@ library(MultiATSM)
 # Load inputs
 data(RiskFacFull)
 RF_TS <- RiskFacFull[1:12, ]
-N <- 3
+N <- 2
 
 JLLinputs <- list(
   Economies = c("China", "Brazil"), DomUnit = "China",

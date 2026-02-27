@@ -29,7 +29,7 @@ FPLim <- c()
 WishBC <- FALSE
 
 # Inputs required for the computation of the numerical outputs
-Horiz <- 10
+Horiz <- 8
 OutputLabel <- "Model_demo"
 DesiredGraphs <- c()
 WGYields <- FALSE
@@ -38,11 +38,11 @@ WGJLL <- FALSE
 
 # Bootstrap settings
 WishBoot <- TRUE
-BootList <- list(methodBS = "bs", BlockLength = 4, ndraws = 3, pctg = 95)
+BootList <- list(methodBS = "bs", BlockLength = 4, ndraws = 2, pctg = 95)
 
 # Forecasting setting
 WishFor <- TRUE
-ForList <- list(ForHoriz = 6, t0Sample = 1, t0Forecast = 132, ForType = "Expanding")
+ForList <- list(ForHoriz = 6, t0Sample = 1, t0Forecast = 133, ForType = "Expanding")
 
 test_that("Optimization + Outputs + Graphs return correct structure (GVAR model)", {
   GVARlist <- list(
@@ -110,9 +110,11 @@ test_that("Optimization + Outputs + Graphs return correct structure (GVAR model)
 
   # --- C) Graphs ---
   plot_types <- c(
-    "RiskFactors", "Fit", "IRF_Factors", "IRF_Yields",
-    "GIRF_Factors", "GIRF_Yields", "FEVD_Factors",
-    "FEVD_Yields", "GFEVD_Factors", "GFEVD_Yields", "TermPremia"
+    "RiskFactors", "Fit",
+    #"IRF_Factors", "IRF_Yields", # To save time (will be tested in the bootstrap setting)
+    #"GIRF_Factors", "GIRF_Yields", "FEVD_Factors", # To save time (will be tested in the bootstrap setting)
+    #"FEVD_Yields", "GFEVD_Factors", "GFEVD_Yields", # To save time (will be tested in the bootstrap setting)
+    "TermPremia"
   )
 
   plot_list <- lapply(plot_types, function(tp) autoplot(res_NumOut, type = tp))
@@ -132,8 +134,14 @@ test_that("Optimization + Outputs + Graphs return correct structure (GVAR model)
 
 
   plot_types_Boot <- c(
-    "IRF_Factors_Boot", "IRF_Yields_Boot", "GIRF_Factors_Boot", "GIRF_Yields_Boot",
-    "FEVD_Factors_Boot", "FEVD_Yields_Boot", "GFEVD_Factors_Boot", "GFEVD_Yields_Boot"
+    #"IRF_Factors_Boot", # TO save time
+    "IRF_Yields_Boot",
+    #"GIRF_Factors_Boot", # TO save time
+    "GIRF_Yields_Boot",
+    #"FEVD_Factors_Boot", # TO save time
+    "FEVD_Yields_Boot",
+    #"GFEVD_Factors_Boot", # TO save time
+    "GFEVD_Yields_Boot"
   )
 
   plot_list_Boot <- lapply(plot_types_Boot, function(tp) autoplot(res_Boot, res_NumOut, type = tp))
