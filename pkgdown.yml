@@ -4,7 +4,7 @@ pkgdown_sha: ~
 articles:
   MultiATSM: MultiATSM.html
   Paper-Replications: Paper-Replications.html
-last_built: 2026-02-25T23:59Z
+last_built: 2026-02-27T19:50Z
 urls:
   reference: https://rubensmoura87.github.io/MultiATSM/reference
   article: https://rubensmoura87.github.io/MultiATSM/articles

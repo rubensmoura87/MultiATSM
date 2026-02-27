@@ -135,7 +135,7 @@ Boot <- Bootstrap(ModelType, ParaSetEx, NumOutEx, Economy, InpForOutEx, FacLab,
   JLLlist = NULL,
   GVARlist = NULL, WishBC = FALSE, BRWlist = NULL, Folder2save = NULL, verbose = FALSE
 )
-#> Warning: cannot create dir '/tmp/RtmpPWG5lH/Outputs/JPS original/Bootstrap', reason 'No such file or directory'
-#> Warning: cannot create dir '/tmp/RtmpPWG5lH/Outputs/JPS original/Bootstrap/Model Brazil', reason 'No such file or directory'
+#> Warning: cannot create dir '/tmp/Rtmp5dLWOM/Outputs/JPS original/Bootstrap', reason 'No such file or directory'
+#> Warning: cannot create dir '/tmp/Rtmp5dLWOM/Outputs/JPS original/Bootstrap/Model Brazil', reason 'No such file or directory'
 # }
 ```
