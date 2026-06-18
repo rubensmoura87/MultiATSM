@@ -32,7 +32,7 @@ JLLlist <- list(DomUnit = "China")
 GVARlist <- NULL
 
 # Inputs required for the computation of the numerical outputs
-Horiz <- 8
+Horiz <- 4
 OutputLabel <- "Model_demo"
 DesiredGraphs <- c()
 WGYields <- FALSE
@@ -41,7 +41,7 @@ WGJLL <- FALSE
 
 # Bootstrap settings
 WishBoot <- TRUE
-BootList <- list(methodBS = "bs", BlockLength = 4, ndraws = 3, pctg = 95)
+BootList <- list(methodBS = "bs", BlockLength = 4, ndraws = 2, pctg = 95)
 
 # Forecasting setting
 WishFor <- TRUE

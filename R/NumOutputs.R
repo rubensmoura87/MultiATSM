@@ -1441,6 +1441,7 @@ Compute_EP <- function(ModelPara, ModelType, UnitYields, matAdjUnit, N, rhoList,
 
   k <- if (UnitYields == "Month") 12 else 1
   YLab <- if (UnitYields == "Month") "M" else "Y"
+  J <- length(matAdjUnit)
 
   if (WishFP) { # Forward premia features
     EP_Lab <- "FP_"
@@ -1467,9 +1468,9 @@ Compute_EP <- function(ModelPara, ModelType, UnitYields, matAdjUnit, N, rhoList,
     econ <- Economies[i]
     # a) Pre-allocation
     if (ModelType %in% SepQ_Lab) { # SepQ models
-      K0Z <- ParaSet[[Economies[i]]]$ModEst$P$K0Z
-      K1Z <- ParaSet[[Economies[i]]]$ModEst$P$K1Z
-      ZZ <- ParaSet[[Economies[i]]]$Inputs$AllFactors
+      K0Z <- ParaSet[[econ]]$ModEst$P$K0Z
+      K1Z <- ParaSet[[econ]]$ModEst$P$K1Z
+      ZZ <- ParaSet[[econ]]$Inputs$AllFactors
     }
 
     # b) Extract spanned factors from the list of unspanned factors
@@ -1490,7 +1491,20 @@ Compute_EP <- function(ModelPara, ModelType, UnitYields, matAdjUnit, N, rhoList,
     dimnames(avexpCS) <- list(colnames(ZZ), paste(EP_Lab, ExpecCompLength, YLab, sep = ""))
 
     for (h in 1:length(ExpecCompLength)) { # per bond maturity
-      for (t in 1:ncol(ZZ)) { # Per point in time
+      # Drop the 1-period maturity (If available), since by definition the expected component explains 100%
+      # of the 1-period maturity yield
+      if (h == 1 && matAdjUnit[1] == 1) {
+
+        if (ModelType %in% SepQ_Lab) {
+        avexpCS[ , 1] <- ModelPara[[ModelType]][[econ]]$Inputs$Y[1,]
+        } else {
+        idxJ <- (i-1)*J + 1
+        avexpCS[ , 1]  <- ModelPara[[ModelType]]$Inputs$Y[idxJ,]
+        }
+
+    } else {
+
+          for (t in 1:ncol(ZZ)) { # Per point in time
 
         # Initialization
         if (WishFP) {
@@ -1530,7 +1544,7 @@ Compute_EP <- function(ModelPara, ModelType, UnitYields, matAdjUnit, N, rhoList,
         avexpCS[t, h] <- mean(MaxExpec)
       }
     }
-
+    }
     avexp[[Economies[i]]] <- avexpCS * 100
   }
 

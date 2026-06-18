@@ -29,7 +29,7 @@ FPLim <- c(24, 36)
 WishBC <- FALSE
 
 # Inputs required for the computation of the numerical outputs
-Horiz <- 8
+Horiz <- 4
 OutputLabel <- "Model_demo"
 DesiredGraphs <- c()
 WGYields <- FALSE

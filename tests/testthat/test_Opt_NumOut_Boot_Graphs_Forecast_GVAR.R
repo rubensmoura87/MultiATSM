@@ -20,7 +20,7 @@ ModelType <- "GVAR multi"
 t0 <- "01-05-2007"
 tF <- "01-12-2018"
 N <- 1
-GlobalVar <- "Gl_Eco_Act"
+GlobalVar <- c()
 DomVar <- "Eco_Act"
 DataFreq <- "Monthly"
 StatQ <- FALSE
@@ -29,7 +29,7 @@ FPLim <- c()
 WishBC <- FALSE
 
 # Inputs required for the computation of the numerical outputs
-Horiz <- 8
+Horiz <- 4
 OutputLabel <- "Model_demo"
 DesiredGraphs <- c()
 WGYields <- FALSE
