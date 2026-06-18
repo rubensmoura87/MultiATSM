@@ -7,8 +7,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>MultiATSM package - General Guidelines • MultiATSM</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="MultiATSM package - General Guidelines">
 </head>
@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">MultiATSM</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.5.1-1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.5.1-2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -60,7 +60,7 @@
                         <h4 data-toc-skip class="author">Rubens
 Moura</h4>
             
-            <h4 data-toc-skip class="date">2026-02-27</h4>
+            <h4 data-toc-skip class="date">2026-06-18</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/rubensmoura87/MultiATSM/blob/main/vignettes/MultiATSM.Rmd" class="external-link"><code>vignettes/MultiATSM.Rmd</code></a></small>
       <div class="d-none name"><code>MultiATSM.Rmd</code></div>
@@ -75,23 +75,23 @@ MultiATSM package available at the <a href="https://cran.r-project.org/" class="
 <p>The <em>MultiATSM</em> package offers estimation routines and various
 outputs for single and multi-country affine term structure models
 (ATSMs). All the frameworks of this package are based on the unspanned
-economic risk framework from <span class="citation">Joslin, Priebsch,
-and Singleton (2014)</span> <strong>(JPS, 2014)</strong>. In essence,
-these models assume the absence of arbitrage opportunities, consider a
-linear state space representation of the yield curve dynamics and offer
-a tractable approach to simultaneously combine the traditional yield
-curve factors (spanned factors) along with macroeconomic variables
-(unspanned factors). A formal exposition of the model’s underlying
-features can be found in <span class="citation">Moura (2025)</span>.</p>
+economic risk framework from <span class="citation">Joslin et al.
+(2014)</span> <strong>(JPS, 2014)</strong>. In essence, these models
+assume the absence of arbitrage opportunities, consider a linear state
+space representation of the yield curve dynamics and offer a tractable
+approach to simultaneously combine the traditional yield curve factors
+(spanned factors) along with macroeconomic variables (unspanned
+factors). A formal exposition of the model’s underlying features can be
+found in <span class="citation">Moura (2025)</span>.</p>
 <p>The <em>MultiATSM</em> package currently supports the generation of
 outputs for eight distinct classes of ATSMs. Specifically, the package
 accommodates models estimated either on a <em>country-by-country</em>
 basis, following the approach of JPS (2014), or <em>jointly</em> across
 all countries within the economic system, as developed in <strong>JLL
-(2015)</strong> by <span class="citation">Jotikasthira, Le, and Lundblad
+(2015)</strong> by <span class="citation">Jotikasthira et al.
 (2015)</span> and <strong>CM (2024)</strong> by <span class="citation">Candelon and Moura (2024)</span>.</p>
-<p>Due to peculiar features of JPS-based specifications (see <span class="citation">Joslin, Singleton, and Zhu (2011)</span>), an efficient
-estimation of the parameters governing the risk-neutral
+<p>Due to peculiar features of JPS-based specifications (see <span class="citation">Joslin et al. (2011)</span>), an efficient estimation
+of the parameters governing the risk-neutral
 (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>Q</mi><annotation encoding="application/x-tex">Q</annotation></semantics></math>-measure)
 and the physical
 (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>P</mi><annotation encoding="application/x-tex">P</annotation></semantics></math>-measure)
@@ -868,11 +868,11 @@ system:</p>
 <div class="section level4">
 <h4 id="S:SectionBRWinputs">BRWlist<a class="anchor" aria-label="anchor" href="#S:SectionBRWinputs"></a>
 </h4>
-<p>In an influential paper, <span class="citation">Bauer, Rudebusch, and
-Wu (2012)</span> <strong>(BRW, 2012)</strong> have shown that the
-estimates from traditional ATSMs can be severely biased due to the
-typical small-sample size used in these studies. As result, such models
-may produce unreasonably stable expected future short-term interest,
+<p>In an influential paper, <span class="citation">Bauer et al.
+(2012)</span> <strong>(BRW, 2012)</strong> have shown that the estimates
+from traditional ATSMs can be severely biased due to the typical
+small-sample size used in these studies. As result, such models may
+produce unreasonably stable expected future short-term interest,
 therefore distorting the term premia estimates for long-maturity bonds.
 To circumvent this problem, they propose a bootstrap-based method that
 relies on indirect inference estimation that corrects for the bias
@@ -998,11 +998,11 @@ calculation of two risk compensation measures: term premia and forward
 premia. In particular, a
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>-maturity
 bond yield can be decomposed as the sum of its expected short-rate
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><mi>x</mi><msubsup><mi>p</mi><mi>t</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></msubsup></mrow><annotation encoding="application/x-tex">Exp_t^{(n)}</annotation></semantics></math>)
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><mi>x</mi><msubsup><mi>p</mi><mi>t</mi><mrow><mo stretchy="false" form="prefix">(</mo><mi>n</mi><mo stretchy="false" form="postfix">)</mo></mrow></msubsup></mrow><annotation encoding="application/x-tex">Exp_t^{(n)}</annotation></semantics></math>)
 and term premia
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><msubsup><mi>P</mi><mi>t</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></msubsup></mrow><annotation encoding="application/x-tex">TP_t^{(n)}</annotation></semantics></math>)
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><msubsup><mi>P</mi><mi>t</mi><mrow><mo stretchy="false" form="prefix">(</mo><mi>n</mi><mo stretchy="false" form="postfix">)</mo></mrow></msubsup></mrow><annotation encoding="application/x-tex">TP_t^{(n)}</annotation></semantics></math>)
 components. Technically:
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>y</mi><mi>t</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></msubsup><mo>=</mo><mi>E</mi><mi>x</mi><msubsup><mi>p</mi><mi>t</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></msubsup><mo>+</mo><mi>T</mi><msubsup><mi>P</mi><mi>t</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></msubsup></mrow><annotation encoding="application/x-tex">
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>y</mi><mi>t</mi><mrow><mo stretchy="false" form="prefix">(</mo><mi>n</mi><mo stretchy="false" form="postfix">)</mo></mrow></msubsup><mo>=</mo><mi>E</mi><mi>x</mi><msubsup><mi>p</mi><mi>t</mi><mrow><mo stretchy="false" form="prefix">(</mo><mi>n</mi><mo stretchy="false" form="postfix">)</mo></mrow></msubsup><mo>+</mo><mi>T</mi><msubsup><mi>P</mi><mi>t</mi><mrow><mo stretchy="false" form="prefix">(</mo><mi>n</mi><mo stretchy="false" form="postfix">)</mo></mrow></msubsup></mrow><annotation encoding="application/x-tex">
 y_t^{(n)} = Exp_t^{(n)} + TP_t^{(n)}
 </annotation></semantics></math> In the package’s standard form, the
 expected short rate term is computed from time
@@ -1010,14 +1010,14 @@ expected short rate term is computed from time
 to
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>t</mi><mo>+</mo><mi>n</mi></mrow><annotation encoding="application/x-tex">t+n</annotation></semantics></math>,
 which represents the bond’s maturity:
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><mi>x</mi><msubsup><mi>p</mi><mi>t</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></msubsup><mo>=</mo><msubsup><mo>∑</mo><mrow><mi>h</mi><mo>=</mo><mn>0</mn></mrow><mi>n</mi></msubsup><msub><mi>E</mi><mi>t</mi></msub><mrow><mo stretchy="true" form="prefix">[</mo><msubsup><mi>y</mi><mrow><mi>t</mi><mo>+</mo><mi>h</mi></mrow><mrow><mo stretchy="true" form="prefix">(</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow></msubsup><mo stretchy="true" form="postfix">]</mo></mrow></mrow><annotation encoding="application/x-tex">Exp_t^{(n)} = \sum_{h=0}^{n} E_t[y_{t+h}^{(1)}]</annotation></semantics></math>.
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><mi>x</mi><msubsup><mi>p</mi><mi>t</mi><mrow><mo stretchy="false" form="prefix">(</mo><mi>n</mi><mo stretchy="false" form="postfix">)</mo></mrow></msubsup><mo>=</mo><msubsup><mo>∑</mo><mrow><mi>h</mi><mo>=</mo><mn>0</mn></mrow><mi>n</mi></msubsup><msub><mi>E</mi><mi>t</mi></msub><mo stretchy="false" form="prefix">[</mo><msubsup><mi>y</mi><mrow><mi>t</mi><mo>+</mo><mi>h</mi></mrow><mrow><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo stretchy="false" form="postfix">)</mo></mrow></msubsup><mo stretchy="false" form="postfix">]</mo></mrow><annotation encoding="application/x-tex">Exp_t^{(n)} = \sum_{h=0}^{n} E_t[y_{t+h}^{(1)}]</annotation></semantics></math>.
 Alternatively, one could perfom such a decomposition at the forward rate
 level
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>f</mi><mi>t</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></msubsup><annotation encoding="application/x-tex">f_t^{(n)}</annotation></semantics></math>),
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>f</mi><mi>t</mi><mrow><mo stretchy="false" form="prefix">(</mo><mi>n</mi><mo stretchy="false" form="postfix">)</mo></mrow></msubsup><annotation encoding="application/x-tex">f_t^{(n)}</annotation></semantics></math>),
 specifically
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>f</mi><mi>t</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></msubsup><mo>=</mo><msubsup><mo>∑</mo><mrow><mi>h</mi><mo>=</mo><mi>m</mi></mrow><mi>n</mi></msubsup><msub><mi>E</mi><mi>t</mi></msub><mrow><mo stretchy="true" form="prefix">[</mo><msubsup><mi>y</mi><mrow><mi>t</mi><mo>+</mo><mi>h</mi></mrow><mrow><mo stretchy="true" form="prefix">(</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow></msubsup><mo stretchy="true" form="postfix">]</mo></mrow><mo>+</mo><mi>F</mi><msubsup><mi>P</mi><mi>t</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></msubsup></mrow><annotation encoding="application/x-tex">f_t^{(n)} = \sum_{h=m}^{n} E_t[y_{t+h}^{(1)}] + FP_t^{(n)}</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>f</mi><mi>t</mi><mrow><mo stretchy="false" form="prefix">(</mo><mi>n</mi><mo stretchy="false" form="postfix">)</mo></mrow></msubsup><mo>=</mo><msubsup><mo>∑</mo><mrow><mi>h</mi><mo>=</mo><mi>m</mi></mrow><mi>n</mi></msubsup><msub><mi>E</mi><mi>t</mi></msub><mo stretchy="false" form="prefix">[</mo><msubsup><mi>y</mi><mrow><mi>t</mi><mo>+</mo><mi>h</mi></mrow><mrow><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo stretchy="false" form="postfix">)</mo></mrow></msubsup><mo stretchy="false" form="postfix">]</mo><mo>+</mo><mi>F</mi><msubsup><mi>P</mi><mi>t</mi><mrow><mo stretchy="false" form="prefix">(</mo><mi>n</mi><mo stretchy="false" form="postfix">)</mo></mrow></msubsup></mrow><annotation encoding="application/x-tex">f_t^{(n)} = \sum_{h=m}^{n} E_t[y_{t+h}^{(1)}] + FP_t^{(n)}</annotation></semantics></math>
 where
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>F</mi><msubsup><mi>P</mi><mi>t</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></msubsup></mrow><annotation encoding="application/x-tex">FP_t^{(n)}</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>F</mi><msubsup><mi>P</mi><mi>t</mi><mrow><mo stretchy="false" form="prefix">(</mo><mi>n</mi><mo stretchy="false" form="postfix">)</mo></mrow></msubsup></mrow><annotation encoding="application/x-tex">FP_t^{(n)}</annotation></semantics></math>
 corresponds to the forward premia. In this case, the user must specify a
 logical variable set to <em>TRUE</em> if the computation of forward
 premia is desired, or <em>FALSE</em> otherwise. If set to <em>TRUE</em>,
@@ -1310,9 +1310,9 @@ optimally selecting the model parameters via the
 <code><a href="../reference/Optimization.html">Optimization()</a></code> function. Broadly, the unspanned risk
 framework from JPS (2014) (and, therefore, all its multi-country
 extensions) follows a model parameterization similar to that proposed by
-<span class="citation">Joslin, Singleton, and Zhu (2011)</span>.
-Specifically, it requires the estimation parameter set consisting of 6
-elements, namely the:</p>
+<span class="citation">Joslin et al. (2011)</span>. Specifically, it
+requires the estimation parameter set consisting of 6 elements, namely
+the:</p>
 <ol style="list-style-type: decimal">
 <li><p>Risk-neutral long-run mean of the short rate
 (<em>r0</em>);</p></li>
@@ -1701,7 +1701,7 @@ across different countries and forecast horizons.</p>
 <div class="section level2">
 <h2 class="unnumbered" id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h2>
-<div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
+<div id="refs" class="references csl-bib-body hanging-indent">
 <div id="ref-BauerRudebuschWu2012" class="csl-entry">
 Bauer, Michael D, Glenn D Rudebusch, and Jing Cynthia Wu. 2012.
 <span>“Correcting Estimation Bias in Dynamic Term Structure
@@ -1714,9 +1714,9 @@ Curves and the COVID-19 in Emerging Markets.”</span> <em>Economic
 Modelling</em>, 106453. <a href="https://doi.org/10.1016/j.econmod.2023.106453" class="external-link">https://doi.org/10.1016/j.econmod.2023.106453</a>.
 </div>
 <div id="ref-CandelonMoura2024" class="csl-entry">
-———. 2024. <span>“A Multicountry Model of the Term Structures of
-Interest Rates with a GVAR.”</span> <em>Journal of Financial
-Econometrics</em> 22 (5): 1558–87.
+Candelon, Bertrand, and Rubens Moura. 2024. <span>“A Multicountry Model
+of the Term Structures of Interest Rates with a GVAR.”</span>
+<em>Journal of Financial Econometrics</em> 22 (5): 1558–87.
 </div>
 <div id="ref-ChudikPesaran2016" class="csl-entry">
 Chudik, Alexander, and M Hashem Pesaran. 2016. <span>“Theory and
@@ -1726,7 +1726,7 @@ Practice of GVAR Modelling.”</span> <em>Journal of Economic Surveys</em>
 <div id="ref-JoslinPriebschSingleton2014" class="csl-entry">
 Joslin, Scott, Marcel Priebsch, and Kenneth J. Singleton. 2014.
 <span>“Risk Premiums in Dynamic Term Structure Models with Unspanned
-Macro Risks.”</span> <em>Journal of Finance</em> 69 (3): 1197–1233.
+Macro Risks.”</span> <em>Journal of Finance</em> 69 (3): 1197–233.
 </div>
 <div id="ref-JoslinSingletonZhu2011" class="csl-entry">
 Joslin, Scott, Kenneth J Singleton, and Haoxiang Zhu. 2011. <span>“A New

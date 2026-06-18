@@ -79,6 +79,7 @@ factors. Particularly useful for GVAR-based models.
 ## Examples
 
 ``` r
+
 # Load data from excel
 macro_data <- Load_Excel_Data(system.file("extdata", "MacroData.xlsx", package = "MultiATSM"))
 yields_data <- Load_Excel_Data(system.file("extdata", "YieldsData.xlsx", package = "MultiATSM"))

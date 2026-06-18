@@ -113,6 +113,7 @@ desired model.
 ## Examples
 
 ``` r
+
 ModelType <- "JPS original"
 Horiz <- 100
 DesiredOutputGraphs <- c("Fit", "GIRF", "GFEVD")

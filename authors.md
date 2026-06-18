@@ -12,15 +12,15 @@ Source:
 
 Moura R (2025). *MultiATSM: Multicountry Term Structure of Interest
 Rates Models*.
-[doi:10.32614/CRAN.package.MultiATSM](https://doi.org/10.32614/CRAN.package.MultiATSM),
-R package version 1.5.1-1,
+[doi:10.32614/CRAN.package.MultiATSM](https://doi.org/10.32614/CRAN.package.MultiATSM).
+R package version 1.5.1-2,
 <https://CRAN.R-project.org/package=MultiATSM>.
 
     @Manual{,
       title = {MultiATSM: Multicountry Term Structure of Interest Rates Models},
       author = {Rubens Moura},
       year = {2025},
-      note = {R package version 1.5.1-1},
+      note = {R package version 1.5.1-2},
       url = {https://CRAN.R-project.org/package=MultiATSM},
       doi = {10.32614/CRAN.package.MultiATSM},
     }

@@ -7,8 +7,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Paper Replications • MultiATSM</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Paper Replications">
 </head>
@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">MultiATSM</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.5.1-1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.5.1-2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -60,7 +60,7 @@
                         <h4 data-toc-skip class="author">Rubens
 Moura</h4>
             
-            <h4 data-toc-skip class="date">2026-02-27</h4>
+            <h4 data-toc-skip class="date">2026-06-18</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/rubensmoura87/MultiATSM/blob/main/vignettes/Paper-Replications.Rmd" class="external-link"><code>vignettes/Paper-Replications.Rmd</code></a></small>
       <div class="d-none name"><code>Paper-Replications.Rmd</code></div>
@@ -71,16 +71,16 @@ Moura</h4>
 <p>This vignette leverages the <em>MultiATSM</em> package to reproduce
 some empirical findings from three academic papers centered around the
 unspanned macroeconomic risk framework. The first segment focuses on
-replicating the outcomes of <span class="citation">Joslin, Priebsch, and
-Singleton (2014)</span>, which laid the foundation for the unspanned
-risk ATSM literature through a single-country analysis of the U.S.
-economy. Subsequently, I present the multi-country model extension
-proposed by <span class="citation">Candelon and Moura (2024)</span>,
-employing a GVAR approach to capture risk factor dynamics. Lastly, I
-introduce the program designed to replicate results detailed in <span class="citation">Candelon and Moura (2023)</span>, an extension of the
+replicating the outcomes of <span class="citation">Joslin et al.
+(2014)</span>, which laid the foundation for the unspanned risk ATSM
+literature through a single-country analysis of the U.S. economy.
+Subsequently, I present the multi-country model extension proposed by
+<span class="citation">Candelon and Moura (2024)</span>, employing a
+GVAR approach to capture risk factor dynamics. Lastly, I introduce the
+program designed to replicate results detailed in <span class="citation">Candelon and Moura (2023)</span>, an extension of the
 previous framework to investigate the term structure behavior of major
 emerging markets during the unprecedented
-COVID<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>−</mo><mn>19</mn></mrow><annotation encoding="application/x-tex">-19</annotation></semantics></math>
+COVID<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>−</mi><mn>19</mn></mrow><annotation encoding="application/x-tex">-19</annotation></semantics></math>
 pandemic. It is worth highlighting that, due to limited public
 availability of bond yield data, I employ, in certain instances,
 simulated data closely matching the original papers’ construction
@@ -593,10 +593,9 @@ understanding of the intricate global economic mechanisms that underlie
 yield curve fluctuations. This framework also reinforces the statistical
 validity of inference and enhances the predictive capabilities of these
 models. This novel setup, embodied by the <em>GVAR multi</em> model
-class, is benchmarked against the findings of <span class="citation">Jotikasthira, Le, and Lundblad (2015)</span>, which are
-captured by the <em>JLL original</em> model class. The paper showcases
-an empirical illustration involving China, Brazil, Mexico, and
-Uruguay.</p>
+class, is benchmarked against the findings of <span class="citation">Jotikasthira et al. (2015)</span>, which are captured
+by the <em>JLL original</em> model class. The paper showcases an
+empirical illustration involving China, Brazil, Mexico, and Uruguay.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># A) Load database data</span></span>
 <span><span class="fu"><a href="../reference/LoadData.html">LoadData</a></span><span class="op">(</span><span class="st">"CM_2024"</span><span class="op">)</span></span>
@@ -700,7 +699,7 @@ Uruguay.</p>
 (2023)</span> delve into an exploration of the underlying factors that
 shape the sovereign yield curves of Brazil, India, Mexico, and Russia in
 the midst of the
-COVID<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>−</mo><mn>19</mn></mrow><annotation encoding="application/x-tex">-19</annotation></semantics></math>
+COVID<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>−</mi><mn>19</mn></mrow><annotation encoding="application/x-tex">-19</annotation></semantics></math>
 pandemic crisis. To comprehensively address the intricate web of global
 macro-financial and particularly health-related interdependencies, the
 study employs a modeling approach based on a <em>GVAR multi</em> type
@@ -791,7 +790,7 @@ pandemic.</p>
 <div class="section level2">
 <h2 class="unnumbered" id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h2>
-<div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
+<div id="refs" class="references csl-bib-body hanging-indent">
 <div id="ref-AngPiazzesi2003JME" class="csl-entry">
 Ang, Andrew, and Monika Piazzesi. 2003. <span>“A No-Arbitrage Vector
 Autoregression of Term Structure Dynamics with Macroeconomic and Latent
@@ -809,14 +808,14 @@ Curves and the COVID-19 in Emerging Markets.”</span> <em>Economic
 Modelling</em>, 106453. <a href="https://doi.org/10.1016/j.econmod.2023.106453" class="external-link">https://doi.org/10.1016/j.econmod.2023.106453</a>.
 </div>
 <div id="ref-CandelonMoura2024" class="csl-entry">
-———. 2024. <span>“A Multicountry Model of the Term Structures of
-Interest Rates with a GVAR.”</span> <em>Journal of Financial
-Econometrics</em> 22 (5): 1558–87.
+Candelon, Bertrand, and Rubens Moura. 2024. <span>“A Multicountry Model
+of the Term Structures of Interest Rates with a GVAR.”</span>
+<em>Journal of Financial Econometrics</em> 22 (5): 1558–87.
 </div>
 <div id="ref-JoslinPriebschSingleton2014" class="csl-entry">
 Joslin, Scott, Marcel Priebsch, and Kenneth J. Singleton. 2014.
 <span>“Risk Premiums in Dynamic Term Structure Models with Unspanned
-Macro Risks.”</span> <em>Journal of Finance</em> 69 (3): 1197–1233.
+Macro Risks.”</span> <em>Journal of Finance</em> 69 (3): 1197–233.
 </div>
 <div id="ref-JotikasthiraLeLundblad2015" class="csl-entry">
 Jotikasthira, Chotibhak, Anh Le, and Christian Lundblad. 2015.

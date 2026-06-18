@@ -23,6 +23,7 @@ You can install the development version of MultiATSM from
 [GitHub](https://github.com/) with:
 
 ``` r
+
 # install.packages("devtools")
 devtools::install_github("rubensmoura87/MultiATSM")
 ```
@@ -30,6 +31,7 @@ devtools::install_github("rubensmoura87/MultiATSM")
 You can also get the official release version from CRAN
 
 ``` r
+
 install.packages("MultiATSM")
 ```
 

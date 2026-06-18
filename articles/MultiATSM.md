@@ -5,52 +5,54 @@ MultiATSM package available at the [CRAN
 repository](https://cran.r-project.org/).
 
 ``` r
+
 library(MultiATSM)
 ```
 
 The *MultiATSM* package offers estimation routines and various outputs
 for single and multi-country affine term structure models (ATSMs). All
 the frameworks of this package are based on the unspanned economic risk
-framework from Joslin, Priebsch, and Singleton (2014) **(JPS, 2014)**.
-In essence, these models assume the absence of arbitrage opportunities,
-consider a linear state space representation of the yield curve dynamics
-and offer a tractable approach to simultaneously combine the traditional
-yield curve factors (spanned factors) along with macroeconomic variables
-(unspanned factors). A formal exposition of the model’s underlying
-features can be found in Moura (2025).
+framework from Joslin et al. (2014) **(JPS, 2014)**. In essence, these
+models assume the absence of arbitrage opportunities, consider a linear
+state space representation of the yield curve dynamics and offer a
+tractable approach to simultaneously combine the traditional yield curve
+factors (spanned factors) along with macroeconomic variables (unspanned
+factors). A formal exposition of the model’s underlying features can be
+found in Moura (2025).
 
 The *MultiATSM* package currently supports the generation of outputs for
 eight distinct classes of ATSMs. Specifically, the package accommodates
 models estimated either on a *country-by-country* basis, following the
 approach of JPS (2014), or *jointly* across all countries within the
-economic system, as developed in **JLL (2015)** by Jotikasthira, Le, and
-Lundblad (2015) and **CM (2024)** by Candelon and Moura (2024).
+economic system, as developed in **JLL (2015)** by Jotikasthira et al.
+(2015) and **CM (2024)** by Candelon and Moura (2024).
 
-Due to peculiar features of JPS-based specifications (see Joslin,
-Singleton, and Zhu (2011)), an efficient estimation of the parameters
-governing the risk-neutral ($Q$-measure) and the physical ($P$-measure)
+Due to peculiar features of JPS-based specifications (see Joslin et al.
+(2011)), an efficient estimation of the parameters governing the
+risk-neutral ($`Q`$-measure) and the physical ($`P`$-measure)
 probability measures can be carried out rather independently. The only
 exception is the variance-covariance matrix (sigma) term which is a
-common element to both the $P$ and the $Q$ density functions. In all
-cases, the risk factor dynamics under the $P$-measure follow a VAR(1)
+common element to both the $`P`$ and the $`Q`$ density functions. In all
+cases, the risk factor dynamics under the $`P`$-measure follow a VAR(1)
 model of some sort. The table below summarizes the general features of
 each one of the models available at this package.
 
 [TABLE]
 
-Model Features
+Model Features {.table .lightable-classic .lightable-striped
+style="font-family: \"Arial Narrow\", \"Source Sans Pro\", sans-serif; width: auto !important; margin-left: auto; margin-right: auto;"}
 
 Some aspects of the multi-country frameworks are worth highlighting. As
 for the models based on the setup of JLL (2015), the version “*JLL
 original*” follows closely the seminal work of JLL (2015), i.e., it is
 assumed an economic cohort containing a worldwide dominant economy and a
 set of smaller countries, in addition to the estimation of the sigma
-matrix be performed exclusively under the $P$-measure. The two other
+matrix be performed exclusively under the $`P`$-measure. The two other
 alternative versions assume the absence of a dominant country (“*JLL No
-DomUnit”*) and the estimation of sigma under both the $P$ and $Q$
+DomUnit”*) and the estimation of sigma under both the $`P`$ and $`Q`$
 measures (”*JLL joint Sigma*”), as in the standard single-country JPS
 (2014) model. As for the remaining multi-country ATSMs, it is considered
-that the dynamics of the risk factors under the $P$-measure evolves
+that the dynamics of the risk factors under the $`P`$-measure evolves
 according to a GVAR model. The version labeled *“GVAR multi”* is the one
 presented in CM (2024).
 
@@ -80,6 +82,7 @@ function with the argument *CM_2024*, and similarly, the CM (2023) data
 with *CM_2023*.
 
 ``` r
+
 LoadData("CM_2024")
 ```
 
@@ -100,6 +103,7 @@ this data manipulation themselves if needed. The data can also be
 retrieved using:
 
 ``` r
+
 data("Yields")
 ```
 
@@ -118,6 +122,7 @@ economy. Similar to the bond yield data, these economic indicators must
 be constructed by the user.
 
 ``` r
+
 data("GlobalMacro")
 data("DomMacro")
 ```
@@ -132,6 +137,7 @@ and are expressed in U.S. dollars. These data are specifically used to
 construct the transition matrix of the GVAR models.
 
 ``` r
+
 data("TradeFlows")
 ```
 
@@ -153,6 +159,7 @@ workflow is as follows:
     [`Load_Excel_Data()`](https://rubensmoura87.github.io/MultiATSM/reference/Load_Excel_Data.md):
 
 ``` r
+
 MacroData <- Load_Excel_Data(system.file("extdata", "MacroData.xlsx", package = "MultiATSM"))
 YieldData <- Load_Excel_Data(system.file("extdata", "YieldsData.xlsx", package = "MultiATSM"))
 ```
@@ -160,6 +167,7 @@ YieldData <- Load_Excel_Data(system.file("extdata", "YieldsData.xlsx", package =
 2.  Specify a subset of the selected inputs. For instance,
 
 ``` r
+
 Initial_Date <- "2006-09-01" # Format "yyyy-mm-dd"
 Final_Date <- "2019-01-01" # Format "yyyy-mm-dd"
 DataFrequency <- "Monthly"
@@ -175,6 +183,7 @@ ModelType <- "JPS original"
     factors required for the model.
 
 ``` r
+
 FactorLabels <- LabFac(N, DomVar, GlobalVar, Economies, ModelType)
 RiskFac_TS <- DataForEstimation(
   Initial_Date, Final_Date, Economies, N, FactorLabels, ModelType,
@@ -224,10 +233,10 @@ several general inputs, namely:
   *“Monthly”*, *“Weekly”*, *“Daily Business Days”*, and *“Daily All
   Days”*.
 
-**5. Stationary constraint under the** $Q$-**dynamics**:
+**5. Stationary constraint under the** $`Q`$-**dynamics**:
 
 - A logical variable. Choose *TRUE* to impose the constraint that the
-  largest eigenvalue under the $Q$-measure is strictly less than $1$
+  largest eigenvalue under the $`Q`$-measure is strictly less than $`1`$
   otherwise, it should be set to *FALSE*. While enforcing this
   stationary constraint may prolong model estimation, it can improve the
   convergence of the model.
@@ -246,6 +255,7 @@ several general inputs, namely:
 One possible example of the basic model inputs is
 
 ``` r
+
 # 1) Model type
 ModelType <- "JPS original"
 
@@ -286,6 +296,7 @@ For GVAR models, the nature of the inputs is twofold. First, the dynamic
 structure of each country’s VARX model must be specified. For example:
 
 ``` r
+
 VARXtype <- "unconstrained"
 ```
 
@@ -294,6 +305,7 @@ inputs to build the `transition matrix()` . An example of this list of
 inputs is
 
 ``` r
+
 W_type <- "Sample Mean" # Method to compute the transition matrix
 t_First_Wgvar <- "2000" # First year of the sample
 t_Last_Wgvar <- "2015" # Last year of the sample
@@ -303,6 +315,7 @@ DataConnectedness <- TradeFlows # Measure of connectedness across countries
 Therefore, a complete *GVARlist* is
 
 ``` r
+
 GVARlist <- list(
   VARXtype = "unconstrained", W_type = "Sample Mean", t_First_Wgvar = "2000",
   t_Last_Wgvar = "2015", DataConnectedness = TradeFlows
@@ -313,21 +326,22 @@ Regarding the JLL-ATSM frameworks, it is sufficient to specify the name
 of the dominant economy (if applicable) within the economic system:
 
 ``` r
+
 JLLlist <- list(DomUnit = "China")
 ```
 
 #### BRWlist
 
-In an influential paper, Bauer, Rudebusch, and Wu (2012) **(BRW, 2012)**
-have shown that the estimates from traditional ATSMs can be severely
-biased due to the typical small-sample size used in these studies. As
-result, such models may produce unreasonably stable expected future
-short-term interest, therefore distorting the term premia estimates for
+In an influential paper, Bauer et al. (2012) **(BRW, 2012)** have shown
+that the estimates from traditional ATSMs can be severely biased due to
+the typical small-sample size used in these studies. As result, such
+models may produce unreasonably stable expected future short-term
+interest, therefore distorting the term premia estimates for
 long-maturity bonds. To circumvent this problem, they propose a
 bootstrap-based method that relies on indirect inference estimation that
 corrects for the bias present in previous works.
 
-From its version $0.3.1$, the *MultiATSM* package accommodates the
+From its version $`0.3.1`$, the *MultiATSM* package accommodates the
 framework proposed by BRW (2012) to each one of its ATSM types. Some
 additional inputs must be specified, if the user intends to perform the
 model estimation along the lines of BRW (2012). They are:
@@ -340,7 +354,7 @@ model estimation along the lines of BRW (2012). They are:
 - *Adjustment parameter* *(gamma)*: this parameter controls the degree
   of shrinkage between the difference in the OLS estimates and the BRW
   (2012)’s bootstrap-based one after each iteration. The value of this
-  parameter is fixed and must lie in the interval $\rbrack 0;1\lbrack$;
+  parameter is fixed and must lie in the interval $`]0;1[`$;
 
 - *Number of iteration* *(N_iter)* : total amount of iterations used in
   the stochastic approximation algorithm after burn-in;
@@ -358,13 +372,14 @@ model estimation along the lines of BRW (2012). They are:
 
 - *Number of burn-in iteration (N_burn)*: quantity of the iterations to
   be discarded in the first stage of the bias-correction estimation
-  process. The recommended number is $15\%$ of the total number of
+  process. The recommended number is $`15\%`$ of the total number of
   iterations.
 
 - *Eigenvalue restriction (Eigen_rest)*: set a restriction on the
-  largest eigenvalue under the $P$-measure. Default is $1$.
+  largest eigenvalue under the $`P`$-measure. Default is $`1`$.
 
 ``` r
+
 BRWlist <- within(list(
   Cent_Measure = "Mean", gamma = 0.2, N_iter = 500, B = 50,
   checkBRW = TRUE, B_check = 1000, Eigen_rest = 1
@@ -384,6 +399,7 @@ directly utilized in the model optimization process. One possible use of
 is:
 
 ``` r
+
 LoadData("CM_2024")
 
 ModelType <- "JPS original"
@@ -427,6 +443,7 @@ For the numerical computation of the IRFs, GIRFs, FEVDs or GFEVDs, a
 horizon of analysis has to be specified, e.g.:
 
 ``` r
+
 Horiz <- 100
 ```
 
@@ -434,6 +451,7 @@ For the graphical outputs, the user must indicate the desired types of
 graphs in a string-based vector:
 
 ``` r
+
 DesiredGraphs <- c("Fit", "GIRF", "GFEVD") # Available options are: "Fit", "IRF", "FEVD", "GIRF",
 # "GFEVD", "TermPremia".
 ```
@@ -443,6 +461,7 @@ Moreover, the user must select the types of variables of interest
 the orthogonalized version should be additionally included
 
 ``` r
+
 WishGraphRiskFac <- FALSE
 WishGraphYields <- TRUE
 WishOrthoJLLgraphs <- FALSE
@@ -460,24 +479,27 @@ user’ console.
 
 In its current form, the *MultiATSM* package allows for the calculation
 of two risk compensation measures: term premia and forward premia. In
-particular, a $n$-maturity bond yield can be decomposed as the sum of
-its expected short-rate ($Exp_{t}^{(n)}$) and term premia
-($TP_{t}^{(n)}$) components. Technically:
-$$y_{t}^{(n)} = Exp_{t}^{(n)} + TP_{t}^{(n)}$$ In the package’s standard
-form, the expected short rate term is computed from time $t$ to $t + n$,
-which represents the bond’s maturity:
-$Exp_{t}^{(n)} = \sum_{h = 0}^{n}E_{t}\left\lbrack y_{t + h}^{(1)} \right\rbrack$.
-Alternatively, one could perfom such a decomposition at the forward rate
-level ($f_{t}^{(n)}$), specifically
-$f_{t}^{(n)} = \sum_{h = m}^{n}E_{t}\left\lbrack y_{t + h}^{(1)} \right\rbrack + FP_{t}^{(n)}$
-where $FP_{t}^{(n)}$ corresponds to the forward premia. In this case,
-the user must specify a logical variable set to *TRUE* if the
-computation of forward premia is desired, or *FALSE* otherwise. If set
-to *TRUE*, the user must also provide a two-element numerical vector
-containing the maturities corresponding to the starting and ending dates
-of the bond maturity. Example:
+particular, a $`n`$-maturity bond yield can be decomposed as the sum of
+its expected short-rate ($`Exp_t^{(n)}`$) and term premia
+($`TP_t^{(n)}`$) components. Technically:
+``` math
+y_t^{(n)} = Exp_t^{(n)} + TP_t^{(n)}
+```
+In the package’s standard form, the expected short rate term is computed
+from time $`t`$ to $`t+n`$, which represents the bond’s maturity:
+$`Exp_t^{(n)} = \sum_{h=0}^{n} E_t[y_{t+h}^{(1)}]`$. Alternatively, one
+could perfom such a decomposition at the forward rate level
+($`f_t^{(n)}`$), specifically
+$`f_t^{(n)} = \sum_{h=m}^{n} E_t[y_{t+h}^{(1)}] + FP_t^{(n)}`$ where
+$`FP_t^{(n)}`$ corresponds to the forward premia. In this case, the user
+must specify a logical variable set to *TRUE* if the computation of
+forward premia is desired, or *FALSE* otherwise. If set to *TRUE*, the
+user must also provide a two-element numerical vector containing the
+maturities corresponding to the starting and ending dates of the bond
+maturity. Example:
 
 ``` r
+
 WishFPremia <- TRUE
 FPmatLim <- c(60, 120)
 ```
@@ -497,6 +519,7 @@ the list of inputs include:
 - The confidence level expressed in percentage points (*pctg*).
 
 ``` r
+
 Bootlist <- list(methodBS = "block", BlockLength = 4, ndraws = 50, pctg = 95)
 ```
 
@@ -520,6 +543,7 @@ list-based features have to be detailed:
   *Expanding*.
 
 ``` r
+
 ForecastList <- list(ForHoriz = 12, t0Sample = 1, t0Forecast = 70, ForType = "Rolling")
 ```
 
@@ -529,25 +553,27 @@ Once bond yields and other (macro)economic time series data are gathered
 and model features are selected, ATSM estimation proceeds in three
 steps. First, the package estimates the country-specific spanned factors
 for inclusion in the global ATSM. Next, it estimates the parameters
-governing risk factor dynamics under the $P -$measure. Finally, it
-optimizes the entire selected ATSM, including the $Q -$measure
+governing risk factor dynamics under the $`P-`$measure. Finally, it
+optimizes the entire selected ATSM, including the $`Q-`$measure
 parameters.
 
 ### Spanned Factors
 
 The spanned factors are yield-related variables that are used to fit the
 cross-section dimensions of the term structures. Typically, the spanned
-factors of country $i$, $P_{i,t}$, are computed as the *N* first
+factors of country $`i`$, $`P_{i,t}`$, are computed as the *N* first
 principal components (PCs) of the set of observed bond yields. Formally,
-$P_{i,t}$ is constructed as $P_{i,t} = w_{i}Y_{i,t}$ where $w_{i}$ is
-the PC weight matrix and $Y_{i,t}$ is a country-specific column-vector
+$`P_{i,t}`$ is constructed as $`P_{i,t} = w_i Y_{i,t}`$ where $`w_i`$ is
+the PC weight matrix and $`Y_{i,t}`$ is a country-specific column-vector
 of yields with increasing maturities.
 
-For $N = 3$, the spanned factors are traditionally interpreted as level,
-slope, and curvature. This interpretation arises from the structure of
-the principal component (PC) weight matrix, as shown below :
+For $`N = 3`$, the spanned factors are traditionally interpreted as
+level, slope, and curvature. This interpretation arises from the
+structure of the principal component (PC) weight matrix, as shown below
+:
 
 ``` r
+
 w <- pca_weights_one_country(Yields, Economy = "Uruguay")
 ```
 
@@ -576,6 +602,7 @@ factors, the user can use the
 function as follows:
 
 ``` r
+
 data("Yields")
 Economies <- c("China", "Brazil", "Mexico", "Uruguay")
 N <- 3
@@ -585,12 +612,12 @@ SpaFact <- Spanned_Factors(Yields, Economies, N)
 ### The P-dynamics estimation
 
 As presented in [Table 0.1](#tab-ModFea), the dynamics of the risk
-factors under the $P$-measure evolve according to a VAR(1) model, which
-may be fully unrestricted (as in the case of the JPS-related models) or
-partially restricted (as in the GVAR and JLL frameworks). While the
-focus here is their integration into an ATSM setup, each specification
-can also be estimated independently to study dynamic systems. The usage
-of these models is illustrated below.
+factors under the $`P`$-measure evolve according to a VAR(1) model,
+which may be fully unrestricted (as in the case of the JPS-related
+models) or partially restricted (as in the GVAR and JLL frameworks).
+While the focus here is their integration into an ATSM setup, each
+specification can also be estimated independently to study dynamic
+systems. The usage of these models is illustrated below.
 
 #### VAR
 
@@ -598,10 +625,11 @@ Using the
 [`VAR()`](https://rubensmoura87.github.io/MultiATSM/reference/VAR.md)
 function of this package requires simply selecting the set of risk
 factors for the desired estimated model. For instance, for the models
-*JPS global* and *JPS multi*, the estimation of the $P$-dynamics
+*JPS global* and *JPS multi*, the estimation of the $`P`$-dynamics
 parameters is obtained as
 
 ``` r
+
 data(RiskFacFull)
 PdynPara <- VAR(RiskFacFull, VARtype = "unconstrained")
 ```
@@ -609,6 +637,7 @@ PdynPara <- VAR(RiskFacFull, VARtype = "unconstrained")
 whereas the estimation of a *JPS original* model for China is
 
 ``` r
+
 FactorsChina <- RiskFacFull[1:7, ]
 PdynPara <- VAR(FactorsChina, VARtype = "unconstrained")
 ```
@@ -652,6 +681,7 @@ list. The former is composed by four elements:
     restricted least squares.
 
 ``` r
+
 data(GVARFactors)
 GVARinputs <- list(Economies = Economies, GVARFactors = GVARFactors, VARXtype = "constrained: Inflation")
 ```
@@ -662,7 +692,7 @@ GVARinputs <- list(Economies = Economies, GVARFactors = GVARFactors, VARXtype = 
     matrix, the entries of which reflect the degree of interconnection
     across two entities of this same economic system. The GVAR setups
     can be estimated using fixed or, starting from package’s version
-    $0.3.3$, time-varying interdependence weights.
+    $`0.3.3`$, time-varying interdependence weights.
 
 Time-varying interdependence implies that the star factors are
 constructed by applying trade flow weights from the specific year to
@@ -677,9 +707,10 @@ Below the illustration of the transition matrix is computed as the
 average of the cross-border trade flow weights for the period spanning
 the years from 2006 to 2019. Therefore, the degree of dependence across
 countries is assumed to be fixed over the entire sample span. Note that
-each row sums up to $1$.
+each row sums up to $`1`$.
 
 ``` r
+
 data("TradeFlows")
 t_First <- "2006"
 t_Last <- "2019"
@@ -701,6 +732,7 @@ Having defined the form of the transition matrix, one can complete the
 check on the inputs provided in *GVARinputs*.
 
 ``` r
+
 data("GVARFactors")
 GVARinputs <- list(
   Economies = Economies, GVARFactors = GVARFactors, VARXtype = "unconstrained",
@@ -713,7 +745,7 @@ GVARpara <- GVAR(GVARinputs, N, CheckInputs = TRUE)
 
 #### JLL
 
-Calculating the $P$-dynamics parameters in the form proposed by JLL
+Calculating the $`P`$-dynamics parameters in the form proposed by JLL
 (2015) requires the following inputs: *(i)* the time series of the risk
 factors in non-orthogonalized form; *(ii)* the number of
 country-specific spanned factors and *(iii)* the specification of the
@@ -746,6 +778,7 @@ country-specific spanned factors and *(iii)* the specification of the
 One possible list of *JLLinputs* is as follows:
 
 ``` r
+
 ModelType <- "JLL original"
 JLLinputs <- list(
   Economies = Economies, DomUnit = "China", WishSigmas = TRUE, SigmaNonOrtho = NULL,
@@ -753,10 +786,11 @@ JLLinputs <- list(
 )
 ```
 
-As such, the $P -$dynamics dimension of a JLL-based setup can be
+As such, the $`P-`$dynamics dimension of a JLL-based setup can be
 computed as:
 
 ``` r
+
 data("RiskFacFull")
 N <- 3
 JLLpara <- JLL(RiskFacFull, N, JLLinputs, CheckInputs = TRUE)
@@ -769,9 +803,9 @@ optimally selecting the model parameters via the
 [`Optimization()`](https://rubensmoura87.github.io/MultiATSM/reference/Optimization.md)
 function. Broadly, the unspanned risk framework from JPS (2014) (and,
 therefore, all its multi-country extensions) follows a model
-parameterization similar to that proposed by Joslin, Singleton, and Zhu
-(2011). Specifically, it requires the estimation parameter set
-consisting of 6 elements, namely the:
+parameterization similar to that proposed by Joslin et al. (2011).
+Specifically, it requires the estimation parameter set consisting of 6
+elements, namely the:
 
 1.  Risk-neutral long-run mean of the short rate (*r0*);
 
@@ -787,8 +821,8 @@ consisting of 6 elements, namely the:
 6.  Feedback matrices of the physical dynamics (*K1Z*).
 
 The parameters *K0Z* and *K1Z* are estimated as part of the model’s
-$P -$dynamics and are known in closed form. Likewise, *r0* and *se* have
-analytical solutions and can be factored out of the log-likelihood
+$`P-`$dynamics and are known in closed form. Likewise, *r0* and *se*
+have analytical solutions and can be factored out of the log-likelihood
 function. However, the remaining parameters (*K1XQ* and *SSZ*) require
 numerical estimation. This package provides standardized routines to set
 effective initial values, facilitating the optimization process.
@@ -811,6 +845,7 @@ package) for a detailed reproduction.
 ### General template
 
 ``` r
+
 ########################################################################################################
 #################################### USER INPUTS #######################################################
 ########################################################################################################
@@ -937,7 +972,7 @@ Forecasts <- ForecastYields(
 
 ### User-Friendly Inspection of Key Elements in the Selected ATSM Specification
 
-Starting from version $1.3.0$, the *MultiATSM* package provides
+Starting from version $`1.3.0`$, the *MultiATSM* package provides
 additional ways to concisely inspect key elements of the selected ATSM.
 In particular, users can now gain an alternative perspective on the
 general model inputs, optimized model parameters, graphocal outputs and
@@ -948,14 +983,16 @@ the variable names used hereafter align with those presented in Section
 #### ATSM inputs
 
 The *ATSMInputs* variable is an object of class *ATSMModelInputs* that
-includes the $S3$ methods [`print()`](https://rdrr.io/r/base/print.html)
-and [`summary()`](https://rdrr.io/r/base/summary.html). The
+includes the $`S3`$ methods
+[`print()`](https://rdrr.io/r/base/print.html) and
+[`summary()`](https://rdrr.io/r/base/summary.html). The
 [`print()`](https://rdrr.io/r/base/print.html) method provides an
 overview of both the model inputs and the economic system’s general
 features, while the [`summary()`](https://rdrr.io/r/base/summary.html)
 method offers statistical summaries of the risk factors and bond yields.
 
 ``` r
+
 data("Out_Example")
 print(Out_Example$ATSMInputs)
 ```
@@ -978,6 +1015,7 @@ print(Out_Example$ATSMInputs)
     ## ------------------------------------------
 
 ``` r
+
 summary(Out_Example$ATSMInputs)
 ```
 
@@ -1025,8 +1063,8 @@ summary(Out_Example$ATSMInputs)
 The
 [`Optimization()`](https://rubensmoura87.github.io/MultiATSM/reference/Optimization.md)
 function returns an object of class *‘ATSMModelOutputs’*, which includes
-the [`summary()`](https://rdrr.io/r/base/summary.html) $S3$ method. This
-method offers a parsimonious summary of key model outputs following
+the [`summary()`](https://rdrr.io/r/base/summary.html) $`S3`$ method.
+This method offers a parsimonious summary of key model outputs following
 optimization process, including the maximum log-likelihood value, the
 intercept and slope coefficients from the model’s cross-sectional
 dimension, and the count of physical-measure eigenvalues greater than
@@ -1034,6 +1072,7 @@ one—an indicator of potential explosive behavior in the model’s time
 series dimension.
 
 ``` r
+
 summary(Out_Example$ModelPara)
 ```
 
@@ -1104,7 +1143,7 @@ The
 [`NumOutputs()`](https://rubensmoura87.github.io/MultiATSM/reference/NumOutputs.md)
 function returns an object of class *ATSMNumOutputs*, which includes an
 [`autoplot()`](https://rubensmoura87.github.io/MultiATSM/reference/autoplot.md)
-$S3$ method. This method allows users to inspect the empirical
+$`S3`$ method. This method allows users to inspect the empirical
 properties of the chosen specification by displaying graphical outputs
 in the console, regardless of whether they were saved to *Folder2Save*.
 The user must specify a plot type: `RiskFactors`, `Fit`, `TermPremia`,
@@ -1115,6 +1154,7 @@ responses of the Brazilian and Chinese yield curves to a global economic
 activity shock:
 
 ``` r
+
 GIRF_all <- autoplot(Out_Example$NumOut, type = "GIRF_Yields")
 GIRF_all$Brazil$Gl_Eco_Act
 ```
@@ -1123,6 +1163,7 @@ GIRF_all$Brazil$Gl_Eco_Act
 economic shocks](MultiATSM_files/figure-html/unnamed-chunk-36-1.png)
 
 ``` r
+
 GIRF_all$China$Gl_Eco_Act
 ```
 
@@ -1131,13 +1172,14 @@ economic shocks](MultiATSM_files/figure-html/unnamed-chunk-36-2.png)
 
 Additionally, the
 [`autoplot()`](https://rubensmoura87.github.io/MultiATSM/reference/autoplot.md)
-$S3$ method for *ATSMModelBoot* objects—generated by the
+$`S3`$ method for *ATSMModelBoot* objects—generated by the
 [`Bootstrap()`](https://rubensmoura87.github.io/MultiATSM/reference/Bootstrap.md)
 function—allows users to assess the statistical significance of the
 results. The example below shows the responses of 12-month bond yields
 to several shocks.
 
 ``` r
+
 GIRF_all_Boot <- autoplot(Out_Example$Bootstrap, Out_Example$NumOut, type = "GIRF_Yields_Boot")
 GIRF_all_Boot$China$Y12M_China
 ```
@@ -1146,6 +1188,7 @@ GIRF_all_Boot$China$Y12M_China
 several shocks](MultiATSM_files/figure-html/unnamed-chunk-37-1.png)
 
 ``` r
+
 GIRF_all_Boot$Brazil$Y12M_Brazil
 ```
 
@@ -1169,11 +1212,12 @@ The
 [`ForecastYields()`](https://rubensmoura87.github.io/MultiATSM/reference/ForecastYields.md)
 function returns an object of class *‘ATSMModelForecast’*, which can be
 visualized using the
-[`plot()`](https://rdrr.io/r/graphics/plot.default.html) $S3$ method.
+[`plot()`](https://rdrr.io/r/graphics/plot.default.html) $`S3`$ method.
 This method generates a graphical representation of the RMSEs across
 different countries and forecast horizons.
 
 ``` r
+
 plot(Out_Example$Forecasts)
 ```
 
@@ -1191,15 +1235,16 @@ Candelon, Bertrand, and Rubens Moura. 2023. “Sovereign Yield Curves and
 the COVID-19 in Emerging Markets.” *Economic Modelling*, 106453.
 <https://doi.org/10.1016/j.econmod.2023.106453>.
 
-———. 2024. “A Multicountry Model of the Term Structures of Interest
-Rates with a GVAR.” *Journal of Financial Econometrics* 22 (5): 1558–87.
+Candelon, Bertrand, and Rubens Moura. 2024. “A Multicountry Model of the
+Term Structures of Interest Rates with a GVAR.” *Journal of Financial
+Econometrics* 22 (5): 1558–87.
 
 Chudik, Alexander, and M Hashem Pesaran. 2016. “Theory and Practice of
 GVAR Modelling.” *Journal of Economic Surveys* 30 (1): 165–97.
 
 Joslin, Scott, Marcel Priebsch, and Kenneth J. Singleton. 2014. “Risk
 Premiums in Dynamic Term Structure Models with Unspanned Macro Risks.”
-*Journal of Finance* 69 (3): 1197–1233.
+*Journal of Finance* 69 (3): 1197–233.
 
 Joslin, Scott, Kenneth J Singleton, and Haoxiang Zhu. 2011. “A New
 Perspective on Gaussian Dynamic Term Structure Models.” *The Review of
